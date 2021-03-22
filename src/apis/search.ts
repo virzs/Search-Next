@@ -2,11 +2,11 @@
  * @Author: Vir
  * @Date: 2021-03-19 11:19:28
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-19 11:54:56
+ * @Last Modified time: 2021-03-21 10:57:59
  */
 
 import engine from '@/data/engine';
-import { ResultTypes } from '@/@types/result';
+import { ResultTypes } from '@/typings/result';
 
 export const list = () => {
   return new Promise<ResultTypes>((resolve) => {
