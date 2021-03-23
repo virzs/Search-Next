@@ -9,7 +9,7 @@ import React from 'react';
 
 // 主题
 
-export type ThemeType = 'light';
+export type ThemeType = 'light' | 'dark';
 
 const ThemeContext = React.createContext<ThemeType>('light');
 
