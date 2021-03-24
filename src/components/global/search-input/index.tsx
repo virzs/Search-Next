@@ -2,12 +2,16 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-21 16:43:09
+ * @Last Modified time: 2021-03-24 17:50:13
  */
 
 import React from 'react';
 import './style/index.less';
 import SizeContext, { SizeType } from '../context-provider/SizeContext';
+
+// 自动填充内容，off不填充，on填充
+// 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
+export type AutoCompleteType = 'off' | 'on';
 
 export interface SearchInputPropTypes {
   placeholder?: string; // 提示文字
@@ -15,8 +19,8 @@ export interface SearchInputPropTypes {
   defaultValue?: string; // 输入框默认内容
   minLength?: number; // 最小字符数
   maxLength?: number; // 最大字符数
-  autocomplete?: boolean; // 自动填充
-  autofocus?: boolean; // 自动聚焦
+  autoComplete?: AutoCompleteType; // 自动填充
+  autoFocus?: boolean; // 自动聚焦
   disabled?: boolean; // 是否禁用
   readonly?: boolean; // 是否只读
   required?: boolean; // 是否必填
@@ -43,7 +47,7 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   };
 
   const handleFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e, 'focus', size);
+    console.log(e, 'focus', props);
   };
 
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +60,7 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
 
   return (
     <input
+      className="v-input"
       type="text"
       value={inputValue}
       onChange={handleChange}

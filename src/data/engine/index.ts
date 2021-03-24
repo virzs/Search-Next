@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-18 16:26:35
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-18 16:32:23
+ * @Last Modified time: 2021-03-23 22:33:03
  */
 
 export interface SearchEngineValueTypes {

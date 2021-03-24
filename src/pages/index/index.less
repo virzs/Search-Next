@@ -2,31 +2,22 @@
  * @Author: Vir
  * @Date: 2021-03-23 17:21:19
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-23 17:24:30
+ * @Last Modified time: 2021-03-24 17:38:32
  */
+@import '../../themes/index.less';
 
-// font size
-@font-size-mini: 12px;
-@font-size-small: 14px;
-@font-size-medium: 16px;
-@font-size-large: 20px;
-@font-size-huge: 24px;
+html,
+body,
+#root {
+  height: 100%;
 
-// line height
-@line-height-mini: 20px;
-@line-height-small: 22px;
-@line-height-medium: 24px;
-@line-height-large: 28px;
-@line-height-huge: 32px;
-
-// font weight
-@font-weight-fine: 400;
-@font-weight-medium: 500;
-@font-weight-bold: 600;
-
-.title {
-  background: rgb(121, 242, 157);
-}
-body {
-  background-color: #fafafa;
+  .index {
+    background-color: @bg-color-light;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    height: 100%;
+  }
 }
