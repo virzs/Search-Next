@@ -24,3 +24,39 @@ $ yarn start
 $ yarn build
 ```
 
+## 已确定的功能
+
+**多语言：**
+
+整体配置位置：`src/locales`
+
+`locale.ts`文件中配置了默认的两种语言 ”中文“ 和 ”English“。
+
+1. 添加语言：
+   `selectLocalesValue`数组中新增同默认格式的配置
+   默认导出的数组中为每一项配置新的`key&value`
+   例：`zhCN: '中文'`
+   然后新增一个对应语言的ts文件，参考默认的zh-CN.ts文件
+
+2. 增加字段：
+   例：
+
+   ```
+   {
+   	id: 'Text',
+   	zhCN: '文本',
+   	enUS: 'Text'
+   }
+   ```
+
+3. 使用：
+
+   ```typescript
+   import { useIntl } from 'react-intl';
+   const intl = useIntl();
+   
+   intl.formatMessage({id:'Text'})
+   ```
+
+   
+
