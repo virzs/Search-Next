@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-23 17:21:19
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-24 17:38:32
+ * @Last Modified time: 2021-03-27 16:29:41
  */
 @import '../../themes/index.less';
 
@@ -12,12 +12,21 @@ body,
   height: 100%;
 
   .index {
+    position: relative;
     background-color: @bg-color-light;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
     overflow: hidden;
     height: 100%;
+    text-align: center;
+    // 默认布局：导航 Logo 输入框 附加内容 版权信息
+    grid-template-rows: 40px 200px 80px auto 30px;
+    .index-navbar {
+      text-align: right;
+    }
+    .index-search-input {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }

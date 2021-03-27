@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 17:34:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-22 09:13:25
+ * @Last Modified time: 2021-03-25 11:32:10
  */
 
 export interface LocaleTypes {
@@ -37,5 +37,10 @@ export default [
     id: 'MAIN_SEARCH_PLACEHOLDER',
     zhCN: '请输入搜索内容',
     enUS: 'Please enter search content',
+  },
+  {
+    id: 'MAIN_SEARCH_SELECT',
+    zhCN: '请选择',
+    enUS: 'Please select',
   },
 ] as LocaleTypes[];

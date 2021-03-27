@@ -26,7 +26,7 @@ const ChangeLocales: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="locales">
       <Button onClick={handleClick}>
         <Public fontSize="small" />
         {selectLocalesValue.find((i) => i.value === localeValue)?.label}
@@ -49,7 +49,7 @@ const ChangeLocales: React.FC = () => {
           </MenuItem>
         ))}
       </Menu>
-    </>
+    </div>
   );
 };
 

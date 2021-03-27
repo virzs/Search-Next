@@ -2,12 +2,13 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-24 17:50:13
+ * @Last Modified time: 2021-03-25 11:53:25
  */
 
 import React from 'react';
 import './style/index.less';
 import SizeContext, { SizeType } from '../context-provider/SizeContext';
+import { Button } from '@material-ui/core';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -27,14 +28,18 @@ export interface SearchInputPropTypes {
   size?: SizeType;
   onChange?: (value: string) => void; // 输入框内容变化时回调
   onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>; // 按下回车回调
+  onBtnClick?: (value: string) => void;
+  primaryText?: string;
 }
 
 const RenderInput: React.FC<SearchInputPropTypes> = ({
   onChange,
   onPressEnter,
+  onBtnClick,
   value,
   defaultValue,
   size,
+  primaryText,
   ...props
 }) => {
   const [inputValue, setInputValue] = React.useState(
@@ -47,28 +52,41 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   };
 
   const handleFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e, 'focus', props);
+    // console.log(e, 'focus', props);
   };
 
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e, 'blur');
+    // console.log(e, 'blur');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' && onPressEnter) onPressEnter(e);
   };
 
+  const handleBtnClick = () => {
+    if (onBtnClick) onBtnClick(inputValue);
+  };
+
   return (
-    <input
-      className="v-input"
-      type="text"
-      value={inputValue}
-      onChange={handleChange}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      onKeyDown={handleKeyDown}
-      {...props}
-    ></input>
+    <div className="v-input">
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        {...props}
+      ></input>
+      <Button
+        variant="contained"
+        disableElevation
+        color="primary"
+        onClick={handleBtnClick}
+      >
+        {primaryText || '搜索'}
+      </Button>
+    </div>
   );
 };
 
