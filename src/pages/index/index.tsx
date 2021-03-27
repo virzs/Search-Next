@@ -9,25 +9,17 @@ import { copyright as copyrightApi } from '@/apis/common';
 import { list } from '@/apis/search';
 import Copyright from '@/components/copyright';
 import { ChangeLocales, SearchInput } from '@/components/global';
+import { CopyrightType } from '@/data/main';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import './index.less';
 
-interface CopyrightType {
-  startTime: string; // 开始时间
-  endTime?: string; // 结束时间
-  href: string; // 网址
-  author: string; // 作者
-  custom?: string; // 自定义信息
+interface CopyrightTypeWithVersion extends CopyrightType {
   version?: string;
 }
 
 export default function IndexPage() {
-  const [copyright, setCopyright] = useState<CopyrightType>({
-    startTime: '',
-    href: '',
-    author: '',
-  });
+  const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
 
   const getList = () => {
     list().then((res) => {
@@ -72,11 +64,13 @@ export default function IndexPage() {
       </div>
       <div className="index-content"></div>
       <div className="index-copyright">
-        <Copyright
-          author={copyright.author}
-          href={copyright.href}
-          startTime={copyright.startTime}
-        ></Copyright>
+        {copyright && (
+          <Copyright
+            author={copyright.author}
+            href={copyright.href}
+            startTime={copyright.startTime}
+          ></Copyright>
+        )}
       </div>
     </div>
   );
