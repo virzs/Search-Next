@@ -25,3 +25,6 @@
 |   Background   | @Black   4% | @White   8% |
 |  Table header  | @Black   2% | @White   4% |
 
+## 配色
+
+- `#D9D9D9` `#AAAAAA` `5F5F5F` `#282727` `#86735E` `#6BB297`
