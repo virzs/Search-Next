@@ -19,14 +19,23 @@ body,
     height: 100%;
     text-align: center;
     // 默认布局：导航 Logo 输入框 附加内容 版权信息
-    grid-template-rows: 40px 200px 80px auto 30px;
-    .index-navbar {
+    grid-template-rows: 40px 300px 80px auto 30px;
+    .index-navbar-box {
       text-align: right;
     }
-    .index-search-input {
+    .index-search-box {
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+      .search-engine-label {
+        width: 710px;
+        margin-bottom: 10px;
+        text-align: left;
+        .engine-chip {
+          margin: 0 5px;
+        }
+      }
     }
   }
 }

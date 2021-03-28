@@ -7,9 +7,14 @@
 
 import engine from '@/data/engine';
 import { ResultTypes } from '@/typings/result';
+import { SearchEngineValueTypes } from './../data/engine/index';
+
+export interface SearchEngineResultTypes extends ResultTypes {
+  data: SearchEngineValueTypes[];
+}
 
 export const list = () => {
-  return new Promise<ResultTypes>((resolve) => {
+  return new Promise<SearchEngineResultTypes>((resolve) => {
     resolve({ code: 200, msg: '获取成功', data: engine });
   });
 };

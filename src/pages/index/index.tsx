@@ -9,8 +9,10 @@ import { copyright as copyrightApi } from '@/apis/common';
 import { list } from '@/apis/search';
 import Copyright from '@/components/copyright';
 import { ChangeLocales, SearchInput } from '@/components/global';
+import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import React, { useState } from 'react';
+import { Chip } from '@material-ui/core';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import './index.less';
 
@@ -20,10 +22,11 @@ interface CopyrightTypeWithVersion extends CopyrightType {
 
 export default function IndexPage() {
   const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
+  const [engineList, setEngineList] = useState([] as SearchEngineValueTypes[]);
 
   const getList = () => {
     list().then((res) => {
-      console.log(res.data);
+      setEngineList(res.data);
     });
   };
 
@@ -33,7 +36,7 @@ export default function IndexPage() {
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getList();
     getCopyright();
   }, []);
@@ -49,11 +52,16 @@ export default function IndexPage() {
   const intl = useIntl();
   return (
     <div className="index">
-      <div className="index-navbar">
+      <div className="index-navbar-box">
         <ChangeLocales />
       </div>
-      <div className="index-logo"></div>
-      <div className="index-search-input">
+      <div className="index-logo-box"></div>
+      <div className="index-search-box">
+        <div className="search-engine-label">
+          {engineList.map((i) => (
+            <Chip className="engine-chip" size="small" label={i.name}></Chip>
+          ))}
+        </div>
         <SearchInput
           autoFocus
           onChange={inputChange}
@@ -62,8 +70,8 @@ export default function IndexPage() {
           primaryText={intl.formatMessage({ id: 'MAIN_SEARCH' })}
         ></SearchInput>
       </div>
-      <div className="index-content"></div>
-      <div className="index-copyright">
+      <div className="index-content-box"></div>
+      <div className="index-copyright-box">
         {copyright && (
           <Copyright
             author={copyright.author}
