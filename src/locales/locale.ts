@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 17:34:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-25 11:32:10
+ * @Last Modified time: 2021-03-29 16:35:46
  */
 
 export interface LocaleTypes {
@@ -42,5 +42,10 @@ export default [
     id: 'MAIN_SEARCH_SELECT',
     zhCN: '请选择',
     enUS: 'Please select',
+  },
+  {
+    id: 'UPDATE_RECORD_DIALOG_TITLE',
+    zhCN: '更新记录',
+    enUS: 'Update record',
   },
 ] as LocaleTypes[];

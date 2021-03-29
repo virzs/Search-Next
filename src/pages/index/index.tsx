@@ -2,16 +2,17 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-27 17:51:29
+ * @Last Modified time: 2021-03-29 17:04:22
  */
 
 import { copyright as copyrightApi } from '@/apis/common';
 import { list } from '@/apis/search';
 import Copyright from '@/components/copyright';
 import { ChangeLocales, SearchInput } from '@/components/global';
+import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import { Chip } from '@material-ui/core';
+import { Button, Chip } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import './index.less';
@@ -23,6 +24,7 @@ interface CopyrightTypeWithVersion extends CopyrightType {
 export default function IndexPage() {
   const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
   const [engineList, setEngineList] = useState([] as SearchEngineValueTypes[]);
+  const [open, setOpen] = useState<boolean>(false);
 
   const getList = () => {
     list().then((res) => {
@@ -59,7 +61,12 @@ export default function IndexPage() {
       <div className="index-search-box">
         <div className="search-engine-label">
           {engineList.map((i) => (
-            <Chip className="engine-chip" size="small" label={i.name}></Chip>
+            <Chip
+              key={i.id}
+              className="engine-chip"
+              size="small"
+              label={i.name}
+            ></Chip>
           ))}
         </div>
         <SearchInput
@@ -79,7 +86,12 @@ export default function IndexPage() {
             startTime={copyright.startTime}
           ></Copyright>
         )}
+        <Button onClick={() => setOpen(true)}>更新日志</Button>
       </div>
+      <UpdateRecordDialog
+        open={open}
+        onClose={() => setOpen(false)}
+      ></UpdateRecordDialog>
     </div>
   );
 }
