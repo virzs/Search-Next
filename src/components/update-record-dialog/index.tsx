@@ -14,12 +14,16 @@ import {
   ListItemAvatar,
   Avatar,
   ListItemText,
+  Chip,
+  CircularProgress,
 } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 import { getGithubCommitType } from '@/utils/common';
 import { commitList } from '@/apis/github';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import dayjs from 'dayjs';
+import './style/index.less';
 
 export interface UpdateRecordDialogPropTypes {
   open: boolean;
@@ -39,6 +43,12 @@ export interface CommitValueTypes {
   url: string;
 }
 
+export interface CommitSourceValueTypes {
+  commit: { author: { [x: string]: any; email: any }; message: string };
+  author: { avatar_url: any; html_url: any };
+  html_url: any;
+}
+
 export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   open,
   onClose,
@@ -46,40 +56,67 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
 }) => {
   const intl = useIntl();
   const [commits, setCommits] = useState([] as CommitValueTypes[]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(0);
+  const [nomore, setNomore] = useState<boolean>(false);
 
   const getCommitList = () => {
-    commitList().then((res) => {
-      const formatCommit = res.data.map(
-        (i: {
-          commit: { author: { [x: string]: any; email: any }; message: string };
-          author: { avatar_url: any; html_url: any };
-          html_url: any;
-        }) => {
-          let { email, ...author } = i.commit.author;
-          return {
-            author: {
-              ...author,
-              avatar_url: i.author.avatar_url,
-              html_url: i.author.html_url,
-            },
-            url: i.html_url,
-            ...getGithubCommitType(i.commit.message),
-          };
-        },
-      );
-      setCommits(formatCommit);
+    let commitPage = page + 1;
+    if (nomore) return;
+    setPage(commitPage);
+    setLoading(true);
+    commitList(commitPage).then((res) => {
+      if (res.data.length === 0) return setNomore(true);
+      const formatCommit = res.data.map((i: CommitSourceValueTypes) => {
+        let { email, ...author } = i.commit.author;
+        return {
+          author: {
+            ...author,
+            avatar_url: i.author.avatar_url,
+            html_url: i.author.html_url,
+          },
+          url: i.html_url,
+          ...getGithubCommitType(i.commit.message),
+        };
+      });
+      setCommits(commits.concat(formatCommit));
+      setNomore(false);
+      setLoading(false);
     });
+  };
+
+  // dialog滚动事件
+  // TODO 加载更多调用一次接口后才能继续调用下一次
+  const contentScroll = (e: { target: any }) => {
+    let el = e.target;
+    let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
+    if (isBottom) {
+      getCommitList();
+    }
+  };
+
+  // dialog关闭
+  const handleClose = () => {
+    onClose();
+    setPage(0);
+    setNomore(false);
   };
 
   useEffect(() => {
     getCommitList();
   }, []);
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      className="update-record-dialog"
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+    >
       <DialogTitle id="scroll-dialog-title">
         {intl.formatMessage({ id: 'UPDATE_RECORD_DIALOG_TITLE' })}
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers onScroll={contentScroll}>
         <List>
           {commits.map((i, j) => (
             <ListItem key={j}>
@@ -90,16 +127,26 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
                 primary={dayjs(i.author.date).format('YYYY/MM/DD')}
                 secondary={
                   <React.Fragment>
-                    <span>{i.author.name}</span>
-                    <a href={i.url} target="_brank">
-                      {i.message}
-                    </a>
+                    <Chip label={i.type} size="small"></Chip>
+                    <span>{i.author.name}</span> - {i.message}
                   </React.Fragment>
                 }
               ></ListItemText>
             </ListItem>
           ))}
         </List>
+        {loading && (
+          <div className="loading-more">
+            {nomore ? (
+              <span className="loading-content">没有更多数据</span>
+            ) : (
+              <>
+                <CircularProgress size={14} color="inherit" />
+                <span className="loading-content">加载中请稍后...</span>
+              </>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
