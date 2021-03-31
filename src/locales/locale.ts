@@ -2,8 +2,9 @@
  * @Author: Vir
  * @Date: 2021-03-14 17:34:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-31 20:44:14
+ * @Last Modified time: 2021-03-31 22:22:11
  */
+import loadMore from './modules/components/load-more';
 import updateRecordDialog from './modules/components/update-record-dialog';
 import index from './modules/pages';
 export interface LocaleTypes {
@@ -32,6 +33,6 @@ export const selectLocalesValue: SelectLocalesTypes[] = [
 const pageLocales = [...index];
 
 // 组件相关
-const componentLocales = [...updateRecordDialog];
+const componentLocales = [...updateRecordDialog, ...loadMore];
 
 export default [...pageLocales, ...componentLocales] as LocaleTypes[];
