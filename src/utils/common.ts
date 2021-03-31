@@ -50,3 +50,18 @@ export const getGithubCommitType = (
   };
   return result;
 };
+
+// 根据commit状态获取对应的颜色
+export const gitCommitColorByType = (type: githubCommitTypes) => {
+  const typesWithColor = new Map([
+    ['feat', '#bddd22'],
+    ['fix', '#41C466'],
+    ['docs', '#3A69ED'],
+    ['style', '#FEC22E'],
+    ['refactor', '#FC4545'],
+    ['pref', '#64687F'],
+    ['test', '#E2E0DE'],
+    ['chore', '#44cef6'],
+  ]);
+  return typesWithColor.get(type);
+};
