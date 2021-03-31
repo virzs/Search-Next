@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-29 17:04:22
+ * @Last Modified time: 2021-03-31 21:47:26
  */
 
 import { copyright as copyrightApi } from '@/apis/common';
@@ -73,8 +73,10 @@ export default function IndexPage() {
           autoFocus
           onChange={inputChange}
           onBtnClick={inputBtnClick}
-          placeholder={intl.formatMessage({ id: 'MAIN_SEARCH_PLACEHOLDER' })}
-          primaryText={intl.formatMessage({ id: 'MAIN_SEARCH' })}
+          placeholder={intl.formatMessage({
+            id: 'PAGE_INDEX_SEARCH_PLACEHOLDER',
+          })}
+          primaryText={intl.formatMessage({ id: 'PAGE_INDEX_SEARCH_BUTTON' })}
         ></SearchInput>
       </div>
       <div className="index-content-box"></div>
@@ -86,7 +88,9 @@ export default function IndexPage() {
             startTime={copyright.startTime}
           ></Copyright>
         )}
-        <Button onClick={() => setOpen(true)}>更新日志</Button>
+        <Button onClick={() => setOpen(true)}>
+          {intl.formatMessage({ id: 'PAGE_INDEX_UPLOAD_RECORD' })}
+        </Button>
       </div>
       <UpdateRecordDialog
         open={open}
