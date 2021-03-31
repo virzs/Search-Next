@@ -2,28 +2,38 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-29 21:49:55
+ * @Last Modified time: 2021-03-31 22:30:21
  */
 
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
   Chip,
-  CircularProgress,
+  Typography,
+  IconButton,
 } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
-import { getGithubCommitType } from '@/utils/common';
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineOppositeContent,
+  TimelineSeparator,
+} from '@material-ui/lab';
+import CloseIcon from '@material-ui/icons/Close';
+import {
+  getGithubCommitType,
+  gitCommitColorByType,
+  githubCommitTypes,
+} from '@/utils/common';
 import { commitList } from '@/apis/github';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import dayjs from 'dayjs';
 import './style/index.less';
+import LoadMore from '../load-more';
 
 export interface UpdateRecordDialogPropTypes {
   open: boolean;
@@ -38,7 +48,7 @@ export interface CommitValueTypes {
     html_url: string;
   };
   desc: string;
-  type: string;
+  type: githubCommitTypes;
   message: string;
   url: string;
 }
@@ -86,11 +96,11 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   };
 
   // dialog滚动事件
-  // TODO 加载更多调用一次接口后才能继续调用下一次
+  // TODO 无数据时的显示效果
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
-    if (isBottom) {
+    if (isBottom && !loading) {
       getCommitList();
     }
   };
@@ -98,13 +108,16 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   // dialog关闭
   const handleClose = () => {
     onClose();
+    setCommits([]);
     setPage(0);
     setNomore(false);
+    setLoading(false);
   };
 
   useEffect(() => {
     getCommitList();
-  }, []);
+  }, [open]);
+
   return (
     <Dialog
       className="update-record-dialog"
@@ -115,38 +128,51 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
     >
       <DialogTitle id="scroll-dialog-title">
         {intl.formatMessage({ id: 'UPDATE_RECORD_DIALOG_TITLE' })}
+        {onClose ? (
+          <IconButton
+            className="dialog-close"
+            aria-label="close"
+            onClick={onClose}
+            size="small"
+          >
+            <CloseIcon />
+          </IconButton>
+        ) : null}
       </DialogTitle>
-      <DialogContent dividers onScroll={contentScroll}>
-        <List>
+      <DialogContent
+        className="dialog-content"
+        dividers
+        onScroll={contentScroll}
+      >
+        <Timeline align="alternate">
           {commits.map((i, j) => (
-            <ListItem key={j}>
-              <ListItemAvatar>
-                <Avatar alt={i.author.name} src={i.author.avatar_url} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={dayjs(i.author.date).format('YYYY/MM/DD')}
-                secondary={
-                  <React.Fragment>
-                    <Chip label={i.type} size="small"></Chip>
-                    <span>{i.author.name}</span> - {i.message}
-                  </React.Fragment>
-                }
-              ></ListItemText>
-            </ListItem>
+            <TimelineItem key={j}>
+              <TimelineOppositeContent>
+                <Typography variant="h6" color="textSecondary">
+                  {dayjs(i.author.date).format('YYYY/MM/DD')}
+                </Typography>
+                <Chip
+                  style={{
+                    backgroundColor: gitCommitColorByType(i.type),
+                    color: '#fff',
+                  }}
+                  label={i.type}
+                  size="small"
+                ></Chip>
+              </TimelineOppositeContent>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                <React.Fragment>
+                  <span>{i.author.name}</span> - {i.message}
+                </React.Fragment>
+              </TimelineContent>
+            </TimelineItem>
           ))}
-        </List>
-        {loading && (
-          <div className="loading-more">
-            {nomore ? (
-              <span className="loading-content">没有更多数据</span>
-            ) : (
-              <>
-                <CircularProgress size={14} color="inherit" />
-                <span className="loading-content">加载中请稍后...</span>
-              </>
-            )}
-          </div>
-        )}
+        </Timeline>
+        {loading && <LoadMore nomore={nomore} />}
       </DialogContent>
     </Dialog>
   );
