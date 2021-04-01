@@ -4,19 +4,12 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-03-14 21:01:46
  */
+import global from './zh-CN/global.json';
+import page from './zh-CN/page.json';
+import component from './zh-CN/component.json';
 
-import locale, { LocaleTypes } from './locale';
-
-interface zhCNTypes {
-  [x: string]: string;
-}
-
-let zh: zhCNTypes = {};
-
-const zhCN = () => {
-  locale.forEach((i: LocaleTypes) => (zh[i.id] = i.zhCN));
+export default {
+  ...global,
+  ...page,
+  ...component,
 };
-
-zhCN();
-
-export default zh;

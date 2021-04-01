@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-31 22:30:21
+ * @Last Modified time: 2021-03-31 23:01:47
  */
 
 import {
@@ -64,7 +64,7 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   onClose,
   ...props
 }) => {
-  const intl = useIntl();
+  const { formatMessage } = useIntl();
   const [commits, setCommits] = useState([] as CommitValueTypes[]);
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
@@ -97,6 +97,7 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
 
   // dialog滚动事件
   // TODO 无数据时的显示效果
+  // TODO commit链接跳转
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
@@ -127,7 +128,7 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
       fullWidth
     >
       <DialogTitle id="scroll-dialog-title">
-        {intl.formatMessage({ id: 'UPDATE_RECORD_DIALOG_TITLE' })}
+        {formatMessage({ id: 'app.component.uploadrecorddialog.title' })}
         {onClose ? (
           <IconButton
             className="dialog-close"

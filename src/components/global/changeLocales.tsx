@@ -6,14 +6,28 @@
  */
 
 import { getLocale, setLocale } from '@/.umi/plugin-locale/localeExports';
-import { selectLocalesValue } from '@/locales/locale';
 import { MenuItem, Button, Menu } from '@material-ui/core';
 import { Public } from '@material-ui/icons';
 import React from 'react';
+export interface SelectLocalesTypes {
+  label: string;
+  value: string;
+}
 
 const ChangeLocales: React.FC = () => {
   const [localeValue, setLocaleValue] = React.useState<string>(getLocale());
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const selectLocalesValue: SelectLocalesTypes[] = [
+    {
+      label: '中文',
+      value: 'zh-CN',
+    },
+    {
+      label: 'English',
+      value: 'en-US',
+    },
+  ];
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

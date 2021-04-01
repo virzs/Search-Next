@@ -13,18 +13,18 @@ export interface LoadMorePropTypes {
 }
 
 const LoadMore = ({ nomore }: LoadMorePropTypes) => {
-  const intl = useIntl();
+  const { formatMessage } = useIntl();
   return (
     <div className="loading-more">
       {nomore ? (
         <span className="loading-content">
-          {intl.formatMessage({ id: 'COMPONENT_LOADMORE_NOMORE_CONTENT' })}
+          {formatMessage({ id: 'app.component.loadmore.nomore' })}
         </span>
       ) : (
         <>
           <CircularProgress size={14} color="inherit" />
           <span className="loading-content">
-            {intl.formatMessage({ id: 'COMPONENT_LOADMORE_LOADING_CONTENT' })}
+            {formatMessage({ id: 'app.component.loadmore.loadmore' })}
           </span>
         </>
       )}

@@ -4,19 +4,8 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-03-14 21:02:02
  */
+import global from './en-US/global.json';
+import page from './en-US/page.json';
+import component from './en-US/component.json';
 
-import locale, { LocaleTypes } from './locale';
-
-interface enUSTypes {
-  [x: string]: string;
-}
-
-let en: enUSTypes = {};
-
-const enUS = () => {
-  locale.forEach((i: LocaleTypes) => (en[i.id] = i.enUS));
-};
-
-enUS();
-
-export default en;
+export default { ...global, ...page, ...component };

@@ -51,7 +51,7 @@ export default function IndexPage() {
     console.log('search btn', value);
   };
 
-  const intl = useIntl();
+  const { formatMessage } = useIntl();
   return (
     <div className="index">
       <div className="index-navbar-box">
@@ -73,10 +73,12 @@ export default function IndexPage() {
           autoFocus
           onChange={inputChange}
           onBtnClick={inputBtnClick}
-          placeholder={intl.formatMessage({
-            id: 'PAGE_INDEX_SEARCH_PLACEHOLDER',
+          placeholder={formatMessage({
+            id: 'app.page.index.searchinput.placeholder',
           })}
-          primaryText={intl.formatMessage({ id: 'PAGE_INDEX_SEARCH_BUTTON' })}
+          primaryText={formatMessage({
+            id: 'app.page.index.searchinput.submitbutton',
+          })}
         ></SearchInput>
       </div>
       <div className="index-content-box"></div>
@@ -89,7 +91,7 @@ export default function IndexPage() {
           ></Copyright>
         )}
         <Button onClick={() => setOpen(true)}>
-          {intl.formatMessage({ id: 'PAGE_INDEX_UPLOAD_RECORD' })}
+          {formatMessage({ id: 'app.component.uploadrecorddialog.title' })}
         </Button>
       </div>
       <UpdateRecordDialog

@@ -9,6 +9,7 @@ import React from 'react';
 import './style/index.less';
 import SizeContext, { SizeType } from '../context-provider/SizeContext';
 import { Button } from '@material-ui/core';
+import { useIntl } from 'react-intl';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -46,6 +47,7 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   primaryText,
   ...props
 }) => {
+  const { formatMessage } = useIntl();
   const [inputValue, setInputValue] = React.useState(
     defaultValue || value || '',
   );
@@ -89,7 +91,8 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
         onClick={handleBtnClick}
         style={{ backgroundColor: '#5f5f5f' }}
       >
-        {primaryText || '搜索'}
+        {primaryText ||
+          formatMessage({ id: 'app.component.searchinput.submitbutton' })}
       </Button>
     </div>
   );
