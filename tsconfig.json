@@ -6,6 +6,7 @@
     "importHelpers": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
     "baseUrl": "./",
     "strict": true,

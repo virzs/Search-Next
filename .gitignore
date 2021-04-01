@@ -16,6 +16,9 @@
 # history
 /.history
 
+# vscode
+/.vscode
+
 # umi
 /src/.umi
 /src/.umi-production
