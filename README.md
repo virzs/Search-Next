@@ -24,6 +24,10 @@ $ yarn start
 $ yarn build
 ```
 
+## 截图（21/4/2）
+
+![image-20210402152903082](http://imgs.virs.xyz/searchreact210402.png)
+
 ## 已确定的功能
 
 **多语言：**
