@@ -28,7 +28,7 @@ export interface SearchInputPropTypes {
   required?: boolean; // 是否必填
   size?: SizeType;
   onChange?: (value: string) => void; // 输入框内容变化时回调
-  onPressEnter?: (e: React.KeyboardEvent<HTMLInputElement>) => void; // 按下回车回调
+  onPressEnter?: (value: string) => void; // 按下回车回调
   onBtnClick?: (value: string) => void;
   onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -66,7 +66,7 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter' && onPressEnter) onPressEnter(e);
+    if (e.code === 'Enter' && onPressEnter) onPressEnter(inputValue);
   };
 
   const handleBtnClick = () => {

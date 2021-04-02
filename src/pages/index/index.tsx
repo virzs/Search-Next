@@ -15,6 +15,7 @@ import { CopyrightType } from '@/data/main';
 import { Button, Chip } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import classnames from 'classnames';
 import './index.less';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
@@ -24,11 +25,20 @@ interface CopyrightTypeWithVersion extends CopyrightType {
 export default function IndexPage() {
   const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
   const [engineList, setEngineList] = useState([] as SearchEngineValueTypes[]);
+  const [engine, setEngine] = useState({} as SearchEngineValueTypes);
   const [open, setOpen] = useState<boolean>(false);
 
   const getList = () => {
     list().then((res) => {
       setEngineList(res.data);
+      if (res.data.length === 0) return;
+      const engineId = localStorage.getItem('engine_id');
+      if (engineId) {
+        const engine = res.data.find((i) => i.id === engineId);
+        setEngine(engine ? engine : res.data[0]);
+      } else {
+        setEngine(res.data[0]);
+      }
     });
   };
 
@@ -36,6 +46,11 @@ export default function IndexPage() {
     copyrightApi().then((res) => {
       setCopyright(res.data);
     });
+  };
+
+  const changeEngine = (item: SearchEngineValueTypes) => {
+    localStorage.setItem('engine_id', item.id);
+    setEngine(item);
   };
 
   useEffect(() => {
@@ -47,8 +62,8 @@ export default function IndexPage() {
     console.log('search', value);
   };
 
-  const inputBtnClick = (value: string) => {
-    console.log('search btn', value);
+  const handleSearch = (value: string) => {
+    window.open(`${engine.href}${value}`);
   };
 
   const { formatMessage } = useIntl();
@@ -63,22 +78,26 @@ export default function IndexPage() {
           {engineList.map((i) => (
             <Chip
               key={i.id}
-              className="engine-chip"
+              className={classnames('engine-chip', {
+                selected: i.id === engine.id,
+              })}
               size="small"
               label={i.name}
+              onClick={() => changeEngine(i)}
             ></Chip>
           ))}
         </div>
         <SearchInput
           autoFocus
           onChange={inputChange}
-          onBtnClick={inputBtnClick}
+          onBtnClick={handleSearch}
           placeholder={formatMessage({
             id: 'app.page.index.searchinput.placeholder',
           })}
           primaryText={formatMessage({
             id: 'app.page.index.searchinput.submitbutton',
           })}
+          onPressEnter={handleSearch}
         ></SearchInput>
       </div>
       <div className="index-content-box"></div>
