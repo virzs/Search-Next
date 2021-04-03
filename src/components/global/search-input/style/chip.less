@@ -1,0 +1,20 @@
+.search-engine-label {
+  width: 100%;
+  position: relative;
+  text-align: left;
+  overflow: hidden;
+  margin-bottom: 10px;
+  .engine-list {
+    position: absolute;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    .engine-chip {
+      margin: 0 5px;
+      &.selected {
+        background-color: #5f5f5f;
+        color: #fff;
+      }
+    }
+  }
+}

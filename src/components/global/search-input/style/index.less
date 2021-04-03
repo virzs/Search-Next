@@ -4,24 +4,26 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-03-25 12:00:56
  */
-
-.v-input {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 4px;
-  box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
-  input {
-    padding: 8px 16px;
-    line-height: 26.25px;
-    border: none;
-    outline: none;
-    width: 600px;
-  }
-  button {
-    color: #ffffff;
-    width: 110px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
+.v-search-input {
+  width: 720px;
+  .v-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+    input {
+      padding: 8px 16px;
+      line-height: 26.25px;
+      border: none;
+      outline: none;
+      width: calc(100% - 108px);
+    }
+    button {
+      color: #ffffff;
+      width: 110px;
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+    }
   }
 }

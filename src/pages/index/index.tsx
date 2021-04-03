@@ -2,20 +2,17 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-31 21:47:26
+ * @Last Modified time: 2021-04-03 17:38:36
  */
 
 import { copyright as copyrightApi } from '@/apis/common';
-import { list } from '@/apis/search';
 import Copyright from '@/components/copyright';
 import { ChangeLocales, SearchInput } from '@/components/global';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
-import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import { Button, Chip } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import classnames from 'classnames';
 import './index.less';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
@@ -24,23 +21,7 @@ interface CopyrightTypeWithVersion extends CopyrightType {
 
 export default function IndexPage() {
   const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
-  const [engineList, setEngineList] = useState([] as SearchEngineValueTypes[]);
-  const [engine, setEngine] = useState({} as SearchEngineValueTypes);
   const [open, setOpen] = useState<boolean>(false);
-
-  const getList = () => {
-    list().then((res) => {
-      setEngineList(res.data);
-      if (res.data.length === 0) return;
-      const engineId = localStorage.getItem('engine_id');
-      if (engineId) {
-        const engine = res.data.find((i) => i.id === engineId);
-        setEngine(engine ? engine : res.data[0]);
-      } else {
-        setEngine(res.data[0]);
-      }
-    });
-  };
 
   const getCopyright = () => {
     copyrightApi().then((res) => {
@@ -48,13 +29,7 @@ export default function IndexPage() {
     });
   };
 
-  const changeEngine = (item: SearchEngineValueTypes) => {
-    localStorage.setItem('engine_id', item.id);
-    setEngine(item);
-  };
-
   useEffect(() => {
-    getList();
     getCopyright();
   }, []);
 
@@ -63,7 +38,7 @@ export default function IndexPage() {
   };
 
   const handleSearch = (value: string) => {
-    window.open(`${engine.href}${value}`);
+    // window.open(`${engine.href}${value}`);
   };
 
   const { formatMessage } = useIntl();
@@ -74,19 +49,6 @@ export default function IndexPage() {
       </div>
       <div className="index-logo-box"></div>
       <div className="index-search-box">
-        <div className="search-engine-label">
-          {engineList.map((i) => (
-            <Chip
-              key={i.id}
-              className={classnames('engine-chip', {
-                selected: i.id === engine.id,
-              })}
-              size="small"
-              label={i.name}
-              onClick={() => changeEngine(i)}
-            ></Chip>
-          ))}
-        </div>
         <SearchInput
           autoFocus
           onChange={inputChange}
