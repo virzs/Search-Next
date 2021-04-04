@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2021-04-03 17:25:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-03 18:09:27
+ * @Last Modified time: 2021-04-04 22:48:06
  */
 
 import classnames from 'classnames';
-import { Chip, Button } from '@material-ui/core';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Chip } from '@material-ui/core';
+import React, { useEffect, useRef, useState } from 'react';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { list } from '@/apis/search';
 import { ArrowLeft, ArrowRight } from '@material-ui/icons';
@@ -19,6 +19,7 @@ export interface EngineChipPropTypes {
   onClick?: () => void;
   onChange?: () => void;
   type?: EngineChipType; // 选择搜索引擎组件展示类型
+  autoHidden?: boolean; // 是否选择后自动隐藏
 }
 
 interface ListType {
@@ -31,17 +32,10 @@ const EngineChip = () => {
   const [engine, setEngine] = useState({} as SearchEngineValueTypes);
   const [isExpand, setIsExpand] = useState<boolean>(false); // 是否展开
   const [listEle, setListEle] = useState({} as ListType);
-  const ele = useRef(null);
-
-  const ref = useCallback((node: any) => {
-    if (node) {
-      setListEle({
-        clientWidth: node.clientWidth,
-        clientHeight: node.clientHeight,
-      });
-    }
-    console.log(node.clientWidth);
-  }, []);
+  const [chipBtnWidth, setChipBtnWidth] = useState<number>(20); //当前按钮宽度
+  const [engineWidth, setEngineWidth] = useState<number>(0); // 当前选中的宽度
+  const ele = useRef(null); // chip组件整体ref
+  const btn = useRef(null); // chip组件展开收缩按钮ref
 
   // 获取搜索引擎列表
   const getList = () => {
@@ -58,18 +52,39 @@ const EngineChip = () => {
     });
   };
 
-  const changeEngine = (item: SearchEngineValueTypes) => {
+  const changeEngine = (item: SearchEngineValueTypes, e: any) => {
     localStorage.setItem('engine_id', item.id);
+    setEngineWidth(e.target.clientWidth);
     setEngine(item);
   };
 
   const buttonClick = () => {
     setIsExpand(!isExpand);
+    setChipBtnWidth(isExpand ? engineWidth + 26 : 20);
   };
 
   useEffect(() => {
     getList();
   }, []);
+
+  useEffect(() => {
+    if (ele && ele.current) {
+      // 此处设置了一个延迟用于获取正确的信息，后续有更好的方法再修改
+      const current: any = ele.current;
+      setTimeout(() => {
+        setListEle({
+          clientWidth: current.clientWidth,
+          clientHeight: current.clientHeight,
+        });
+      }, 1);
+    }
+    if (btn && btn.current) {
+      const btnCurrent: any = btn.current;
+      setTimeout(() => {
+        setChipBtnWidth(btnCurrent.clientWidth);
+      }, 1);
+    }
+  }, [ele, btn]);
 
   return (
     <div
@@ -82,7 +97,7 @@ const EngineChip = () => {
           from: { left: isExpand ? `-${listEle.clientWidth || 0}px` : '0px' },
           to: { left: isExpand ? '0px' : `-${listEle.clientWidth || 0}px` },
         })}
-        ref={ref}
+        ref={ele}
       >
         {engineList.map((i) => (
           <Chip
@@ -92,13 +107,26 @@ const EngineChip = () => {
             })}
             size="small"
             label={i.name}
-            onClick={() => changeEngine(i)}
+            onClick={(e) => changeEngine(i, e)}
           ></Chip>
         ))}
+        <div
+          ref={btn}
+          className="chip-btn"
+          onClick={buttonClick}
+          style={{ right: `-${chipBtnWidth}px` }}
+        >
+          <Chip
+            className="engine-chip selected"
+            size="small"
+            label={engine.name}
+            style={{ display: isExpand ? 'none' : '' }}
+          ></Chip>
+          <div className="svg-btn">
+            {isExpand ? <ArrowLeft></ArrowLeft> : <ArrowRight></ArrowRight>}
+          </div>
+        </div>
       </animated.div>
-      <Button size="small" onClick={buttonClick}>
-        {isExpand ? <ArrowLeft></ArrowLeft> : <ArrowRight></ArrowRight>}
-      </Button>
     </div>
   );
 };

@@ -1,19 +1,41 @@
+/*
+ * @Author: Vir 
+ * @Date: 2021-04-03 14:08:05 
+ * @Last Modified by:   Vir 
+ * @Last Modified time: 2021-04-04 14:08:05 
+ */
+
 .search-engine-label {
   width: 100%;
   position: relative;
   text-align: left;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   .engine-list {
     position: absolute;
     display: inline-block;
-    overflow: hidden;
     white-space: nowrap;
     .engine-chip {
       margin: 0 5px;
       &.selected {
         background-color: #5f5f5f;
         color: #fff;
+      }
+    }
+    .chip-btn {
+      position: absolute;
+      right: -70px;
+      display: inline-flex;
+      color: #5f5f5f;
+      .svg-btn {
+        width: 16px;
+        height: 24px;
+        svg {
+          width: 100%;
+        }
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
   }
