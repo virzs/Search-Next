@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-03 17:25:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-04 22:48:06
+ * @Last Modified time: 2021-04-05 21:16:25
  */
 
 import classnames from 'classnames';
@@ -60,7 +60,9 @@ const EngineChip = () => {
 
   const buttonClick = () => {
     setIsExpand(!isExpand);
-    setChipBtnWidth(isExpand ? engineWidth + 26 : 20);
+    const width =
+      engineWidth !== 0 ? engineWidth + 26 : localStorage.getItem('engine_w');
+    setChipBtnWidth(isExpand ? Number(width) : 16);
   };
 
   useEffect(() => {
@@ -82,6 +84,7 @@ const EngineChip = () => {
       const btnCurrent: any = btn.current;
       setTimeout(() => {
         setChipBtnWidth(btnCurrent.clientWidth);
+        localStorage.setItem('engine_w', btnCurrent.clientWidth);
       }, 1);
     }
   }, [ele, btn]);
@@ -94,7 +97,6 @@ const EngineChip = () => {
       <animated.div
         className="engine-list"
         style={useSpring({
-          from: { left: isExpand ? `-${listEle.clientWidth || 0}px` : '0px' },
           to: { left: isExpand ? '0px' : `-${listEle.clientWidth || 0}px` },
         })}
         ref={ele}
