@@ -10,6 +10,7 @@ import './style/index.less';
 import { Button } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 import EngineChip from './engineChip';
+import { SearchEngineValueTypes } from '@/data/engine';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -26,9 +27,9 @@ export interface SearchInputPropTypes {
   disabled?: boolean; // 是否禁用
   readonly?: boolean; // 是否只读
   required?: boolean; // 是否必填
-  onChange?: (value: string) => void; // 输入框内容变化时回调
-  onPressEnter?: (value: string) => void; // 按下回车回调
-  onBtnClick?: (value: string) => void;
+  onChange?: (value: string, engine: SearchEngineValueTypes) => void; // 输入框内容变化时回调
+  onPressEnter?: (value: string, engine: SearchEngineValueTypes) => void; // 按下回车回调
+  onBtnClick?: (value: string, engine: SearchEngineValueTypes) => void;
   onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   primaryText?: string;
@@ -49,10 +50,11 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   const [inputValue, setInputValue] = React.useState(
     defaultValue || value || '',
   );
+  const [engine, setEngine] = React.useState({} as SearchEngineValueTypes);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    if (onChange) onChange(e.target.value);
+    if (onChange) onChange(e.target.value, engine);
   };
 
   const handleFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,16 +66,20 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter' && onPressEnter) onPressEnter(inputValue);
+    if (e.code === 'Enter' && onPressEnter) onPressEnter(inputValue, engine);
   };
 
   const handleBtnClick = () => {
-    if (onBtnClick) onBtnClick(inputValue);
+    if (onBtnClick) onBtnClick(inputValue, engine);
+  };
+
+  const chipChange = (value: SearchEngineValueTypes) => {
+    setEngine(value);
   };
 
   return (
     <div className="v-search-input">
-      <EngineChip></EngineChip>
+      <EngineChip onChange={chipChange}></EngineChip>
       <div className="v-input">
         <input
           type="text"

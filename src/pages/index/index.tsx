@@ -10,6 +10,7 @@ import Copyright from '@/components/copyright';
 import { ChangeLocales } from '@/components/global';
 import SearchInput from '@/components/search-input';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
+import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
 import { Button } from '@material-ui/core';
 import { useEffect, useState } from 'react';
@@ -34,12 +35,12 @@ export default function IndexPage() {
     getCopyright();
   }, []);
 
-  const inputChange = (value: string) => {
-    console.log('search', value);
+  const inputChange = (value: string, engine: SearchEngineValueTypes) => {
+    console.log('search', value, engine);
   };
 
-  const handleSearch = (value: string) => {
-    // window.open(`${engine.href}${value}`);
+  const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
+    window.open(`${engine.href}${value}`);
   };
 
   const { formatMessage } = useIntl();

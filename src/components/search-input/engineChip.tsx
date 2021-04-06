@@ -16,8 +16,8 @@ import './style/chip.less';
 
 export type EngineChipType = '' | '';
 export interface EngineChipPropTypes {
-  onClick?: () => void;
-  onChange?: () => void;
+  // onClick?: () => void;
+  onChange?: (value: SearchEngineValueTypes) => void;
   type?: EngineChipType; // 选择搜索引擎组件展示类型
   autoHidden?: boolean; // 是否选择后自动隐藏
 }
@@ -27,7 +27,7 @@ interface ListType {
   clientHeight: number;
 }
 
-const EngineChip = () => {
+const EngineChip = ({ onChange }: EngineChipPropTypes) => {
   const [engineList, setEngineList] = useState([] as SearchEngineValueTypes[]);
   const [engine, setEngine] = useState({} as SearchEngineValueTypes);
   const [isExpand, setIsExpand] = useState<boolean>(false); // 是否展开
@@ -46,8 +46,10 @@ const EngineChip = () => {
       if (engineId) {
         const engine = res.data.find((i) => i.id === engineId);
         setEngine(engine ? engine : res.data[0]);
+        if (onChange) onChange(engine ? engine : res.data[0]);
       } else {
         setEngine(res.data[0]);
+        if (onChange) onChange(res.data[0]);
       }
     });
   };
@@ -56,6 +58,7 @@ const EngineChip = () => {
     localStorage.setItem('engine_id', item.id);
     setEngineWidth(e.target.clientWidth);
     setEngine(item);
+    if (onChange) onChange(item);
   };
 
   const buttonClick = () => {
