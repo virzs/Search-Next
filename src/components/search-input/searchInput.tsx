@@ -7,7 +7,6 @@
 
 import React from 'react';
 import './style/index.less';
-import SizeContext, { SizeType } from '../context-provider/SizeContext';
 import { Button } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 import EngineChip from './engineChip';
@@ -27,7 +26,6 @@ export interface SearchInputPropTypes {
   disabled?: boolean; // 是否禁用
   readonly?: boolean; // 是否只读
   required?: boolean; // 是否必填
-  size?: SizeType;
   onChange?: (value: string) => void; // 输入框内容变化时回调
   onPressEnter?: (value: string) => void; // 按下回车回调
   onBtnClick?: (value: string) => void;
@@ -44,7 +42,6 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   onBlur,
   value,
   defaultValue,
-  size,
   primaryText,
   ...props
 }) => {
@@ -103,9 +100,7 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
 };
 
 const SearchInput: React.FC<SearchInputPropTypes> = (props) => (
-  <SizeContext.Consumer>
-    {(size) => <RenderInput size={size} {...props} />}
-  </SizeContext.Consumer>
+  <RenderInput {...props} />
 );
 
 export default SearchInput;

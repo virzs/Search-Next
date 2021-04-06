@@ -7,7 +7,8 @@
 
 import { copyright as copyrightApi } from '@/apis/common';
 import Copyright from '@/components/copyright';
-import { ChangeLocales, SearchInput } from '@/components/global';
+import { ChangeLocales } from '@/components/global';
+import SearchInput from '@/components/search-input';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { CopyrightType } from '@/data/main';
 import { Button } from '@material-ui/core';
