@@ -1,3 +1,4 @@
+import LoadMore from './load-more';
 import ChangeLocales from './changeLocales';
 
-export { ChangeLocales };
+export { ChangeLocales, LoadMore };

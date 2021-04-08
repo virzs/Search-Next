@@ -33,7 +33,7 @@ import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import dayjs from 'dayjs';
 import './style/index.less';
-import LoadMore from '../load-more';
+import { LoadMore } from '@/components/global';
 
 export interface UpdateRecordDialogPropTypes {
   open: boolean;
@@ -97,7 +97,6 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
 
   // dialog滚动事件
   // TODO 无数据时的显示效果
-  // TODO commit链接跳转
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
@@ -167,7 +166,9 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
               </TimelineSeparator>
               <TimelineContent>
                 <React.Fragment>
-                  <span>{i.author.name}</span> - {i.message}
+                  <a href={i.url} target="_break">
+                    {i.author.name} - {i.message}
+                  </a>
                 </React.Fragment>
               </TimelineContent>
             </TimelineItem>
