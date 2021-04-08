@@ -22,3 +22,8 @@ export const copyright = () => {
     resolve({ code: 200, msg: '获取成功', data: copyrightData });
   });
 };
+
+// 获取网站icon
+export const getWebIconByUrl = (url: string) => {
+  return `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${url}`;
+};
