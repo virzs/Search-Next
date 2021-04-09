@@ -1,4 +1,7 @@
 {
+  "app.component.empty.description": "No data",
+  "app.component.empty.list.description": "No data in the list",
+  "app.component.empty.table_description": "No data in the table",
   "app.component.loadmore.loadmore": "load more...",
   "app.component.loadmore.nomore": "No more data",
   "app.component.searchinput.submitbutton": "Search",
