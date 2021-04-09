@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { useIntl } from 'react-intl';
+import './style/index.less';
 
 type EmptyType = 'table' | 'list' | '' | undefined;
 

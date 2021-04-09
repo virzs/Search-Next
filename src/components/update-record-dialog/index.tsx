@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-31 23:01:47
+ * @Last Modified time: 2021-04-09 17:42:03
  */
 
 import {
@@ -33,7 +33,7 @@ import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import dayjs from 'dayjs';
 import './style/index.less';
-import { LoadMore } from '@/components/global';
+import { Empty, LoadMore } from '@/components/global';
 
 export interface UpdateRecordDialogPropTypes {
   open: boolean;
@@ -96,7 +96,7 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   };
 
   // dialog滚动事件
-  // TODO 无数据时的显示效果
+  // TODO 弹窗打开时加载数据，关闭时清空
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
@@ -144,37 +144,43 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
         dividers
         onScroll={contentScroll}
       >
-        <Timeline align="alternate">
-          {commits.map((i, j) => (
-            <TimelineItem key={j}>
-              <TimelineOppositeContent>
-                <Typography variant="h6" color="textSecondary">
-                  {dayjs(i.author.date).format('YYYY/MM/DD')}
-                </Typography>
-                <Chip
-                  style={{
-                    backgroundColor: gitCommitColorByType(i.type),
-                    color: '#fff',
-                  }}
-                  label={i.type}
-                  size="small"
-                ></Chip>
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>
-                <React.Fragment>
-                  <a href={i.url} target="_break">
-                    {i.author.name} - {i.message}
-                  </a>
-                </React.Fragment>
-              </TimelineContent>
-            </TimelineItem>
-          ))}
-        </Timeline>
-        {loading && <LoadMore nomore={nomore} />}
+        {commits.length ? (
+          <>
+            <Timeline align="alternate">
+              {commits.map((i, j) => (
+                <TimelineItem key={j}>
+                  <TimelineOppositeContent>
+                    <Typography variant="h6" color="textSecondary">
+                      {dayjs(i.author.date).format('YYYY/MM/DD')}
+                    </Typography>
+                    <Chip
+                      style={{
+                        backgroundColor: gitCommitColorByType(i.type),
+                        color: '#fff',
+                      }}
+                      label={i.type}
+                      size="small"
+                    ></Chip>
+                  </TimelineOppositeContent>
+                  <TimelineSeparator>
+                    <TimelineDot />
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <React.Fragment>
+                      <a href={i.url} target="_break">
+                        {i.author.name} - {i.message}
+                      </a>
+                    </React.Fragment>
+                  </TimelineContent>
+                </TimelineItem>
+              ))}
+            </Timeline>
+            {loading && <LoadMore nomore={nomore} />}
+          </>
+        ) : (
+          <Empty></Empty>
+        )}
       </DialogContent>
     </Dialog>
   );
