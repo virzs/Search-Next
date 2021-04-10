@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-09 17:42:03
+ * @Last Modified time: 2021-04-10 16:44:29
  */
 
 import {
@@ -71,6 +71,7 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   const [nomore, setNomore] = useState<boolean>(false);
 
   const getCommitList = () => {
+    if (!open) return;
     let commitPage = page + 1;
     if (nomore) return;
     setPage(commitPage);
@@ -108,14 +109,18 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   // dialog关闭
   const handleClose = () => {
     onClose();
-    setCommits([]);
-    setPage(0);
-    setNomore(false);
-    setLoading(false);
   };
 
   useEffect(() => {
-    getCommitList();
+    if (open) {
+      setPage(0);
+      getCommitList();
+    } else {
+      setCommits([]);
+      setPage(0);
+      setNomore(false);
+      setLoading(false);
+    }
   }, [open]);
 
   return (
