@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-10 16:44:29
+ * @Last Modified time: 2021-04-10 21:28:18
  */
 
 import {
@@ -97,7 +97,6 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   };
 
   // dialog滚动事件
-  // TODO 弹窗打开时加载数据，关闭时清空
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
