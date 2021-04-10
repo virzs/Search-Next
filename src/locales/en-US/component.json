@@ -5,5 +5,8 @@
   "app.component.loadmore.loadmore": "load more...",
   "app.component.loadmore.nomore": "No more data",
   "app.component.searchinput.submitbutton": "Search",
+  "app.component.sitedialog.title.add": "Add site",
+  "app.component.sitedialog.title.del": "Delete site",
+  "app.component.sitedialog.title.edit": "Edit site",
   "app.component.uploadrecorddialog.title": "Update record"
 }
