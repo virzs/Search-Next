@@ -2,13 +2,14 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-03 17:38:36
+ * @Last Modified time: 2021-04-11 12:18:24
  */
 
 import { copyright as copyrightApi } from '@/apis/common';
 import Copyright from '@/components/copyright';
 import { ChangeLocales } from '@/components/global';
 import SearchInput from '@/components/search-input';
+import TopSites from '@/components/top-sites';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
@@ -64,7 +65,9 @@ export default function IndexPage() {
           onPressEnter={handleSearch}
         ></SearchInput>
       </div>
-      <div className="index-content-box"></div>
+      <div className="index-content-box">
+        <TopSites></TopSites>
+      </div>
       <div className="index-copyright-box">
         {copyright && (
           <Copyright
