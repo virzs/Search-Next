@@ -7,7 +7,7 @@ import './styles/dialog-title.less';
  * @Author: Vir
  * @Date: 2021-04-11 19:59:33
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-12 09:39:02
+ * @Last Modified time: 2021-04-12 09:52:33
  */
 
 export interface DialogTitleCustomProps extends DialogTitleProps {
@@ -27,7 +27,7 @@ const DialogTitleCustom: React.FC<DialogTitleCustomProps> = ({
         <IconButton
           className="dialog-title-custom-close"
           aria-label="close"
-          onClick={() => onClose}
+          onClick={onClose}
           size="small"
         >
           <Close />
