@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-11 22:44:20
+ * @Last Modified time: 2021-04-12 16:04:36
  */
 
 import {
@@ -13,6 +13,7 @@ import {
   Button,
 } from '@material-ui/core';
 import React from 'react';
+import { Controller, RegisterOptions, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { DialogTitle } from '../material-ui-custom/dialog';
 import './styles/dialog.less';
@@ -24,47 +25,138 @@ export type SiteDialogType = 'add' | 'edit' | 'del';
 interface SiteDialogPropTypes {
   open: boolean;
   type: SiteDialogType;
+  value?: FormTypes;
   onClose: () => void;
+  onSubmit: (val: FormTypes) => void;
 }
 
-const SiteDialog: React.FC<SiteDialogPropTypes> = ({ open, type, onClose }) => {
-  const { formatMessage } = useIntl();
+export interface FormTypes {
+  name: string;
+  url: string;
+}
 
-  const addContent = () => {
+interface FormItemPropType {
+  name: 'name' | 'url';
+  label: string;
+  placeholder: string;
+  rules: Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
+}
+
+interface FormTemplatePropType {
+  id: string;
+  items?: FormItemPropType[];
+  defaultValues?: FormTypes;
+  submit: (val: FormTypes) => void;
+}
+
+const SiteDialog: React.FC<SiteDialogPropTypes> = ({
+  open,
+  type,
+  value,
+  onClose,
+}) => {
+  const { formatMessage } = useIntl();
+  const { handleSubmit, control, reset } = useForm<FormTypes>();
+
+  // 表单模板
+  const FormTemplate: React.FC<FormTemplatePropType> = ({
+    id,
+    items = [
+      {
+        name: 'name',
+        label: formatMessage({ id: 'app.component.sitedialog.form.name' }),
+        placeholder: formatMessage({
+          id: 'app.component.sitedialog.placeholder.name',
+        }),
+        rules: {
+          required: {
+            value: true,
+            message: formatMessage({
+              id: 'app.component.sitedialog.placeholder.name',
+            }),
+          },
+        },
+      },
+      {
+        name: 'url',
+        label: formatMessage({ id: 'app.component.sitedialog.form.url' }),
+        placeholder: formatMessage({
+          id: 'app.component.sitedialog.placeholder.url',
+        }),
+        rules: {
+          required: {
+            value: true,
+            message: formatMessage({
+              id: 'app.component.sitedialog.placeholder.url',
+            }),
+          },
+          pattern: {
+            value: /^(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/,
+            message: formatMessage({
+              id: 'app.component.sitedialog.error.url',
+            }),
+          },
+        },
+      },
+    ],
+    defaultValues,
+    submit,
+  }) => {
     return (
-      <form autoComplete="off">
-        <TextField
-          variant="outlined"
-          fullWidth
-          required
-          size="small"
-          style={{ margin: '5px 0' }}
-          label={formatMessage({ id: 'app.component.sitedialog.form.name' })}
-          placeholder={formatMessage({
-            id: 'app.component.sitedialog.placeholder.name',
-          })}
-        ></TextField>
-        <TextField
-          variant="outlined"
-          fullWidth
-          required
-          size="small"
-          style={{ margin: '5px 0' }}
-          label={formatMessage({ id: 'app.component.sitedialog.form.url' })}
-          placeholder={formatMessage({
-            id: 'app.component.sitedialog.placeholder.url',
-          })}
-        ></TextField>
+      <form id={id} onSubmit={handleSubmit(submit)}>
+        {items.map((i, index) => (
+          <Controller
+            key={index}
+            control={control}
+            name={i.name}
+            rules={i.rules}
+            defaultValue={defaultValues?.[i.name]}
+            render={({ field: { onChange, ref }, fieldState: { error } }) => (
+              <TextField
+                inputRef={ref}
+                onChange={onChange}
+                variant="outlined"
+                fullWidth
+                size="small"
+                autoComplete="off"
+                error={error ? true : false}
+                style={{ margin: '8px 0' }}
+                label={i.label}
+                placeholder={i.placeholder}
+                helperText={error ? error.message : null}
+              ></TextField>
+            )}
+          />
+        ))}
       </form>
     );
   };
 
+  const addContent = () => {
+    return <FormTemplate id="SiteForm" submit={handleDialogSubmit} />;
+  };
+
   const editContent = () => {
-    return <></>;
+    return (
+      <FormTemplate
+        id="SiteForm"
+        defaultValues={value}
+        submit={handleDialogSubmit}
+      />
+    );
   };
 
   const delContent = () => {
     return <></>;
+  };
+
+  // dialog提交
+  const handleDialogSubmit = (val: FormTypes) => {
+    console.log(val);
+  };
+  // dialog取消
+  const handleCancel = () => {
+    reset();
   };
 
   React.useEffect(() => {}, [open]);
@@ -85,9 +177,17 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({ open, type, onClose }) => {
         {type === 'del' && delContent()}
       </DialogContent>
       <DialogActions className="dialog-actions">
-        <Button variant="contained">取消</Button>
-        <Button variant="contained" color="primary">
-          确认
+        <Button disableElevation variant="contained" onClick={handleCancel}>
+          {formatMessage({ id: 'app.global.dialog.cancel' })}
+        </Button>
+        <Button
+          form="SiteForm"
+          disableElevation
+          variant="contained"
+          color="primary"
+          type="submit"
+        >
+          {formatMessage({ id: 'app.global.dialog.confirm' })}
         </Button>
       </DialogActions>
     </Dialog>

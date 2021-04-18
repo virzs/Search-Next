@@ -5,6 +5,7 @@
   "app.component.loadmore.loadmore": "load more...",
   "app.component.loadmore.nomore": "No more data",
   "app.component.searchinput.submitbutton": "Search",
+  "app.component.sitedialog.error.url": "Please enter the URL in the correct format",
   "app.component.sitedialog.form.name": "Name",
   "app.component.sitedialog.form.url": "URL",
   "app.component.sitedialog.placeholder.name": "Please enter a name",

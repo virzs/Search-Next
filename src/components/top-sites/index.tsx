@@ -6,7 +6,7 @@
  */
 import { Grid } from '@material-ui/core';
 import React from 'react';
-import SiteDialog, { SiteDialogType } from './dialog';
+import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
 import SiteCard from './siteCard';
 import './styles/index.less';
 
@@ -25,6 +25,8 @@ const TopSites: React.FC = () => {
     setOpen(false);
   };
 
+  const dialogSubmit = (val: FormTypes) => {};
+
   return (
     <>
       <Grid
@@ -38,7 +40,12 @@ const TopSites: React.FC = () => {
           <SiteCard type="add" onClick={addClick} />
         </Grid>
       </Grid>
-      <SiteDialog open={open} type={type} onClose={dialogClose} />
+      <SiteDialog
+        open={open}
+        type={type}
+        onSubmit={dialogSubmit}
+        onClose={dialogClose}
+      />
     </>
   );
 };

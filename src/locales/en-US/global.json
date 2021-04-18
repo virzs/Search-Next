@@ -1,1 +1,4 @@
-{}
+{
+  "app.global.dialog.cancel": "Cancel",
+  "app.global.dialog.confirm": "Confirm"
+}
