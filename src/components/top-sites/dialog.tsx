@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-12 16:04:36
+ * @Last Modified time: 2021-04-18 17:42:36
  */
 
 import {
@@ -31,6 +31,7 @@ interface SiteDialogPropTypes {
 }
 
 export interface FormTypes {
+  id?: string;
   name: string;
   url: string;
 }
@@ -54,6 +55,7 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   type,
   value,
   onClose,
+  onSubmit,
 }) => {
   const { formatMessage } = useIntl();
   const { handleSubmit, control, reset } = useForm<FormTypes>();
@@ -152,7 +154,7 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
 
   // dialog提交
   const handleDialogSubmit = (val: FormTypes) => {
-    console.log(val);
+    onSubmit(val);
   };
   // dialog取消
   const handleCancel = () => {
