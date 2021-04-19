@@ -34,6 +34,7 @@
     "normalize.css": "^8.0.1",
     "react-hook-form": "^7.1.1",
     "react-spring": "^9.0.0",
+    "redux-persist": "^6.0.0",
     "umi": "^3.4.2"
   },
   "devDependencies": {

@@ -2,11 +2,14 @@
  * @Author: Vir
  * @Date: 2021-03-18 15:08:21
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-21 16:43:12
+ * @Last Modified time: 2021-04-19 11:44:51
  */
 
 import React from 'react';
-import { ThemeContext } from './components/global/context-provider';
+import { getDvaApp, Reducer } from 'umi';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
 interface RouterChangeTypes {
   location?: any;
@@ -22,6 +25,27 @@ export function onRouteChange({
   matchedRoutes,
   action,
 }: RouterChangeTypes) {}
+
+// 配置dva持久化存储
+export const dva = {
+  config: {
+    onError(e: Error) {},
+    onReducer(reducer: Reducer) {
+      const persistConfig = {
+        key: 'root',
+        storage,
+        whitelist: ['sites'],
+        stateReconciler: autoMergeLevel2,
+      };
+      return persistReducer(persistConfig, reducer);
+    },
+  },
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const app = getDvaApp();
+  persistStore(app._store);
+});
 
 //修改渲染时的根组件
 export function rootContainer(container: React.ReactElement) {
