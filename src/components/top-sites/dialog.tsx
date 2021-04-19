@@ -159,6 +159,7 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   // dialog取消
   const handleCancel = () => {
     reset();
+    onClose();
   };
 
   React.useEffect(() => {}, [open]);
