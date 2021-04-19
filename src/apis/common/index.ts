@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-27 16:37:20
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-27 16:55:20
+ * @Last Modified time: 2021-04-19 13:43:18
  */
 
 import mainData, { CopyrightType } from '@/data/main/index';
@@ -24,6 +24,6 @@ export const copyright = () => {
 };
 
 // 获取网站icon
-export const getWebIconByUrl = (url: string) => {
+export const getWebIconByUrl = (url?: string) => {
   return `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${url}`;
 };

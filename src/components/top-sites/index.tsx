@@ -25,6 +25,17 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
     setOpen(true);
   };
 
+  const itemClick = (val: SiteListType) => {
+    console.log(val);
+    if (dispatch)
+      dispatch({
+        type: 'sites/addCount',
+        payload: {
+          id: val.id,
+        },
+      });
+  };
+
   const dialogClose = () => {
     setOpen(false);
   };
@@ -41,18 +52,17 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
   };
 
   React.useEffect(() => {
-    console.log({ list, dispatch });
+    console.log(list);
   }, [list]);
 
   return (
     <>
-      <Grid
-        className="top-sites"
-        container
-        alignContent="center"
-        alignItems="center"
-        justify="center"
-      >
+      <Grid className="top-sites" container justify="center" spacing={2}>
+        {list.map((i) => (
+          <Grid item key={i.id}>
+            <SiteCard item={i} onClick={() => itemClick(i)} />
+          </Grid>
+        ))}
         <Grid item>
           <SiteCard type="add" onClick={addClick} />
         </Grid>
