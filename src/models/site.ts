@@ -24,9 +24,13 @@ export interface SitesModelType {
   state: SitesStateType;
   effects: {
     add: Effect;
+    addCount: Effect;
+    del: Effect;
   };
   reducers: {
     add: Reducer<any>;
+    addCount: Reducer<any>;
+    del: Reducer<any>;
   };
 }
 
@@ -35,20 +39,46 @@ export default {
   namespace: 'sites',
   state: { list: [] },
   effects: {
+    // 新增网址
     *add({ payload }, { put }) {
-      console.log(payload);
       return put({ type: 'add', payload });
+    },
+    // 网址计数
+    *addCount({ payload }, { put }) {
+      return put({ type: 'addCount', payload });
+    },
+    *del({ payload }, { put }) {
+      return put({ type: 'del', payload });
     },
   },
   reducers: {
+    // 新增网址
     add(state, action) {
       const site = {
         id: getUuid(),
         count: 0,
         ...action.payload.item,
       };
-      console.log(state.list);
       return { ...state, list: state.list.concat(site) };
+    },
+    // 网址计数
+    addCount(state, action) {
+      const id = action.payload.id;
+      return {
+        ...state,
+        list: state.list.map((i: SiteListType) => {
+          if (i.id === id) return { ...i, count: i.count + 1 };
+          return i;
+        }),
+      };
+    },
+    // 删除网址
+    del(state, action) {
+      const id = action.payload.id;
+      return {
+        ...state,
+        list: state.list.filter((i: SiteListType) => i.id !== id),
+      };
     },
   },
 } as SitesModelType;
