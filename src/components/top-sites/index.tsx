@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-18 23:45:28
+ * @Last Modified time: 2021-04-23 16:38:26
  */
 import { ConnectStateType } from '@/models/connect';
 import { Grid } from '@material-ui/core';
@@ -10,6 +10,7 @@ import React from 'react';
 import { connect, ConnectProps, SiteListType } from 'umi';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
 import SiteCard from './siteCard';
+import { useSnackbar } from 'notistack';
 import './styles/index.less';
 
 export interface TopSitesPropType extends ConnectProps {
@@ -17,6 +18,8 @@ export interface TopSitesPropType extends ConnectProps {
 }
 
 const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [open, setOpen] = React.useState<boolean>(false);
   const [type, setType] = React.useState<SiteDialogType>('add');
 
@@ -41,13 +44,15 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
   };
 
   const dialogSubmit = (val: FormTypes) => {
-    console.log(val, 'dialog submit');
     if (dispatch)
       dispatch({
         type: 'sites/add',
         payload: {
           item: val,
         },
+      }).then(() => {
+        enqueueSnackbar('添加成功', { variant: 'success' });
+        setOpen(false);
       });
   };
 

@@ -162,7 +162,9 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
     onClose();
   };
 
-  React.useEffect(() => {}, [open]);
+  React.useEffect(() => {
+    if (!open) reset();
+  }, [open]);
 
   return (
     <Dialog className="top-site-dialog" open={open} onClose={onClose}>
