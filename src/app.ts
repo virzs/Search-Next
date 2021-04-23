@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-18 15:08:21
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-19 11:44:51
+ * @Last Modified time: 2021-04-23 16:24:01
  */
 
 import React from 'react';
@@ -10,6 +10,7 @@ import { getDvaApp, Reducer } from 'umi';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import NotistackWrapper from './components/material-ui-custom/notistack';
 
 interface RouterChangeTypes {
   location?: any;
@@ -49,5 +50,5 @@ window.addEventListener('DOMContentLoaded', () => {
 
 //修改渲染时的根组件
 export function rootContainer(container: React.ReactElement) {
-  return container;
+  return React.createElement(NotistackWrapper, null, container);
 }
