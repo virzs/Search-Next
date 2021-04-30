@@ -101,7 +101,6 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
         },
       },
     ],
-    defaultValues,
     submit,
   }) => {
     return (
@@ -112,7 +111,6 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
             control={control}
             name={i.name}
             rules={i.rules}
-            defaultValue={defaultValues?.[i.name]}
             render={({ field: { onChange, ref }, fieldState: { error } }) => (
               <TextField
                 inputRef={ref}
@@ -139,13 +137,7 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   };
 
   const editContent = () => {
-    return (
-      <FormTemplate
-        id="SiteForm"
-        defaultValues={value}
-        submit={handleDialogSubmit}
-      />
-    );
+    return <FormTemplate id="SiteForm" submit={handleDialogSubmit} />;
   };
 
   const delContent = () => {
@@ -158,16 +150,16 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   };
   // dialog取消
   const handleCancel = () => {
-    reset();
     onClose();
+    reset();
   };
 
   React.useEffect(() => {
-    if (!open) reset();
-  }, [open]);
+    reset(value);
+  }, [value]);
 
   return (
-    <Dialog className="top-site-dialog" open={open} onClose={onClose}>
+    <Dialog className="top-site-dialog" open={open} onClose={handleCancel}>
       <DialogTitle onClose={onClose}>
         {type === 'add' &&
           formatMessage({ id: 'app.component.sitedialog.title.add' })}

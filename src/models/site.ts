@@ -24,11 +24,13 @@ export interface SitesModelType {
   state: SitesStateType;
   effects: {
     add: Effect;
+    edit: Effect;
     addCount: Effect;
     del: Effect;
   };
   reducers: {
     add: Reducer<any>;
+    edit: Reducer<any>;
     addCount: Reducer<any>;
     del: Reducer<any>;
   };
@@ -42,6 +44,10 @@ export default {
     // 新增网址
     *add({ payload }, { put }) {
       return put({ type: 'add', payload });
+    },
+    // 编辑网址
+    *edit({ payload }, { put }) {
+      return put({ type: 'edit', payload });
     },
     // 网址计数
     *addCount({ payload }, { put }) {
@@ -60,6 +66,16 @@ export default {
         ...action.payload.item,
       };
       return { ...state, list: state.list.concat(site) };
+    },
+    // 编辑网站
+    edit(state, action) {
+      const item = action.payload.item;
+      return {
+        ...state,
+        list: state.list.map((i: SiteListType) =>
+          i.id === item.id ? item : i,
+        ),
+      };
     },
     // 网址计数
     addCount(state, action) {

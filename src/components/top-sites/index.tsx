@@ -22,6 +22,7 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [type, setType] = React.useState<SiteDialogType>('add');
+  const [editValue, setEditValue] = React.useState({} as SiteListType);
 
   const addClick = () => {
     setType('add');
@@ -29,7 +30,6 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
   };
 
   const itemClick = (val: SiteListType) => {
-    console.log(val);
     if (dispatch)
       dispatch({
         type: 'sites/addCount',
@@ -39,21 +39,50 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
       });
   };
 
+  const onEdit = (value: SiteListType) => {
+    setType('edit');
+    setEditValue(value);
+    setOpen(true);
+  };
+
+  const onRemove = (id: string) => {
+    if (dispatch)
+      dispatch({
+        type: 'sites/del',
+        payload: { id },
+      }).then(() => {
+        enqueueSnackbar('删除成功', { variant: 'success' });
+      });
+  };
+
   const dialogClose = () => {
     setOpen(false);
+    setEditValue({ id: '', name: '', url: '', count: 0 });
   };
 
   const dialogSubmit = (val: FormTypes) => {
     if (dispatch)
-      dispatch({
-        type: 'sites/add',
-        payload: {
-          item: val,
-        },
-      }).then(() => {
-        enqueueSnackbar('添加成功', { variant: 'success' });
-        setOpen(false);
-      });
+      if (type === 'add') {
+        dispatch({
+          type: 'sites/add',
+          payload: {
+            item: val,
+          },
+        }).then(() => {
+          enqueueSnackbar('添加成功', { variant: 'success' });
+          setOpen(false);
+        });
+      } else if (type === 'edit') {
+        dispatch({
+          type: 'sites/edit',
+          payload: {
+            item: val,
+          },
+        }).then(() => {
+          enqueueSnackbar('修改成功', { variant: 'success' });
+          setOpen(false);
+        });
+      }
   };
 
   React.useEffect(() => {
@@ -65,7 +94,12 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
       <Grid className="top-sites" container justify="center" spacing={2}>
         {list.map((i) => (
           <Grid item key={i.id}>
-            <SiteCard item={i} onClick={() => itemClick(i)} />
+            <SiteCard
+              item={i}
+              onClick={() => itemClick(i)}
+              onEdit={onEdit}
+              onRemove={onRemove}
+            />
           </Grid>
         ))}
         <Grid item>
@@ -75,6 +109,7 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
       <SiteDialog
         open={open}
         type={type}
+        value={editValue}
         onSubmit={dialogSubmit}
         onClose={dialogClose}
       />
