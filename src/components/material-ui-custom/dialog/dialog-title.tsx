@@ -7,12 +7,12 @@ import './styles/dialog-title.less';
  * @Author: Vir
  * @Date: 2021-04-11 19:59:33
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-12 09:52:33
+ * @Last Modified time: 2021-05-04 11:22:56
  */
 
 export interface DialogTitleCustomProps extends DialogTitleProps {
   children: any;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const DialogTitleCustom: React.FC<DialogTitleCustomProps> = ({
