@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-18 17:42:36
+ * @Last Modified time: 2021-05-04 16:45:09
  */
 
 import {
@@ -141,11 +141,14 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   };
 
   const delContent = () => {
-    return <></>;
+    return (
+      <p>{formatMessage({ id: 'app.component.sitedialog.content.del' })}</p>
+    );
   };
 
   // dialog提交
   const handleDialogSubmit = (val: FormTypes) => {
+    if (type === 'del' && value) val = value;
     onSubmit(val);
   };
   // dialog取消

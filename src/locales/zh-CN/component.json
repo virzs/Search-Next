@@ -5,13 +5,14 @@
   "app.component.loadmore.loadmore": "加载更多...",
   "app.component.loadmore.nomore": "没有更多数据",
   "app.component.searchinput.submitbutton": "搜索",
+  "app.component.sitedialog.content.del": "是否删除此网址？",
   "app.component.sitedialog.error.url": "请输入正确格式的网址",
   "app.component.sitedialog.form.name": "名称",
   "app.component.sitedialog.form.url": "网址",
   "app.component.sitedialog.placeholder.name": "请输入名称",
   "app.component.sitedialog.placeholder.url": "请输入网址",
   "app.component.sitedialog.title.add": "添加网站",
-  "app.component.sitedialog.title.del": "删除网站",
+  "app.component.sitedialog.title.del": "删除",
   "app.component.sitedialog.title.edit": "编辑网站",
   "app.component.uploadrecorddialog.title": "更新记录"
 }
