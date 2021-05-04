@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-05-01 01:23:50
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-04 16:37:26
+ * @Last Modified time: 2021-05-04 16:49:40
  */
 
 import {
@@ -111,10 +111,16 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button disableElevation variant="contained" onClick={onCancel}>
+        <Button
+          size="small"
+          disableElevation
+          variant="contained"
+          onClick={onCancel}
+        >
           {cancelText ? cancelText : 'Cancel'}
         </Button>
         <Button
+          size="small"
           disableElevation
           variant="contained"
           color="primary"
