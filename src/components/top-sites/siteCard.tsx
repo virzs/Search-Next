@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-11 14:54:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-27 23:27:39
+ * @Last Modified time: 2021-05-04 22:50:12
  */
 
 import { getWebIconByUrl } from '@/apis/common';
@@ -17,6 +17,7 @@ import {
   IconButton,
 } from '@material-ui/core';
 import { Add, Delete, Edit, MoreHoriz } from '@material-ui/icons';
+import classNames from 'classnames';
 import React from 'react';
 import './styles/siteCard.less';
 
@@ -38,27 +39,6 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
   onRemove,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const viewContent = () => {
-    return (
-      <>
-        <Avatar
-          className="icon"
-          variant="rounded"
-          src={getWebIconByUrl(item?.url)}
-        ></Avatar>
-        <p className="site-name">{item?.name}</p>
-      </>
-    );
-  };
-
-  const addContent = () => {
-    return (
-      <Avatar className="icon" variant="rounded">
-        <Add />
-      </Avatar>
-    );
-  };
 
   const onMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -84,9 +64,23 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
 
   return (
     <>
-      <Card className="top-site-item" onClick={siteClick}>
-        <CardHeader
-          title={
+      <div className="VuiSiteCard-root">
+        <div
+          className={classNames(['content-container', { add: type === 'add' }])}
+        >
+          <Avatar
+            className="image-container"
+            variant="rounded"
+            src={getWebIconByUrl(item?.url)}
+          >
+            {type === 'add' && <Add />}
+          </Avatar>
+          <p className="title-container">
+            <a>{item?.name}</a>
+          </p>
+        </div>
+        {type === 'view' && (
+          <span className="handle-container">
             <IconButton
               size="small"
               aria-controls={`site-${item?.name}-menu`}
@@ -95,13 +89,9 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
             >
               <MoreHoriz />
             </IconButton>
-          }
-        />
-        <CardContent className="site-item-content">
-          {type === 'add' && addContent()}
-          {type === 'view' && viewContent()}
-        </CardContent>
-      </Card>
+          </span>
+        )}
+      </div>
       <Menu
         id={`site-${item?.name}-menu`}
         open={Boolean(anchorEl)}
