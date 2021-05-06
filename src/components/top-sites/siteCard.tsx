@@ -27,6 +27,7 @@ interface SiteCardPropTypes {
   type?: SiteCardType;
   item?: SiteListType;
   onClick?: () => void;
+  onAdd?: () => void;
   onEdit?: (value: SiteListType) => void;
   onRemove?: (id: string) => void;
 }
@@ -35,6 +36,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
   type = 'view',
   item,
   onClick,
+  onAdd,
   onEdit,
   onRemove,
 }) => {
@@ -64,7 +66,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
 
   return (
     <>
-      <div className="VuiSiteCard-root">
+      <div className="VuiSiteCard-root" onClick={onClick}>
         <div
           className={classNames(['content-container', { add: type === 'add' }])}
         >
@@ -72,6 +74,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
             className="image-container"
             variant="rounded"
             src={getWebIconByUrl(item?.url)}
+            onClick={onAdd ? onAdd : undefined}
           >
             {type === 'add' && <Add />}
           </Avatar>

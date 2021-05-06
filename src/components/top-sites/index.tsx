@@ -13,6 +13,7 @@ import SiteCard from './siteCard';
 import { useSnackbar } from 'notistack';
 import './styles/index.less';
 import DialogConfirm from '../material-ui-custom/dialog/DialogConfirm';
+import { replaceUrlNotHaveHttpsOrHttpToHttps } from '@/utils/common';
 
 export interface TopSitesPropType extends ConnectProps {
   list: SiteListType[];
@@ -28,11 +29,6 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
   const [confirmOpen, setConfirmOpen] = React.useState<boolean>(false);
   const [delId, setDelId] = React.useState<string>('');
 
-  const addClick = () => {
-    setType('add');
-    setOpen(true);
-  };
-
   const itemClick = (val: SiteListType) => {
     if (dispatch)
       dispatch({
@@ -40,7 +36,14 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
         payload: {
           id: val.id,
         },
+      }).then(() => {
+        window.open(replaceUrlNotHaveHttpsOrHttpToHttps(val.url));
       });
+  };
+
+  const onAdd = () => {
+    setType('add');
+    setOpen(true);
   };
 
   const onEdit = (value: SiteListType) => {
@@ -117,7 +120,7 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
           </Grid>
         ))}
         <Grid item>
-          <SiteCard type="add" onClick={addClick} />
+          <SiteCard type="add" onAdd={onAdd} />
         </Grid>
       </Grid>
       <SiteDialog

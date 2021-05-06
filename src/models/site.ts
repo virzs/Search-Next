@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-04-18 23:44:37
  */
 
-import { getUuid } from '@/utils/common';
+import { getUuid, replaceUrlHaveHttpsOrHttpToEmpty } from '@/utils/common';
 import { Effect, Reducer } from 'umi';
 
 export interface SiteListType {
@@ -60,10 +60,13 @@ export default {
   reducers: {
     // 新增网址
     add(state, action) {
+      // todo url附加https
+      const item = action.payload.item;
       const site = {
         id: getUuid(),
         count: 0,
-        ...action.payload.item,
+        ...item,
+        url: replaceUrlHaveHttpsOrHttpToEmpty(item.url),
       };
       return { ...state, list: state.list.concat(site) };
     },
@@ -73,7 +76,9 @@ export default {
       return {
         ...state,
         list: state.list.map((i: SiteListType) =>
-          i.id === item.id ? item : i,
+          i.id === item.id
+            ? { ...item, url: replaceUrlHaveHttpsOrHttpToEmpty(item.url) }
+            : i,
         ),
       };
     },

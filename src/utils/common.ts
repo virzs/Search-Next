@@ -85,3 +85,22 @@ export const getUuid = () => {
   let uuid = s.join('');
   return uuid;
 };
+
+// 检查网址是否包含https或http
+export const checkUrlWithHttpsOrHttp = (url: string) => {
+  const re = /^(((ht|f)tps?):\/\/)[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/;
+  return re.test(url);
+};
+
+// 网址存在https或http替换
+export const replaceUrlHaveHttpsOrHttpToEmpty = (url: string): string => {
+  const reg = /^((ht|f)tps?:\/\/)/;
+  return url.replace(reg, '');
+};
+
+// 网址不存在https或http替换
+export const replaceUrlNotHaveHttpsOrHttpToHttps = (url: string): string => {
+  const reg = /^((ht|f)tps?:\/\/)/;
+  const res = reg.test(url);
+  return res ? url : `https://${url}`;
+};
