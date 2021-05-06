@@ -140,12 +140,6 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
     return <FormTemplate id="SiteForm" submit={handleDialogSubmit} />;
   };
 
-  const delContent = () => {
-    return (
-      <p>{formatMessage({ id: 'app.component.sitedialog.content.del' })}</p>
-    );
-  };
-
   // dialog提交
   const handleDialogSubmit = (val: FormTypes) => {
     if (type === 'del' && value) val = value;
@@ -168,13 +162,10 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
           formatMessage({ id: 'app.component.sitedialog.title.add' })}
         {type === 'edit' &&
           formatMessage({ id: 'app.component.sitedialog.title.edit' })}
-        {type === 'del' &&
-          formatMessage({ id: 'app.component.sitedialog.title.del' })}
       </DialogTitle>
       <DialogContent>
         {type === 'add' && addContent()}
         {type === 'edit' && editContent()}
-        {type === 'del' && delContent()}
       </DialogContent>
       <DialogActions className="dialog-actions">
         <Button disableElevation variant="contained" onClick={handleCancel}>

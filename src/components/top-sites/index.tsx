@@ -43,6 +43,7 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
 
   const onAdd = () => {
     setType('add');
+    console.log(editValue);
     setOpen(true);
   };
 
@@ -76,7 +77,6 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
   };
 
   const dialogSubmit = (val: FormTypes) => {
-    console.log(val);
     if (!dispatch) return;
     if (type === 'add') {
       dispatch({
@@ -86,6 +86,7 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
         },
       }).then(() => {
         enqueueSnackbar('添加成功', { variant: 'success' });
+        setEditValue({ id: '', name: '', url: '', count: 0 });
         setOpen(false);
       });
     }
@@ -97,6 +98,7 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
         },
       }).then(() => {
         enqueueSnackbar('修改成功', { variant: 'success' });
+        setEditValue({ id: '', name: '', url: '', count: 0 });
         setOpen(false);
       });
     }

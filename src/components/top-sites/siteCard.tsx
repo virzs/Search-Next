@@ -7,15 +7,7 @@
 
 import { getWebIconByUrl } from '@/apis/common';
 import { SiteListType } from '@/models/site';
-import {
-  Card,
-  CardContent,
-  Avatar,
-  CardHeader,
-  Menu,
-  MenuItem,
-  IconButton,
-} from '@material-ui/core';
+import { Avatar, Menu, MenuItem, IconButton } from '@material-ui/core';
 import { Add, Delete, Edit, MoreHoriz } from '@material-ui/icons';
 import classNames from 'classnames';
 import React from 'react';
