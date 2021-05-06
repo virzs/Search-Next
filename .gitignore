@@ -19,6 +19,9 @@
 # vscode
 /.vscode
 
+# idea
+/.idea
+
 # umi
 /src/.umi
 /src/.umi-production
