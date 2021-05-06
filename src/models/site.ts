@@ -63,9 +63,9 @@ export default {
       // todo url附加https
       const item = action.payload.item;
       const site = {
+        ...item,
         id: getUuid(),
         count: 0,
-        ...item,
         url: replaceUrlHaveHttpsOrHttpToEmpty(item.url),
       };
       return { ...state, list: state.list.concat(site) };
