@@ -60,7 +60,6 @@ export default {
   reducers: {
     // 新增网址
     add(state, action) {
-      // todo url附加https
       const item = action.payload.item;
       const site = {
         ...item,
