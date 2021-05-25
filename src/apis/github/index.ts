@@ -16,3 +16,13 @@ export const commitList = (page: number = 1, size: number = 10) => {
     },
   });
 };
+
+// 获取github releases记录
+export const releasesList = (page: number = 1, size: number = 10) => {
+  return axios.get('https://api.github.com/repos/virzs/Search-React/releases', {
+    params: {
+      page: page,
+      per_page: size,
+    },
+  });
+};

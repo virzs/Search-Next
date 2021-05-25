@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-10 21:28:18
+ * @Last Modified time: 2021-05-25 22:10:11
  */
 
 import {
@@ -12,6 +12,8 @@ import {
   Chip,
   Typography,
   IconButton,
+  Tabs,
+  Tab,
 } from '@material-ui/core';
 import {
   Timeline,
@@ -34,6 +36,8 @@ import { useIntl } from 'react-intl';
 import dayjs from 'dayjs';
 import './style/index.less';
 import { Empty, LoadMore } from '@/components/global';
+import TabsCustom from '../material-ui-custom/tabs/tabs';
+import CommitPage from './commits';
 
 export interface UpdateRecordDialogPropTypes {
   open: boolean;
@@ -69,39 +73,14 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
   const [nomore, setNomore] = useState<boolean>(false);
-
-  const getCommitList = () => {
-    if (!open) return;
-    let commitPage = page + 1;
-    if (nomore) return;
-    setPage(commitPage);
-    setLoading(true);
-    commitList(commitPage).then((res) => {
-      if (res.data.length === 0) return setNomore(true);
-      const formatCommit = res.data.map((i: CommitSourceValueTypes) => {
-        let { email, ...author } = i.commit.author;
-        return {
-          author: {
-            ...author,
-            avatar_url: i.author.avatar_url,
-            html_url: i.author.html_url,
-          },
-          url: i.html_url,
-          ...getGithubCommitType(i.commit.message),
-        };
-      });
-      setCommits(commits.concat(formatCommit));
-      setNomore(false);
-      setLoading(false);
-    });
-  };
+  const [activeTab, setActiveTab] = React.useState<number>(0);
 
   // dialog滚动事件
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
     if (isBottom && !loading) {
-      getCommitList();
+      setLoading(true);
     }
   };
 
@@ -113,7 +92,6 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   useEffect(() => {
     if (open) {
       setPage(0);
-      getCommitList();
     } else {
       setCommits([]);
       setPage(0);
@@ -148,43 +126,19 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
         dividers
         onScroll={contentScroll}
       >
-        {commits.length ? (
-          <>
-            <Timeline align="alternate">
-              {commits.map((i, j) => (
-                <TimelineItem key={j}>
-                  <TimelineOppositeContent>
-                    <Typography variant="h6" color="textSecondary">
-                      {dayjs(i.author.date).format('YYYY/MM/DD')}
-                    </Typography>
-                    <Chip
-                      style={{
-                        backgroundColor: gitCommitColorByType(i.type),
-                        color: '#fff',
-                      }}
-                      label={i.type}
-                      size="small"
-                    ></Chip>
-                  </TimelineOppositeContent>
-                  <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <React.Fragment>
-                      <a href={i.url} target="_break">
-                        {i.author.name} - {i.message}
-                      </a>
-                    </React.Fragment>
-                  </TimelineContent>
-                </TimelineItem>
-              ))}
-            </Timeline>
-            {loading && <LoadMore nomore={nomore} />}
-          </>
-        ) : (
-          <Empty></Empty>
-        )}
+        <TabsCustom
+          value={activeTab}
+          handleChange={(_, tab) => {
+            setActiveTab(tab);
+          }}
+          tabs={['更新记录', '历史版本']}
+          tabPanels={[
+            <CommitPage
+              loading={loading}
+              onAfterLoading={() => setLoading(false)}
+            />,
+          ]}
+        />
       </DialogContent>
     </Dialog>
   );
