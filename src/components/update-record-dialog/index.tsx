@@ -2,40 +2,20 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-25 22:10:11
+ * @Last Modified time: 2021-05-25 22:18:12
  */
 
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Chip,
-  Typography,
   IconButton,
-  Tabs,
-  Tab,
 } from '@material-ui/core';
-import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineItem,
-  TimelineOppositeContent,
-  TimelineSeparator,
-} from '@material-ui/lab';
 import CloseIcon from '@material-ui/icons/Close';
-import {
-  getGithubCommitType,
-  gitCommitColorByType,
-  githubCommitTypes,
-} from '@/utils/common';
-import { commitList } from '@/apis/github';
-import React, { useEffect, useState } from 'react';
+import { githubCommitTypes } from '@/utils/common';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
-import dayjs from 'dayjs';
 import './style/index.less';
-import { Empty, LoadMore } from '@/components/global';
 import TabsCustom from '../material-ui-custom/tabs/tabs';
 import CommitPage from './commits';
 
@@ -69,10 +49,7 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   ...props
 }) => {
   const { formatMessage } = useIntl();
-  const [commits, setCommits] = useState([] as CommitValueTypes[]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
-  const [nomore, setNomore] = useState<boolean>(false);
   const [activeTab, setActiveTab] = React.useState<number>(0);
 
   // dialog滚动事件
@@ -88,17 +65,6 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
   const handleClose = () => {
     onClose();
   };
-
-  useEffect(() => {
-    if (open) {
-      setPage(0);
-    } else {
-      setCommits([]);
-      setPage(0);
-      setNomore(false);
-      setLoading(false);
-    }
-  }, [open]);
 
   return (
     <Dialog
