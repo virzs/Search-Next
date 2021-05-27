@@ -55,7 +55,7 @@ const CommitPage: React.FC<CommitPagePropsType> = ({
 
   const [commits, setCommits] = React.useState([] as CommitValueTypes[]);
   const [nomore, setNomore] = React.useState<boolean>(false);
-  const [page, setPage] = React.useState<number>(0);
+  const [page, setPage] = React.useState<number>(1);
 
   const getList = (page: number) => {
     setPage(page);

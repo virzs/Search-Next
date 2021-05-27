@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 16:26:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-25 22:18:12
+ * @Last Modified time: 2021-05-26 17:26:22
  */
 
 import {
@@ -18,6 +18,7 @@ import { useIntl } from 'react-intl';
 import './style/index.less';
 import TabsCustom from '../material-ui-custom/tabs/tabs';
 import CommitPage from './commits';
+import ReleasePage from './releases';
 
 export interface UpdateRecordDialogPropTypes {
   open: boolean;
@@ -50,14 +51,16 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
 }) => {
   const { formatMessage } = useIntl();
   const [loading, setLoading] = useState<boolean>(false);
+  const [releaseLoading, setReleaseLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = React.useState<number>(0);
 
   // dialog滚动事件
   const contentScroll = (e: { target: any }) => {
     let el = e.target;
     let isBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1; // 修正误差
-    if (isBottom && !loading) {
+    if (isBottom && (!loading || !releaseLoading)) {
       setLoading(true);
+      setReleaseLoading(true);
     }
   };
 
@@ -102,6 +105,10 @@ export const UpdateRecordDialog: React.FC<UpdateRecordDialogPropTypes> = ({
             <CommitPage
               loading={loading}
               onAfterLoading={() => setLoading(false)}
+            />,
+            <ReleasePage
+              loading={releaseLoading}
+              onAfterLoading={() => setReleaseLoading(false)}
             />,
           ]}
         />
