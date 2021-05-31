@@ -6,7 +6,8 @@
  */
 import { releasesList } from '@/apis/github';
 import { GithubReleaseType } from '@/apis/github/interface';
-import { Card, CardContent } from '@material-ui/core';
+import { Card, CardContent, CardHeader } from '@material-ui/core';
+import dayjs from 'dayjs';
 import React from 'react';
 import { Empty, LoadMore } from '../global';
 
@@ -50,13 +51,21 @@ const ReleasePage: React.FC<ReleasePagePropsType> = ({
       {releases.length ? (
         <>
           {releases.map((i, j: number) => (
-            <Card key={j}>
-              <CardContent>
-                <p>{i.author.login}</p>
-                <p>{i.tag_name}</p>
-                <p>{i.name}</p>
-                <p>{i.body}</p>
-                <p>{i.published_at}</p>
+            <Card key={j} className="release-card-root">
+              <p className="release-tag">{i.tag_name}</p>
+              <CardHeader className="release-title" title={i.name}></CardHeader>
+              <CardContent className="release-content">
+                <div className="release-author">
+                  <img src={i.author.avatar_url} alt="" />
+                  <span>{i.author.login}</span>
+                  <span>
+                    {dayjs(i.published_at).format('YYYY-MM-DD HH:mm:ss')}
+                  </span>
+                </div>
+                <pre className="release-body">{i.body}</pre>
+                <a className="release-more" href={i.html_url} target="_blank">
+                  查看更多
+                </a>
               </CardContent>
             </Card>
           ))}

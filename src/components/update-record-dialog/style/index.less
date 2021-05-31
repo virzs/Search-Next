@@ -27,4 +27,52 @@
       }
     }
   }
+  .release-card-root {
+    margin: 10px 0;
+    position: relative;
+    .release-tag {
+      position: absolute;
+      background-color: #28a745;
+      color: #fff;
+      transform: rotate(45deg);
+      top: 10px;
+      right: -20px;
+      width: 80px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .release-title {
+      padding: 20px 20px 0;
+      .MuiCardHeader-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+    }
+    .release-content {
+      padding: 0 20px 20px;
+      .release-author {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        margin: 5px 0 14px;
+        img {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          margin-right: 5px;
+          border-radius: 10px;
+        }
+        span {
+          display: inline-block;
+          margin-right: 5px;
+        }
+      }
+      .release-body {
+        font-size: 16px;
+      }
+      .release-more {
+        font-size: 14px;
+      }
+    }
+  }
 }
