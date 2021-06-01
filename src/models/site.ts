@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-18 16:15:58
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-18 23:44:37
+ * @Last Modified time: 2021-06-01 17:15:35
  */
 
 import { getUuid, replaceUrlHaveHttpsOrHttpToEmpty } from '@/utils/common';
@@ -27,12 +27,14 @@ export interface SitesModelType {
     edit: Effect;
     addCount: Effect;
     del: Effect;
+    repeal: Effect;
   };
   reducers: {
     add: Reducer<any>;
     edit: Reducer<any>;
     addCount: Reducer<any>;
     del: Reducer<any>;
+    repeal: Reducer<any>;
   };
 }
 
@@ -55,6 +57,9 @@ export default {
     },
     *del({ payload }, { put }) {
       return put({ type: 'del', payload });
+    },
+    *repeal({ payload }, { put }) {
+      return put({ type: 'repeal', payload });
     },
   },
   reducers: {
@@ -95,9 +100,30 @@ export default {
     // 删除网址
     del(state, action) {
       const id = action.payload.id;
+      const item = state.list.find((i: SiteListType) => i.id === id);
+      sessionStorage.setItem('repeal', JSON.stringify(item));
       return {
         ...state,
         list: state.list.filter((i: SiteListType) => i.id !== id),
+      };
+    },
+    // 撤销
+    repeal(state, action) {
+      let item = {};
+      let session = sessionStorage.getItem('repeal');
+      if (session !== null) {
+        item = JSON.parse(session);
+        sessionStorage.removeItem('repeal');
+      }
+      if (Object.keys(item).length === 0) {
+        return {
+          ...state,
+          list: state.list,
+        };
+      }
+      return {
+        ...state,
+        list: state.list.concat(item),
       };
     },
   },

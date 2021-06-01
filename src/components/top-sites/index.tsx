@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-04 16:43:10
+ * @Last Modified time: 2021-06-01 17:04:45
  */
 import { ConnectStateType } from '@/models/connect';
-import { Grid } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import React from 'react';
 import { connect, ConnectProps, SiteListType, useIntl } from 'umi';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
@@ -67,7 +67,24 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
         },
       }).then(() => {
         setConfirmOpen(false);
-        enqueueSnackbar('删除成功', { variant: 'success' });
+        enqueueSnackbar('删除成功', {
+          variant: 'info',
+          action: () => (
+            <Button
+              style={{ color: '#fff' }}
+              onClick={() => {
+                if (dispatch)
+                  dispatch({
+                    type: 'sites/repeal',
+                  }).then(() => {
+                    enqueueSnackbar('撤销成功', { variant: 'success' });
+                  });
+              }}
+            >
+              撤销
+            </Button>
+          ),
+        });
       });
   };
 
