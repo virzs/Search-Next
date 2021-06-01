@@ -75,4 +75,38 @@
       }
     }
   }
+  .commit-card-root {
+    margin: 10px 0;
+    position: relative;
+    .commit-tag {
+      position: absolute;
+      color: #fff;
+      transform: rotate(45deg);
+      top: 10px;
+      right: -20px;
+      width: 80px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .commit-card-content {
+      padding: 20px;
+      .commit-author-container {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        margin: 5px 0 14px;
+        img {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          margin-right: 5px;
+          border-radius: 10px;
+        }
+        span {
+          display: inline-block;
+          margin-right: 5px;
+        }
+      }
+    }
+  }
 }

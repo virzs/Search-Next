@@ -11,10 +11,9 @@ import {
   gitCommitColorByType,
   githubCommitTypes,
 } from '@/utils/common';
-import { Typography, Chip, Card, CardContent } from '@material-ui/core';
+import { Chip, Card, CardContent } from '@material-ui/core';
 import dayjs from 'dayjs';
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import { LoadMore, Empty } from '../global';
 
 export interface CommitValueTypes {
@@ -41,18 +40,10 @@ export interface CommitPagePropsType {
   onAfterLoading: () => void;
 }
 
-const useStyles = makeStyles({
-  root: {
-    margin: '10px 0',
-  },
-});
-
 const CommitPage: React.FC<CommitPagePropsType> = ({
   loading,
   onAfterLoading,
 }) => {
-  const classes = useStyles();
-
   const [commits, setCommits] = React.useState([] as CommitValueTypes[]);
   const [nomore, setNomore] = React.useState<boolean>(false);
   const [page, setPage] = React.useState<number>(1);
@@ -94,22 +85,22 @@ const CommitPage: React.FC<CommitPagePropsType> = ({
       {commits.length ? (
         <>
           {commits.map((i, j) => (
-            <Card key={j} className={classes.root}>
-              <CardContent>
-                <Typography variant="h6" color="textSecondary">
-                  {dayjs(i.author.date).format('YYYY/MM/DD')}
-                </Typography>
-                <Chip
-                  style={{
-                    backgroundColor: gitCommitColorByType(i.type),
-                    color: '#fff',
-                  }}
-                  label={i.type}
-                  size="small"
-                ></Chip>
+            <Card key={j} className="commit-card-root">
+              <p
+                className="commit-tag"
+                style={{ backgroundColor: gitCommitColorByType(i.type) }}
+              >
+                {i.type}
+              </p>
+              <CardContent className="commit-card-content">
+                <div className="commit-author-container">
+                  <img src={i.author.avatar_url} alt="" />
+                  <span>{i.author.name}</span>
+                  <span>{dayjs(i.author.date).format('YYYY/MM/DD')}</span>
+                </div>
                 <React.Fragment>
                   <a href={i.url} target="_break">
-                    {i.author.name} - {i.message}
+                    {i.message}
                   </a>
                 </React.Fragment>
               </CardContent>

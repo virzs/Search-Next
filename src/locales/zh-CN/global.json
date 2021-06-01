@@ -1,4 +1,5 @@
 {
   "app.global.dialog.cancel": "取消",
-  "app.global.dialog.confirm": "确认"
+  "app.global.dialog.confirm": "确认",
+  "app.global.link.show_more": "查看更多"
 }

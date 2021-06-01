@@ -1,4 +1,5 @@
 {
   "app.global.dialog.cancel": "Cancel",
-  "app.global.dialog.confirm": "Confirm"
+  "app.global.dialog.confirm": "Confirm",
+  "app.global.link.show_more": "see more"
 }

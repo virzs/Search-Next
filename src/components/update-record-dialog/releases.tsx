@@ -9,6 +9,7 @@ import { GithubReleaseType } from '@/apis/github/interface';
 import { Card, CardContent, CardHeader } from '@material-ui/core';
 import dayjs from 'dayjs';
 import React from 'react';
+import { useIntl } from 'umi';
 import { Empty, LoadMore } from '../global';
 
 export interface ReleasePagePropsType {
@@ -21,6 +22,7 @@ const ReleasePage: React.FC<ReleasePagePropsType> = ({
   loading,
   onAfterLoading,
 }) => {
+  const { formatMessage } = useIntl();
   const [releases, setReleases] = React.useState([] as GithubReleaseType[]);
   const [nomore, setNomore] = React.useState<boolean>(false);
   const [page, setPage] = React.useState<number>(1);
@@ -64,7 +66,7 @@ const ReleasePage: React.FC<ReleasePagePropsType> = ({
                 </div>
                 <pre className="release-body">{i.body}</pre>
                 <a className="release-more" href={i.html_url} target="_blank">
-                  查看更多
+                  {formatMessage({ id: 'app.global.link.show_more' })}
                 </a>
               </CardContent>
             </Card>
