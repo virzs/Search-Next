@@ -7,7 +7,7 @@
 import { ConnectStateType } from '@/models/connect';
 import { Button, Grid } from '@material-ui/core';
 import React from 'react';
-import { connect, ConnectProps, SiteListType, useIntl } from 'umi';
+import { connect, Dispatch, SiteListType, useIntl } from 'umi';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
 import SiteCard from './siteCard';
 import { useSnackbar } from 'notistack';
@@ -15,8 +15,9 @@ import './styles/index.less';
 import DialogConfirm from '../material-ui-custom/dialog/DialogConfirm';
 import { replaceUrlNotHaveHttpsOrHttpToHttps } from '@/utils/common';
 
-export interface TopSitesPropType extends ConnectProps {
+export interface TopSitesPropType {
   list: SiteListType[];
+  dispatch: Dispatch;
 }
 
 const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {

@@ -2,19 +2,22 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-11 12:18:24
+ * @Last Modified time: 2021-06-02 14:06:42
  */
 
 import { copyright as copyrightApi } from '@/apis/common';
 import Copyright from '@/components/copyright';
 import { ChangeLocales } from '@/components/global';
+import { helloMsg } from '@/components/global/hello-msg';
 import SearchInput from '@/components/search-input';
 import TopSites from '@/components/top-sites';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import { Button } from '@material-ui/core';
-import { useEffect, useState } from 'react';
+import { Button, IconButton } from '@material-ui/core';
+import { Close } from '@material-ui/icons';
+import { useSnackbar } from 'notistack';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import './index.less';
 
@@ -25,6 +28,7 @@ interface CopyrightTypeWithVersion extends CopyrightType {
 export default function IndexPage() {
   const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
   const [open, setOpen] = useState<boolean>(false);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const getCopyright = () => {
     copyrightApi().then((res) => {
@@ -34,6 +38,11 @@ export default function IndexPage() {
 
   useEffect(() => {
     getCopyright();
+    helloMsg().then((res) => {
+      enqueueSnackbar(res?.content, {
+        content: (key) => res.node(key, closeSnackbar),
+      });
+    });
   }, []);
 
   const inputChange = (value: string, engine: SearchEngineValueTypes) => {
