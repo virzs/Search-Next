@@ -28,7 +28,7 @@ yarn build
 
 ## 截图（21/6/3）
 
-![屏幕截图 2021-06-03 155137.png](http://imgs.virs.xyz/屏幕截图 2021-06-03 155137.png)
+![屏幕截图 2021-06-03 155137.png](http://imgs.virs.xyz/searchreactindex)
 
 21/4/2
 ![image-20210402152903082](http://imgs.virs.xyz/searchreact210402.png)
