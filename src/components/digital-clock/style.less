@@ -1,0 +1,106 @@
+/*
+ * @Author: Vir 
+ * @Date: 2021-06-03 11:07:42 
+ * @Last Modified by: Vir
+ * @Last Modified time: 2021-06-03 15:29:37
+ */
+
+@size: 10px;
+
+.digital-clock-root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .digit {
+    width: 60px;
+    height: 100px;
+    margin: 0 5px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .digit .segment {
+    background: rgb(95, 95, 95);
+    border-radius: 5px;
+    position: absolute;
+    opacity: 0.15;
+    transition: opacity 0.2s;
+  }
+
+  .digit .segment.on,
+  .separator {
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+  .separator-box {
+    width: 20px;
+    height: 100px;
+    position: relative;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    .separator {
+      width: 6px;
+      height: 6px;
+      background: rgb(95, 95, 95);
+      border-radius: 25%;
+      margin: 5px 0;
+    }
+  }
+
+  .digit .segment:nth-child(1) {
+    top: 5px;
+    left: 10px;
+    right: 10px;
+    height: 5px;
+  }
+
+  .digit .segment:nth-child(2) {
+    top: 10px;
+    right: 5px;
+    width: 5px;
+    height: 37.5px;
+    height: calc(50% - 12.5px);
+  }
+
+  .digit .segment:nth-child(3) {
+    bottom: 10px;
+    right: 5px;
+    width: 5px;
+    height: 37.5px;
+    height: calc(50% - 12.5px);
+  }
+
+  .digit .segment:nth-child(4) {
+    bottom: 5px;
+    right: 10px;
+    height: 5px;
+    left: 10px;
+  }
+
+  .digit .segment:nth-child(5) {
+    bottom: 10px;
+    left: 5px;
+    width: 5px;
+    height: 37.5px;
+    height: calc(50% - 12.5px);
+  }
+
+  .digit .segment:nth-child(6) {
+    top: 10px;
+    left: 5px;
+    width: 5px;
+    height: 37.5px;
+    height: calc(50% - 12.5px);
+  }
+
+  .digit .segment:nth-child(7) {
+    bottom: 47.5px;
+    bottom: calc(50% - 2.5px);
+    right: 10px;
+    left: 10px;
+    height: 5px;
+  }
+}

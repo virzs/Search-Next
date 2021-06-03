@@ -43,6 +43,4 @@ VS Code 安装i18n Ally插件
 
 ## 引用资源
 
-**字体：**
-
-Orbitron
+-----none------

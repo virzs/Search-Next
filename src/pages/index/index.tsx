@@ -2,11 +2,12 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-02 14:06:42
+ * @Last Modified time: 2021-06-03 11:12:00
  */
 
 import { copyright as copyrightApi } from '@/apis/common';
 import Copyright from '@/components/copyright';
+import DigitalClock from '@/components/digital-clock';
 import { ChangeLocales } from '@/components/global';
 import { helloMsg } from '@/components/global/hello-msg';
 import SearchInput from '@/components/search-input';
@@ -14,10 +15,9 @@ import TopSites from '@/components/top-sites';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import { Button, IconButton } from '@material-ui/core';
-import { Close } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 import './index.less';
 
@@ -26,8 +26,10 @@ interface CopyrightTypeWithVersion extends CopyrightType {
 }
 
 export default function IndexPage() {
-  const [copyright, setCopyright] = useState({} as CopyrightTypeWithVersion);
-  const [open, setOpen] = useState<boolean>(false);
+  const [copyright, setCopyright] = React.useState(
+    {} as CopyrightTypeWithVersion,
+  );
+  const [open, setOpen] = React.useState<boolean>(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const getCopyright = () => {
@@ -36,7 +38,7 @@ export default function IndexPage() {
     });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     getCopyright();
     helloMsg().then((res) => {
       enqueueSnackbar(res?.content, {
@@ -59,7 +61,9 @@ export default function IndexPage() {
       <div className="index-navbar-box">
         <ChangeLocales />
       </div>
-      <div className="index-logo-box"></div>
+      <div className="index-logo-box">
+        <DigitalClock />
+      </div>
       <div className="index-search-box">
         <SearchInput
           autoFocus
