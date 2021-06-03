@@ -30,8 +30,19 @@ yarn build
 
 ![image-20210402152903082](http://imgs.virs.xyz/searchreact210402.png)
 
-## 已确定的功能
+## 功能
+
+- 搜索
+- 切换搜索引擎
+- 添加常用网址
+- 消息提示
 
 **多语言：**
 
 VS Code 安装i18n Ally插件
+
+## 引用资源
+
+**字体：**
+
+Orbitron
