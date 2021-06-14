@@ -1,0 +1,54 @@
+/*
+ * @Author: Vir 
+ * @Date: 2021-06-10 13:40:02 
+ * @Last Modified by: Vir
+ * @Last Modified time: 2021-06-12 21:43:47
+ */
+
+.setting-page-root {
+  background-color: rgb(247, 247, 247);
+  height: 100%;
+  display: flex;
+  .setting-navigator-root {
+    width: 340px;
+    height: 100%;
+    padding: 30px 25px 0px 50px;
+    border-right: 1px solid #c3c3c3;
+  }
+  .setting-content-root {
+    width: calc(100% - 340px);
+    padding: 0px 25px 0px 50px;
+    .content-box {
+      max-width: 820px;
+      .content-header-root {
+        padding-top: 34px;
+        padding-bottom: 16px;
+        > * {
+          font-weight: 600;
+        }
+      }
+      .content-item-title-root {
+        min-height: 60px;
+        padding: 10px 0;
+        overflow: auto;
+        overflow-wrap: break-word;
+        > p {
+          margin-bottom: 0;
+        }
+        .item-title {
+          font-weight: 600;
+          font-size: 14px;
+          line-height: 20px;
+          color: #262626;
+        }
+        .item-title-desc {
+          margin-top: 4px;
+          margin-bottom: 0px;
+          font-size: 12px;
+          line-height: 16px;
+          color: #717171;
+        }
+      }
+    }
+  }
+}
