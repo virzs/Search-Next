@@ -2,9 +2,11 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-03 11:12:00
+ * @Last Modified time: 2021-06-15 15:09:40
  */
 
+import { history } from '@/.umi/core/history';
+import { BingImage } from '@/apis/bing/interface';
 import { copyright as copyrightApi } from '@/apis/common';
 import Copyright from '@/components/copyright';
 import DigitalClock from '@/components/digital-clock';
@@ -15,7 +17,8 @@ import TopSites from '@/components/top-sites';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import { Button } from '@material-ui/core';
+import { Button, IconButton } from '@material-ui/core';
+import { Settings } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -31,6 +34,7 @@ export default function IndexPage() {
   );
   const [open, setOpen] = React.useState<boolean>(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [bg, setBg] = React.useState<BingImage>();
 
   const getCopyright = () => {
     copyrightApi().then((res) => {
@@ -45,6 +49,12 @@ export default function IndexPage() {
         content: (key) => res.node(key, closeSnackbar),
       });
     });
+    // 设置背景
+    const image = localStorage.getItem('checkIndexBg');
+    if (image) {
+      setBg(JSON.parse(image));
+      console.log(image);
+    }
   }, []);
 
   const inputChange = (value: string, engine: SearchEngineValueTypes) => {
@@ -57,9 +67,19 @@ export default function IndexPage() {
 
   const { formatMessage } = useIntl();
   return (
-    <div className="index">
+    <div
+      className="index"
+      style={{ backgroundImage: bg ? `url('${bg?.url}')` : undefined }}
+    >
       <div className="index-navbar-box">
         <ChangeLocales />
+        <IconButton
+          onClick={() => {
+            history.push('/setting');
+          }}
+        >
+          <Settings />
+        </IconButton>
       </div>
       <div className="index-logo-box">
         <DigitalClock />

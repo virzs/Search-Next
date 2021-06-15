@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-11 09:16:52
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-15 13:58:10
+ * @Last Modified time: 2021-06-15 14:50:13
  */
 
 import { bingImg } from '@/apis/bing';
@@ -35,12 +35,17 @@ const BackgroundItem = () => {
     setLoadings(imgLoadings.map((i) => i));
   };
 
+  const findImgToStroage = (hsh: string) => {
+    const image = imgList.find((i) => i.hsh === hsh);
+    if (image) localStorage.setItem('checkIndexBg', JSON.stringify(image));
+  };
+
   React.useEffect(() => {
     getList();
   }, []);
 
   React.useEffect(() => {
-    console.log(checkHsh, 'value');
+    findImgToStroage(checkHsh);
   }, [checkHsh]);
 
   return (
