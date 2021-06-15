@@ -1,8 +1,8 @@
-# Search导航页React版
+# Search导航页Next版
 
 ## **原项目：**[Search](https://github.com/virzs/Search)
 
-Search项目的React版本，相较于原项目从原生js更改为React，方便更多的开发，同时支持多语言切换，原项目已实现或未实现的内容将移植到此项目。相较于原项目，此项目计划更换更美观的页面，更多的功能，甚至在后期支持登录同步。
+Search项目的React版本，相较于原项目从原生js更改为React，引入新的设计和交互，原项目已实现或未实现的内容将移植到此项目。
 
 ## 启动项目
 
@@ -39,6 +39,18 @@ yarn build
 - 切换搜索引擎
 - 添加常用网址
 - 消息提示
+
+## 后端支持
+
+部分内容需要配合该项目的后端接口部分
+
+地址：[Search-Next-Nestjs-api](https://github.com/virzs/Search-Next-Nestjs-api)
+
+新建 `development.env` 文件，按 `.env.example` 文件中内容配置
+
+安装依赖 `yarn`
+
+运行 `yarn start:dev`
 
 **多语言：**
 
