@@ -2,7 +2,7 @@
  * @Author: Vir 
  * @Date: 2021-06-12 00:03:03 
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-12 00:31:46
+ * @Last Modified time: 2021-06-15 13:43:26
  */
 
 .bing-img-root {
@@ -11,16 +11,19 @@
   flex-wrap: wrap;
   margin-top: 8px;
   margin-bottom: 16px;
-
-  .bing-img-card-root {
-    display: inline-flex;
-    position: relative;
-    align-items: stretch;
-    justify-content: start;
+  .ant-image {
+    display: block;
+  }
+  .content-w-h {
     width: 150px;
-    padding: 8px 8px 4px 8px;
-    transition: all 0.2s ease-in-out;
-    background: #ffffff;
-    border-radius: 4px;
+    height: 84px;
+  }
+  .bg-empty {
+    background: rgb(213, 213, 213);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 }
