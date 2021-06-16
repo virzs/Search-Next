@@ -2,19 +2,20 @@
  * @Author: Vir
  * @Date: 2021-06-11 09:16:52
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-15 17:32:29
+ * @Last Modified time: 2021-06-16 11:57:16
  */
 
 import { bingImg } from '@/apis/bing';
-import { CircularProgress } from '@material-ui/core';
+import { Button, CircularProgress } from '@material-ui/core';
 import React from 'react';
 import { Image, Spin } from 'antd';
 import { BingImage } from '@/apis/bing/interface';
 import './styles/background.style.less';
 import ContentItemTitle from '../../components/contentItemTitle';
 import OutlineCard from '@/components/global/card/outline-card';
-import { Block } from '@material-ui/icons';
+import { Block, Replay } from '@material-ui/icons';
 import dayjs from 'dayjs';
+import Tooltip from 'antd/es/tooltip';
 
 const BackgroundItem = () => {
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
@@ -55,7 +56,23 @@ const BackgroundItem = () => {
 
   return (
     <div>
-      <ContentItemTitle title="背景" desc="适用于主页的背景" />
+      <ContentItemTitle
+        title="背景"
+        desc="适用于主页的背景"
+        rightHandle={
+          <Tooltip title="通过刷新获取随机背景图片">
+            <Button
+              variant="contained"
+              startIcon={<Replay />}
+              size="small"
+              disableElevation
+              onClick={() => getList()}
+            >
+              刷新
+            </Button>
+          </Tooltip>
+        }
+      />
       <div className="bing-img-root">
         {!apiLoading && (
           <OutlineCard
