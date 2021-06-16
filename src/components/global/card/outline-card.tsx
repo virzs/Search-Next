@@ -47,7 +47,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
     return (
       <input
         className={classNames('outline-card-radio', {
-          checked: radioChecked,
+          checked: !loading && radioChecked,
         })}
         type="radio"
         id={id}
