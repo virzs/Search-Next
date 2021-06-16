@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 16:55:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-15 17:25:44
+ * @Last Modified time: 2021-06-16 13:49:46
  */
 
 import { Tooltip } from '@material-ui/core';
@@ -68,7 +68,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
           <div className="outline-card-label-content">
             <div className="outline-card-content">
               {loading ? (
-                <Skeleton variant="rect" width={150} height={84} />
+                <Skeleton variant="rect" width={136} height={76} />
               ) : (
                 children
               )}

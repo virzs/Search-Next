@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-11 09:16:52
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-16 11:57:16
+ * @Last Modified time: 2021-06-16 14:25:14
  */
 
 import { bingImg } from '@/apis/bing';
@@ -22,11 +22,12 @@ const BackgroundItem = () => {
   const [loadings, setLoadings] = React.useState<boolean[]>([]); //图片加载数组
   const [checkHsh, setCheckHsh] = React.useState<string>('empty'); //选中图片的hsh值
   const [apiLoading, setApiLoading] = React.useState<boolean>(false);
-  const demoList = [1, 2, 3, 4, 5, 6];
+  const demoList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
   const getList = () => {
     setApiLoading(true);
-    bingImg().then((res) => {
+    const hsh = initCheck();
+    bingImg({ size: 9, hsh }).then((res) => {
       let list = res.data.data;
       setImgList(list);
       setLoadings(list.map(() => true));
@@ -38,6 +39,16 @@ const BackgroundItem = () => {
     let imgLoadings = loadings;
     imgLoadings[index] = false;
     setLoadings(imgLoadings.map((i) => i));
+  };
+
+  const initCheck = (): string => {
+    const check = localStorage.getItem('checkIndexBg');
+    let hsh = 'empty';
+    if (check) {
+      hsh = JSON.parse(check).hsh;
+      setCheckHsh(hsh);
+    }
+    return hsh;
   };
 
   const findImgToStroage = (hsh: string) => {
