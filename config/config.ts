@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 16:03:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-14 20:53:59
+ * @Last Modified time: 2021-06-16 11:30:23
  */
 
 import { defineConfig } from 'umi';
@@ -23,4 +23,7 @@ export default defineConfig({
     hmr: false,
   },
   fastRefresh: {},
+  dynamicImport: {
+    loading: '@/components/global/loading',
+  },
 });
