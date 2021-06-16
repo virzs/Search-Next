@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:08:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-12 00:01:03
+ * @Last Modified time: 2021-06-16 14:54:14
  */
 
 import {
@@ -35,7 +35,11 @@ const SettingPage: React.FC = () => {
           {allSetting.map((i) => (
             <div key={i.id}>
               {i.component && (
-                <ListItem selected={selected.id === i.id}>
+                <ListItem
+                  button
+                  selected={selected.id === i.id}
+                  onClick={() => setSelected(i)}
+                >
                   <ListItemIcon>{i.icon}</ListItemIcon>
                   <ListItemText primary={i.name} />
                 </ListItem>

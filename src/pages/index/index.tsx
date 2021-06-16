@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-15 15:09:40
+ * @Last Modified time: 2021-06-16 16:03:38
  */
 
 import { history } from '@/.umi/core/history';
@@ -10,7 +10,6 @@ import { BingImage } from '@/apis/bing/interface';
 import { copyright as copyrightApi } from '@/apis/common';
 import Copyright from '@/components/copyright';
 import DigitalClock from '@/components/digital-clock';
-import { ChangeLocales } from '@/components/global';
 import { helloMsg } from '@/components/global/hello-msg';
 import SearchInput from '@/components/search-input';
 import TopSites from '@/components/top-sites';
@@ -85,7 +84,6 @@ export default function IndexPage() {
       style={{ backgroundImage: bg ? `url('${bg?.url}')` : undefined }}
     >
       <div className="index-navbar-box">
-        <ChangeLocales />
         <IconButton
           onClick={() => {
             history.push('/setting');

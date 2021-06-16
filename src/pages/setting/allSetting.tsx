@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:38:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-10 15:43:59
+ * @Last Modified time: 2021-06-16 14:40:00
  */
 import {
   PaletteOutlined,
@@ -13,6 +13,7 @@ import {
   Storage,
 } from '@material-ui/icons';
 import { SettingType } from './interface';
+import Locales from './settings/locales';
 import Personalise from './settings/personalise';
 
 export default [
@@ -38,7 +39,7 @@ export default [
     id: 'c7c7f60a702e4d4fa44e992662292da5',
     icon: <TranslateOutlined />,
     name: '语言',
-    component: '',
+    component: <Locales />,
   },
   {
     id: '041925b47b4142c8bf03b9ffbd8035a2',
