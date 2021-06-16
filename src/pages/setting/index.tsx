@@ -13,24 +13,37 @@ import {
   Typography,
 } from '@material-ui/core';
 import React from 'react';
+import { history, useIntl } from 'umi';
 import allSetting from './allSetting';
 import { SettingType } from './interface';
 import './style.less';
 
+export type SettingRouteState = { search?: string } | null | undefined;
+
 const SettingPage: React.FC = () => {
+  const { formatMessage } = useIntl();
+
   const [selected, setSelected] = React.useState<SettingType>(
     {} as SettingType,
   );
 
   React.useEffect(() => {
+    // init state
     const selected = allSetting.find((i) => i.component);
+    const state: SettingRouteState = history.location?.state;
     if (selected) setSelected(selected);
+    if (state?.search && selected) {
+      const sel = allSetting.find((i) => i.id === state?.search);
+      setSelected(sel ? sel : selected);
+    }
   }, []);
 
   return (
     <div className="setting-page-root">
       <div className="setting-navigator-root">
-        <Typography variant="h5">设置</Typography>
+        <Typography variant="h5">
+          {formatMessage({ id: 'app.page.setting.title' })}
+        </Typography>
         <List dense>
           {allSetting.map((i) => (
             <div key={i.id}>
@@ -38,7 +51,10 @@ const SettingPage: React.FC = () => {
                 <ListItem
                   button
                   selected={selected.id === i.id}
-                  onClick={() => setSelected(i)}
+                  onClick={() => {
+                    setSelected(i);
+                    history.replace('/setting', { search: i.id });
+                  }}
                 >
                   <ListItemIcon>{i.icon}</ListItemIcon>
                   <ListItemText primary={i.name} />

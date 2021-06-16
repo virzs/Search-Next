@@ -1,4 +1,5 @@
 {
   "app.page.index.searchinput.placeholder": "请输入搜索内容",
-  "app.page.index.searchinput.submitbutton": "搜索"
+  "app.page.index.searchinput.submitbutton": "搜索",
+  "app.page.setting.title": "设置"
 }
