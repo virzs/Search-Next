@@ -42,19 +42,32 @@ export default function IndexPage() {
     });
   };
 
-  React.useEffect(() => {
-    getCopyright();
-    helloMsg().then((res) => {
-      enqueueSnackbar(res?.content, {
-        content: (key) => res.node(key, closeSnackbar),
-      });
-    });
+  const setBackground = () => {
     // 设置背景
     const image = localStorage.getItem('checkIndexBg');
     if (image) {
       setBg(JSON.parse(image));
       console.log(image);
     }
+  };
+
+  // 进入主页消息提示
+  const setHello = () => {
+    const inFirst = sessionStorage.getItem('inFirst');
+    if (!inFirst) {
+      helloMsg().then((res) => {
+        enqueueSnackbar(res?.content, {
+          content: (key) => res.node(key, closeSnackbar),
+        });
+        sessionStorage.setItem('inFirst', 'true');
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    getCopyright();
+    setBackground();
+    setHello();
   }, []);
 
   const inputChange = (value: string, engine: SearchEngineValueTypes) => {
