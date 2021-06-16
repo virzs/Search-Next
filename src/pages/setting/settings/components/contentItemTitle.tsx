@@ -2,18 +2,28 @@
  * @Author: Vir
  * @Date: 2021-06-12 21:35:35
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-12 21:41:04
+ * @Last Modified time: 2021-06-16 11:51:06
  */
+
+import React from 'react';
 
 export interface ContentItemTitleProps {
   title: string;
   desc?: string;
+  rightHandle?: React.ReactNode;
 }
 
-const ContentItemTitle: React.FC<ContentItemTitleProps> = ({ title, desc }) => {
+const ContentItemTitle: React.FC<ContentItemTitleProps> = ({
+  title,
+  desc,
+  rightHandle,
+}) => {
   return (
     <div className="content-item-title-root">
-      <p className="item-title">{title}</p>
+      <div className="item-title">
+        <p>{title}</p>
+        {rightHandle}
+      </div>
       {desc && <p className="item-title-desc">{desc}</p>}
     </div>
   );
