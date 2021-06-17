@@ -13,10 +13,9 @@ import DigitalClock from '@/components/digital-clock';
 import { helloMsg } from '@/components/global/hello-msg';
 import SearchInput from '@/components/search-input';
 import TopSites from '@/components/top-sites';
-import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
-import { Button, IconButton } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
 import { Settings } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -31,7 +30,6 @@ export default function IndexPage() {
   const [copyright, setCopyright] = React.useState(
     {} as CopyrightTypeWithVersion,
   );
-  const [open, setOpen] = React.useState<boolean>(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [bg, setBg] = React.useState<BingImage>();
 
@@ -120,14 +118,7 @@ export default function IndexPage() {
             startTime={copyright.startTime}
           ></Copyright>
         )}
-        <Button onClick={() => setOpen(true)}>
-          {formatMessage({ id: 'app.component.uploadrecorddialog.title' })}
-        </Button>
       </div>
-      <UpdateRecordDialog
-        open={open}
-        onClose={() => setOpen(false)}
-      ></UpdateRecordDialog>
     </div>
   );
 }
