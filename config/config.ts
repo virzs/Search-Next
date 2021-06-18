@@ -13,6 +13,8 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
+  define: {},
+  history: { type: 'hash' },
   routes,
   proxy,
   locale: {

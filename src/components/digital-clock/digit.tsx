@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-03 11:55:10
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-03 15:02:02
+ * @Last Modified time: 2021-06-17 16:43:24
  */
 
 import classNames from 'classnames';
@@ -48,7 +48,6 @@ const Digit: React.FC<DigitPropsType> = ({ value = 0 }) => {
 
   React.useEffect(() => {
     changeSegment();
-    console.log(value);
   }, [value]);
 
   return (

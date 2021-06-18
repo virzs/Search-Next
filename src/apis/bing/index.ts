@@ -1,4 +1,4 @@
-import axios from 'axios';
+import instance from '@/utils/request';
 /*
  * @Author: Vir
  * @Date: 2021-06-06 22:01:45
@@ -13,7 +13,7 @@ export interface bingImgParamsType {
 
 // 获取bing随机壁纸
 export const bingImg = (params?: bingImgParamsType) => {
-  return axios.get('/v1/resource/bing/random', {
+  return instance.get('/v1/resource/bing/random', {
     params,
   });
 };
