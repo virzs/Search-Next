@@ -2,16 +2,18 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:08:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-16 14:54:14
+ * @Last Modified time: 2021-06-18 15:58:59
  */
 
 import {
+  IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Typography,
 } from '@material-ui/core';
+import { ArrowBack } from '@material-ui/icons';
 import React from 'react';
 import { history, useIntl } from 'umi';
 import allSetting from './allSetting';
@@ -42,6 +44,14 @@ const SettingPage: React.FC = () => {
     <div className="setting-page-root">
       <div className="setting-navigator-root">
         <Typography variant="h5">
+          <IconButton
+            size="small"
+            onClick={() => {
+              history.goBack();
+            }}
+          >
+            <ArrowBack />
+          </IconButton>
           {formatMessage({ id: 'app.page.setting.title' })}
         </Typography>
         <List dense>
