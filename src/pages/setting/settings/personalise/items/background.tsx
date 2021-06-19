@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-11 09:16:52
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-16 14:25:14
+ * @Last Modified time: 2021-06-18 11:47:39
  */
 
 import { bingImg } from '@/apis/bing';
@@ -52,9 +52,11 @@ const BackgroundItem = () => {
   };
 
   const findImgToStroage = (hsh: string) => {
-    if (hsh === 'empty') localStorage.removeItem('checkIndexBg');
+    let inFirst = true;
+    if (hsh === 'empty' && !inFirst) localStorage.removeItem('checkIndexBg');
     const image = imgList.find((i) => i.hsh === hsh);
     if (image) localStorage.setItem('checkIndexBg', JSON.stringify(image));
+    inFirst = false;
   };
 
   React.useEffect(() => {
@@ -69,7 +71,7 @@ const BackgroundItem = () => {
     <div>
       <ContentItemTitle
         title="背景"
-        desc="适用于主页的背景"
+        desc="修改适用于主页的背景"
         rightHandle={
           <Tooltip title="通过刷新获取随机背景图片">
             <Button
