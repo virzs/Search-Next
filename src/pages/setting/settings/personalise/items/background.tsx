@@ -71,7 +71,7 @@ const BackgroundItem = () => {
     <div>
       <ContentItemTitle
         title="背景"
-        desc="修改适用于主页的背景"
+        desc="修改适用于主页的背景，当前版本壁纸尺寸为标准1920x1080，在更大分辨率下会存在模糊问题。"
         rightHandle={
           <Tooltip title="通过刷新获取随机背景图片">
             <Button
