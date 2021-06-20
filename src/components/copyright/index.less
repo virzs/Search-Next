@@ -2,13 +2,16 @@
  * @Author: Vir
  * @Date: 2021-03-27 14:42:07
  * @Last Modified by: Vir
- * @Last Modified time: 2021-03-27 15:08:20
+ * @Last Modified time: 2021-06-20 17:18:18
  */
 @import '../../themes/index.less';
 @import '../../global.less';
 
 .copyright {
   text-align: center;
-  color: @font-color-main-light;
+  color: var(--main-text-color, rgb(95, 95, 95));
   font-size: @font-size-small;
+  &:hover {
+    color: rgb(95, 95, 95);
+  }
 }

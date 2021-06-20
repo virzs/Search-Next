@@ -2,7 +2,7 @@
  * @Author: Vir 
  * @Date: 2021-04-11 17:29:55 
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-04 22:51:32
+ * @Last Modified time: 2021-06-20 15:26:16
  */
 
 .top-site-item {
@@ -65,6 +65,7 @@
       a {
         overflow: hidden;
         text-overflow: ellipsis;
+        color: var(--main-text-color, rgb(95, 95, 95));
       }
     }
     &.add {
@@ -87,7 +88,11 @@
     opacity: 0;
     transition: all 0.3s;
     &:hover {
-      background-color: rgba(229, 229, 229, 0.3);
+      background-color: transparent;
+    }
+    .MuiIconButton-root {
+      border-radius: 5px;
+      color: var(--main-text-color, rgb(95, 95, 95));
     }
   }
 }

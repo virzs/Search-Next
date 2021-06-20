@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-18 15:08:21
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-23 16:24:01
+ * @Last Modified time: 2021-06-20 15:12:12
  */
 
 import React from 'react';
@@ -43,9 +43,15 @@ export const dva = {
   },
 };
 
+// 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
+  // 持久化存储
   const app = getDvaApp();
   persistStore(app._store);
+  // 应用主题
+  const hasBg = localStorage.getItem('checkIndexBg');
+  const body = document.getElementById('root');
+  if (hasBg && body) body.className = 'theme-on-background';
 });
 
 //修改渲染时的根组件
