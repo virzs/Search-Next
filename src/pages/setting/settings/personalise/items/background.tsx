@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-11 09:16:52
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-18 11:47:39
+ * @Last Modified time: 2021-06-20 15:46:58
  */
 
 import { bingImg } from '@/apis/bing';
@@ -20,7 +20,7 @@ import Tooltip from 'antd/es/tooltip';
 const BackgroundItem = () => {
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
   const [loadings, setLoadings] = React.useState<boolean[]>([]); //图片加载数组
-  const [checkHsh, setCheckHsh] = React.useState<string>('empty'); //选中图片的hsh值
+  const [checkHsh, setCheckHsh] = React.useState<string>(''); //选中图片的hsh值
   const [apiLoading, setApiLoading] = React.useState<boolean>(false);
   const demoList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
@@ -46,26 +46,26 @@ const BackgroundItem = () => {
     let hsh = 'empty';
     if (check) {
       hsh = JSON.parse(check).hsh;
-      setCheckHsh(hsh);
     }
+    setCheckHsh(hsh);
     return hsh;
   };
 
+  // 选择背景
+  const onCheckChange = (hsh: string) => {
+    setCheckHsh(hsh);
+    findImgToStroage(hsh);
+  };
+
   const findImgToStroage = (hsh: string) => {
-    let inFirst = true;
-    if (hsh === 'empty' && !inFirst) localStorage.removeItem('checkIndexBg');
+    if (hsh === 'empty') localStorage.removeItem('checkIndexBg');
     const image = imgList.find((i) => i.hsh === hsh);
     if (image) localStorage.setItem('checkIndexBg', JSON.stringify(image));
-    inFirst = false;
   };
 
   React.useEffect(() => {
     getList();
   }, []);
-
-  React.useEffect(() => {
-    findImgToStroage(checkHsh);
-  }, [checkHsh]);
 
   return (
     <div>
@@ -91,7 +91,7 @@ const BackgroundItem = () => {
           <OutlineCard
             id="empty"
             value={checkHsh}
-            onChange={(val) => setCheckHsh(val)}
+            onChange={(val) => onCheckChange(val)}
             label="默认背景"
           >
             <Image
@@ -113,7 +113,7 @@ const BackgroundItem = () => {
                 id={i.hsh}
                 value={checkHsh}
                 label={dayjs(i.enddate).format('YYYY/MM/DD')}
-                onChange={(val) => setCheckHsh(val)}
+                onChange={(val) => onCheckChange(val)}
                 tip={i.copyright}
               >
                 <Spin
