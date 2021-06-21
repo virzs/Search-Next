@@ -11,7 +11,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import NotistackWrapper from './components/material-ui-custom/notistack';
-import { setTheme } from './utils/common';
+import { setTheme } from './themes/theme';
 
 interface RouterChangeTypes {
   location?: any;

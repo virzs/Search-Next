@@ -104,16 +104,3 @@ export const replaceUrlNotHaveHttpsOrHttpToHttps = (url: string): string => {
   const res = reg.test(url);
   return res ? url : `https://${url}`;
 };
-
-// 应用主题 has是否应用主题 theme主题名
-export const setTheme = (
-  has?: boolean,
-  theme: string = 'theme-on-background',
-) => {
-  const body = document.getElementById('root');
-  if (has && body) {
-    body.className = theme;
-  } else if (!has && body) {
-    body.className = '';
-  }
-};

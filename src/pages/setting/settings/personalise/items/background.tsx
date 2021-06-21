@@ -16,7 +16,7 @@ import OutlineCard from '@/components/global/card/outline-card';
 import { Block, Replay } from '@material-ui/icons';
 import dayjs from 'dayjs';
 import Tooltip from 'antd/es/tooltip';
-import { setTheme } from '@/utils/common';
+import { setTheme } from '@/themes/theme';
 
 const BackgroundItem = () => {
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
