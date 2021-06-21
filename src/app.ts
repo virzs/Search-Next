@@ -11,6 +11,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import NotistackWrapper from './components/material-ui-custom/notistack';
+import { setTheme } from './utils/common';
 
 interface RouterChangeTypes {
   location?: any;
@@ -50,8 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
   persistStore(app._store);
   // 应用主题
   const hasBg = localStorage.getItem('checkIndexBg');
-  const body = document.getElementById('root');
-  if (hasBg && body) body.className = 'theme-on-background';
+  setTheme(!!hasBg);
 });
 
 //修改渲染时的根组件

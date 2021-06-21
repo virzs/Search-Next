@@ -16,6 +16,7 @@ import OutlineCard from '@/components/global/card/outline-card';
 import { Block, Replay } from '@material-ui/icons';
 import dayjs from 'dayjs';
 import Tooltip from 'antd/es/tooltip';
+import { setTheme } from '@/utils/common';
 
 const BackgroundItem = () => {
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
@@ -61,6 +62,7 @@ const BackgroundItem = () => {
     if (hsh === 'empty') localStorage.removeItem('checkIndexBg');
     const image = imgList.find((i) => i.hsh === hsh);
     if (image) localStorage.setItem('checkIndexBg', JSON.stringify(image));
+    setTheme(hsh !== 'empty');
   };
 
   React.useEffect(() => {
