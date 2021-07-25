@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-16 16:40:19
+ * @Last Modified time: 2021-07-25 00:18:37
  */
 
 import { history } from '@/.umi/core/history';
@@ -16,7 +16,7 @@ import TopSites from '@/components/top-sites';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { CopyrightType } from '@/data/main';
 import { IconButton } from '@material-ui/core';
-import { Settings } from '@material-ui/icons';
+import { Bookmarks, Settings } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -82,6 +82,13 @@ export default function IndexPage() {
       style={{ backgroundImage: bg ? `url('${bg?.url}')` : undefined }}
     >
       <div className="index-navbar-box">
+        <IconButton
+          onClick={() => {
+            history.push('/navigation');
+          }}
+        >
+          <Bookmarks />
+        </IconButton>
         <IconButton
           onClick={() => {
             history.push('/setting');

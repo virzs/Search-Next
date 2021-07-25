@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 16:09:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-10 11:09:53
+ * @Last Modified time: 2021-07-25 00:09:17
  */
 
 interface RouteTypes {
@@ -18,4 +18,5 @@ interface RouteTypes {
 export default [
   { path: '/', component: '@/pages/index/index' },
   { path: '/setting', component: '@/pages/setting/index' },
+  { path: '/navigation', component: '@/pages/navigation/index' },
 ] as RouteTypes[];
