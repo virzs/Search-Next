@@ -1,0 +1,55 @@
+/*
+ * @Author: Vir
+ * @Date: 2021-07-25 00:25:51
+ * @Last Modified by: Vir
+ * @Last Modified time: 2021-07-25 11:22:28
+ */
+
+import { css } from '@emotion/css';
+
+export const MenuLayoutRootStyle = () => {
+  return css`
+    background-color: rgba(247, 247, 247);
+    height: 100%;
+    display: flex;
+  `;
+};
+
+export const MenuLayoutSideStyle = () => {
+  return css`
+    width: 340px;
+    height: 100%;
+    padding: 30px 25px 0 50px;
+    border-right: 1px solid #c3c3c3;
+    .MuiListItemIcon-root {
+      min-width: 32px;
+    }
+    .MuiTypography-h5 {
+      display: flex;
+      align-items: center;
+    }
+  `;
+};
+
+export const MenuLayoutContentStyle = () => {
+  return css`
+    width: calc(100% - 340px);
+    padding: 0px 25px 0px 50px;
+  `;
+};
+
+export const MenuLayoutContentBoxStyle = () => {
+  return css`
+    max-width: 820px;
+  `;
+};
+
+export const MenuLayoutContentHeaderStyle = () => {
+  return css`
+    padding-top: 34px;
+    padding-bottom: 16px;
+    > * {
+      font-weight: 600;
+    }
+  `;
+};
