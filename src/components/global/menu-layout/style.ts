@@ -35,6 +35,9 @@ export const MenuLayoutContentStyle = () => {
   return css`
     width: calc(100% - 340px);
     padding: 0px 25px 0px 50px;
+    height: 100%;
+    overflow-y: auto;
+    scroll-behavior: smooth;
   `;
 };
 
@@ -50,6 +53,26 @@ export const MenuLayoutContentHeaderStyle = () => {
     padding-bottom: 16px;
     > * {
       font-weight: 600;
+    }
+  `;
+};
+
+export const ContentHeaderStyle = () => {
+  return css`
+    padding-top: 34px;
+    padding-bottom: 16px;
+    > * {
+      font-weight: 600 !important;
+    }
+    .content-header {
+      display: flex;
+      align-items: center;
+      .header-icon {
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   `;
 };

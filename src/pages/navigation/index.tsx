@@ -2,14 +2,24 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-07-25 23:19:54
+ * @Last Modified time: 2021-07-26 17:21:40
  */
 
 import MenuLayout from '@/components/global/menu-layout';
-import { MenuLayoutMenu } from '@/components/global/menu-layout/interface';
 import React from 'react';
 import navigations from './data';
 import { Navigation } from './interface';
+import ContentHeader from '@/components/global/menu-layout/contentHeader';
+import WebsiteCard from './components/WebisteCard';
+import { css } from '@emotion/css';
+
+const WebsiteGridStyle = css`
+  display: grid;
+  grid: auto-flow / 1fr 1fr 1fr;
+  column-gap: 8px;
+  row-gap: 8px;
+  grid-template-columns: repeat(auto-fit);
+`;
 
 const NavigationPage = (props: any) => {
   const menu: Navigation[] = navigations;
@@ -17,7 +27,13 @@ const NavigationPage = (props: any) => {
 
   const menuChange = (id: string) => {
     const find = navigations.find((i) => i.id === id);
-    if (find) setSelected(find);
+    if (find) {
+      setSelected(find);
+      const node = document.getElementById(`${find.id}`);
+      if (node) {
+        node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   };
 
   return (
@@ -27,14 +43,22 @@ const NavigationPage = (props: any) => {
       onChange={menuChange}
       menu={menu}
     >
-      {Object.keys(selected).length > 0 &&
-        selected.children.map((i) => (
-          <div>
-            <a href={i.url}>
-              <p>{i.name}</p>
-            </a>
+      {menu.map((i) => (
+        <div key={i.id} id={i.id}>
+          <ContentHeader icon={i.icon} title={i.name} />
+          <div className={WebsiteGridStyle}>
+            {i.children.map((j) => (
+              <WebsiteCard
+                key={j.id}
+                title={j.name}
+                intro={j.intro}
+                color={j.color}
+                url={j.url}
+              />
+            ))}
           </div>
-        ))}
+        </div>
+      ))}
     </MenuLayout>
   );
 };

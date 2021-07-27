@@ -9,6 +9,7 @@ export interface Website {
   id: string;
   name: string;
   url: string;
+  intro?: string;
   icon?: string;
   color?: string;
   isShow?: boolean;
