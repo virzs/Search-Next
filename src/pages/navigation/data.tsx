@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-07-25 23:18:04
  */
 
-import { Build, Code, Description, Group } from '@material-ui/icons';
+import { Build, Code, Description, Group, Apps } from '@material-ui/icons';
 import { Navigation } from './interface';
 
 const navigations: Navigation[] = [
@@ -100,6 +100,72 @@ const navigations: Navigation[] = [
         intro: '一个开发动态Web应用的框架。',
         icon: 'angularjs',
         color: '#E23237',
+        isShow: true,
+      },
+      {
+        id: '8d34bc84c31048a8beb9b0f144f3fa5e',
+        name: 'Flutter中文网',
+        url: 'https://flutterchina.club/',
+        intro: '极速构建漂亮的原生应用。',
+        icon: 'flutterchina',
+        color: '#0091EA',
+        isShow: true,
+      },
+      {
+        id: '879a26836b83420898d1e4daf45b5035',
+        name: 'FlutterCN',
+        url: 'https://flutter.cn/',
+        intro:
+          'Flutter 是 Google 开源的 UI 工具包，帮助开发者通过一套代码库高效构建多平台精美应用，支持移动、Web、桌面和嵌入式平台。',
+        icon: 'fluttercn',
+        color: '#ED4845',
+        isShow: true,
+      },
+    ],
+  },
+  {
+    id: '2f2480b6e2974694a89f962e24fa1de0',
+    name: '图标库',
+    path: 'icons',
+    icon: <Apps />,
+    color: '',
+    isShow: true,
+    children: [
+      {
+        id: '75f6ae67b74a4457bb91edc58654ade1',
+        name: 'Font Awesome',
+        url: 'https://fontawesome.com/',
+        intro:
+          "Get vector icons and social logos on your website with Font Awesome, the web's most popular icon set and toolkit.",
+        icon: 'fontawesome',
+        color: '#183153',
+        isShow: true,
+      },
+      {
+        id: '1ab297fb419642f0adfa8e1d304daa6f',
+        name: 'Icon Font',
+        url: 'https://www.iconfont.cn/',
+        icon: 'iconfont',
+        color: '#183153',
+        isShow: true,
+      },
+      {
+        id: '18bcd286eaf942829a2e6322084ab679',
+        name: 'Material Icons',
+        url: 'https://fonts.google.com/icons',
+        intro:
+          'Material Icons are available in five styles and a range of downloadable sizes and densities. The icons are based on the core Material Design principles and metrics.',
+        icon: 'materialicons',
+        color: '#BDBDBD',
+        isShow: true,
+      },
+      {
+        id: 'fcdfc66efc524d73849c6cbc52fa10a5',
+        name: 'Simple Icons',
+        url: 'https://simpleicons.org/',
+        intro: 'Free SVG icons for popular brands',
+        icon: 'simpleicons',
+        color: '#222222',
         isShow: true,
       },
     ],
