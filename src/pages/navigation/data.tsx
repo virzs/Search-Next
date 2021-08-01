@@ -94,7 +94,7 @@ const navigations: Navigation[] = [
         isShow: true,
       },
       {
-        id: '879a26836b83420898d1e4daf45b5035',
+        id: 'a0383758c5ec46f0a24d913e6929872f',
         name: 'AngularJS',
         url: 'https://www.angularjs.net.cn/',
         intro: '一个开发动态Web应用的框架。',
@@ -119,6 +119,16 @@ const navigations: Navigation[] = [
           'Flutter 是 Google 开源的 UI 工具包，帮助开发者通过一套代码库高效构建多平台精美应用，支持移动、Web、桌面和嵌入式平台。',
         icon: 'fluttercn',
         color: '#ED4845',
+        isShow: true,
+      },
+      {
+        id: '82d5e217d8fb4906a8b818e2052a0130',
+        name: 'Flutter Gallery',
+        url: 'https://gallery.flutter.dev/#/',
+        intro:
+          'Flutter Gallery is a resource to help developers evaluate and use Flutter',
+        icon: 'fluttergallery',
+        color: '#FF8383',
         isShow: true,
       },
     ],
@@ -194,6 +204,15 @@ const navigations: Navigation[] = [
         intro: 'Essential tools for software developers and teams',
         icon: 'jetbrains',
         color: '#080809',
+        isShow: true,
+      },
+      {
+        id: '26701f2812b54667afe396e80e522d05',
+        name: 'Atom',
+        url: 'https://atom.io/',
+        intro: 'A hackable text editor for the 21st Century',
+        icon: 'atom',
+        color: '#E0AD38',
         isShow: true,
       },
       {

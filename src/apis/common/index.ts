@@ -7,6 +7,7 @@
 
 import mainData, { CopyrightType } from '@/data/main/index';
 import { ResultTypes } from '@/typings/result';
+import { replaceUrlHaveHttpsOrHttpToEmpty } from '@/utils/common';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
   version: string;
@@ -25,5 +26,6 @@ export const copyright = () => {
 
 // 获取网站icon
 export const getWebIconByUrl = (url?: string) => {
-  return `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${url}`;
+  let newUrl = replaceUrlHaveHttpsOrHttpToEmpty(url || '');
+  return `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${newUrl}`;
 };
