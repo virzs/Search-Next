@@ -2,21 +2,17 @@
  * @Author: Vir
  * @Date: 2021-07-26 13:55:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-07-26 17:23:00
+ * @Last Modified time: 2021-08-01 19:28:23
  */
 
-import { getWebIconByUrl } from '@/apis/common';
-import { replaceUrlHaveHttpsOrHttpToEmpty } from '@/utils/common';
+import { hexToRgba } from '@/utils/color';
 import { css } from '@emotion/css';
 import {
   Avatar,
-  Button,
   Card,
   CardActionArea,
   CardHeader,
   IconButton,
-  CardActions,
-  Tooltip,
   Dialog,
   DialogContent,
   Typography,
@@ -27,9 +23,14 @@ import classNames from 'classnames';
 import React from 'react';
 import { Overflow } from 'vmdc-ui';
 
-const WebsiteCardStyle = () => {
+const WebsiteCardStyle = (color: string) => {
   return css`
     cursor: pointer;
+    &.MuiCard-root {
+      box-shadow: 0px 4px 2px -2px ${hexToRgba(color, 0.2).rgba},
+        0px 2px 2px 0px ${hexToRgba(color, 0.14).rgba},
+        0px 2px 6px 0px ${hexToRgba(color, 0.12).rgba};
+    }
     .MuiCardHeader-root {
       height: 100%;
       align-items: flex-start;
@@ -60,7 +61,7 @@ const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
   };
 
   return (
-    <Card className={classNames(WebsiteCardStyle())}>
+    <Card className={classNames(WebsiteCardStyle(color))}>
       <CardActionArea
         onClick={() => {
           window.open(url);
@@ -79,9 +80,11 @@ const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
           title={name}
           subheader={<Overflow>{intro || '暂无介绍'}</Overflow>}
           action={
-            <IconButton size="small" onClick={(e) => handleAction(e)}>
-              <MoreHoriz />
-            </IconButton>
+            intro && (
+              <IconButton size="small" onClick={(e) => handleAction(e)}>
+                <MoreHoriz />
+              </IconButton>
+            )
           }
         />
       </CardActionArea>
