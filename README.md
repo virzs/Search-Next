@@ -72,6 +72,12 @@ yarn build
 
 运行 `yarn start:dev`
 
+其他命令详见后端项目
+
+关于打包运行，可以参考
+
+[nestJs项目打包部署的方法](https://www.cnblogs.com/xianxiaobo/p/12162309.html)
+
 **多语言：**
 
 VS Code 安装i18n Ally插件
