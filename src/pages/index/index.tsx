@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-07-25 00:18:37
+ * @Last Modified time: 2021-08-08 18:58:32
  */
 
 import { history } from '@/.umi/core/history';
@@ -20,6 +20,7 @@ import { Bookmarks, Settings } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import SugPopper from './components/sug-popper';
 import './index.less';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
@@ -32,6 +33,12 @@ export default function IndexPage() {
   );
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [bg, setBg] = React.useState<BingImage>();
+
+  const [sugOpen, setSugOpen] = React.useState<boolean>(false);
+  const [sugAnchorEl, setSugAnchorEl] = React.useState<null | HTMLElement>(
+    null,
+  );
+  const [wd, setWd] = React.useState<string>('');
 
   const getCopyright = () => {
     copyrightApi().then((res) => {
@@ -67,8 +74,16 @@ export default function IndexPage() {
     setHello();
   }, []);
 
-  const inputChange = (value: string, engine: SearchEngineValueTypes) => {
+  // 搜索框内容变化事件
+  const inputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    value: string,
+    engine: SearchEngineValueTypes,
+  ) => {
     console.log('search', value, engine);
+    setWd(value);
+    setSugAnchorEl(e.currentTarget);
+    setSugOpen(true);
   };
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
@@ -104,6 +119,10 @@ export default function IndexPage() {
         <SearchInput
           autoFocus
           onChange={inputChange}
+          // onBlur={() => setSugOpen(false)}
+          onFocus={() => {
+            if (wd) setSugOpen(true);
+          }}
           onBtnClick={handleSearch}
           placeholder={formatMessage({
             id: 'app.page.index.searchinput.placeholder',
@@ -112,7 +131,7 @@ export default function IndexPage() {
             id: 'app.page.index.searchinput.submitbutton',
           })}
           onPressEnter={handleSearch}
-        ></SearchInput>
+        />
       </div>
       <div className="index-content-box">
         <TopSites></TopSites>
@@ -126,6 +145,8 @@ export default function IndexPage() {
           ></Copyright>
         )}
       </div>
+      {/* sug popper */}
+      <SugPopper open={sugOpen} anchorEl={sugAnchorEl} wd={wd} />
     </div>
   );
 }

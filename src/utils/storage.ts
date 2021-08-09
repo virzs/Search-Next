@@ -1,60 +1,109 @@
 /*
  * @Author: Vir
- * @Date: 2021-07-21 13:35:29
+ * @Date: 2021-08-06 14:42:56
  * @Last Modified by: Vir
- * @Last Modified time: 2021-07-21 13:45:28
+ * @Last Modified time: 2021-08-06 15:25:19
  */
 
-import store from 'store';
+// 生成uuid
+const uuid = (len?: number, radix?: number) => {
+  var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(
+    '',
+  );
+  var uuid = [],
+    i;
+  radix = radix || chars.length;
 
-interface StorageBootStrapConfig {
-  /** 当前环境 */
-  mode: 'session' | 'local';
+  if (len) {
+    // Compact form
+    for (i = 0; i < len; i++) uuid[i] = chars[0 | (Math.random() * radix)];
+  } else {
+    // rfc4122, version 4 form
+    var r;
 
-  /** 超时时间 */
-  timeout?: number;
-}
+    // rfc4122 requires these characters
+    uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+    uuid[14] = '4';
 
-class CustomStorage {
-  private readStorage!: Storage;
-  private config!: StorageBootStrapConfig;
-
-  constructor() {
-    if (!window) {
-      throw new Error('当前环境非浏览器，无法消费全局window实例。');
-    }
-    if (!window.localStorage) {
-      throw new Error('当前环境非无法使用localStorage');
-    }
-    if (!window.sessionStorage) {
-      throw new Error('当前环境非无法使用sessionStorage');
+    // Fill in random data.  At i==19 set the high bits of clock sequence as
+    // per rfc4122, sec. 4.1.5
+    for (i = 0; i < 36; i++) {
+      if (!uuid[i]) {
+        r = 0 | (Math.random() * 16);
+        uuid[i] = chars[i == 19 ? (r & 0x3) | 0x8 : r];
+      }
     }
   }
 
-  /**
-   * 初始化Storage的数据
-   * @param config StorageBootStrapConfig
-   */
-  bootStrap(config: StorageBootStrapConfig): void {
-    switch (config.mode) {
-      case 'session':
-        this.readStorage = window.sessionStorage;
-        break;
+  return uuid.join('');
+};
 
-      default:
-      case 'local':
-        this.readStorage = window.localStorage;
-        break;
+// 检查是否支持 storage
+const isSupported = (storage: Storage) => {
+  if (!storage || !(storage instanceof Object)) {
+    return false;
+  }
+
+  try {
+    storage.setItem('_supported', '1');
+    storage.removeItem('_supported');
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+class Collection {
+  name: any;
+  storage: any;
+  cache!: { [x: string]: object };
+  path: string;
+  constructor(db: any, name: string, opts: DBOpts) {
+    this.name = name;
+    this.storage = db.storage;
+    this.path = db.database + db.sep + name + db.sep;
+  }
+
+  _initCache() {
+    let cache: { [x: string]: object } = {};
+    for (let key of Object.keys(this.storage)) {
+      cache[key] = JSON.parse(this.storage.getItem(key));
     }
-    this.config = config;
+    this.cache = cache;
+  }
+
+  inset(data: any, opts: any) {}
+}
+interface DBOpts {
+  storage: Storage | null;
+  database: string;
+  primaryKey: string;
+  sep: string;
+}
+
+class StorageDB {
+  storage: Storage | null;
+  database: string;
+  primaryKey: string;
+  sep: string;
+  constructor(opts: DBOpts) {
+    this.storage = opts.storage || (window && window.localStorage);
+    this.database = opts.database || 'db';
+    this.primaryKey = opts.primaryKey || '_id';
+    this.sep = opts.sep || ':';
+
+    if (!isSupported(this.storage)) {
+      this.storage = null;
+    }
+  }
+
+  get(name: string, opts: DBOpts) {
+    return new Collection(this, name, opts);
+  }
+
+  collection(name: string, opts: DBOpts) {
+    return this.get(name, opts);
   }
 }
 
-const customStorage = new CustomStorage();
-
-customStorage.bootStrap({
-  mode: 'local',
-  timeout: 3000,
-});
-
-export default customStorage;
+export default StorageDB;

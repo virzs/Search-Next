@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-03 17:41:10
+ * @Last Modified time: 2021-08-08 13:21:35
  */
 
 import React from 'react';
@@ -27,7 +27,11 @@ export interface SearchInputPropTypes {
   disabled?: boolean; // 是否禁用
   readonly?: boolean; // 是否只读
   required?: boolean; // 是否必填
-  onChange?: (value: string, engine: SearchEngineValueTypes) => void; // 输入框内容变化时回调
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    value: string,
+    engine: SearchEngineValueTypes,
+  ) => void; // 输入框内容变化时回调
   onPressEnter?: (value: string, engine: SearchEngineValueTypes) => void; // 按下回车回调
   onBtnClick?: (value: string, engine: SearchEngineValueTypes) => void;
   onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -54,7 +58,7 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    if (onChange) onChange(e.target.value, engine);
+    if (onChange) onChange(e, e.target.value, engine);
   };
 
   const handleFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
