@@ -11,6 +11,7 @@ import { Button } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 import EngineChip from './engineChip';
 import { SearchEngineValueTypes } from '@/data/engine';
+import SugPopper from './sugPopper';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -56,8 +57,17 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   );
   const [engine, setEngine] = React.useState({} as SearchEngineValueTypes);
 
+  const [sugOpen, setSugOpen] = React.useState<boolean>(false);
+
+  const [wd, setWd] = React.useState<string>('');
+
+  const [sugAnchorEl, setSugAnchorEl] = React.useState<null | HTMLElement>(
+    null,
+  );
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+    setWd(e.target.value);
     if (onChange) onChange(e, e.target.value, engine);
   };
 
@@ -82,7 +92,19 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
   };
 
   return (
-    <div className="v-search-input">
+    <div
+      className="v-search-input"
+      onFocus={(e) => {
+        setSugOpen(true);
+        setSugAnchorEl(e.currentTarget);
+      }}
+      onBlur={(e) => {
+        // 元素外部失去焦点时隐藏提示词
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setSugOpen(false);
+        }
+      }}
+    >
       <EngineChip onChange={chipChange}></EngineChip>
       <div className="v-input">
         <input
@@ -105,6 +127,14 @@ const RenderInput: React.FC<SearchInputPropTypes> = ({
             formatMessage({ id: 'app.component.searchinput.submitbutton' })}
         </Button>
       </div>
+      <SugPopper
+        open={sugOpen}
+        wd={wd}
+        anchorEl={sugAnchorEl}
+        onSelect={(content) => {
+          if (onBtnClick) onBtnClick(content, engine);
+        }}
+      />
     </div>
   );
 };

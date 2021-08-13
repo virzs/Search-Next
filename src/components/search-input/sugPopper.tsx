@@ -18,6 +18,7 @@ export interface SugPopperProps {
   open: boolean;
   wd: string;
   anchorEl: any;
+  onSelect: (content: string) => void;
 }
 
 interface SugList {
@@ -36,10 +37,21 @@ const SugPopperCardCss = (width: number = 0) => css`
   margin-top: 4px;
 `;
 
+const SugSourceCss = css`
+  padding: 10px 20px;
+  text-align: right;
+  margin: 0;
+`;
+
+const SugPopperCss = css`
+  z-index: 1;
+`;
+
 const SugPopper: React.FC<SugPopperProps> = ({
   open,
   anchorEl,
   wd,
+  onSelect,
   ...props
 }) => {
   const [sugList, setSugList] = React.useState<SugList[]>([]);
@@ -72,19 +84,33 @@ const SugPopper: React.FC<SugPopperProps> = ({
   }, [wd]);
 
   return (
-    <Popper open={open} anchorEl={anchorEl} transition>
+    <Popper
+      open={open && wd.length > 0}
+      anchorEl={anchorEl}
+      transition
+      placement="bottom"
+      container={anchorEl}
+      className={classNames(SugPopperCss)}
+    >
       <Card className={classNames(SugPopperCardCss(anchorEl?.clientWidth))}>
         <Spin spinning={refresh} color="#5f5f5f" type="chase">
           {sugList.length ? (
             <>
-              <List>
+              <List disablePadding>
                 {sugList.map((i, j) => (
-                  <ListItem button key={j}>
+                  <ListItem
+                    button
+                    key={j}
+                    onClick={() => {
+                      console.log(i.content);
+                      onSelect(i.content);
+                    }}
+                  >
                     {i.content}
                   </ListItem>
                 ))}
               </List>
-              <p>数据来源：{engine.name}</p>
+              <p className={SugSourceCss}>数据来源：{engine.name}</p>
             </>
           ) : (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />

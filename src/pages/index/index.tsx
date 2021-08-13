@@ -20,7 +20,6 @@ import { Bookmarks, Settings } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import SugPopper from './components/sug-popper';
 import './index.less';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
@@ -34,12 +33,6 @@ export default function IndexPage() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [bg, setBg] = React.useState<BingImage>();
 
-  const [sugOpen, setSugOpen] = React.useState<boolean>(false);
-  const [sugAnchorEl, setSugAnchorEl] = React.useState<null | HTMLElement>(
-    null,
-  );
-  const [wd, setWd] = React.useState<string>('');
-
   const getCopyright = () => {
     copyrightApi().then((res) => {
       setCopyright(res.data);
@@ -51,7 +44,6 @@ export default function IndexPage() {
     const image = localStorage.getItem('checkIndexBg');
     if (image) {
       setBg(JSON.parse(image));
-      console.log(image);
     }
   };
 
@@ -81,12 +73,10 @@ export default function IndexPage() {
     engine: SearchEngineValueTypes,
   ) => {
     console.log('search', value, engine);
-    setWd(value);
-    setSugAnchorEl(e.currentTarget);
-    setSugOpen(true);
   };
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
+    console.log(value);
     window.open(`${engine.href}${value}`);
   };
 
@@ -119,10 +109,6 @@ export default function IndexPage() {
         <SearchInput
           autoFocus
           onChange={inputChange}
-          // onBlur={() => setSugOpen(false)}
-          onFocus={() => {
-            if (wd) setSugOpen(true);
-          }}
           onBtnClick={handleSearch}
           placeholder={formatMessage({
             id: 'app.page.index.searchinput.placeholder',
@@ -145,8 +131,6 @@ export default function IndexPage() {
           ></Copyright>
         )}
       </div>
-      {/* sug popper */}
-      <SugPopper open={sugOpen} anchorEl={sugAnchorEl} wd={wd} />
     </div>
   );
 }
