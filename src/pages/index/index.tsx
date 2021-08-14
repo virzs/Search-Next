@@ -76,7 +76,7 @@ export default function IndexPage() {
   };
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
-    console.log(value);
+    // console.log(value);
     window.open(`${engine.href}${value}`);
   };
 

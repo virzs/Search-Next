@@ -27,5 +27,7 @@ export const copyright = () => {
 // 获取网站icon
 export const getWebIconByUrl = (url?: string) => {
   let newUrl = replaceUrlHaveHttpsOrHttpToEmpty(url || '');
-  return `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${newUrl}`;
+  return url
+    ? `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${newUrl}`
+    : '';
 };

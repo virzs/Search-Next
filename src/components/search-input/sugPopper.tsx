@@ -80,7 +80,6 @@ const SugPopper: React.FC<SugPopperProps> = ({
 
   React.useEffect(() => {
     handRefresh();
-    console.log(wd);
   }, [wd]);
 
   return (

@@ -122,10 +122,6 @@ const TopSites: React.FC<TopSitesPropType> = ({ list, dispatch }) => {
     }
   };
 
-  React.useEffect(() => {
-    console.log(list);
-  }, [list]);
-
   return (
     <>
       <Grid className="top-sites" container justify="center" spacing={2}>
