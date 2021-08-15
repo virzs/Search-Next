@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-08-06 14:42:56
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-06 15:25:19
+ * @Last Modified time: 2021-08-15 20:48:50
  */
 
 // 生成uuid
@@ -38,6 +38,14 @@ const uuid = (len?: number, radix?: number) => {
   return uuid.join('');
 };
 
+const isObject = (object: any) => {
+  return object instanceof Object && object.constructor.name === 'Object';
+};
+
+const isArray = (array: any) => {
+  return array instanceof Array && array.constructor.name === 'Array';
+};
+
 // 检查是否支持 storage
 const isSupported = (storage: Storage) => {
   if (!storage || !(storage instanceof Object)) {
@@ -56,36 +64,84 @@ const isSupported = (storage: Storage) => {
 class Collection {
   name: any;
   storage: any;
-  cache!: { [x: string]: object };
+  cache: any[];
   path: string;
+  cacheable: boolean;
+  primaryKey: any;
   constructor(db: any, name: string, opts: DBOpts) {
-    this.name = name;
-    this.storage = db.storage;
-    this.path = db.database + db.sep + name + db.sep;
+    opts = opts || {};
+
+    this.name = name; // 名称
+    this.storage = db.storage; // 当前storage
+    this.path = db.database + db.sep + name; // 路径
+    this.primaryKey = opts.primaryKey || db.primaryKey;
+    this.cache = []; // 缓存
+    this.cacheable = false; // 是否可缓存
   }
 
+  // 初始化缓存
   _initCache() {
-    let cache: { [x: string]: object } = {};
+    let cache: any[] = [];
+    let filterExp = new RegExp('^' + this.path);
+
     for (let key of Object.keys(this.storage)) {
-      cache[key] = JSON.parse(this.storage.getItem(key));
+      if (filterExp.test(key)) {
+        cache = JSON.parse(this.storage.getItem(key));
+      }
     }
     this.cache = cache;
+    this.cacheable = true;
   }
 
-  inset(data: any, opts: any) {}
+  inset(data: any, opts?: any) {
+    let arrayInsert = isArray(data);
+    let objectInset = isObject(data);
+
+    if (arrayInsert) {
+      if (data.length === 0) {
+        return [];
+      }
+    } else {
+      data = [data];
+    }
+
+    let pk = this.primaryKey;
+    let cacheable = this.cacheable;
+    let pathData = JSON.parse(this.storage.getItem(this.path) || '[]');
+
+    for (let row of data) {
+      if (!objectInset && !arrayInsert) {
+        throw new Error(
+          'TypeError: insert data must be an object or an object array',
+        );
+      }
+
+      if (typeof row[pk] === 'undefined') {
+        row[pk] = uuid();
+      }
+
+      if (cacheable) {
+        this.cache = pathData.concat(row);
+      }
+
+      this.storage.setItem(this.path, JSON.stringify(pathData.concat(row)));
+    }
+
+    return arrayInsert ? data : data[0];
+  }
 }
 interface DBOpts {
   storage: Storage | null;
   database: string;
-  primaryKey: string;
-  sep: string;
+  primaryKey?: string;
+  sep?: string;
 }
 
 class StorageDB {
   storage: Storage | null;
   database: string;
-  primaryKey: string;
-  sep: string;
+  primaryKey?: string;
+  sep?: string;
   constructor(opts: DBOpts) {
     this.storage = opts.storage || (window && window.localStorage);
     this.database = opts.database || 'db';
@@ -97,11 +153,20 @@ class StorageDB {
     }
   }
 
-  get(name: string, opts: DBOpts) {
-    return new Collection(this, name, opts);
+  get(name: string, opts?: DBOpts) {
+    return new Collection(
+      this,
+      name,
+      opts || {
+        storage: this.storage,
+        database: this.database,
+        primaryKey: this.primaryKey,
+        sep: this.sep,
+      },
+    );
   }
 
-  collection(name: string, opts: DBOpts) {
+  collection(name: string, opts?: DBOpts) {
     return this.get(name, opts);
   }
 }
