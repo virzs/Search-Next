@@ -2,8 +2,63 @@
  * @Author: Vir
  * @Date: 2021-08-06 14:42:56
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-15 20:48:50
+ * @Last Modified time: 2021-08-16 09:13:12
  */
+
+const ops = ['$eq', '$gt', '$gte', '$in', '$lt', '$lte', '$ne', '$nin'];
+
+const isNotNumber = (val: any) => {
+  return typeof val !== 'number';
+};
+
+class Operator {
+  static $eq(val: any, tar: any) {
+    return tar === val;
+  }
+
+  static $gt(val: number, tar: number) {
+    if (isNotNumber(val)) throw new Error("'$gt' value must be a number");
+    return tar > val;
+  }
+
+  static $gte(val: number, tar: number) {
+    if (isNotNumber(val)) throw new Error("'$gte' value must be a number");
+    return tar >= val;
+  }
+
+  static $in(val: string | any[], tar: any) {
+    if (!(val instanceof Array))
+      throw new Error("'$in' value must be an array");
+    return val.includes(tar);
+  }
+
+  static $lt(val: number, tar: number) {
+    if (isNotNumber(val)) throw new Error("'$lt' value must be a number");
+    return tar < val;
+  }
+
+  static $lte(val: number, tar: number) {
+    if (isNotNumber(val)) throw new Error("'$lte' value must be a number");
+    return tar <= val;
+  }
+
+  static $ne(val: any, tar: any) {
+    return tar !== val;
+  }
+
+  static $nin(val: string | any[], tar: any) {
+    if (!(val instanceof Array))
+      throw new Error("'$nin' value must be an array");
+    return !val.includes(tar);
+  }
+
+  static _checkExist(op: string) {
+    if (ops.includes(op)) {
+      return true;
+    }
+    throw new Error("unknown operator: '" + op + "'");
+  }
+}
 
 // 生成uuid
 const uuid = (len?: number, radix?: number) => {
@@ -61,6 +116,66 @@ const isSupported = (storage: Storage) => {
   }
 };
 
+const queryMatch = (
+  query: { [x: string]: any },
+  target: { [x: string]: any },
+) => {
+  if (!query || !Object.keys(query).length) {
+    return true;
+  }
+
+  for (let field of Object.keys(query)) {
+    let val = query[field];
+    let tar = target[field];
+
+    if (val instanceof RegExp) {
+      if (!val.test(tar)) {
+        return false;
+      }
+    } else if (isObject(val)) {
+      for (let op of Object.keys(val)) {
+        if (Operator._checkExist(op) && !Operator[op](val[op], tar)) {
+          return false;
+        }
+      }
+    } else if (val !== tar) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const sortCompare = (
+  sort: { [x: string]: number },
+  a: { [x: string]: number },
+  b: { [x: string]: number },
+  i?: number,
+  fields?: string[],
+): any => {
+  i = i || 0;
+  fields = fields || Object.keys(sort);
+
+  let field = fields[i];
+
+  if (!field) {
+    return 0;
+  }
+
+  if (a[field] === b[field]) {
+    i++;
+    return sortCompare(sort, a, b, i, fields);
+  }
+
+  if (sort[field] === 1) {
+    return a[field] - b[field];
+  }
+
+  if (sort[field] === -1) {
+    return b[field] - a[field];
+  }
+};
+
 class Collection {
   name: any;
   storage: any;
@@ -91,6 +206,64 @@ class Collection {
     }
     this.cache = cache;
     this.cacheable = true;
+  }
+
+  _filter(
+    filter: string | RegExp | void | null,
+    opts: { type: any; multi: any },
+  ) {
+    opts.type = opts.type || 'data'; // data, id
+    opts.multi = opts.multi || false;
+
+    if (!this.cacheable) {
+      this._initCache();
+    }
+
+    let res = [];
+    let isFnFilter;
+    let isTypeId = opts.type === 'id';
+
+    if (typeof filter === 'string') {
+      filter = new RegExp(filter);
+    } else if (typeof filter === 'function') {
+      isFnFilter = true;
+    } else if (!filter) {
+      let ret = isTypeId ? Object.keys(this.cache) : Object.values(this.cache);
+
+      if (opts.multi) {
+        return ret;
+      } else {
+        return ret[0] || null;
+      }
+    }
+
+    for (let key of Object.keys(this.cache)) {
+      let val = this.cache[Number(key)];
+
+      if (isFnFilter) {
+        if (filter(key, val)) {
+          let ret = isTypeId ? key : val;
+
+          if (opts.multi) {
+            res.push(ret);
+          } else {
+            return ret;
+          }
+        }
+      } else {
+        if (filter.test(val[this.primaryKey])) {
+          let ret = isTypeId ? key : val;
+
+          if (opts.multi) {
+            res.push(ret);
+          } else {
+            return ret;
+          }
+        }
+      }
+    }
+
+    return opts.multi ? res : null;
   }
 
   inset(data: any, opts?: any) {
@@ -128,6 +301,243 @@ class Collection {
     }
 
     return arrayInsert ? data : data[0];
+  }
+
+  /**
+   *
+   * find('')
+   * find(['', ''])
+   *
+   */
+
+  find(query: any, opts?: { skip?: any; limit?: any; sort?: any }) {
+    query = query || {};
+    opts = opts || {};
+    opts.skip = opts.skip || 0;
+    opts.limit = opts.limit;
+    opts.sort = opts.sort;
+
+    if (isArray(opts.sort)) {
+      opts.sort = opts.sort.reduce(
+        (res: { [x: string]: any }, item: string | any[]) => {
+          if (typeof item === 'string') {
+            res[item] = 1;
+          } else if (item instanceof Array && item.length) {
+            res[item[0]] = item[1] || 1;
+          }
+          return res;
+        },
+        {},
+      );
+    }
+
+    let data;
+    let ids = isObject(query) ? null : isArray(query) ? query : [query];
+    let filterOpts = {
+      type: 'data',
+      multi: true,
+    };
+
+    if (ids) {
+      // 当前查询参数为单个 id 或数组 ids
+      let filterRegExp = new RegExp('^' + ids.join('|') + '$');
+      data = this._filter(filterRegExp, filterOpts);
+    } else if (Object.keys(query).length) {
+      // by query
+      data = this._filter((_key: any, val: any) => {
+        return queryMatch(query, val);
+      }, filterOpts);
+    } else {
+      data = this._filter(null, filterOpts);
+    }
+
+    // sort
+    if (opts.sort) {
+      data.sort((a: any, b: any) => {
+        return sortCompare(opts?.sort, a, b);
+      });
+    }
+
+    if (opts.limit) {
+      data = data.slice(opts.skip, opts.skip + opts.limit);
+    } else if (opts.skip) {
+      data = data.slice(opts.skip);
+    }
+
+    return data;
+  }
+
+  findOne(
+    query: { [x: string]: any },
+    opts: { skip?: any; limit?: any; sort?: any } | undefined,
+  ) {
+    query = query || {};
+    opts = opts || {};
+
+    let data;
+    let id = isObject(query) ? null : query;
+    let queryFields = query ? Object.keys(query) : [];
+    let quickTarget = false;
+    let needsSort = !!opts.sort;
+    let filterOpts = {
+      type: opts._filterType || 'data',
+      multi: false,
+    };
+
+    if (queryFields.length && queryFields.includes(this.primaryKey)) {
+      id = query[this.primaryKey];
+      quickTarget = true;
+    }
+
+    if (id) {
+      // by id
+      data = this.storage.getItem(this.path + id);
+      data = data ? JSON.parse(data) : null;
+
+      if (data && quickTarget && !queryMatch(query, data)) {
+        return null;
+      }
+    } else if (queryFields.length) {
+      // by query
+      if (needsSort) {
+        data = this.find(query, opts);
+      } else {
+        data = this._filter((key: any, val: { [x: string]: any }) => {
+          return queryMatch(query, val);
+        }, filterOpts);
+      }
+    } else {
+      if (needsSort) {
+        data = this.find(query, opts);
+      } else {
+        data = this._filter(null, filterOpts);
+      }
+    }
+
+    if (!id && needsSort && data) {
+      data = data[0] || null;
+    }
+
+    return data;
+  }
+
+  remove(query: {}, opts?: { multi?: any; mulit?: any } | undefined) {
+    if (!query) {
+      throw new Error('remove needs a query');
+    }
+
+    opts = opts || {};
+    opts.multi = typeof opts.multi === 'undefined' ? true : opts.multi;
+
+    let findMethod = opts.multi ? 'find' : 'findOne';
+    let ids = this[findMethod](query, {
+      _filterType: 'id',
+    });
+    let cacheable = this.cacheable;
+
+    if ((opts.mulit && !ids.length) || (!opts.mulit && !ids)) {
+      return 0;
+    }
+
+    if (!opts.multi) {
+      ids = [ids];
+    }
+
+    for (let id of ids) {
+      if (cacheable) {
+        delete this.cache[id];
+      }
+
+      this.storage.removeItem(id);
+    }
+
+    return ids.length;
+  }
+
+  update(
+    query: any,
+    values: { [x: string]: any },
+    opts?: { multi?: any; mulit?: any },
+  ) {
+    if (!query) {
+      throw new Error('update needs a query');
+    }
+    if (!values || !isObject(values)) {
+      throw new Error('update needs an object');
+    }
+
+    opts = opts || {};
+    opts.multi = typeof opts.multi === 'undefined' ? false : opts.multi;
+
+    let findMethod = opts.multi ? 'find' : 'findOne';
+    let ids = this[findMethod](query, {
+      _filterType: 'id',
+    });
+    let pk = this.primaryKey;
+    let cacheable = this.cacheable;
+
+    if ((opts.mulit && !ids.length) || (!opts.mulit && !ids)) {
+      return 0;
+    }
+
+    if (!opts.multi) {
+      let id = ids;
+      let row = cacheable
+        ? this.cache[id]
+        : JSON.parse(this.storage.getItem(id));
+      let isIdUpdated = values[pk] && values[pk] !== row[pk];
+      let newId = isIdUpdated ? this.path + values[pk] : id;
+
+      // check exist
+      if (isIdUpdated && this.findOne(values[pk])) {
+        throw new Error(
+          "Duplicate value '" + values[pk] + "' for unique field '" + pk + "'",
+        );
+      }
+
+      let data = Object.assign({}, row, values);
+
+      if (cacheable) {
+        this.cache[newId] = data;
+        if (isIdUpdated) {
+          delete this.cache[id];
+        }
+      }
+
+      this.storage.setItem(newId, JSON.stringify(data));
+
+      if (isIdUpdated) {
+        this.storage.removeItem(id);
+      }
+
+      return data;
+    } else {
+      delete values[pk];
+
+      if (!Object.keys(values).length) {
+        return 0;
+      }
+
+      for (let id of ids) {
+        let row = cacheable
+          ? this.cache[id]
+          : JSON.parse(this.storage.getItem(id));
+        let data = Object.assign({}, row, values);
+
+        if (cacheable) {
+          this.cache[id] = data;
+        }
+
+        this.storage.setItem(id, JSON.stringify(data));
+      }
+
+      return ids.length;
+    }
+  }
+
+  drop() {
+    this.remove({});
+    return true;
   }
 }
 interface DBOpts {
