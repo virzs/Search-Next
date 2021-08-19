@@ -5,60 +5,73 @@
  * @Last Modified time: 2021-08-16 09:13:12
  */
 
+interface Operators {
+  $eq: (val: any, tar: any) => boolean;
+  $gt: (val: number, tar: number) => boolean;
+  $gte: (val: number, tar: number) => boolean;
+  $in: (val: string | any[], tar: any) => boolean;
+  $lt: (val: number, tar: number) => boolean;
+  $lte: (val: number, tar: number) => boolean;
+  $ne: (val: any, tar: any) => boolean;
+  $nin: (val: string | any[], tar: any) => boolean;
+  _checkExist: (op: string) => op is keyof Operators;
+}
+
 const ops = ['$eq', '$gt', '$gte', '$in', '$lt', '$lte', '$ne', '$nin'];
 
 const isNotNumber = (val: any) => {
   return typeof val !== 'number';
 };
 
-class Operator {
-  static $eq(val: any, tar: any) {
+const Operator: Operators = {
+  // 相等
+  $eq: (val, tar) => {
     return tar === val;
-  }
-
-  static $gt(val: number, tar: number) {
+  },
+  // 大于
+  $gt: (val, tar) => {
     if (isNotNumber(val)) throw new Error("'$gt' value must be a number");
     return tar > val;
-  }
-
-  static $gte(val: number, tar: number) {
+  },
+  // 大于等于
+  $gte: (val, tar) => {
     if (isNotNumber(val)) throw new Error("'$gte' value must be a number");
     return tar >= val;
-  }
-
-  static $in(val: string | any[], tar: any) {
+  },
+  // 包含
+  $in: (val, tar) => {
     if (!(val instanceof Array))
       throw new Error("'$in' value must be an array");
     return val.includes(tar);
-  }
-
-  static $lt(val: number, tar: number) {
+  },
+  // 小于
+  $lt: (val, tar) => {
     if (isNotNumber(val)) throw new Error("'$lt' value must be a number");
     return tar < val;
-  }
-
-  static $lte(val: number, tar: number) {
+  },
+  // 小于等于
+  $lte: (val, tar) => {
     if (isNotNumber(val)) throw new Error("'$lte' value must be a number");
     return tar <= val;
-  }
-
-  static $ne(val: any, tar: any) {
+  },
+  // 不等于
+  $ne: (val, tar) => {
     return tar !== val;
-  }
-
-  static $nin(val: string | any[], tar: any) {
+  },
+  // 不包含
+  $nin: (val, tar) => {
     if (!(val instanceof Array))
       throw new Error("'$nin' value must be an array");
     return !val.includes(tar);
-  }
-
-  static _checkExist(op: string) {
+  },
+  // 检查存在
+  _checkExist: (op): op is keyof Operators => {
     if (ops.includes(op)) {
       return true;
     }
     throw new Error("unknown operator: '" + op + "'");
-  }
-}
+  },
+};
 
 // 生成uuid
 const uuid = (len?: number, radix?: number) => {
@@ -209,7 +222,7 @@ class Collection {
   }
 
   _filter(
-    filter: string | RegExp | void | null,
+    filter: string | RegExp | (() => void) | null,
     opts: { type: any; multi: any },
   ) {
     opts.type = opts.type || 'data'; // data, id
@@ -369,7 +382,7 @@ class Collection {
 
   findOne(
     query: { [x: string]: any },
-    opts: { skip?: any; limit?: any; sort?: any } | undefined,
+    opts?: { skip?: any; limit?: any; sort?: any } | undefined,
   ) {
     query = query || {};
     opts = opts || {};
