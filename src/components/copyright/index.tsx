@@ -5,6 +5,7 @@
  * @Last Modified time: 2021-03-27 14:42:52
  */
 
+import classNames from 'classnames';
 import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
 import './index.less';
@@ -33,7 +34,11 @@ const Copyright: React.FC<CopyrightPropTypes> = ({
     ? children
     : `©${startTime}-${endTime} by ${author}. All rights reserved.`;
   return (
-    <a className="copyright" {...props} href={href}>
+    <a
+      className={classNames('copyright', props.classnames)}
+      {...props}
+      href={href}
+    >
       {content}
     </a>
   );

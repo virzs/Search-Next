@@ -2,14 +2,12 @@
  * @Author: Vir
  * @Date: 2021-07-26 13:55:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-01 19:28:23
+ * @Last Modified time: 2021-08-14 23:57:32
  */
 
-import { hexToRgba } from '@/utils/color';
-import { css } from '@emotion/css';
+import BorderColorCard from '@/components/material-ui-custom/card/BorderColorCard';
 import {
   Avatar,
-  Card,
   CardActionArea,
   CardHeader,
   IconButton,
@@ -19,35 +17,8 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import { MoreHoriz } from '@material-ui/icons';
-import classNames from 'classnames';
 import React from 'react';
 import { Overflow } from 'vmdc-ui';
-
-const WebsiteCardStyle = (color: string) => {
-  return css`
-    cursor: pointer;
-    &.MuiCard-root {
-      box-shadow: 0px 4px 2px -2px ${hexToRgba(color, 0.2).rgba},
-        0px 2px 2px 0px ${hexToRgba(color, 0.14).rgba},
-        0px 2px 6px 0px ${hexToRgba(color, 0.12).rgba};
-    }
-    .MuiCardHeader-root {
-      height: 100%;
-      align-items: flex-start;
-      .MuiCardHeader-content {
-        width: calc(100% - 80px);
-      }
-      .MuiCardHeader-subheader {
-        p {
-          margin-bottom: 0;
-        }
-      }
-    }
-    .MuiCardActions-root {
-      justify-content: flex-end;
-    }
-  `;
-};
 
 const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
   const { name, intro, color, url } = item;
@@ -61,7 +32,7 @@ const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
   };
 
   return (
-    <Card className={classNames(WebsiteCardStyle(color))}>
+    <BorderColorCard color={color}>
       <CardActionArea
         onClick={() => {
           window.open(url);
@@ -80,7 +51,8 @@ const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
           title={name}
           subheader={<Overflow>{intro || '暂无介绍'}</Overflow>}
           action={
-            intro && (
+            intro &&
+            intro.length > 10 && (
               <IconButton size="small" onClick={(e) => handleAction(e)}>
                 <MoreHoriz />
               </IconButton>
@@ -99,7 +71,7 @@ const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
           <Typography>{intro || '暂无介绍'}</Typography>
         </DialogContent>
       </Dialog>
-    </Card>
+    </BorderColorCard>
   );
 };
 
