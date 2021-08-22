@@ -12,14 +12,22 @@ import { ContentHeaderStyle } from './style';
 export interface ContentHeaderProps {
   title: string;
   icon?: JSX.Element;
+  action?: React.ReactNode;
 }
 
-const ContentHeader: React.FC<ContentHeaderProps> = ({ title, icon }) => {
+const ContentHeader: React.FC<ContentHeaderProps> = ({
+  title,
+  action,
+  icon,
+}) => {
   return (
     <div className={classNames(ContentHeaderStyle())}>
       <Typography variant="h6" className="content-header">
-        {icon && <div className="header-icon">{icon}</div>}
-        {title}
+        <div className="header-title">
+          {icon && <div className="header-icon">{icon}</div>}
+          {title}
+        </div>
+        <div className="header-action">{action}</div>
       </Typography>
     </div>
   );

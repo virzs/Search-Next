@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:38:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-16 21:33:55
+ * @Last Modified time: 2021-08-14 23:26:18
  */
 import {
   PaletteOutlined,
@@ -14,6 +14,7 @@ import {
 } from '@material-ui/icons';
 import { SettingType } from './interface';
 import About from './settings/about';
+import Auth from './settings/auth';
 import Locales from './settings/locales';
 import Personalise from './settings/personalise';
 
@@ -26,7 +27,7 @@ export default [
     id: '8d31980bee4040ffbacfaac264d1c11d',
     icon: <AccountBoxOutlined {...iconProps} />,
     name: '个人信息',
-    component: '',
+    component: <Auth />,
   },
   {
     id: '1b47486d417c438ab66a3b91c40e99f0',

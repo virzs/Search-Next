@@ -7,13 +7,13 @@
 
 import { latest } from '@/apis/github';
 import { LatestType } from '@/apis/github/interface';
+import ContentHeader from '@/components/global/menu-layout/contentHeader';
+import ContentItemTitle from '@/components/global/menu-layout/contentItemTitle';
 import { UpdateRecordDialog } from '@/components/update-record-dialog';
 import { Button, Card, CardContent, Typography } from '@material-ui/core';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useIntl } from 'umi';
-import ContentHeader from '../components/contentHeader';
-import ContentItemTitle from '../components/contentItemTitle';
 import ContentTextSecond from '../components/contentTextSecond';
 
 const About: React.FC = () => {

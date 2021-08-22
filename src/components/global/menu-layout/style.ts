@@ -67,6 +67,7 @@ export const ContentHeaderStyle = () => {
     .content-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       .header-icon {
         margin-right: 8px;
         display: flex;

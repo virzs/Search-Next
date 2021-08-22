@@ -11,7 +11,7 @@ import React from 'react';
 import { Image, Spin } from 'antd';
 import { BingImage } from '@/apis/bing/interface';
 import './styles/background.style.less';
-import ContentItemTitle from '../../components/contentItemTitle';
+import ContentItemTitle from '@/components/global/menu-layout/contentItemTitle';
 import OutlineCard from '@/components/global/card/outline-card';
 import { Block, Replay } from '@material-ui/icons';
 import dayjs from 'dayjs';

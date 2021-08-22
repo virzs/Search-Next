@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-06-12 21:31:53
  */
 
-import ContentHeader from '../components/contentHeader';
+import ContentHeader from '@/components/global/menu-layout/contentHeader';
 import allItems from './items/allItems';
 
 const Personalise: React.FC = () => {

@@ -10,6 +10,7 @@ import {
   getLocale,
   setLocale,
 } from '@/.umi/plugin-locale/localeExports';
+import ContentItemTitle from '@/components/global/menu-layout/contentItemTitle';
 import {
   Radio,
   List,
@@ -19,7 +20,6 @@ import {
 } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import React from 'react';
-import ContentItemTitle from '../components/contentItemTitle';
 
 export interface SelectLocalesTypes {
   label: string;

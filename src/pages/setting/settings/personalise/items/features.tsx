@@ -7,7 +7,7 @@
 
 import { Button, Switch } from '@material-ui/core';
 import React from 'react';
-import ContentItemTitle from '../../components/contentItemTitle';
+import ContentItemTitle from '@/components/global/menu-layout/contentItemTitle';
 import { ContentList, ContentListItem } from '../../components/contentList';
 
 import store from 'store';
