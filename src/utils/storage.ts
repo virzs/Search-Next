@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-08-06 14:42:56
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-16 09:13:12
+ * @Last Modified time: 2021-08-23 17:31:22
  */
 
 interface Operators {
@@ -381,7 +381,7 @@ class Collection {
   }
 
   findOne(
-    query: { [x: string]: any },
+    query: any,
     opts?: { skip?: any; limit?: any; sort?: any } | undefined,
   ) {
     query = query || {};
@@ -404,12 +404,16 @@ class Collection {
 
     if (id) {
       // by id
-      data = this.storage.getItem(this.path + id);
+      data = this.storage.getItem(this.path);
       data = data ? JSON.parse(data) : null;
 
       if (data && quickTarget && !queryMatch(query, data)) {
         return null;
       }
+
+      data = data
+        ? data.find((i: any) => i[this.primaryKey] === id)
+        : undefined;
     } else if (queryFields.length) {
       // by query
       if (needsSort) {
@@ -552,6 +556,12 @@ class Collection {
     this.remove({});
     return true;
   }
+
+  count() {
+    let data = this.storage.getItem(this.path);
+
+    return data ? JSON.parse(data).length : undefined;
+  }
 }
 interface DBOpts {
   storage: Storage | null;
@@ -576,6 +586,7 @@ class StorageDB {
     }
   }
 
+  // 使用数据库
   get(name: string, opts?: DBOpts) {
     return new Collection(
       this,
@@ -591,6 +602,21 @@ class StorageDB {
 
   collection(name: string, opts?: DBOpts) {
     return this.get(name, opts);
+  }
+
+  // 当前数据库占用空间
+  size() {
+    let size = 0;
+    for (let i in this.storage) {
+      if (
+        this.storage.hasOwnProperty(i) &&
+        i.indexOf(this.database + ':') !== -1
+      ) {
+        const item = this.storage.getItem(i);
+        size += item ? item.length : 0;
+      }
+    }
+    return size;
   }
 }
 
