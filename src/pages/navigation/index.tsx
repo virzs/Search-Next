@@ -2,13 +2,13 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-07-26 17:21:40
+ * @Last Modified time: 2021-08-23 16:51:43
  */
 
 import MenuLayout from '@/components/global/menu-layout';
 import React from 'react';
-import navigations from './data';
-import { Navigation } from './interface';
+import navigations from '@/data/navigation/data';
+import { Navigation } from '@/data/navigation/interface';
 import ContentHeader from '@/components/global/menu-layout/contentHeader';
 import WebsiteCard from './components/WebisteCard';
 import { css } from '@emotion/css';
