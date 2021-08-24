@@ -60,6 +60,14 @@ yarn build
   - 切换背景（数据来源必应壁纸，分辨率1920x1080）
 - 消息提示
 
+## 组件说明
+
+组件文件夹路径 `src/components`
+
+- `material-ui-custom` 基于业务封装的 `material ui` 组件，如：`form 表单`、`card 卡片`、`dialog 对话框`、`popper 弹出提示工具`、`notistack 消息条`、`tabs 选项卡` 等。
+- `global` 通用组件
+- 其他组件
+
 ## 后端支持
 
 部分内容需要配合该项目的后端接口部分
