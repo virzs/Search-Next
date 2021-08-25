@@ -75,9 +75,8 @@ const NavigationPage = (props: any) => {
         <div key={i.id} id={i.id}>
           <ContentHeader icon={i.icon} title={i.name} />
           <div className={WebsiteGridStyle}>
-            {i.children.map((j) => (
-              <WebsiteCard key={j.id} item={j} />
-            ))}
+            {i.component &&
+              i.component.map((j) => <WebsiteCard key={j.id} item={j} />)}
           </div>
         </div>
       ))}

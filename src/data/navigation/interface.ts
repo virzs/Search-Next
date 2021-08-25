@@ -22,5 +22,5 @@ export interface Navigation {
   icon?: JSX.Element;
   color?: string;
   isShow?: boolean;
-  children: Website[];
+  component: Website[] | '';
 }
