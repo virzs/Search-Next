@@ -221,10 +221,7 @@ class Collection {
     this.cacheable = true;
   }
 
-  _filter(
-    filter: string | RegExp | (() => void) | null,
-    opts: { type: any; multi: any },
-  ) {
+  _filter(filter: any | null, opts: { type: any; multi: any }) {
     opts.type = opts.type || 'data'; // data, id
     opts.multi = opts.multi || false;
 
@@ -382,7 +379,9 @@ class Collection {
 
   findOne(
     query: any,
-    opts?: { skip?: any; limit?: any; sort?: any } | undefined,
+    opts?:
+      | { skip?: any; limit?: any; sort?: any; _filterType?: any }
+      | undefined,
   ) {
     query = query || {};
     opts = opts || {};
