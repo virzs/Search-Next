@@ -46,7 +46,9 @@ const BorderColorCard: React.FC<BorderColorCardProps> = ({
   ...props
 }) => {
   return (
-    <Card className={classNames(BorderColorCardStyle(color))}>{children}</Card>
+    <Card {...props} className={classNames(BorderColorCardStyle(color))}>
+      {children}
+    </Card>
   );
 };
 
