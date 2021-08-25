@@ -10,7 +10,6 @@ import { Navigation } from '@/data/navigation/interface';
 import React from 'react';
 import { history } from 'umi';
 import allSetting from './allSetting';
-import './style.less';
 
 export type SettingRouteState = { search?: string } | null | undefined;
 
