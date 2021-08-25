@@ -77,3 +77,31 @@ export const ContentHeaderStyle = () => {
     }
   `;
 };
+
+export const ContentItemTitleStyle = css`
+  padding: 10px 0;
+  overflow: auto;
+  overflow-wrap: break-word;
+  > p {
+    margin-bottom: 0;
+  }
+  .item-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    color: #262626;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    p {
+      margin-bottom: 0;
+    }
+  }
+  .item-title-desc {
+    margin-top: 4px;
+    margin-bottom: 0px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #717171;
+  }
+`;

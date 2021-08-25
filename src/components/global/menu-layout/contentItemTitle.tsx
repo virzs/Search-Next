@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { ContentItemTitleStyle } from './style';
 
 export interface ContentItemTitleProps {
   title: string;
@@ -19,7 +20,7 @@ const ContentItemTitle: React.FC<ContentItemTitleProps> = ({
   rightHandle,
 }) => {
   return (
-    <div className="content-item-title-root">
+    <div className={ContentItemTitleStyle}>
       <div className="item-title">
         <p>{title}</p>
         {rightHandle}
