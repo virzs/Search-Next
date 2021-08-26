@@ -448,6 +448,8 @@ class Collection {
     opts = opts || {};
     opts.multi = typeof opts.multi === 'undefined' ? true : opts.multi;
 
+    let data = JSON.parse(this.storage.getItem(this.path));
+
     let ids = opts.multi
       ? this.find(query, {
           _filterType: 'id',
@@ -470,8 +472,11 @@ class Collection {
       if (cacheable) {
         delete this.cache[id];
       }
+      data = data.filter(
+        (i: any) => i[this.primaryKey] !== id[this.primaryKey],
+      );
 
-      this.storage.removeItem(id);
+      this.storage.setItem(this.path, JSON.stringify(data));
     }
 
     return ids.length;
