@@ -470,7 +470,9 @@ class Collection {
 
     for (let id of ids) {
       if (cacheable) {
-        delete this.cache[id];
+        this.cache = this.cache.filter(
+          (i: any) => i[this.primaryKey] !== id[this.primaryKey],
+        );
       }
       data = data.filter(
         (i: any) => i[this.primaryKey] !== id[this.primaryKey],
