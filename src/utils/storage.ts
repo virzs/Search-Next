@@ -516,32 +516,22 @@ class Collection {
 
     if (!opts.multi) {
       let id = ids;
-      let row = cacheable
-        ? this.cache[id]
-        : JSON.parse(this.storage.getItem(id));
-      let isIdUpdated = values[pk] && values[pk] !== row[pk];
-      let newId = isIdUpdated ? this.path + values[pk] : id;
 
-      // check exist
-      if (isIdUpdated && this.findOne(values[pk])) {
-        throw new Error(
-          "Duplicate value '" + values[pk] + "' for unique field '" + pk + "'",
-        );
-      }
+      let data = JSON.parse(this.storage.getItem(this.path));
 
-      let data = Object.assign({}, row, values);
+      data = data.map((i: any) => {
+        if (i[pk] === id[pk]) {
+          for (let j in values) {
+            i[j] = values[j];
+          }
+        }
+        return i;
+      });
+
+      this.storage.setItem(this.path, JSON.stringify(data));
 
       if (cacheable) {
-        this.cache[newId] = data;
-        if (isIdUpdated) {
-          delete this.cache[id];
-        }
-      }
-
-      this.storage.setItem(newId, JSON.stringify(data));
-
-      if (isIdUpdated) {
-        this.storage.removeItem(id);
+        this.cache = data;
       }
 
       return data;
