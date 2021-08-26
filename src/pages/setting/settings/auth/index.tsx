@@ -148,6 +148,7 @@ const Auth: React.FC = () => {
   // dialog取消
   const handleCancel = () => {
     setOpen(false);
+    setEditData({ _id: '', username: '' });
     reset();
   };
 
