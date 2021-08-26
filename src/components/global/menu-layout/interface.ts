@@ -19,4 +19,5 @@ export interface MenuLayoutProps {
   menu: MenuLayoutMenu[];
   children?: any;
   onChange?: (id: string, item: MenuLayoutMenu) => void;
+  showCopyright?: boolean;
 }

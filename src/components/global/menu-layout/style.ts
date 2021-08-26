@@ -34,7 +34,7 @@ export const MenuLayoutSideStyle = () => {
 export const MenuLayoutContentStyle = () => {
   return css`
     width: calc(100% - 340px);
-    padding: 0px 25px 0px 50px;
+    padding: 0px 25px 42px 50px;
     height: 100%;
     overflow-y: auto;
     scroll-behavior: smooth;
@@ -44,6 +44,7 @@ export const MenuLayoutContentStyle = () => {
 export const MenuLayoutContentBoxStyle = () => {
   return css`
     max-width: 820px;
+    padding-bottom: 42px;
   `;
 };
 
@@ -104,4 +105,16 @@ export const ContentItemTitleStyle = css`
     line-height: 16px;
     color: #717171;
   }
+`;
+
+export const CopyrightStyle = css`
+  width: 100%;
+  padding: 10px 0 10px;
+  display: block;
+  color: #000 !important;
+  position: fixed;
+  bottom: 0;
+  left: 340px;
+  max-width: 900px;
+  background-color: #f7f7f7;
 `;

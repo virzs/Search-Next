@@ -12,10 +12,7 @@ import { Navigation } from '@/data/navigation/interface';
 import ContentHeader from '@/components/global/menu-layout/contentHeader';
 import WebsiteCard from './components/WebisteCard';
 import { css } from '@emotion/css';
-import { copyright as copyrightApi } from '@/apis/common';
 import { CopyrightType } from '@/data/main';
-import Copyright from '@/components/copyright';
-import classNames from 'classnames';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
   version?: string;
@@ -29,19 +26,9 @@ const WebsiteGridStyle = css`
   grid-template-columns: repeat(auto-fit);
 `;
 
-const CopyrightStyle = css`
-  width: 100%;
-  margin: 30px auto 10px;
-  display: block;
-  color: #000;
-`;
-
 const NavigationPage = (props: any) => {
   const menu: Navigation[] = navigations;
   const [selected, setSelected] = React.useState<Navigation>({} as Navigation);
-  const [copyright, setCopyright] = React.useState(
-    {} as CopyrightTypeWithVersion,
-  );
 
   const menuChange = (id: string) => {
     const find = navigations.find((i) => i.id === id);
@@ -53,16 +40,6 @@ const NavigationPage = (props: any) => {
       }
     }
   };
-
-  const getCopyright = () => {
-    copyrightApi().then((res) => {
-      setCopyright(res.data);
-    });
-  };
-
-  React.useEffect(() => {
-    getCopyright();
-  }, []);
 
   return (
     <MenuLayout
@@ -80,14 +57,6 @@ const NavigationPage = (props: any) => {
           </div>
         </div>
       ))}
-      {copyright && (
-        <Copyright
-          classnames={classNames(CopyrightStyle)}
-          author={copyright.author}
-          href={copyright.href}
-          startTime={copyright.startTime}
-        ></Copyright>
-      )}
     </MenuLayout>
   );
 };

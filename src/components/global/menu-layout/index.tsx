@@ -16,6 +16,7 @@ import {
 import classNames from 'classnames';
 import { MenuLayoutMenu, MenuLayoutProps } from './interface';
 import {
+  CopyrightStyle,
   MenuLayoutContentBoxStyle,
   MenuLayoutContentStyle,
   MenuLayoutRootStyle,
@@ -25,13 +26,38 @@ import { history } from 'umi';
 import { ArrowBack } from '@material-ui/icons';
 import React from 'react';
 import { SettingRouteState } from '@/pages/setting';
+import Copyright from '@/components/copyright';
+import { copyright as copyrightApi } from '@/apis/common';
+import { css } from '@emotion/css';
+import { CopyrightType } from '@/data/main';
+
+interface CopyrightTypeWithVersion extends CopyrightType {
+  version?: string;
+}
 
 const MenuLayout: React.FC<MenuLayoutProps> = (props) => {
-  const { title, basePath, menu, children, onChange, ...other } = props;
+  const {
+    title,
+    basePath,
+    menu,
+    children,
+    onChange,
+    showCopyright = true,
+    ...other
+  } = props;
 
   const [selected, setSelected] = React.useState<MenuLayoutMenu>(
     ([] as unknown) as MenuLayoutMenu,
   );
+  const [copyright, setCopyright] = React.useState(
+    {} as CopyrightTypeWithVersion,
+  );
+
+  const getCopyright = () => {
+    copyrightApi().then((res) => {
+      setCopyright(res.data);
+    });
+  };
 
   React.useEffect(() => {
     const state: SettingRouteState = history.location?.state;
@@ -44,6 +70,7 @@ const MenuLayout: React.FC<MenuLayoutProps> = (props) => {
       setSelected(menu[0]);
       if (onChange) onChange(menu[0].id, menu[0]);
     }
+    getCopyright();
   }, []);
 
   return (
@@ -86,6 +113,14 @@ const MenuLayout: React.FC<MenuLayoutProps> = (props) => {
         <div className={classNames(MenuLayoutContentBoxStyle())}>
           {children ? children : selected.component}
         </div>
+        {showCopyright && (
+          <Copyright
+            classnames={classNames(CopyrightStyle)}
+            author={copyright.author}
+            href={copyright.href}
+            startTime={copyright.startTime}
+          />
+        )}
       </div>
     </div>
   );
