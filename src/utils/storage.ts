@@ -320,7 +320,10 @@ class Collection {
    *
    */
 
-  find(query: any, opts?: { skip?: any; limit?: any; sort?: any }) {
+  find(
+    query: any,
+    opts?: { skip?: any; limit?: any; sort?: any; _filterType?: string },
+  ) {
     query = query || {};
     opts = opts || {};
     opts.skip = opts.skip || 0;
@@ -445,10 +448,14 @@ class Collection {
     opts = opts || {};
     opts.multi = typeof opts.multi === 'undefined' ? true : opts.multi;
 
-    let findMethod = opts.multi ? 'find' : 'findOne';
-    let ids = this[findMethod](query, {
-      _filterType: 'id',
-    });
+    let ids = opts.multi
+      ? this.find(query, {
+          _filterType: 'id',
+        })
+      : this.findOne(query, {
+          _filterType: 'id',
+        });
+
     let cacheable = this.cacheable;
 
     if ((opts.mulit && !ids.length) || (!opts.mulit && !ids)) {
@@ -473,7 +480,7 @@ class Collection {
   update(
     query: any,
     values: { [x: string]: any },
-    opts?: { multi?: any; mulit?: any },
+    opts?: { multi?: any; mulit?: any; _filterType?: string },
   ) {
     if (!query) {
       throw new Error('update needs a query');
@@ -485,10 +492,14 @@ class Collection {
     opts = opts || {};
     opts.multi = typeof opts.multi === 'undefined' ? false : opts.multi;
 
-    let findMethod = opts.multi ? 'find' : 'findOne';
-    let ids = this[findMethod](query, {
-      _filterType: 'id',
-    });
+    let ids = opts.multi
+      ? this.find(query, {
+          _filterType: 'id',
+        })
+      : this.findOne(query, {
+          _filterType: 'id',
+        });
+
     let pk = this.primaryKey;
     let cacheable = this.cacheable;
 
