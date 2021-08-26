@@ -9,4 +9,6 @@ import confirm from './confirm';
 
 const DialogTitle = DialogTitleCustom;
 
-export { DialogTitle, confirm };
+const Modal = confirm;
+
+export { DialogTitle, Modal };
