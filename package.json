@@ -6,7 +6,8 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "test": "npx nyc@latest mocha"
+    "test": "npx nyc@latest mocha",
+    "deploy": "gh-pages -d dist"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -46,6 +47,7 @@
     "@types/react-router-dom": "^5.1.8",
     "@vitejs/plugin-react-refresh": "^1.3.1",
     "autoprefixer": "^10.3.4",
+    "gh-pages": "^3.2.3",
     "mocha": "^9.1.1",
     "nyc": "^15.1.0",
     "postcss": "^8.3.6",
