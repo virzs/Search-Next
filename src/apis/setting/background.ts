@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-01 15:20:59
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-01 17:52:24
+ * @Last Modified time: 2021-09-23 17:31:01
  */
 
 import instance from '@/utils/request';
@@ -58,6 +58,11 @@ export const bingImg = (params?: bingImgParamsType) => {
   return instance.get('/v1/resource/bing/random', {
     params,
   });
+};
+
+// 获取最新壁纸/每日一图
+export const latestImg = () => {
+  return instance.get('/v1/resource/bing/latest');
 };
 
 export interface SetBackgroundParams {

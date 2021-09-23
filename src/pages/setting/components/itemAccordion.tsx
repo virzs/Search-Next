@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-21 10:50:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-21 21:11:59
+ * @Last Modified time: 2021-09-23 13:32:45
  */
 
 import {
@@ -16,6 +16,8 @@ import React from 'react';
 
 export interface ItemAccordionProps {
   title?: string;
+  desc?: string;
+  action?: React.ReactNode;
   children: any;
   disableDetailPadding?: boolean;
 }
@@ -39,6 +41,8 @@ export const AccordionDetailItem: React.FC<AccordionDetailItemProps> = ({
 
 const ItemAccordion: React.FC<ItemAccordionProps> = ({
   title,
+  desc,
+  action,
   children,
   disableDetailPadding = false,
 }) => {
@@ -48,7 +52,13 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
         className=" transition hover:bg-gray-100"
         expandIcon={<ExpandMore />}
       >
-        {title}
+        <div className="flex items-center justify-between w-full mr-2">
+          <div>
+            {title && <p className="mb-0 text-sm font-semibold">{title}</p>}
+            {desc && <p className="mb-0 text-xs">{desc}</p>}
+          </div>
+          <div className="flex items-center">{action}</div>
+        </div>
       </AccordionSummary>
       <AccordionDetails className={classNames({ 'p-0': disableDetailPadding })}>
         {children}

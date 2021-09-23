@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-26 13:55:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-14 23:57:32
+ * @Last Modified time: 2021-09-23 15:22:52
  */
 
 import BorderColorCard from '@/components/md-custom/card/BorderColorCard';
@@ -24,7 +24,7 @@ import { Overflow } from 'vmdc-ui';
 const WebsiteCard: React.FC<any> = ({ item, ...props }) => {
   const { name, intro, color, url } = item;
 
-  const DialogRef = React.createRef();
+  const DialogRef = React.createRef<any>();
 
   const [visible, setVisible] = React.useState<boolean>(false);
 
