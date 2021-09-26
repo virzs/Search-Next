@@ -32,6 +32,17 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
   const [apiLoading, setApiLoading] = React.useState<boolean>(false);
   const demoList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
   const [init, setInit] = React.useState<boolean>(false);
+
+  const formatItem = (data: BingImage): AuthBackgroundRandomData => {
+    return {
+      id: data._id,
+      url: data.url,
+      hsh: data.hsh,
+      copyright: data.copyright,
+      copyrightlink: data.copyrightlink,
+    };
+  };
+
   const getList = () => {
     setApiLoading(true);
     const hsh = initCheck();
@@ -44,14 +55,7 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
       if (data) {
         setCheckHsh(data.hsh);
       } else {
-        if (onChange)
-          onChange({
-            id: image._id,
-            url: image.url,
-            hsh: image.hsh,
-            copyright: image.copyright,
-            copyrightlink: image.copyrightlink,
-          });
+        if (onChange) onChange(formatItem(image));
         setCheckHsh(image.hsh);
       }
     });
@@ -80,13 +84,7 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
     findImgToStroage(hsh);
     const selected: any = imgList.find((i) => i.hsh === hsh);
     if (selected && onChange) {
-      onChange({
-        id: selected._id,
-        url: selected.url,
-        hsh: selected.hsh,
-        copyright: selected.copyright,
-        copyrightlink: selected.copyrightlink,
-      });
+      onChange(formatItem(selected));
     }
   };
 

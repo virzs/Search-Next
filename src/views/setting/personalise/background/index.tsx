@@ -23,7 +23,10 @@ export interface BgOptions {
   label: string;
   value: AuthBackgroundType;
   canSelect?: boolean;
+  autoExpaneded: boolean;
 }
+
+// TODO 设置为必应壁纸时，历史记录及细节重构
 
 const Background: React.FC = () => {
   const [value, setValue] = React.useState<BgOptions>({} as BgOptions); // 选择背景类型
@@ -35,10 +38,20 @@ const Background: React.FC = () => {
   const [expanded, setExpanded] = React.useState(false);
 
   const bgOptions: BgOptions[] = [
-    { label: '纯色', value: 'color', canSelect: false },
-    { label: '必应壁纸', value: 'random', canSelect: true },
-    { label: '每日一图', value: 'everyday', canSelect: false },
-    { label: '在线图片', value: 'link', canSelect: false },
+    { label: '纯色', value: 'color', canSelect: true, autoExpaneded: false },
+    {
+      label: '必应壁纸',
+      value: 'random',
+      canSelect: true,
+      autoExpaneded: true,
+    },
+    {
+      label: '每日一图',
+      value: 'everyday',
+      canSelect: false,
+      autoExpaneded: true,
+    },
+    { label: '在线图片', value: 'link', canSelect: false, autoExpaneded: true },
   ];
 
   // 更新设置
@@ -55,7 +68,7 @@ const Background: React.FC = () => {
     if (!data) return;
     setSelected(selected);
     setValue(data);
-    setExpanded(true);
+    setExpanded(data.autoExpaneded);
     if (data.canSelect === true) {
       const setting = {
         type: selected,
@@ -111,7 +124,9 @@ const Background: React.FC = () => {
         disableDetailPadding
       >
         {value.value === 'color' && (
-          <Alert severity="info">纯色背景设置将在未来支持</Alert>
+          <Alert severity="info">
+            设置为纯色背景，在纯色设置时，会自动应用当前主题配色。
+          </Alert>
         )}
         {value.value === 'random' && (
           <Random
