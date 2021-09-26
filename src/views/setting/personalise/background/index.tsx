@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-24 14:23:31
+ * @Last Modified time: 2021-09-26 17:40:30
  */
 
 import { editAccount } from '@/apis/auth';
@@ -16,6 +16,7 @@ import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import { Alert, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';
 import { getAccount } from '../../auth/utils/acount';
+import EveryDay from './everyDay';
 import Random from './random';
 import './styles/background.style.less';
 
@@ -48,8 +49,8 @@ const Background: React.FC = () => {
     {
       label: '每日一图',
       value: 'everyday',
-      canSelect: false,
-      autoExpaneded: true,
+      canSelect: true,
+      autoExpaneded: false,
     },
     { label: '在线图片', value: 'link', canSelect: false, autoExpaneded: true },
   ];
@@ -140,9 +141,7 @@ const Background: React.FC = () => {
             }}
           />
         )}
-        {value.value === 'everyday' && (
-          <Alert severity="info">每日一图背景设置将在未来支持</Alert>
-        )}
+        {value.value === 'everyday' && <EveryDay />}
         {value.value === 'link' && (
           <Alert severity="info">在线图片背景设置将在未来支持</Alert>
         )}

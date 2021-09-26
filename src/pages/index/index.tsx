@@ -2,10 +2,14 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 16:50:26
+ * @Last Modified time: 2021-09-26 17:46:13
  */
 
-import { checkedBg, SetBackgroundParams } from '@/apis/setting/background';
+import {
+  checkedBg,
+  latestImg,
+  SetBackgroundParams,
+} from '@/apis/setting/background';
 import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
 import { getAccount } from '@/views/setting/auth/utils/acount';
@@ -24,8 +28,18 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
 
   const setBackground = () => {
     const user = getAccount();
-    if (user && user.background && user.background.data) {
-      setBg(user.background.data);
+    const background = user.background;
+    if (user && background) {
+      switch (background.type) {
+        case 'random':
+          setBg(user.background.data);
+          break;
+        case 'everyday':
+          latestImg().then((res) => {
+            setBg(res.data.data[0]);
+          });
+          break;
+      }
     }
   };
 
