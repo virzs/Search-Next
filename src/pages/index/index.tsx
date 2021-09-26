@@ -8,6 +8,7 @@
 import { checkedBg, SetBackgroundParams } from '@/apis/setting/background';
 import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
+import { getAccount } from '@/views/setting/auth/utils/acount';
 import { IconButton, Tooltip } from '@material-ui/core';
 import { Bookmarks, Settings } from '@material-ui/icons';
 import classNames from 'classnames';
@@ -22,10 +23,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   };
 
   const setBackground = () => {
-    const userId = localStorage.getItem('account');
-    const check = checkedBg(userId);
-    if (check) {
-      setBg(check);
+    const user = getAccount();
+    if (user && user.background && user.background.data) {
+      setBg(user.background.data);
     }
   };
 
