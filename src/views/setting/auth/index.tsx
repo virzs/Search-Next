@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@/config/router';
-import { AuthDefaultData } from '@/data/account/default';
+import { AuthData } from '@/data/account/default';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
 import { PageProps } from '@/typings';
@@ -16,8 +16,8 @@ import { getAccount } from './utils/acount';
 
 const Auth: React.FC<PageProps> = ({ history, route, children, ...props }) => {
   const [list, setList] = React.useState<Router[]>([]);
-  const [account, setAccount] = React.useState<AuthDefaultData>(
-    {} as AuthDefaultData,
+  const [account, setAccount] = React.useState<AuthData>(
+    {} as AuthData,
   );
 
   React.useEffect(() => {

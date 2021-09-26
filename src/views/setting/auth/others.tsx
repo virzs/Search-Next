@@ -16,7 +16,7 @@ import {
 } from '@/apis/auth';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { Modal } from '@/components/md-custom/dialog';
-import { authDefaultData, AuthDefaultData } from '@/data/account/default';
+import { authDefaultData, AuthData } from '@/data/account/default';
 import ItemAccordion, {
   AccordionDetailItem,
 } from '@/pages/setting/components/itemAccordion';
@@ -29,8 +29,8 @@ import HandleAccountDialog from './components/handleAccountDialog';
 
 const Others:React.FC = () => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const [account, setAccount] = React.useState({} as AuthDefaultData);
-  const [others, setOthers] = React.useState<AuthDefaultData[]>([]);
+  const [account, setAccount] = React.useState({} as AuthData);
+  const [others, setOthers] = React.useState<AuthData[]>([]);
   const [editData, setEditData] = React.useState(
     {} as {
       _id: string;

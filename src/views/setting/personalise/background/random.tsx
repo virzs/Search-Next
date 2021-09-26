@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 15:34:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 16:18:23
+ * @Last Modified time: 2021-09-24 16:54:52
  */
 
 import {
@@ -11,15 +11,21 @@ import {
   checkedBg,
   setBackground,
 } from '@/apis/setting/background';
-import { Block, Replay } from '@material-ui/icons';
+import { Replay } from '@material-ui/icons';
 import { Spin, Image } from 'antd';
 import { Button, CircularProgress, Tooltip } from '@material-ui/core';
 import OutlineCard from '@/components/global/card/outline-card';
 import React from 'react';
 import dayjs from 'dayjs';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
+import { AuthBackgroundRandomData } from '@/data/account/default';
 
-const Random: React.FC = () => {
+export interface RandomProps {
+  data?: AuthBackgroundRandomData;
+  onChange?: (selected?: AuthBackgroundRandomData) => void;
+}
+
+const Random: React.FC<RandomProps> = ({ data, onChange }) => {
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
   const [loadings, setLoadings] = React.useState<boolean[]>([]); //图片加载数组
   const [checkHsh, setCheckHsh] = React.useState<string>(''); //选中图片的hsh值
@@ -29,14 +35,29 @@ const Random: React.FC = () => {
   const getList = () => {
     setApiLoading(true);
     const hsh = initCheck();
-    bingImg({ size: 9, hsh }).then((res) => {
+    bingImg({ size: 10, hsh }).then((res) => {
       let list = res.data.data;
       setImgList(list);
       setLoadings(list.map(() => true));
       setApiLoading(false);
+      const image = list[0];
+      if (data) {
+        setCheckHsh(data.hsh);
+      } else {
+        if (onChange)
+          onChange({
+            id: image._id,
+            url: image.url,
+            hsh: image.hsh,
+            copyright: image.copyright,
+            copyrightlink: image.copyrightlink,
+          });
+        setCheckHsh(image.hsh);
+      }
     });
   };
 
+  // 图片加载状态
   const imgLoad = (index: number) => {
     let imgLoadings = loadings;
     imgLoadings[index] = false;
@@ -44,9 +65,8 @@ const Random: React.FC = () => {
   };
 
   const initCheck = (): string => {
-    const userId = localStorage.getItem('account');
-    const check = checkedBg(userId);
-    let hsh = 'empty';
+    const check = data;
+    let hsh = '';
     if (check) {
       hsh = check.hsh;
     }
@@ -58,13 +78,22 @@ const Random: React.FC = () => {
   const onCheckChange = (hsh: string) => {
     setCheckHsh(hsh);
     findImgToStroage(hsh);
+    const selected: any = imgList.find((i) => i.hsh === hsh);
+    if (selected && onChange) {
+      onChange({
+        id: selected._id,
+        url: selected.url,
+        hsh: selected.hsh,
+        copyright: selected.copyright,
+        copyrightlink: selected.copyrightlink,
+      });
+    }
   };
 
   const findImgToStroage = (hsh: string) => {
     // 解决初始化时每个card都触发onChange事件的问题
     if (!init) return setInit(true);
     const userId = localStorage.getItem('account');
-    if (hsh === 'empty' && userId) setBackground(userId);
     const image = imgList.find((i) => i.hsh === hsh);
     if (image && userId) {
       setBackground(userId, {
@@ -76,7 +105,6 @@ const Random: React.FC = () => {
         copyrightlink: image.copyrightlink,
       });
     }
-    // setTheme(hsh !== 'empty');
   };
 
   React.useEffect(() => {
@@ -91,7 +119,6 @@ const Random: React.FC = () => {
         rightHandle={
           <Tooltip title="通过刷新获取随机背景图片">
             <Button
-              variant="contained"
               startIcon={<Replay />}
               size="small"
               disableElevation
@@ -103,24 +130,6 @@ const Random: React.FC = () => {
         }
       />
       <div className="bing-img-root p-4 justify-center">
-        {!apiLoading && (
-          <OutlineCard
-            id="empty"
-            value={checkHsh}
-            onChange={(val) => onCheckChange(val)}
-            label="默认背景"
-          >
-            <Image
-              className="content-w-h"
-              preview={false}
-              placeholder={
-                <div className="bg-empty">
-                  <Block />
-                </div>
-              }
-            />
-          </OutlineCard>
-        )}
         {apiLoading
           ? demoList.map((i) => (
               <OutlineCard key={i} label=" " disabled loading />

@@ -2,11 +2,12 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 15:11:47
+ * @Last Modified time: 2021-09-24 13:51:06
  */
 
 import { lazy } from 'react';
 import {
+  ColorLens,
   ManageAccounts,
   PhotoLibrary,
   SupervisorAccount,
@@ -18,6 +19,7 @@ import SettingPage from '@pages/setting';
 import Others from '@/views/setting/auth/others';
 import Personalise from '@/views/setting/personalise';
 import Background from '@/views/setting/personalise/background';
+import Theme from '@/views/setting/personalise/theme/theme';
 
 /**
  * 关于 component 额外说明
@@ -61,13 +63,13 @@ const routers: Router[] = [
         routes: [
           {
             title: '账户信息',
-            icon: <ManageAccounts />,
+            icon: <ManageAccounts/>,
             path: '/setting/auth/info',
             component: Info,
           },
           {
             title: '其他账户',
-            icon: <SupervisorAccount />,
+            icon: <SupervisorAccount/>,
             path: '/setting/auth/others',
             component: Others,
           },
@@ -81,9 +83,15 @@ const routers: Router[] = [
         routes: [
           {
             title: '背景',
-            icon: <PhotoLibrary />,
+            icon: <PhotoLibrary/>,
             path: '/setting/personalise/background',
             component: Background,
+          },
+          {
+            title: '主题',
+            icon: <ColorLens/>,
+            path: '/setting/personalise/theme',
+            component: Theme,
           },
         ],
       },

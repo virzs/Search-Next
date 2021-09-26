@@ -5,13 +5,13 @@
  * @Last Modified time: 2021-09-20 19:32:51
  */
 
-import { AuthDefaultData } from '@/data/account/default';
+import { AuthData } from '@/data/account/default';
 import { Avatar, Chip } from '@material-ui/core';
 import dayjs from 'dayjs';
 import React from 'react';
 
 export interface AccoundCardProps {
-  account: AuthDefaultData;
+  account: AuthData;
 }
 
 const AccountCard: React.FC<AccoundCardProps> = ({ account }) => {

@@ -9,7 +9,7 @@ import { editAccount } from '@/apis/auth';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { DialogTitle } from '@/components/md-custom/dialog';
 import Form from '@/components/md-custom/form';
-import { AuthDefaultData } from '@/data/account/default';
+import { AuthData } from '@/data/account/default';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { PageProps } from '@/typings';
 import {
@@ -25,8 +25,8 @@ import AccountCard from './components/accountCard';
 import { getAccount } from './utils/acount';
 
 const Info: React.FC<PageProps> = () => {
-  const [account, setAccount] = React.useState<AuthDefaultData>(
-    {} as AuthDefaultData,
+  const [account, setAccount] = React.useState<AuthData>(
+    {} as AuthData,
   );
   const [open, setOpen] = React.useState<boolean>(false);
   const [editData, setEditData] = React.useState(

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-21 10:50:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 13:32:45
+ * @Last Modified time: 2021-09-24 14:18:31
  */
 
 import {
@@ -18,6 +18,10 @@ export interface ItemAccordionProps {
   title?: string;
   desc?: string;
   action?: React.ReactNode;
+  expanded?: boolean;
+  onChange?:
+    | ((event: React.SyntheticEvent<Element, Event>, expanded: boolean) => void)
+    | undefined;
   children: any;
   disableDetailPadding?: boolean;
 }
@@ -43,11 +47,17 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
   title,
   desc,
   action,
+  expanded,
+  onChange,
   children,
   disableDetailPadding = false,
 }) => {
   return (
-    <Accordion className="rounded border shadow-none bg-white my-0">
+    <Accordion
+      expanded={expanded}
+      onChange={onChange}
+      className="rounded border shadow-none bg-white my-0"
+    >
       <AccordionSummary
         className=" transition hover:bg-gray-100"
         expandIcon={<ExpandMore />}
