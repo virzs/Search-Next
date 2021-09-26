@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 16:55:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 15:22:18
+ * @Last Modified time: 2021-09-26 17:46:55
  */
 
 import { Tooltip } from '@material-ui/core';
@@ -41,7 +41,6 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
     if (radioChecked) {
       if (onChange && id) onChange(id);
     }
-    console.log('radioChecked', value, id, radioChecked);
   }, [radioChecked]);
 
   const radio = () => {
