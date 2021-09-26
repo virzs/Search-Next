@@ -34,13 +34,14 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   const [radioChecked, setChecked] = React.useState<boolean>(id === value);
 
   React.useEffect(() => {
-    if (value !== id && value) setChecked(false);
+    value && setChecked(value === id);
   }, [value]);
 
   React.useEffect(() => {
     if (radioChecked) {
       if (onChange && id) onChange(id);
     }
+    console.log('radioChecked', value, id, radioChecked);
   }, [radioChecked]);
 
   const radio = () => {
