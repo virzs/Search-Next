@@ -11,6 +11,7 @@ import {
   SetBackgroundParams,
 } from '@/apis/setting/background';
 import Copyright from '@/components/global/copyright';
+import { SearchEngineValueTypes } from '@/data/engine';
 import { PageProps } from '@/typings';
 import { getAccount } from '@/views/setting/auth/utils/acount';
 import { IconButton, Tooltip } from '@material-ui/core';
@@ -22,8 +23,8 @@ import SearchInput from './components/search-input';
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const [bg, setBg] = React.useState<SetBackgroundParams>();
 
-  const handleSearch = (value: string) => {
-    window.open(value);
+  const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
+    window.open(`${engine.href}${value}`);
   };
 
   const setBackground = () => {
@@ -74,7 +75,11 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
       </div>
       <div className="index-logo-box flex-grow max-h-48 sm:max-h-72"></div>
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
-        <SearchInput placeholder="请输入搜索内容" />
+        <SearchInput
+          placeholder="请输入搜索内容"
+          onPressEnter={handleSearch}
+          onBtnClick={handleSearch}
+        />
       </div>
       <div className="index-content-box flex-grow"></div>
       <div className="index-copyright-box flex-grow max-h-8 text-center leading-8">

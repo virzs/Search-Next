@@ -62,6 +62,7 @@ const SugPopper: React.FC<SugPopperProps> = ({
 
   React.useEffect(() => {
     handRefresh();
+    console.log(anchorEl);
   }, [wd]);
 
   return (
@@ -71,32 +72,38 @@ const SugPopper: React.FC<SugPopperProps> = ({
       transition
       placement="bottom"
       container={anchorEl}
-      className="z-10"
+      className="z-10 top-auto left-auto"
     >
-      <Card className="mt-1" style={{ width: `${anchorEl?.clientWidth}px` }}>
-        <Spin spinning={refresh} indicator={<LoadingOutlined spin />}>
-          {sugList.length ? (
-            <>
-              <List disablePadding>
-                {sugList.map((i, j) => (
-                  <ListItem
-                    button
-                    key={j}
-                    onClick={() => {
-                      onSelect(i.content);
-                    }}
-                  >
-                    {i.content}
-                  </ListItem>
-                ))}
-              </List>
-              <p className="px-5 py-2 text-right">数据来源：{engine.name}</p>
-            </>
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-          )}
-        </Spin>
-      </Card>
+      {({ TransitionProps }) => (
+        <Card
+          {...TransitionProps}
+          className="mt-1"
+          style={{ width: `${anchorEl?.clientWidth}px` }}
+        >
+          <Spin spinning={refresh} indicator={<LoadingOutlined spin />}>
+            {sugList.length ? (
+              <>
+                <List disablePadding>
+                  {sugList.map((i, j) => (
+                    <ListItem
+                      button
+                      key={j}
+                      onClick={() => {
+                        onSelect(i.content);
+                      }}
+                    >
+                      {i.content}
+                    </ListItem>
+                  ))}
+                </List>
+                <p className="px-5 py-2 text-right">数据来源：{engine.name}</p>
+              </>
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
+          </Spin>
+        </Card>
+      )}
     </Popper>
   );
 };
