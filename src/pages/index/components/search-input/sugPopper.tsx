@@ -62,7 +62,6 @@ const SugPopper: React.FC<SugPopperProps> = ({
 
   React.useEffect(() => {
     handRefresh();
-    console.log(anchorEl);
   }, [wd]);
 
   return (
