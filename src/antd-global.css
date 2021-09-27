@@ -1,0 +1,8 @@
+/* antd 全局样式修正 */
+
+.ant-image-preview-img {
+  display: inline-block;
+}
+.ant-image-mask-info > span {
+  vertical-align: middle;
+}
