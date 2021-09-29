@@ -7,6 +7,7 @@
 
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import GlobalLoading from './components/global/loading';
 import routers, { Router } from './config/router';
 
 // 处理路由数据
@@ -32,12 +33,9 @@ const Recursive = (routes: Router[]) => {
 };
 
 function App(props: any) {
-  React.useEffect(() => {
-    console.log(props);
-  }, []);
   return (
     <div className="App">
-      <Suspense fallback={<p>loading</p>}>
+      <Suspense fallback={<GlobalLoading />}>
         <BrowserRouter>
           <Switch>{Recursive(routers)}</Switch>
         </BrowserRouter>
