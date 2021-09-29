@@ -8,8 +8,10 @@
 import { AuthBackgroundLinkData } from '@/data/account/default';
 import { AccordionDetailItem } from '@/pages/setting/components/itemAccordion';
 import { isHttpLink } from '@/utils/regexp';
+import { css } from '@emotion/css';
 import { TextField } from '@material-ui/core';
 import { Image, message } from 'antd';
+import classNames from 'classnames';
 import React from 'react';
 
 export interface LinkProps {
@@ -60,7 +62,20 @@ const Link: React.FC<LinkProps> = (props) => {
           />
         }
       />
-      {url && blur && isUrl && <Image src={url} />}
+      {url && blur && isUrl && (
+        <div
+          className={classNames(
+            'm-2 rounded overflow-hidden',
+            css`
+              .ant-image {
+                display: block;
+              }
+            `,
+          )}
+        >
+          <Image src={url} />
+        </div>
+      )}
     </div>
   );
 };
