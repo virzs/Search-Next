@@ -17,9 +17,13 @@ export interface AuthBackgroundRandomData {
   copyrightlink: string;
 }
 
+export interface AuthBackgroundLinkData {
+  url: string;
+}
+
 export interface AuthBackground {
   type: AuthBackgroundType; // 背景类型
-  data?: AuthBackgroundRandomData; // 背景数据
+  data?: AuthBackgroundRandomData | AuthBackgroundLinkData; // 背景数据
 }
 
 export interface AuthData {

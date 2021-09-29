@@ -40,6 +40,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
             setBg(res.data.data[0]);
           });
           break;
+        case 'link':
+          setBg(user.background.data);
+          break;
       }
     }
   };

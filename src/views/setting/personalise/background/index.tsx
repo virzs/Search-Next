@@ -2,13 +2,15 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-26 17:40:30
+ * @Last Modified time: 2021-09-27 13:56:48
  */
 
 import { editAccount } from '@/apis/auth';
 import Select from '@/components/md-custom/form/select';
 import {
   AuthBackground,
+  AuthBackgroundLinkData,
+  AuthBackgroundRandomData,
   AuthBackgroundType,
   AuthData,
 } from '@/data/account/default';
@@ -17,6 +19,7 @@ import { Alert, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';
 import { getAccount } from '../../auth/utils/acount';
 import EveryDay from './everyDay';
+import Link from './link';
 import Random from './random';
 import './styles/background.style.less';
 
@@ -52,7 +55,7 @@ const Background: React.FC = () => {
       canSelect: true,
       autoExpaneded: false,
     },
-    { label: '在线图片', value: 'link', canSelect: false, autoExpaneded: true },
+    { label: '在线图片', value: 'link', canSelect: true, autoExpaneded: true },
   ];
 
   // 更新设置
@@ -105,7 +108,7 @@ const Background: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <div className="flex gap-2 flex-col">
       <ItemAccordion
         expanded={expanded}
         onChange={(_, expanded) => {
@@ -131,7 +134,7 @@ const Background: React.FC = () => {
         )}
         {value.value === 'random' && (
           <Random
-            data={userBgSetting.data}
+            data={userBgSetting.data as AuthBackgroundRandomData}
             onChange={(data) => {
               if (userBgSetting.type === 'random') {
                 const setting = { ...userBgSetting, data };
@@ -143,7 +146,17 @@ const Background: React.FC = () => {
         )}
         {value.value === 'everyday' && <EveryDay />}
         {value.value === 'link' && (
-          <Alert severity="info">在线图片背景设置将在未来支持</Alert>
+          <Link
+            data={userBgSetting.data as AuthBackgroundLinkData}
+            onChange={(url) => {
+              if (userBgSetting.type === 'link') {
+                const data = { url };
+                const setting = { ...userBgSetting, data: data };
+                setUserBgSetting(setting);
+                account._id && updateBgSetting(account._id, setting);
+              }
+            }}
+          />
         )}
       </ItemAccordion>
     </div>
