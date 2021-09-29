@@ -29,16 +29,20 @@ export interface ItemAccordionProps {
 export interface AccordionDetailItemProps {
   title: string;
   action: React.ReactNode;
+  disabledRightPadding?: boolean;
 }
 
 export const AccordionDetailItem: React.FC<AccordionDetailItemProps> = ({
   title,
   action,
+  disabledRightPadding = false,
 }) => {
   return (
     <div className="flex justify-between items-center border-t px-4 py-2">
       <div>{title}</div>
-      <div>{action}</div>
+      <div className={classNames({ 'mr-8': !disabledRightPadding })}>
+        {action}
+      </div>
     </div>
   );
 };
