@@ -44,14 +44,17 @@ export interface Router {
 const routers: Router[] = [
   {
     path: '/',
+    title: '首页',
     component: lazy(() => import('@pages/index')),
   },
   {
     path: '/navigation',
+    title: '导航',
     component: lazy(() => import('@pages/navigation')),
   },
   {
     path: '/setting',
+    title: '设置',
     exact: false,
     component: SettingPage,
     routes: [
@@ -63,13 +66,13 @@ const routers: Router[] = [
         routes: [
           {
             title: '账户信息',
-            icon: <ManageAccounts/>,
+            icon: <ManageAccounts />,
             path: '/setting/auth/info',
             component: Info,
           },
           {
             title: '其他账户',
-            icon: <SupervisorAccount/>,
+            icon: <SupervisorAccount />,
             path: '/setting/auth/others',
             component: Others,
           },
@@ -83,13 +86,13 @@ const routers: Router[] = [
         routes: [
           {
             title: '背景',
-            icon: <PhotoLibrary/>,
+            icon: <PhotoLibrary />,
             path: '/setting/personalise/background',
             component: Background,
           },
           {
             title: '主题',
-            icon: <ColorLens/>,
+            icon: <ColorLens />,
             path: '/setting/personalise/theme',
             component: Theme,
           },

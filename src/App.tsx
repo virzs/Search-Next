@@ -11,7 +11,7 @@ import GlobalLoading from './components/global/loading';
 import routers, { Router } from './config/router';
 
 // 处理路由数据
-const Recursive = (routes: Router[]) => {
+const Recursive = (routes: Router[], parent?: Router) => {
   let list = routes;
   return list.map((i) => {
     return (
@@ -20,11 +20,13 @@ const Recursive = (routes: Router[]) => {
         key={i.path}
         exact={i.exact !== undefined ? i.exact : true}
         component={(props: any) => {
-          document.title = i.title || '';
+          document.title = parent
+            ? `${parent.title}-${i.title}`
+            : i.title || '';
           return React.createElement(i.component, {
             ...props,
             route: i,
-            children: i.routes ? Recursive(i.routes) : undefined,
+            children: i.routes ? Recursive(i.routes, i) : undefined,
           });
         }}
       />
