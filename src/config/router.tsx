@@ -90,12 +90,13 @@ const routers: Router[] = [
             path: '/setting/personalise/background',
             component: Background,
           },
-          {
-            title: '主题',
-            icon: <ColorLens />,
-            path: '/setting/personalise/theme',
-            component: Theme,
-          },
+          // ! 主题功能暂时不开发，优先重构
+          // {
+          //   title: '主题',
+          //   icon: <ColorLens />,
+          //   path: '/setting/personalise/theme',
+          //   component: Theme,
+          // },
         ],
       },
     ],
