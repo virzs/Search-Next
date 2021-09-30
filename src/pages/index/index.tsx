@@ -19,6 +19,7 @@ import { Bookmarks, Settings } from '@material-ui/icons';
 import classNames from 'classnames';
 import React from 'react';
 import SearchInput from './components/search-input';
+import Sites from './components/sites';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const [bg, setBg] = React.useState<SetBackgroundParams>();
@@ -84,7 +85,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
           onBtnClick={handleSearch}
         />
       </div>
-      <div className="index-content-box flex-grow"></div>
+      <div className="index-content-box flex-grow">
+        <Sites />
+      </div>
       <div className="index-copyright-box flex-grow max-h-8 text-center leading-8">
         <Copyright />
       </div>
