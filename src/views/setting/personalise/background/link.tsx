@@ -27,7 +27,8 @@ const Link: React.FC<LinkProps> = (props) => {
   const [isUrl, setIsUrl] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    setUrl(data.url);
+    console.log(data);
+    setUrl(data ? data.url : '');
     setIsUrl(true);
     setBlur(true);
   }, [data]);
