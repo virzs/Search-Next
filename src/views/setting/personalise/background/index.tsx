@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-27 13:56:48
+ * @Last Modified time: 2021-09-29 17:52:02
  */
 
 import { editAccount } from '@/apis/auth';
@@ -18,6 +18,7 @@ import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import { Alert, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';
 import { getAccount } from '../../auth/utils/acount';
+import Example from './component/example';
 import EveryDay from './everyDay';
 import Link from './link';
 import Random from './random';
@@ -108,57 +109,60 @@ const Background: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex gap-2 flex-col">
-      <ItemAccordion
-        expanded={expanded}
-        onChange={(_, expanded) => {
-          setExpanded(expanded);
-        }}
-        title="个性化设置背景"
-        desc="背景设置主要适用于主页"
-        action={
-          <Select
-            label="背景类型"
-            value={selected}
-            size="small"
-            onChange={handleChange}
-            options={bgOptions}
-          />
-        }
-        disableDetailPadding
-      >
-        {value.value === 'color' && (
-          <Alert severity="info">
-            设置为纯色背景，在纯色设置时，会自动应用当前主题配色。
-          </Alert>
-        )}
-        {value.value === 'random' && (
-          <Random
-            data={userBgSetting.data as AuthBackgroundRandomData}
-            onChange={(data) => {
-              if (userBgSetting.type === 'random') {
-                const setting = { ...userBgSetting, data };
-                setUserBgSetting(setting);
-                account._id && updateBgSetting(account._id, setting);
-              }
-            }}
-          />
-        )}
-        {value.value === 'everyday' && <EveryDay />}
-        {value.value === 'link' && (
-          <Link
-            data={userBgSetting.data as AuthBackgroundLinkData}
-            onChange={(url) => {
-              if (userBgSetting.type === 'link') {
-                const data = { url };
-                const setting = { ...userBgSetting, data: data };
-                setUserBgSetting(setting);
-                account._id && updateBgSetting(account._id, setting);
-              }
-            }}
-          />
-        )}
-      </ItemAccordion>
+    <div>
+      <Example data={userBgSetting} />
+      <div className="flex gap-2 flex-col">
+        <ItemAccordion
+          expanded={expanded}
+          onChange={(_, expanded) => {
+            setExpanded(expanded);
+          }}
+          title="个性化设置背景"
+          desc="背景设置主要适用于主页"
+          action={
+            <Select
+              label="背景类型"
+              value={selected}
+              size="small"
+              onChange={handleChange}
+              options={bgOptions}
+            />
+          }
+          disableDetailPadding
+        >
+          {value.value === 'color' && (
+            <Alert severity="info">
+              设置为纯色背景，在纯色设置时，会自动应用当前主题配色。
+            </Alert>
+          )}
+          {value.value === 'random' && (
+            <Random
+              data={userBgSetting.data as AuthBackgroundRandomData}
+              onChange={(data) => {
+                if (userBgSetting.type === 'random') {
+                  const setting = { ...userBgSetting, data };
+                  setUserBgSetting(setting);
+                  account._id && updateBgSetting(account._id, setting);
+                }
+              }}
+            />
+          )}
+          {value.value === 'everyday' && <EveryDay />}
+          {value.value === 'link' && (
+            <Link
+              data={userBgSetting.data as AuthBackgroundLinkData}
+              onChange={(url) => {
+                if (userBgSetting.type === 'link') {
+                  const data = { url };
+                  const setting = { ...userBgSetting, data: data };
+                  setUserBgSetting(setting);
+                  account._id && updateBgSetting(account._id, setting);
+                }
+              }}
+            />
+          )}
+        </ItemAccordion>
+      </div>
     </div>
   );
 };
