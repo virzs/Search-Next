@@ -53,7 +53,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
 
   return (
     <div
-      className="index-page flex flex-col h-screen"
+      className="index-page flex flex-col h-screen bg-cover bg-center"
       style={{ backgroundImage: bg ? `url('${bg?.url}')` : undefined }}
     >
       <div className="index-navbar-box flex-grow max-h-12 text-right align-middle">
