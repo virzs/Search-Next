@@ -202,3 +202,18 @@ export const loop = (data: any[], option: object = {}): any[] => {
       : item;
   });
 };
+
+// 获取页面比例
+export const getScale = (): [number, number] => {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const gcd = (x: number, y: number): number => {
+    if (x % y == 0) return y;
+    return gcd(y, x % y);
+  };
+
+  const n = gcd(width, height);
+
+  return [width / n, height / n];
+};
