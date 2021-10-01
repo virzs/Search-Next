@@ -6,7 +6,6 @@
  */
 
 import { editAccount } from '@/apis/auth';
-import { latestImg } from '@/apis/setting/background';
 import Select from '@/components/md-custom/form/select';
 import {
   AuthBackground,
@@ -67,16 +66,6 @@ const Background: React.FC = () => {
     });
   };
 
-  // 获取每日一图
-  const getEveryDay = () => {
-    latestImg().then((res) => {
-      setUserBgSetting({
-        type: selected,
-        data: res.data.data[0],
-      });
-    });
-  };
-
   // 选择背景类型
   const handleChange = (event: SelectChangeEvent<any>) => {
     const selected: AuthBackgroundType = event.target.value;
@@ -92,9 +81,6 @@ const Background: React.FC = () => {
       account._id && updateBgSetting(account._id, setting);
       setUserBgSetting(setting);
     }
-    if (selected === 'everyday') {
-      getEveryDay();
-    }
   };
 
   // 初始化背景设置
@@ -107,10 +93,6 @@ const Background: React.FC = () => {
       setValue(option || bgOptions[0]);
       setSelected(type || bgOptions[0].value);
       setUserBgSetting(data.background);
-
-      if (type === 'everyday') {
-        getEveryDay();
-      }
     } else {
       data._id &&
         updateBgSetting(data._id, {
