@@ -6,10 +6,13 @@
  */
 
 import { Router } from '@/config/router';
+import { AuthBackground, AuthData } from '@/data/account/default';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
 import { PageProps } from '@/typings';
 import React from 'react';
+import { getAccount } from '../auth/utils/acount';
+import Example from './components/example';
 
 const Personalise: React.FC<PageProps> = ({
   history,
@@ -18,8 +21,13 @@ const Personalise: React.FC<PageProps> = ({
   ...props
 }) => {
   const [list, setList] = React.useState<Router[]>([]);
+  const [userBgSetting, setUserBgSetting] = React.useState<AuthBackground>(
+    {} as AuthBackground,
+  ); // 当前账户的背景设置数据
 
   React.useEffect(() => {
+    const data: AuthData = getAccount();
+    setUserBgSetting(data.background);
     setList(route?.routes || []);
   }, []);
 
@@ -28,6 +36,7 @@ const Personalise: React.FC<PageProps> = ({
       location={history.location as unknown as Location}
       pChildren={children}
     >
+      <Example data={userBgSetting} />
       <div className="flex flex-col gap-2 my-4">
         {list.map((i) => (
           <ItemCard

@@ -18,7 +18,7 @@ import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import { Alert, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';
 import { getAccount } from '../../auth/utils/acount';
-import Example from './component/example';
+import Example from '../components/example';
 import EveryDay from './everyDay';
 import Link from './link';
 import Random from './random';
