@@ -2,16 +2,16 @@
  * @Author: Vir
  * @Date: 2021-04-11 14:54:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-03 15:44:12
+ * @Last Modified time: 2021-10-03 22:28:18
  */
 
 import { getWebIconByUrl } from '@/apis/common';
 import { Site } from '@/apis/site';
+import { css } from '@emotion/css';
 import { Avatar, Menu, MenuItem, IconButton } from '@material-ui/core';
 import { Add, Delete, Edit, MoreHoriz } from '@material-ui/icons';
 import classNames from 'classnames';
 import React from 'react';
-import './styles/siteCard.less';
 
 type SiteCardType = 'view' | 'add';
 
@@ -58,25 +58,52 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
 
   return (
     <>
-      <div className="VuiSiteCard-root" onClick={onClick}>
+      <div
+        className={classNames(
+          'cursor-pointer bg-transparent rounded shadow-none relative w-28 h-20 transition-all hover:bg-rgba-gray-3',
+          css`
+            &:hover {
+              .handle-container {
+                opacity: 1 !important;
+              }
+            }
+          `,
+        )}
+        onClick={onClick}
+      >
         <div
-          className={classNames(['content-container', { add: type === 'add' }])}
+          className={classNames([
+            'content-container transition-all box-border flex flex-col items-center w-full h-full px-3 py-2 rounded',
+            type === 'add' ? 'justify-start text-primary' : 'justify-end',
+          ])}
         >
           <Avatar
-            className="image-container"
+            className={classNames(
+              'bg-white rounded mx-auto',
+              {
+                'text-primary': type === 'add',
+              },
+              css`
+                img {
+                  max-width: 24px;
+                  height: 24px;
+                }
+              `,
+            )}
             variant="rounded"
             src={getWebIconByUrl(item?.url)}
             onClick={onAdd ? onAdd : undefined}
           >
             {type === 'add' && <Add />}
           </Avatar>
-          <p className="title-container">
-            <a>{item?.name}</a>
+          <p className="text-center flex justify-center mt-1 w-full">
+            <a className="overflow-hidden overflow-ellipsis">{item?.name}</a>
           </p>
         </div>
         {type === 'view' && (
-          <span className="handle-container">
+          <span className="handle-container w-6 h-6 flex justify-center absolute top-1 right-1 z-10 opacity-0 transition-all">
             <IconButton
+              className="rounded"
               size="small"
               aria-controls={`site-${item?.name}-menu`}
               aria-haspopup="true"

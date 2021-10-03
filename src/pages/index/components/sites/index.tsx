@@ -2,12 +2,11 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-03 15:47:04
+ * @Last Modified time: 2021-10-03 21:01:12
  */
 import React from 'react';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
 import SiteCard from './siteCard';
-import './styles/index.less';
 import DialogConfirm from '@/components/md-custom/dialog/DialogConfirm';
 import { replaceUrlNotHaveHttpsOrHttpToHttps } from '@/utils/common';
 import {
