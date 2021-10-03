@@ -33,6 +33,7 @@
     "classnames": "^2.3.1",
     "dayjs": "^1.10.7",
     "i18next": "^21.2.4",
+    "i18next-browser-languagedetector": "^6.1.2",
     "less": "^4.1.1",
     "path": "^0.12.7",
     "react": "^17.0.0",
