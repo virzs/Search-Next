@@ -2,14 +2,10 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-26 17:46:13
+ * @Last Modified time: 2021-10-03 20:03:59
  */
 
-import {
-  checkedBg,
-  latestImg,
-  SetBackgroundParams,
-} from '@/apis/setting/background';
+import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
 import Copyright from '@/components/global/copyright';
 import { SearchEngineValueTypes } from '@/data/engine';
 import { PageProps } from '@/typings';
@@ -20,8 +16,11 @@ import classNames from 'classnames';
 import React from 'react';
 import SearchInput from './components/search-input';
 import Sites from './components/sites';
+import { useTranslation } from 'react-i18next';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
+  const { t, i18n } = useTranslation();
+
   const [bg, setBg] = React.useState<SetBackgroundParams>();
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
@@ -50,6 +49,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
 
   React.useEffect(() => {
     setBackground();
+    console.log(props);
   }, []);
 
   return (
@@ -80,7 +80,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
       <div className="index-logo-box flex-grow max-h-48 sm:max-h-72"></div>
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
         <SearchInput
-          placeholder="请输入搜索内容"
+          placeholder={t('placeholder.qing-shu-ru-sou-suo-nei-rong')}
           onPressEnter={handleSearch}
           onBtnClick={handleSearch}
         />

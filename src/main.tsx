@@ -5,6 +5,7 @@ import App from './App';
 import { addAccount } from './apis/auth';
 import { authDefaultData } from './data/account/default';
 import { message } from 'antd';
+import '@/locales';
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {

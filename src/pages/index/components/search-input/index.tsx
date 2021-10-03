@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-12 23:36:50
+ * @Last Modified time: 2021-10-03 18:59:26
  */
 
 import { SearchEngineValueTypes } from '@/data/engine';
@@ -10,6 +10,7 @@ import { Button } from '@material-ui/core';
 import React from 'react';
 import EngineChip from './engineChip';
 import SugPopper from './sugPopper';
+import { useTranslation } from 'react-i18next';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -49,6 +50,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
   primaryText,
   ...props
 }) => {
+  const { t, i18n } = useTranslation();
+
   const [inputValue, setInputValue] = React.useState(
     defaultValue || value || '',
   );
@@ -119,7 +122,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           disableElevation
           onClick={handleBtnClick}
         >
-          搜索
+          {t('sou-suo')}
         </Button>
       </div>
       <SugPopper
