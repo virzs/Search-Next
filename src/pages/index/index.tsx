@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-03 20:03:59
+ * @Last Modified time: 2021-10-04 12:20:15
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -49,7 +49,6 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
 
   React.useEffect(() => {
     setBackground();
-    console.log(props);
   }, []);
 
   return (

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-04 16:45:09
+ * @Last Modified time: 2021-10-04 15:50:52
  */
 
 import {
@@ -15,7 +15,6 @@ import {
 import React from 'react';
 import { Controller, RegisterOptions, useForm } from 'react-hook-form';
 import { DialogTitle } from '@/components/md-custom/dialog';
-import './styles/dialog.less';
 
 // 网址 新增、编辑弹窗
 
@@ -154,7 +153,7 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
         {type === 'add' && addContent()}
         {type === 'edit' && editContent()}
       </DialogContent>
-      <DialogActions className="dialog-actions">
+      <DialogActions className="pt-2 px-4 pb-4">
         <Button disableElevation variant="contained" onClick={handleCancel}>
           取消
         </Button>

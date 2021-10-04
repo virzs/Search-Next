@@ -2,14 +2,19 @@
  * @Author: Vir
  * @Date: 2021-04-11 14:54:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-03 22:28:18
+ * @Last Modified time: 2021-10-04 00:03:01
  */
 
 import { getWebIconByUrl } from '@/apis/common';
 import { Site } from '@/apis/site';
 import { css } from '@emotion/css';
 import { Avatar, Menu, MenuItem, IconButton } from '@material-ui/core';
-import { Add, Delete, Edit, MoreHoriz } from '@material-ui/icons';
+import {
+  AddOutlined,
+  DeleteOutlineOutlined,
+  EditOutlined,
+  MoreHorizOutlined,
+} from '@material-ui/icons';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -94,7 +99,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
             src={getWebIconByUrl(item?.url)}
             onClick={onAdd ? onAdd : undefined}
           >
-            {type === 'add' && <Add />}
+            {type === 'add' && <AddOutlined />}
           </Avatar>
           <p className="text-center flex justify-center mt-1 w-full">
             <a className="overflow-hidden overflow-ellipsis">{item?.name}</a>
@@ -109,7 +114,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
               aria-haspopup="true"
               onClick={onMenuOpen}
             >
-              <MoreHoriz />
+              <MoreHorizOutlined />
             </IconButton>
           </span>
         )}
@@ -121,10 +126,10 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
         onClose={onMenuClose}
       >
         <MenuItem onClick={handleEdit}>
-          <Edit /> 修改
+          <EditOutlined /> 修改
         </MenuItem>
         <MenuItem onClick={handleRemove}>
-          <Delete />
+          <DeleteOutlineOutlined />
           删除
         </MenuItem>
       </Menu>
