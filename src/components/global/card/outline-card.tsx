@@ -2,14 +2,13 @@
  * @Author: Vir
  * @Date: 2021-06-10 16:55:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-26 17:46:55
+ * @Last Modified time: 2021-10-04 16:20:27
  */
 
 import { Tooltip } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import classNames from 'classnames';
 import React from 'react';
-import './styles/outline-card.style.less';
 
 export interface OutlineCardProps {
   label?: React.ReactNode; //标题
@@ -46,9 +45,10 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   const radio = () => {
     return (
       <input
-        className={classNames('outline-card-radio', {
-          checked: !loading && radioChecked,
-        })}
+        className={classNames(
+          'rounded w-full cursor-pointer h-full m-0 p-0 z-10 overflow-hidden absolute appearance-none bg-transparent transition-all border',
+          !loading && radioChecked ? 'border-primary shadow-inner' : 'border-gray-200 shadow-sm',
+        )}
         type="radio"
         id={id}
         name={value}
@@ -61,12 +61,16 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   };
 
   return (
-    <div className="outline-card-root">
-      <div className="outline-card-container-flex">
+    <div className="p-0 mb-0 h-full transition-all rounded">
+      <div className="inline-block relative min-w-min min-h-full items-stretch justify-start h-full">
         {tip ? <Tooltip title={tip}>{radio()}</Tooltip> : radio()}
-        <label slot="label" htmlFor={id} className="outline-card-label">
-          <div className="outline-card-label-content">
-            <div className="outline-card-content">
+        <label
+          slot="label"
+          htmlFor={id}
+          className="inline-block p-0 text-sm leading-5 text-primary"
+        >
+          <div className="px-2 pt-2 pb-1">
+            <div className="border border-gray-300 rounded">
               {loading ? (
                 <Skeleton variant="rectangular" width={136} height={76} />
               ) : (
@@ -75,7 +79,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
             </div>
             {label && (
               <div>
-                <label className="outline-card-title">
+                <label className="mt-1 overflow-hidden max-w-full whitespace-nowrap overflow-ellipsis text-xs leading-4 inline-block p-0 text-primary">
                   {loading ? (
                     <Skeleton variant="text" width={100} height={16} />
                   ) : (

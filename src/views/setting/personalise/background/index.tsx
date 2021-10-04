@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-29 17:52:02
+ * @Last Modified time: 2021-10-04 15:56:30
  */
 
 import { editAccount } from '@/apis/auth';
@@ -22,7 +22,6 @@ import Example from '../components/example';
 import EveryDay from './everyDay';
 import Link from './link';
 import Random from './random';
-import './styles/background.style.less';
 
 export interface BgOptions {
   label: string;

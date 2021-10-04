@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 15:34:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-24 16:54:52
+ * @Last Modified time: 2021-10-04 16:01:21
  */
 
 import {
@@ -19,6 +19,8 @@ import React from 'react';
 import dayjs from 'dayjs';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { AuthBackgroundRandomData } from '@/data/account/default';
+import classNames from 'classnames';
+import { css } from '@emotion/css';
 
 export interface RandomProps {
   data?: AuthBackgroundRandomData;
@@ -127,7 +129,16 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
           </Tooltip>
         }
       />
-      <div className="bing-img-root p-4 justify-center">
+      <div
+        className={classNames(
+          'p-4 justify-center flex flex-wrap mt-2 mb-4 gap-3',
+          css`
+            .ant-image {
+              display: block;
+            }
+          `,
+        )}
+      >
         {apiLoading
           ? demoList.map((i) => (
               <OutlineCard key={i} label=" " disabled loading />
@@ -146,7 +157,7 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
                   indicator={<CircularProgress size={18} color="inherit" />}
                 >
                   <Image
-                    className="content-w-h"
+                    className="w-32 h-20 block"
                     onLoad={() => imgLoad(j)}
                     preview={false}
                     placeholder
