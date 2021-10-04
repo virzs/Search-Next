@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-11 14:54:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-04 00:03:01
+ * @Last Modified time: 2021-10-05 00:29:29
  */
 
 import { getWebIconByUrl } from '@/apis/common';
@@ -101,7 +101,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
           >
             {type === 'add' && <AddOutlined />}
           </Avatar>
-          <p className="text-center flex justify-center mt-1 w-full">
+          <p className="text-center flex justify-center mt-1 w-full text-var-main-10">
             <a className="overflow-hidden overflow-ellipsis">{item?.name}</a>
           </p>
         </div>
@@ -114,7 +114,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
               aria-haspopup="true"
               onClick={onMenuOpen}
             >
-              <MoreHorizOutlined />
+              <MoreHorizOutlined className="text-var-main-10" />
             </IconButton>
           </span>
         )}

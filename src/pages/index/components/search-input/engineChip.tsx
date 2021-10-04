@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-03 17:25:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-12 17:49:32
+ * @Last Modified time: 2021-10-05 01:05:33
  */
 
 import { list } from '@/apis/search';
@@ -56,9 +56,10 @@ const EngineChip = ({ onChange }: EngineChipProps) => {
       {engineList.map((i) => (
         <Chip
           key={i.id}
-          className={classnames('mx-1', {
-            'bg-primary text-white': i.id === engine.id,
-          })}
+          className={classnames(
+            'mx-1',
+            i.id === engine.id ? 'bg-primary text-white' : 'bg-gray-100',
+          )}
           size="small"
           label={i.name}
           onClick={(e) => changeEngine(i, e)}

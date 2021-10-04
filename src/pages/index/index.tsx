@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-04 12:20:15
+ * @Last Modified time: 2021-10-05 00:55:39
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -17,6 +17,7 @@ import React from 'react';
 import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
+import { setTheme } from '@/utils/theme';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const { t, i18n } = useTranslation();
@@ -33,17 +34,24 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
     if (user && background) {
       switch (background.type) {
         case 'random':
+          setTheme(true, 'inverse');
           setBg(user.background.data);
           break;
         case 'everyday':
+          setTheme(true, 'inverse');
           latestImg().then((res) => {
             setBg(res.data.data[0]);
           });
           break;
         case 'link':
+          setTheme(true, 'inverse');
           setBg(user.background.data);
           break;
+        case 'color':
+          setTheme(false);
+          break;
       }
+    } else {
     }
   };
 
@@ -61,7 +69,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
           <IconButton onClick={() => history.push('/navigation')}>
             <Bookmarks
               className={classNames({
-                'text-white': !!bg,
+                'text-var-main-10': !!bg,
               })}
             />
           </IconButton>
@@ -70,7 +78,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
           <IconButton onClick={() => history.push('/setting')}>
             <Settings
               className={classNames({
-                'text-white': !!bg,
+                'text-var-main-10': !!bg,
               })}
             />
           </IconButton>
