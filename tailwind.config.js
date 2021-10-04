@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#5f5f5f',
+        primary: 'rgba(95, 95, 95, 1)',
         rgba: {
           gray: {
             3: 'rgba(229, 229, 229, 0.3)',
@@ -16,6 +16,10 @@ module.exports = {
           70: 'F3F3F3',
           150: '#EAEAEA',
         },
+        var: {
+          'main-7': 'var(--main-text-color-opacity-7, rgba(95, 95, 95, 0.7))',
+          'main-10': 'var(--main-text-color, rgb(95, 95, 95))',
+        },
       },
       lineHeight: {},
     },
@@ -23,5 +27,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  plugins: ['./index.html', './src/**/*.{ts,tsx}'],
 };

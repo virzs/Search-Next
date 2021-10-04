@@ -16,3 +16,13 @@ code {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#root {
+  --main-text-color: rgba(95, 95, 95, 1);
+  --main-text-color-opacity-7: rgba(255, 255, 255, 0.7);
+}
+
+.inverse {
+  --main-text-color: #fff !important;
+  --main-text-color-opacity-7: rgba(255, 255, 255, 0.7) !important;
+}
