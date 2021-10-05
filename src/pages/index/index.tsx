@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-05 00:55:39
+ * @Last Modified time: 2021-10-05 15:48:13
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -18,6 +18,7 @@ import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
 import { setTheme } from '@/utils/theme';
+import DigitalClock from '@/components/global/logo/digital-clock';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const { t, i18n } = useTranslation();
@@ -84,7 +85,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
           </IconButton>
         </Tooltip>
       </div>
-      <div className="index-logo-box flex-grow max-h-48 sm:max-h-72"></div>
+      <div className="index-logo-box flex-grow max-h-48 sm:max-h-72 items-center flex justify-center">
+        <DigitalClock />
+      </div>
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
         <SearchInput
           placeholder={t('placeholder.qing-shu-ru-sou-suo-nei-rong')}
