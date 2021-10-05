@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-05 15:48:13
+ * @Last Modified time: 2021-10-05 15:51:34
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -62,7 +62,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
 
   return (
     <div
-      className="index-page flex flex-col h-screen bg-cover bg-center"
+      className="index-page flex flex-col h-screen bg-cover bg-center bg-secondary"
       style={{ backgroundImage: bg ? `url('${bg?.url}')` : undefined }}
     >
       <div className="index-navbar-box flex-grow max-h-12 text-right align-middle">
