@@ -2,13 +2,14 @@
  * @Author: Vir
  * @Date: 2021-04-11 14:54:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-05 00:29:29
+ * @Last Modified time: 2021-10-06 23:05:42
  */
 
 import { getWebIconByUrl } from '@/apis/common';
 import { Site } from '@/apis/site';
+import Menu from '@/components/md-custom/menu';
 import { css } from '@emotion/css';
-import { Avatar, Menu, MenuItem, IconButton } from '@material-ui/core';
+import { Avatar, MenuItem, IconButton } from '@material-ui/core';
 import {
   AddOutlined,
   DeleteOutlineOutlined,
@@ -124,15 +125,19 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         onClose={onMenuClose}
-      >
-        <MenuItem onClick={handleEdit}>
-          <EditOutlined /> 修改
-        </MenuItem>
-        <MenuItem onClick={handleRemove}>
-          <DeleteOutlineOutlined />
-          删除
-        </MenuItem>
-      </Menu>
+        config={[
+          {
+            label: '修改',
+            onClick: handleEdit,
+            icon: EditOutlined,
+          },
+          {
+            label: '删除',
+            onClick: handleRemove,
+            icon: DeleteOutlineOutlined,
+          },
+        ]}
+      />
     </>
   );
 };
