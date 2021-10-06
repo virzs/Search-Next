@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-05 15:51:34
+ * @Last Modified time: 2021-10-06 14:45:19
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -22,8 +22,11 @@ import DigitalClock from '@/components/global/logo/digital-clock';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const { t, i18n } = useTranslation();
+  const logoRef = React.useRef<HTMLDivElement>(null);
 
   const [bg, setBg] = React.useState<SetBackgroundParams>();
+
+  const [zoom, setZoom] = React.useState<boolean>(false);
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
     window.open(`${engine.href}${value}`);
@@ -85,14 +88,28 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
           </IconButton>
         </Tooltip>
       </div>
-      <div className="index-logo-box flex-grow max-h-48 sm:max-h-72 items-center flex justify-center">
-        <DigitalClock />
+      <div
+        ref={logoRef}
+        className={classNames(
+          'index-logo-box max-h-48 sm:max-h-72 items-center flex justify-center transition-all',
+          zoom ? 'flex-grow-0' : 'flex-grow',
+        )}
+        style={{
+          height:
+            zoom && logoRef && logoRef.current
+              ? `${logoRef.current.clientHeight * 0.5}px`
+              : '100%',
+        }}
+      >
+        <DigitalClock className={classNames(zoom && 'delay-100 transform scale-50')} />
       </div>
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
         <SearchInput
           placeholder={t('placeholder.qing-shu-ru-sou-suo-nei-rong')}
           onPressEnter={handleSearch}
           onBtnClick={handleSearch}
+          onFocus={() => setZoom(true)}
+          onBlur={() => setZoom(false)}
         />
       </div>
       <div className="index-content-box flex-grow">
