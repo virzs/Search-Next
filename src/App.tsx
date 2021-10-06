@@ -2,11 +2,11 @@
  * @Author: Vir
  * @Date: 2021-09-08 14:22:02
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 16:27:58
+ * @Last Modified time: 2021-10-06 13:35:08
  */
 
 import React, { Suspense } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Switch } from 'react-router-dom';
 import GlobalLoading from './components/global/loading';
 import routers, { Router } from './config/router';
 
@@ -38,9 +38,9 @@ function App(props: any) {
   return (
     <div className="App">
       <Suspense fallback={<GlobalLoading />}>
-        <BrowserRouter>
+        <HashRouter>
           <Switch>{Recursive(routers)}</Switch>
-        </BrowserRouter>
+        </HashRouter>
       </Suspense>
     </div>
   );
