@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-06 14:45:19
+ * @Last Modified time: 2021-10-06 14:47:48
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -101,7 +101,12 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
               : '100%',
         }}
       >
-        <DigitalClock className={classNames(zoom && 'delay-100 transform scale-50')} />
+        <DigitalClock
+          className={classNames(
+            'delay-75 transform',
+            zoom ? 'scale-50' : 'scale-100',
+          )}
+        />
       </div>
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
         <SearchInput
