@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-06 14:47:48
+ * @Last Modified time: 2021-10-06 23:11:39
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -91,7 +91,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
       <div
         ref={logoRef}
         className={classNames(
-          'index-logo-box max-h-48 sm:max-h-72 items-center flex justify-center transition-all',
+          'index-logo-box max-h-48 sm:max-h-72 items-center flex justify-center transition-all duration-300',
           zoom ? 'flex-grow-0' : 'flex-grow',
         )}
         style={{
@@ -103,7 +103,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
       >
         <DigitalClock
           className={classNames(
-            'delay-75 transform',
+            'delay-75 transform duration-300',
             zoom ? 'scale-50' : 'scale-100',
           )}
         />
