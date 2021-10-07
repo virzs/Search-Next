@@ -23,6 +23,9 @@ module.exports = {
         },
       },
       lineHeight: {},
+      width: {
+        100: '25rem',
+      },
     },
   },
   variants: {
