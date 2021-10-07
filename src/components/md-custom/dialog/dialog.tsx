@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-07 10:16:22
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 19:26:45
+ * @Last Modified time: 2021-10-07 21:43:42
  */
 
 import React from 'react';
@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Close } from '@material-ui/icons';
 
-export interface ModalProps {
+export interface DialogProps {
   open: boolean;
   title: string | (() => void);
   onOk: () => void;
@@ -24,7 +24,7 @@ export interface ModalProps {
   children?: any;
 }
 
-const Modal: React.FC<ModalProps> = ({
+const Dialog: React.FC<DialogProps> = ({
   open,
   title,
   onOk,
@@ -47,7 +47,7 @@ const Modal: React.FC<ModalProps> = ({
     >
       <Fade in={open}>
         <div className="bg-white rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100">
-          <div className="p-3 py-2 font-bold flex justify-between items-center">
+          <div className="p-3 py-2 font-bold text-lg flex justify-between items-center">
             {title}
             <IconButton size="small" onClick={onCancel}>
               <Close />
@@ -55,10 +55,10 @@ const Modal: React.FC<ModalProps> = ({
           </div>
           <div className="p-4">{children}</div>
           <div className="p-2 flex justify-end gap-2">
-            <Button variant="text" size="small" onClick={onCancel}>
+            <Button variant="text" onClick={onCancel}>
               {t('cancel')}
             </Button>
-            <Button variant="text" size="small" onClick={onOk}>
+            <Button variant="text" onClick={onOk}>
               {t('submit')}
             </Button>
           </div>
@@ -68,4 +68,4 @@ const Modal: React.FC<ModalProps> = ({
   );
 };
 
-export default Modal;
+export default Dialog;

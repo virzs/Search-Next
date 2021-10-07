@@ -2,14 +2,14 @@
  * @Author: Vir
  * @Date: 2021-05-01 00:28:50
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-03 21:46:02
+ * @Last Modified time: 2021-10-07 23:43:06
  */
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DialogConfirm, { confirmType } from './DialogConfirm';
 
-export interface ConfirmPropsType {
+export interface ConfirmProps {
   title: string;
   icon?: React.ReactNode;
   content?: string;
@@ -20,61 +20,55 @@ export interface ConfirmPropsType {
   onCancel?: () => void;
 }
 
-class Modal {
-  dom: HTMLDivElement | undefined;
+const confirm = (props: ConfirmProps) => {
+  const {
+    title,
+    content,
+    type = 'info',
+    okText,
+    cancelText,
+    onOk,
+    onCancel,
+  } = props;
 
-  constructor() {}
+  const div = document.createElement('div');
 
-  confirm(props: ConfirmPropsType) {
-    const {
-      title,
-      content,
-      type = 'info',
-      okText,
-      cancelText,
-      onOk,
-      onCancel,
-    } = props;
-
-    this.dom = document.createElement('div');
-
-    const dialog = (
-      <DialogConfirm
-        open={true}
-        container={this.dom}
-        title={title}
-        content={content}
-        type={type}
-        okText={okText}
-        cancelText={cancelText}
-        onOk={() => this.onOk(onOk)}
-        onCancel={() => this.onCancel(onCancel)}
-      />
-    );
-
-    ReactDOM.render(dialog, this.dom);
-
-    document.body.append(this.dom);
-  }
-  onCancel(onCancel?: () => void) {
-    onCancel instanceof Function && onCancel();
-    this.close();
-  }
-
-  onOk(onOk?: () => void) {
-    onOk instanceof Function && onOk();
-    this.close();
-  }
-
-  close() {
-    this.dom?.setAttribute(
+  const close = () => {
+    div.setAttribute(
       'style',
       'opacity:0;transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;',
     );
     setTimeout(() => {
-      this.dom && this.dom.remove();
+      div && div.remove();
     }, 226);
-  }
-}
+  };
 
-export default new Modal();
+  const privateOnCancel = (onCancel?: () => void) => {
+    onCancel instanceof Function && onCancel();
+    close();
+  };
+
+  const privateOnOk = (onOk?: () => void) => {
+    onOk instanceof Function && onOk();
+    close();
+  };
+
+  const dialog = (
+    <DialogConfirm
+      open={true}
+      container={div}
+      title={title}
+      content={content}
+      type={type}
+      okText={okText}
+      cancelText={cancelText}
+      onOk={() => privateOnOk(onOk)}
+      onCancel={() => privateOnCancel(onCancel)}
+    />
+  );
+
+  ReactDOM.render(dialog, div);
+
+  document.body.append(div);
+};
+export default confirm;
