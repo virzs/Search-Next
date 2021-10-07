@@ -2,5 +2,7 @@
   "placeholder": {
     "qing-shu-ru-sou-suo-nei-rong": "请输入搜索内容"
   },
-  "sou-suo": "搜索"
+  "sou-suo": "搜索",
+  "cancel": "取消",
+  "submit": "确认"
 }

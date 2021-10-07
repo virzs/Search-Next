@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-04 15:50:52
+ * @Last Modified time: 2021-10-07 20:22:10
  */
 
 import {
@@ -15,6 +15,8 @@ import {
 import React from 'react';
 import { Controller, RegisterOptions, useForm } from 'react-hook-form';
 import { DialogTitle } from '@/components/md-custom/dialog';
+import Modal from '@/components/md-custom/modal';
+import Form from '@/components/md-custom/form';
 
 // 网址 新增、编辑弹窗
 
@@ -55,78 +57,9 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   onClose,
   onSubmit,
 }) => {
-  const { handleSubmit, control, reset } = useForm<FormTypes>();
-
-  // 表单模板
-  const FormTemplate: React.FC<FormTemplatePropType> = ({
-    id,
-    items = [
-      {
-        name: 'name',
-        label: '名称',
-        placeholder: '请输入名称',
-        rules: {
-          required: {
-            value: true,
-            message: '请输入名称',
-          },
-        },
-      },
-      {
-        name: 'url',
-        label: '网址',
-        placeholder: '请输入网址',
-        rules: {
-          required: {
-            value: true,
-            message: '请输入网址',
-          },
-          pattern: {
-            value:
-              /^(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/,
-            message: '网址格式不正确',
-          },
-        },
-      },
-    ],
-    submit,
-  }) => {
-    return (
-      <form id={id} onSubmit={handleSubmit(submit)}>
-        {items.map((i, index) => (
-          <Controller
-            key={index}
-            control={control}
-            name={i.name}
-            rules={i.rules}
-            render={({ field: { onChange, ref }, fieldState: { error } }) => (
-              <TextField
-                inputRef={ref}
-                onChange={onChange}
-                variant="outlined"
-                fullWidth
-                size="small"
-                autoComplete="off"
-                error={error ? true : false}
-                style={{ margin: '8px 0' }}
-                label={i.label}
-                placeholder={i.placeholder}
-                helperText={error ? error.message : null}
-              ></TextField>
-            )}
-          />
-        ))}
-      </form>
-    );
-  };
-
-  const addContent = () => {
-    return <FormTemplate id="SiteForm" submit={handleDialogSubmit} />;
-  };
-
-  const editContent = () => {
-    return <FormTemplate id="SiteForm" submit={handleDialogSubmit} />;
-  };
+  const { Item } = Form;
+  const form = Form.useForm();
+  const { handleSubmit, reset } = form;
 
   // dialog提交
   const handleDialogSubmit = (val: FormTypes) => {
@@ -144,30 +77,40 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   }, [value]);
 
   return (
-    <Dialog className="top-site-dialog" open={open} onClose={handleCancel}>
-      <DialogTitle onClose={onClose}>
-        {type === 'add' && '添加网址'}
-        {type === 'edit' && '编辑网址'}
-      </DialogTitle>
-      <DialogContent>
-        {type === 'add' && addContent()}
-        {type === 'edit' && editContent()}
-      </DialogContent>
-      <DialogActions className="pt-2 px-4 pb-4">
-        <Button disableElevation variant="contained" onClick={handleCancel}>
-          取消
-        </Button>
-        <Button
-          form="SiteForm"
-          disableElevation
-          variant="contained"
-          color="primary"
-          type="submit"
+    <Modal
+      title={type === 'add' ? '添加网址' : '编辑网址'}
+      open={open}
+      onCancel={handleCancel}
+      onOk={() => {
+        handleSubmit(handleDialogSubmit, (err) => {
+          console.log(err);
+        })();
+      }}
+    >
+      <Form form={form} size="small">
+        <Item
+          name="name"
+          label="名称"
+          rules={{ required: { value: true, message: '请输入名称' } }}
         >
-          确认
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <TextField fullWidth variant="outlined" placeholder="请输入名称" />
+        </Item>
+        <Item
+          name="url"
+          label="网址"
+          rules={{
+            required: { value: true, message: '请输入网址' },
+            pattern: {
+              value:
+                /^(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/,
+              message: '网址格式不正确',
+            },
+          }}
+        >
+          <TextField fullWidth variant="outlined" placeholder="请输入网址" />
+        </Item>
+      </Form>
+    </Modal>
   );
 };
 
