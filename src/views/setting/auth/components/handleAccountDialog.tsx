@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2021-09-21 16:04:34
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 21:02:23
+ * @Last Modified time: 2021-10-07 21:42:55
  */
 
 import { DialogTitle } from '@/components/md-custom/dialog';
 import Form from '@/components/md-custom/form';
-import Modal from '@/components/md-custom/modal';
+import Modal from '@/components/md-custom/dialog/dialog';
 import {
   Button,
   Dialog,

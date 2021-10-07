@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 20:22:10
+ * @Last Modified time: 2021-10-07 21:42:53
  */
 
 import {
@@ -15,7 +15,7 @@ import {
 import React from 'react';
 import { Controller, RegisterOptions, useForm } from 'react-hook-form';
 import { DialogTitle } from '@/components/md-custom/dialog';
-import Modal from '@/components/md-custom/modal';
+import Modal from '@/components/md-custom/dialog/dialog';
 import Form from '@/components/md-custom/form';
 
 // 网址 新增、编辑弹窗

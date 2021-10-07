@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-20 23:42:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 11:11:37
+ * @Last Modified time: 2021-10-07 21:59:09
  */
 
 import {
@@ -15,7 +15,7 @@ import {
   findAccounts,
 } from '@/apis/auth';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
-import { Modal } from '@/components/md-custom/dialog';
+import { Dialog } from '@/components/md-custom/dialog';
 import { authDefaultData, AuthData } from '@/data/account/default';
 import ItemAccordion, {
   AccordionDetailItem,
@@ -27,7 +27,7 @@ import React from 'react';
 import AccountCard from './components/accountCard';
 import HandleAccountDialog from './components/handleAccountDialog';
 
-const Others:React.FC = () => {
+const Others: React.FC = () => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [account, setAccount] = React.useState({} as AuthData);
   const [others, setOthers] = React.useState<AuthData[]>([]);
@@ -111,7 +111,7 @@ const Others:React.FC = () => {
       return;
     }
 
-    Modal.confirm({
+    Dialog.confirm({
       title: '删除组件',
       content: '删除当前账户将同时删除与该账户关联的所有数据',
       onOk: () => {

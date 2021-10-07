@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-05-01 01:23:50
  * @Last Modified by: Vir
- * @Last Modified time: 2021-05-04 16:49:40
+ * @Last Modified time: 2021-10-07 21:12:48
  */
 
 import {
@@ -22,6 +22,7 @@ import {
   ReportProblemOutlined,
 } from '@material-ui/icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { DialogTitle } from '.';
 import './styles/dialog-confirm.less';
 
@@ -82,6 +83,7 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
     ...rest
   } = props;
 
+  const { t } = useTranslation();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -114,19 +116,19 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
         <Button
           size="small"
           disableElevation
-          variant="contained"
+          variant="text"
           onClick={onCancel}
         >
-          {cancelText ? cancelText : 'Cancel'}
+          {cancelText ? cancelText : t('cancel')}
         </Button>
         <Button
           size="small"
           disableElevation
-          variant="contained"
+          variant="text"
           color="primary"
           onClick={onOk}
         >
-          {okText ? okText : 'Ok'}
+          {okText ? okText : t('ok')}
         </Button>
       </DialogActions>
     </Dialog>
