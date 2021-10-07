@@ -2,11 +2,12 @@
  * @Author: Vir
  * @Date: 2021-09-21 16:04:34
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-21 16:17:50
+ * @Last Modified time: 2021-10-07 21:02:23
  */
 
 import { DialogTitle } from '@/components/md-custom/dialog';
 import Form from '@/components/md-custom/form';
+import Modal from '@/components/md-custom/modal';
 import {
   Button,
   Dialog,
@@ -55,36 +56,26 @@ const HandleAccountDialog: React.FC<HandleAccountDialogProps> = ({
   }, [open]);
 
   return (
-    <Dialog open={open} onClose={onCancel}>
-      <DialogTitle onClose={onCancel}>
-        {title ? title : '修改账户名称'}
-      </DialogTitle>
-      <DialogContent>
-        <Form form={form} size="small">
-          <Item
-            name="username"
-            label="账户名称"
-            rules={{ required: { value: true, message: '请输入账户名称' } }}
-          >
-            <TextField variant="outlined" placeholder="请输入账户名称" />
-          </Item>
-        </Form>
-      </DialogContent>
-      <DialogActions>
-        <Button disableElevation variant="outlined" onClick={handleCancel}>
-          取消
-        </Button>
-        <Button
-          disableElevation
-          variant="contained"
-          color="primary"
-          type="submit"
-          onClick={handleOk}
+    <Modal
+      title={title ? title : '修改账户名称'}
+      open={open}
+      onCancel={handleCancel}
+      onOk={handleOk}
+    >
+      <Form form={form} size="small">
+        <Item
+          name="username"
+          label="账户名称"
+          rules={{ required: { value: true, message: '请输入账户名称' } }}
         >
-          确认
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="请输入账户名称"
+          />
+        </Item>
+      </Form>
+    </Modal>
   );
 };
 
