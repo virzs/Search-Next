@@ -15,9 +15,7 @@ import {
 } from '@material-ui/icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DialogTitle } from '.';
 import Dialog, { DialogProps } from './dialog';
-import './styles/dialog-confirm.less';
 
 export type confirmType = 'info' | 'success' | 'error' | 'warning';
 

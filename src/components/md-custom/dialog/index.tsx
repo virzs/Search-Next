@@ -4,7 +4,6 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-10-07 23:21:02
  */
-import DialogTitleCustom from './dialog-title';
 import confirm from './confirm';
 import PrivateDialog from './dialog';
 
@@ -14,10 +13,8 @@ interface DialogInterface extends PrivateDialogType {
   confirm: typeof confirm;
 }
 
-const DialogTitle = DialogTitleCustom;
-
 const Dialog = PrivateDialog as DialogInterface;
 
 Dialog.confirm = confirm;
 
-export { DialogTitle, Dialog };
+export { Dialog };
