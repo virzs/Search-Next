@@ -5,16 +5,9 @@
  * @Last Modified time: 2021-10-07 21:42:53
  */
 
-import {
-  Dialog,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Button,
-} from '@material-ui/core';
+import { TextField } from '@material-ui/core';
 import React from 'react';
-import { Controller, RegisterOptions, useForm } from 'react-hook-form';
-import { DialogTitle } from '@/components/md-custom/dialog';
+import { RegisterOptions } from 'react-hook-form';
 import Modal from '@/components/md-custom/dialog/dialog';
 import Form from '@/components/md-custom/form';
 

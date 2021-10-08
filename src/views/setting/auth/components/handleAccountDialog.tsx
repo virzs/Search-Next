@@ -5,16 +5,9 @@
  * @Last Modified time: 2021-10-07 21:42:55
  */
 
-import { DialogTitle } from '@/components/md-custom/dialog';
 import Form from '@/components/md-custom/form';
 import Modal from '@/components/md-custom/dialog/dialog';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  TextField,
-} from '@material-ui/core';
+import { TextField } from '@material-ui/core';
 import React from 'react';
 
 export interface HandleAccountDialogProps {
