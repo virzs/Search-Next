@@ -56,7 +56,6 @@ const confirm = (props: ConfirmProps) => {
   const dialog = (
     <DialogConfirm
       open={true}
-      container={div}
       title={title}
       content={content}
       type={type}
@@ -64,6 +63,7 @@ const confirm = (props: ConfirmProps) => {
       cancelText={cancelText}
       onOk={() => privateOnOk(onOk)}
       onCancel={() => privateOnCancel(onCancel)}
+      container={div}
     />
   );
 

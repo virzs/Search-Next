@@ -5,14 +5,6 @@
  * @Last Modified time: 2021-10-07 21:12:48
  */
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogProps,
-} from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
@@ -24,17 +16,14 @@ import {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DialogTitle } from '.';
+import Dialog, { DialogProps } from './dialog';
 import './styles/dialog-confirm.less';
 
 export type confirmType = 'info' | 'success' | 'error' | 'warning';
 
 export interface DialogConfirm extends DialogProps {
-  okText?: string;
-  cancelText?: string;
   type?: confirmType;
   content?: string;
-  onOk?: (value: any) => void;
-  onCancel?: () => void;
 }
 
 const InfoContent = () => {
@@ -75,7 +64,6 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
     title,
     content,
     type,
-    onClose,
     okText,
     cancelText,
     onOk,
@@ -98,39 +86,9 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
   };
 
   return (
-    <Dialog
-      className="MuiDialog-confirm"
-      open={open}
-      onClose={onCancel}
-      fullScreen={fullScreen}
-      {...rest}
-    >
-      <DialogTitle onClose={onCancel}>{title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          {getIconByType()}
-          {content}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          size="small"
-          disableElevation
-          variant="text"
-          onClick={onCancel}
-        >
-          {cancelText ? cancelText : t('cancel')}
-        </Button>
-        <Button
-          size="small"
-          disableElevation
-          variant="text"
-          color="primary"
-          onClick={onOk}
-        >
-          {okText ? okText : t('ok')}
-        </Button>
-      </DialogActions>
+    <Dialog open={open} onCancel={onCancel} onOk={onOk} title={title} {...rest}>
+      {getIconByType()}
+      {content}
     </Dialog>
   );
 };

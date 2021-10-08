@@ -19,9 +19,12 @@ import { Close } from '@material-ui/icons';
 export interface DialogProps {
   open: boolean;
   title: string | (() => void);
-  onOk: () => void;
+  onOk: (value?: any) => void;
   onCancel: () => void;
+  okText?: string;
+  cancelText?: string;
   children?: any;
+  container?: Element;
 }
 
 const Dialog: React.FC<DialogProps> = ({
@@ -30,6 +33,7 @@ const Dialog: React.FC<DialogProps> = ({
   onOk,
   onCancel,
   children,
+  container,
 }) => {
   const { t } = useTranslation();
 
@@ -44,10 +48,11 @@ const Dialog: React.FC<DialogProps> = ({
       BackdropProps={{
         timeout: 500,
       }}
+      container={container}
     >
       <Fade in={open}>
         <div className="bg-white rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100">
-          <div className="p-3 py-2 font-bold text-lg flex justify-between items-center">
+          <div className="p-3 py-2 font-bold text-base flex justify-between items-center">
             {title}
             <IconButton size="small" onClick={onCancel}>
               <Close />
