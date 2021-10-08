@@ -7,7 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import DialogConfirm, { confirmType } from './DialogConfirm';
+import DialogConfirm, { confirmType } from './dialogConfirm';
 
 export interface ConfirmProps {
   title: string;

@@ -7,7 +7,7 @@
 import React from 'react';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
 import SiteCard from './siteCard';
-import DialogConfirm from '@/components/md-custom/dialog/DialogConfirm';
+import DialogConfirm from '@/components/md-custom/dialog/dialogConfirm';
 import { replaceUrlNotHaveHttpsOrHttpToHttps } from '@/utils/common';
 import {
   addCount,

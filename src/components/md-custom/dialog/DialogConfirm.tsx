@@ -5,8 +5,6 @@
  * @Last Modified time: 2021-10-07 21:12:48
  */
 
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
   CheckCircleOutlined,
   InfoOutlined,
@@ -14,7 +12,6 @@ import {
   ReportProblemOutlined,
 } from '@material-ui/icons';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import Dialog, { DialogProps } from './dialog';
 
 export type confirmType = 'info' | 'success' | 'error' | 'warning';
@@ -27,7 +24,7 @@ export interface DialogConfirm extends DialogProps {
 const InfoContent = () => {
   return (
     <>
-      <InfoOutlined className="MuiDialog-confirm-icon-info" />
+      <InfoOutlined className="text-blue-500 mr-1" />
     </>
   );
 };
@@ -35,7 +32,7 @@ const InfoContent = () => {
 const SuccessContent = () => {
   return (
     <>
-      <CheckCircleOutlined className="MuiDialog-confirm-icon-success" />
+      <CheckCircleOutlined className="text-green-500 mr-1" />
     </>
   );
 };
@@ -43,7 +40,7 @@ const SuccessContent = () => {
 const ErrorContent = () => {
   return (
     <>
-      <HighlightOffOutlined className="MuiDialog-confirm-icon-error" />
+      <HighlightOffOutlined className="text-red-500 mr-1" />
     </>
   );
 };
@@ -51,7 +48,7 @@ const ErrorContent = () => {
 const WarningContent = () => {
   return (
     <>
-      <ReportProblemOutlined className="MuiDialog-confirm-icon-warning" />
+      <ReportProblemOutlined className="text-yellow-500 mr-1" />
     </>
   );
 };
@@ -68,10 +65,6 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
     onCancel,
     ...rest
   } = props;
-
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const getIconByType = () => {
     const typeMap = {
