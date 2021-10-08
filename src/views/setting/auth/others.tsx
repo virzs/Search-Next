@@ -112,7 +112,8 @@ const Others: React.FC = () => {
     }
 
     Dialog.confirm({
-      title: '删除组件',
+      title: '删除账户',
+      type: 'warning',
       content: '删除当前账户将同时删除与该账户关联的所有数据',
       onOk: () => {
         const remove = delAccount(id);
