@@ -5,6 +5,7 @@
  * @Last Modified time: 2021-09-24 14:18:31
  */
 
+import { css } from '@emotion/css';
 import {
   Accordion,
   AccordionDetails,
@@ -12,6 +13,7 @@ import {
 } from '@material-ui/core';
 import { ExpandMore } from '@material-ui/icons';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import React from 'react';
 
 export interface ItemAccordionProps {
@@ -32,6 +34,7 @@ export interface AccordionDetailItemProps {
   disabledRightPadding?: boolean;
 }
 
+// 附带操作的项
 export const AccordionDetailItem: React.FC<AccordionDetailItemProps> = ({
   title,
   action,
@@ -43,6 +46,39 @@ export const AccordionDetailItem: React.FC<AccordionDetailItemProps> = ({
       <div className={classNames({ 'mr-8': !disabledRightPadding })}>
         {action}
       </div>
+    </div>
+  );
+};
+
+export interface AccordionDetailTextProps {
+  title: string;
+  value?: string | Date;
+  href?: string;
+  target?: React.HTMLAttributeAnchorTarget;
+}
+
+// key、value 格式的项，支持链接跳转
+export const AccordionDetailText: React.FC<AccordionDetailTextProps> = ({
+  title,
+  value = '-',
+  href,
+  target = '_blank',
+}) => {
+  const formatValue = dayjs(value).isValid()
+    ? dayjs(value).format('YYYY-MM-DD HH:mm:ss')
+    : value;
+  return (
+    <div className="px-6 grid grid-cols-3 py-1">
+      <span className="col-span-1">{title}</span>
+      <span className="col-span-2">
+        {href ? (
+          <a href={href} target={target}>
+            {formatValue}
+          </a>
+        ) : (
+          formatValue
+        )}
+      </span>
     </div>
   );
 };
@@ -60,7 +96,14 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
     <Accordion
       expanded={expanded}
       onChange={onChange}
-      className="rounded border shadow-none bg-white my-0"
+      className={classNames(
+        'rounded border shadow-none bg-white my-0',
+        css`
+          &::before {
+            background-color: transparent;
+          }
+        `,
+      )}
     >
       <AccordionSummary
         className=" transition hover:bg-gray-100"
