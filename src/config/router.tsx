@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-24 13:51:06
+ * @Last Modified time: 2021-10-08 21:28:59
  */
 
 import { lazy } from 'react';
@@ -20,6 +20,7 @@ import Others from '@/views/setting/auth/others';
 import Personalise from '@/views/setting/personalise';
 import Background from '@/views/setting/personalise/background';
 import Theme from '@/views/setting/personalise/theme/theme';
+import About from '@/views/setting/about';
 
 /**
  * 关于 component 额外说明
@@ -98,6 +99,12 @@ const routers: Router[] = [
           //   component: Theme,
           // },
         ],
+      },
+      {
+        title: '关于',
+        exact: false,
+        path: '/setting/about',
+        component: About,
       },
     ],
   },
