@@ -30,6 +30,7 @@
     "@material-ui/lab": "^5.0.0-alpha.44",
     "antd": "^4.16.13",
     "axios": "^0.21.4",
+    "bowser": "^2.11.0",
     "classnames": "^2.3.1",
     "dayjs": "^1.10.7",
     "i18next": "^21.2.4",
