@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 11:19:14
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-12 12:40:27
+ * @Last Modified time: 2021-10-10 20:34:45
  */
 
 import {
@@ -17,6 +17,7 @@ import {
   VideoLibrary,
   Email,
   ShoppingCart,
+  Search,
 } from '@material-ui/icons';
 import React from 'react';
 import { Navigation } from './interface';
@@ -568,6 +569,15 @@ const navigations: Navigation[] = [
         color: '#55A7DD',
         isShow: true,
       },
+      {
+        id: '8adc9d543405497b95279847ef9db1d4',
+        name: 'Amp What',
+        url: 'http://www.amp-what.com/',
+        intro: 'Discover your character',
+        icon: 'webpackjs',
+        color: '#333333',
+        isShow: true,
+      },
     ],
   },
   {
@@ -841,6 +851,34 @@ const navigations: Navigation[] = [
         intro: 'Screen capture, file sharing and productivity tool',
         icon: 'sharex',
         color: '#313642',
+        isShow: true,
+      },
+    ],
+  },
+  {
+    id: 'af73c0d3e7cd49269e30a8fda67dd1e5',
+    name: '发现',
+    path: 'find',
+    icon: <Search />,
+    color: '',
+    isShow: true,
+    children: [
+      {
+        id: '551d2ced5e4a4e7eba712fb0e512ff32',
+        name: 'EmojiAll官方网站',
+        url: 'https://www.emojiall.com/',
+        intro: 'Emoji大全 | Emoji表情符号字典',
+        icon: 'emojiall',
+        color: '#FD5D3B',
+        isShow: true,
+      },
+      {
+        id: 'df30201ec4764704b3c6d42edd4af4dc',
+        name: 'gitmoji',
+        url: 'https://gitmoji.dev/',
+        intro: 'An emoji guide for your commit messages',
+        icon: 'gitmoji',
+        color: '#FFDD67',
         isShow: true,
       },
     ],
