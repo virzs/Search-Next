@@ -2,13 +2,14 @@
  * @Author: Vir
  * @Date: 2021-10-09 17:13:56
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 00:17:33
+ * @Last Modified time: 2021-10-10 19:57:45
  */
 
 import { releasesList } from '@/apis/github';
 import { GithubReleaseType } from '@/apis/github/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
+import { formatText } from '@/utils/common';
 import { CardHeader, CardContent } from '@material-ui/core';
 import { Empty } from 'antd';
 import dayjs from 'dayjs';
@@ -42,7 +43,9 @@ const Releases: React.FC = () => {
                   'YYYY-MM-DD',
                 )}`}
               >
-                <pre className="bg-gray-100 rounded p-2">{i.body}</pre>
+                <pre className="bg-gray-100 rounded p-2">
+                  {formatText(i.body)}
+                </pre>
                 <a
                   className="flex justify-center mt-2 bg-gray-100 rounded p-1"
                   href={i.html_url}
