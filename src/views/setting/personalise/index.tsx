@@ -2,11 +2,12 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:05:05
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-24 13:49:20
+ * @Last Modified time: 2021-10-10 19:04:18
  */
 
 import { Router } from '@/config/router';
 import { AuthBackground, AuthData } from '@/data/account/default';
+import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
 import { PageProps } from '@/typings';
@@ -37,7 +38,7 @@ const Personalise: React.FC<PageProps> = ({
       pChildren={children}
     >
       <Example data={userBgSetting} />
-      <div className="flex flex-col gap-2 my-4">
+      <ContentList>
         {list.map((i) => (
           <ItemCard
             key={i.path}
@@ -46,7 +47,7 @@ const Personalise: React.FC<PageProps> = ({
             onClick={() => history.push(i.path)}
           ></ItemCard>
         ))}
-      </div>
+      </ContentList>
     </RenderContent>
   );
 };
