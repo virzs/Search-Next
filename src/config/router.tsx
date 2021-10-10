@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-09 21:25:37
+ * @Last Modified time: 2021-10-10 19:01:54
  */
 
 import { lazy } from 'react';
@@ -25,6 +25,7 @@ import About from '@/views/setting/about';
 import History from '@/views/setting/about/releases';
 import Releases from '@/views/setting/about/releases';
 import Commits from '../views/setting/about/commits';
+import Data from '@/views/setting/data';
 
 /**
  * 关于 component 额外说明
@@ -103,6 +104,12 @@ const routers: Router[] = [
           //   component: Theme,
           // },
         ],
+      },
+      {
+        title: '数据',
+        exact: false,
+        path: '/setting/data',
+        component: Data,
       },
       {
         title: '关于',
