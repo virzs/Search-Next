@@ -2,11 +2,12 @@
  * @Author: Vir
  * @Date: 2021-10-08 21:27:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-08 22:03:05
+ * @Last Modified time: 2021-10-09 17:26:45
  */
 import { latest } from '@/apis/github';
 import { LatestType } from '@/apis/github/interface';
 import { Router } from '@/config/router';
+import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion, {
   AccordionDetailText,
 } from '@/pages/setting/components/itemAccordion';
@@ -38,7 +39,7 @@ const About: React.FC<PageProps> = ({ history, route, children, ...props }) => {
       location={history.location as unknown as Location}
       pChildren={children}
     >
-      <div className="flex flex-col gap-2 my-4">
+      <ContentList>
         <ItemAccordion title="设备信息">
           <AccordionDetailText title="浏览器" value={ua.browser?.name} />
           <AccordionDetailText title="版本" value={ua.browser?.version} />
@@ -57,8 +58,8 @@ const About: React.FC<PageProps> = ({ history, route, children, ...props }) => {
             href={lastData.author?.html_url}
           />
         </ItemAccordion>
-      </div>
-      <div className="flex flex-col gap-2 my-4">
+      </ContentList>
+      <ContentList title="更多">
         {list.map((i) => (
           <ItemCard
             key={i.path}
@@ -67,7 +68,7 @@ const About: React.FC<PageProps> = ({ history, route, children, ...props }) => {
             onClick={() => history.push(i.path)}
           ></ItemCard>
         ))}
-      </div>
+      </ContentList>
     </RenderContent>
   );
 };
