@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 21:42:53
+ * @Last Modified time: 2021-10-10 16:02:20
  */
 
 import { TextField } from '@material-ui/core';
@@ -101,6 +101,23 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
           }}
         >
           <TextField fullWidth variant="outlined" placeholder="请输入网址" />
+        </Item>
+        <Item
+          name="iconUrl"
+          label="图标"
+          rules={{
+            pattern: {
+              value:
+                /^(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/,
+              message: '图标网址格式不正确',
+            },
+          }}
+        >
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="请输入图标地址"
+          />
         </Item>
       </Form>
     </Modal>

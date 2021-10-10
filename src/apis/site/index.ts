@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-03 14:26:02
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-03 15:46:12
+ * @Last Modified time: 2021-10-10 16:01:13
  */
 
 import StorageDB from '@/utils/storage';
@@ -18,6 +18,7 @@ export interface Site {
   _id: string;
   name: string;
   url: string;
+  iconUrl?: string;
   count: number;
 }
 

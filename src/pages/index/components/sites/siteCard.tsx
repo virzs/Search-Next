@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-11 14:54:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 19:25:24
+ * @Last Modified time: 2021-10-10 16:00:59
  */
 
 import { getWebIconByUrl } from '@/apis/common';
@@ -97,7 +97,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
               `,
             )}
             variant="rounded"
-            src={getWebIconByUrl(item?.url)}
+            src={item?.iconUrl ? item?.iconUrl : getWebIconByUrl(item?.url)}
             onClick={onAdd ? onAdd : undefined}
           >
             {type === 'add' && <AddOutlined />}
