@@ -2,8 +2,11 @@
  * @Author: Vir
  * @Date: 2021-03-29 11:36:28
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-17 17:53:12
+ * @Last Modified time: 2021-10-10 14:52:52
  */
+
+import { gitemoji, GitEmoji } from '@/data/github/gitemoji';
+import { isEmoji } from './regexp';
 
 export type githubCommitTypes =
   | 'feat' // 提交新功能
@@ -216,4 +219,23 @@ export const getScale = (): [number, number] => {
   const n = gcd(width, height);
 
   return [width / n, height / n];
+};
+
+// 快速生成 type 用于数据更改时更新 ts 类型
+export const getTypeStr = (key: keyof GitEmoji) => {
+  let arr: string[] = [];
+  gitemoji.forEach((i) => {
+    arr.push(`'${i[key]}'`);
+  });
+  return arr.join('|');
+};
+
+// 将 emoji 简码替换成 emoji
+export const formatText = (text: string) => {
+  const match = isEmoji.match(text);
+  match?.forEach((i) => {
+    const emoji = gitemoji.find((j) => j.code === i)?.emoji;
+    text = emoji ? text.replace(i, emoji) : text;
+  });
+  return text;
 };

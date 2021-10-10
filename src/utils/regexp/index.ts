@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-27 17:50:06
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 14:31:41
+ * @Last Modified time: 2021-10-10 14:45:29
  */
 
 // 验证是否为http/https链接
@@ -17,7 +17,7 @@ export const isHttpLink = {
 };
 
 // 验证指定字符中的内容
-export const isEmojiPattern = /:(\S*):/;
+export const isEmojiPattern = /:(\S*):/g;
 
 export const isEmoji = {
   test: (value: string) => {
