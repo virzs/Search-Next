@@ -2,12 +2,16 @@
  * @Author: Vir
  * @Date: 2021-10-09 21:25:26
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 13:40:18
+ * @Last Modified time: 2021-10-10 14:39:53
  */
 import { commitList } from '@/apis/github';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { getGithubCommitType, githubCommitTypes } from '@/utils/common';
+import {
+  formatText,
+  getGithubCommitType,
+  githubCommitTypes,
+} from '@/utils/common';
 import { Empty } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
@@ -65,7 +69,7 @@ const Commits: React.FC = () => {
           commits.map((i, j) => (
             <ItemCard
               key={j}
-              title={i.message}
+              title={formatText(i.message)}
               desc={`${i.author.name} ${dayjs(i.author.date).format(
                 'YYYY/MM/DD',
               )}`}
