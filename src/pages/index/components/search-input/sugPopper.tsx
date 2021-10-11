@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-08-08 13:15:51
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-12 21:19:47
+ * @Last Modified time: 2021-10-11 17:00:01
  */
 
 import { baiduSug } from '@/apis/baidu';
@@ -11,12 +11,15 @@ import { Popper, Card, List, ListItem } from '@material-ui/core';
 import React from 'react';
 import { Empty, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import classNames from 'classnames';
 
 export interface SugPopperProps {
   open: boolean;
   wd: string;
   anchorEl: any;
+  code: 'ArrowDown' | 'ArrowUp' | null;
   onSelect: (content: string) => void;
+  onKeySelect: (content: string) => void;
 }
 
 interface SugList {
@@ -34,11 +37,14 @@ const SugPopper: React.FC<SugPopperProps> = ({
   open,
   anchorEl,
   wd,
+  code,
   onSelect,
+  onKeySelect,
   ...props
 }) => {
   const [sugList, setSugList] = React.useState<SugList[]>([]);
   const [engine, setEngine] = React.useState<SugEngine>({} as SugEngine);
+  const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const [refresh, setRefresh] = React.useState<boolean>(false);
 
@@ -56,6 +62,7 @@ const SugPopper: React.FC<SugPopperProps> = ({
       let data = res.data.data;
       setSugList(data.sugs);
       setEngine(data.engine);
+      setSelectedIndex(null);
       setRefresh(false);
     });
   };
@@ -63,6 +70,24 @@ const SugPopper: React.FC<SugPopperProps> = ({
   React.useEffect(() => {
     handRefresh();
   }, [wd]);
+
+  React.useEffect(() => {
+    const listLength = sugList.length;
+    let index = selectedIndex === null ? -1 : selectedIndex;
+    if (listLength > 0 && code) {
+      if (code === 'ArrowDown') index++;
+      if (code === 'ArrowUp') index--;
+
+      if (index >= listLength - 1) index = 0;
+      if (index < 0) index = listLength - 1;
+
+      const content = sugList[index]?.content;
+      if (content) {
+        onKeySelect(content);
+        setSelectedIndex(index);
+      }
+    }
+  }, [code]);
 
   return (
     <Popper
@@ -87,7 +112,11 @@ const SugPopper: React.FC<SugPopperProps> = ({
                     <ListItem
                       button
                       key={j}
+                      className={classNames({
+                        'bg-gray-100': selectedIndex === j,
+                      })}
                       onClick={() => {
+                        setSelectedIndex(j);
                         onSelect(i.content);
                       }}
                     >

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-03 18:59:26
+ * @Last Modified time: 2021-10-11 13:30:56
  */
 
 import { SearchEngineValueTypes } from '@/data/engine';
@@ -36,6 +36,7 @@ export interface SearchInputProps {
   onBtnClick?: (value: string, engine: SearchEngineValueTypes) => void;
   onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onArrow?: (code: string) => void;
   primaryText?: string;
 }
 
@@ -45,6 +46,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onBtnClick,
   onFocus,
   onBlur,
+  onArrow,
   value,
   defaultValue,
   primaryText,
@@ -61,6 +63,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const [sugAnchorEl, setSugAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
+  const [code, setCode] = React.useState<'ArrowDown' | 'ArrowUp' | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -77,7 +80,17 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // 相应键盘 Enter 事件
     if (e.code === 'Enter' && onPressEnter) onPressEnter(inputValue, engine);
+    // 相应键盘 方向键 上下 事件
+    if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
+      if (onArrow) onArrow(e.code);
+      setCode(e.code);
+    }
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    setCode(null);
   };
 
   const handleBtnClick = () => {
@@ -113,6 +126,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
           {...props}
         />
         <Button
@@ -128,7 +142,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
       <SugPopper
         open={sugOpen}
         wd={wd}
+        code={code}
         anchorEl={sugAnchorEl}
+        onKeySelect={(content) => {
+          setInputValue(content);
+        }}
         onSelect={(content) => {
           if (onBtnClick) onBtnClick(content, engine);
         }}
