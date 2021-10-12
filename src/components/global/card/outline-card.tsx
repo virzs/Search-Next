@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 16:55:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-04 16:20:27
+ * @Last Modified time: 2021-10-11 22:17:43
  */
 
 import { Tooltip } from '@material-ui/core';
@@ -18,6 +18,7 @@ export interface OutlineCardProps {
   tip?: string; //提示tooltip文案
   disabled?: boolean; //是否禁用
   loading?: boolean; //是否加载中，显示skeleton
+  fullWidth?: boolean;
 }
 
 const OutlineCard: React.FC<OutlineCardProps> = ({
@@ -27,6 +28,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   tip,
   disabled = false,
   loading = false,
+  fullWidth = false,
   children,
   onChange,
 }) => {
@@ -47,7 +49,9 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
       <input
         className={classNames(
           'rounded w-full cursor-pointer h-full m-0 p-0 z-10 overflow-hidden absolute appearance-none bg-transparent transition-all border',
-          !loading && radioChecked ? 'border-primary shadow-inner' : 'border-gray-200 shadow-sm',
+          !loading && radioChecked
+            ? 'border-primary shadow-inner'
+            : 'border-gray-200 shadow-sm',
         )}
         type="radio"
         id={id}
@@ -61,13 +65,26 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   };
 
   return (
-    <div className="p-0 mb-0 h-full transition-all rounded">
-      <div className="inline-block relative min-w-min min-h-full items-stretch justify-start h-full">
+    <div
+      className={classNames(
+        'p-0 mb-0 h-full transition-all rounded',
+        fullWidth && 'w-full',
+      )}
+    >
+      <div
+        className={classNames(
+          'inline-block relative min-w-min min-h-full items-stretch justify-start h-full',
+          fullWidth && 'w-full',
+        )}
+      >
         {tip ? <Tooltip title={tip}>{radio()}</Tooltip> : radio()}
         <label
           slot="label"
           htmlFor={id}
-          className="inline-block p-0 text-sm leading-5 text-primary"
+          className={classNames(
+            'inline-block p-0 text-sm leading-5 text-primary',
+            fullWidth && 'w-full',
+          )}
         >
           <div className="px-2 pt-2 pb-1">
             <div className="border border-gray-300 rounded">
