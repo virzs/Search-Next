@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-21 11:28:06
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-21 15:08:00
+ * @Last Modified time: 2021-10-21 17:00:24
  */
 import dayjs from 'dayjs';
 import React from 'react';
@@ -42,7 +42,7 @@ const Clock3: React.FC = () => {
     <div className="flex gap-2">
       <Digit number={mathNum(hour)} />
       <Digit number={mathNum(hour, false)} />
-      <Separator number={minute} />
+      <Separator number={second} />
       <Digit number={mathNum(minute)} />
       <Digit number={mathNum(minute, false)} />
       <Separator number={second} />
