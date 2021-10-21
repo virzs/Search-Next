@@ -18,6 +18,7 @@ module.exports = {
           150: '#EAEAEA',
         },
         var: {
+          'main-2': 'var(--main-text-color-opacity-2, rgba(95, 95, 95, 0.2))',
           'main-7': 'var(--main-text-color-opacity-7, rgba(95, 95, 95, 0.7))',
           'main-10': 'var(--main-text-color, rgb(95, 95, 95))',
         },

@@ -24,5 +24,6 @@ code {
 
 .inverse {
   --main-text-color: #fff !important;
+  --main-text-color-opacity-2: rgba(255, 255, 255, 0.2) !important;
   --main-text-color-opacity-7: rgba(255, 255, 255, 0.7) !important;
 }
