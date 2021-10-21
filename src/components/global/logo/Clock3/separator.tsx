@@ -22,13 +22,13 @@ const Separator: React.FC<SeparatorProps> = ({ number }) => {
     <div className="flex justify-around flex-col">
       <i
         className={classNames(
-          'w-3 h-3 rounded-sm transition-all',
+          'w-2.5 h-2.5 rounded-sm transition-all',
           refresh ? 'bg-var-main-10' : 'bg-var-main-2',
         )}
       />
       <i
         className={classNames(
-          'w-3 h-3 rounded-sm transition-all',
+          'w-2.5 h-2.5 rounded-sm transition-all',
           refresh ? 'bg-var-main-10' : 'bg-var-main-2',
         )}
       />

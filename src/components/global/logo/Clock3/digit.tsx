@@ -27,11 +27,11 @@ const Digit: React.FC<DigitProps> = ({ number }) => {
   }, [number]);
 
   return (
-    <div className="grid grid-cols-4 gap-1">
+    <div className="grid grid-cols-4 gap-1.5">
       {matrix.map((i) => (
         <i
           className={classNames(
-            'rounded-sm transition-all w-3 h-3',
+            'rounded-sm transition-all w-2.5 h-2.5',
             i ? 'bg-var-main-10' : 'bg-var-main-2',
           )}
         />

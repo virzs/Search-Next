@@ -39,7 +39,7 @@ const Clock3: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3">
       <Digit number={mathNum(hour)} />
       <Digit number={mathNum(hour, false)} />
       <Separator number={second} />
