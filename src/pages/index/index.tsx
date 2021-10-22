@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:57:12
+ * @Last Modified time: 2021-10-22 16:08:53
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -31,13 +31,14 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const [zoom, setZoom] = React.useState<boolean>(false);
   const [logoData, setLogoData] = React.useState<AuthLogo>({
     type: 'clock',
-    show: false,
+    show: true,
   } as AuthLogo);
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
     window.open(`${engine.href}${value}`);
   };
 
+  // 获取并设置logo
   const setLogoSetting = () => {
     const id = localStorage.getItem('account');
     if (!id) return;
@@ -45,8 +46,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
     setLogoData(logoData);
   };
 
+  // 渲染时钟样式logo
   const renderClockLogo = () => {
-    const clockType = logoData.config.clock.type || 'clock1';
+    const clockType = logoData?.config?.clock?.type || 'clock1';
     const logo = ClockData.find((i) => i.value === clockType);
     console.log(logo, clockType);
     return (
@@ -121,8 +123,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
       <div
         ref={logoRef}
         className={classNames(
-          'index-logo-box max-h-48 sm:max-h-72 items-center flex justify-center transition-all duration-300',
-          zoom ? 'flex-grow-0' : 'flex-grow',
+          'index-logo-box items-center flex justify-center transition-all duration-300',
+          zoom && logoData.show ? 'flex-grow-0' : 'flex-grow',
+          logoData.show ? 'max-h-48 sm:max-h-72' : 'max-h-32',
         )}
         style={{
           height:
