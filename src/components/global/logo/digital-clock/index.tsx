@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2021-06-03 11:08:20
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-06 14:25:04
+ * @Last Modified time: 2021-10-22 14:20:00
  */
 
 import dayjs from 'dayjs';
 import React from 'react';
-import Digit from './digit';
+import Digit, { DigitNum } from './digit';
 import Separator from './separator';
 import './style.less';
 
@@ -27,6 +27,12 @@ const DigitalClock: React.FC<DigitalClockProps> = ({ className }) => {
     setSec(time.second());
   };
 
+  const mathNum = (number: number, bool: boolean = true): DigitNum => {
+    return bool
+      ? (Math.floor(number / 10) as unknown as DigitNum)
+      : ((number % 10) as unknown as DigitNum);
+  };
+
   React.useEffect(() => {
     const timer = setInterval(getTime, 1000);
 
@@ -37,15 +43,15 @@ const DigitalClock: React.FC<DigitalClockProps> = ({ className }) => {
 
   return (
     <div className={className}>
-      <div className="digital-clock-root">
-        <Digit value={Math.floor(hour / 10)} />
-        <Digit value={hour % 10} />
-        <Separator />
-        <Digit value={Math.floor(min / 10)} />
-        <Digit value={min % 10} />
-        <Separator />
-        <Digit value={Math.floor(sec / 10)} />
-        <Digit value={sec % 10} />
+      <div className="flex justify-center items-center">
+        <Digit value={mathNum(hour)} />
+        <Digit value={mathNum(hour, false)} />
+        <Separator number={sec} />
+        <Digit value={mathNum(min)} />
+        <Digit value={mathNum(min, false)} />
+        <Separator number={sec} />
+        <Digit value={mathNum(sec)} />
+        <Digit value={mathNum(sec, false)} />
       </div>
     </div>
   );

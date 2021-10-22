@@ -2,16 +2,29 @@
  * @Author: Vir
  * @Date: 2021-06-03 13:32:19
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-05 15:46:37
+ * @Last Modified time: 2021-10-22 14:20:57
  */
 import './style.less';
 import React from 'react';
+import classNames from 'classnames';
 
-const Separator: React.FC = () => {
+export interface SeparatorProps {
+  number: number
+}
+
+const Separator: React.FC<SeparatorProps> = ({ number }) => {
+  const [refresh, setRefresh] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    setRefresh(!refresh);
+  }, [number]);
+
   return (
-    <div className="separator-box">
-      <div className="separator"></div>
-      <div className="separator"></div>
+    <div className="h-25 flex flex-col justify-around">
+      <i className={classNames("w-1.5 h-1.5 block rounded transition-all",
+        refresh ? 'bg-var-main-10' : 'bg-var-main-2')} />
+      <i className={classNames("w-1.5 h-1.5 block rounded transition-all",
+        refresh ? 'bg-var-main-10' : 'bg-var-main-2')} />
     </div>
   );
 };
