@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-20 23:42:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 21:59:09
+ * @Last Modified time: 2021-10-22 15:28:15
  */
 
 import {
@@ -16,7 +16,8 @@ import {
 } from '@/apis/auth';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { Dialog } from '@/components/md-custom/dialog';
-import { authDefaultData, AuthData } from '@/data/account/default';
+import { authDefaultData } from '@/data/account/default';
+import { AuthData } from '@/data/account/type';
 import ItemAccordion, {
   AccordionDetailItem,
 } from '@/pages/setting/components/itemAccordion';

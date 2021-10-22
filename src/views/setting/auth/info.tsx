@@ -2,14 +2,14 @@
  * @Author: Vir
  * @Date: 2021-09-19 23:23:36
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-21 00:15:54
+ * @Last Modified time: 2021-10-22 15:26:53
  */
 
 import { editAccount } from '@/apis/auth';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { Dialog } from '@/components/md-custom/dialog';
 import Form from '@/components/md-custom/form';
-import { AuthData } from '@/data/account/default';
+import { AuthData } from '@/data/account/type';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { PageProps } from '@/typings';
 import { Button, TextField } from '@material-ui/core';

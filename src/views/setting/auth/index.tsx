@@ -2,11 +2,11 @@
  * @Author: Vir
  * @Date: 2021-09-17 23:07:52
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-20 17:09:56
+ * @Last Modified time: 2021-10-22 15:26:46
  */
 
 import { Router } from '@/config/router';
-import { AuthData } from '@/data/account/default';
+import { AuthData } from '@/data/account/type';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
 import { PageProps } from '@/typings';

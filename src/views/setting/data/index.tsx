@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2021-10-10 19:01:36
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 19:28:06
+ * @Last Modified time: 2021-10-22 15:27:09
  */
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import BorderColorCard from '@/components/md-custom/card/BorderColorCard';
 import { Router } from '@/config/router';
-import { AuthData } from '@/data/account/default';
+import { AuthData } from '@/data/account/type';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';

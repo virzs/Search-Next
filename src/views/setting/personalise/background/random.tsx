@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 15:34:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-04 16:01:21
+ * @Last Modified time: 2021-10-22 14:44:47
  */
 
 import {
@@ -18,7 +18,7 @@ import OutlineCard from '@/components/global/card/outline-card';
 import React from 'react';
 import dayjs from 'dayjs';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
-import { AuthBackgroundRandomData } from '@/data/account/default';
+import { AuthBackgroundRandomData } from '@/data/account/type';
 import classNames from 'classnames';
 import { css } from '@emotion/css';
 
@@ -141,32 +141,32 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
       >
         {apiLoading
           ? demoList.map((i) => (
-              <OutlineCard key={i} label=" " disabled loading />
-            ))
+            <OutlineCard key={i} label=" " disabled loading />
+          ))
           : imgList.map((i, j) => (
-              <OutlineCard
-                key={i.hsh}
-                id={i.hsh}
-                value={checkHsh}
-                label={dayjs(i.enddate).format('YYYY/MM/DD')}
-                onChange={(val) => onCheckChange(val)}
-                tip={i.copyright}
+            <OutlineCard
+              key={i.hsh}
+              id={i.hsh}
+              value={checkHsh}
+              label={dayjs(i.enddate).format('YYYY/MM/DD')}
+              onChange={(val) => onCheckChange(val)}
+              tip={i.copyright}
+            >
+              <Spin
+                spinning={loadings[j]}
+                indicator={<CircularProgress size={18} color="inherit" />}
               >
-                <Spin
-                  spinning={loadings[j]}
-                  indicator={<CircularProgress size={18} color="inherit" />}
-                >
-                  <Image
-                    className="w-32 h-20 block"
-                    onLoad={() => imgLoad(j)}
-                    preview={false}
-                    placeholder
-                    src={i.url}
-                    alt={i.copyright}
-                  />
-                </Spin>
-              </OutlineCard>
-            ))}
+                <Image
+                  className="w-32 h-20 block"
+                  onLoad={() => imgLoad(j)}
+                  preview={false}
+                  placeholder
+                  src={i.url}
+                  alt={i.copyright}
+                />
+              </Spin>
+            </OutlineCard>
+          ))}
       </div>
     </div>
   );

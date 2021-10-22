@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-04 15:56:30
+ * @Last Modified time: 2021-10-22 15:26:24
  */
 
 import { editAccount } from '@/apis/auth';
@@ -13,7 +13,7 @@ import {
   AuthBackgroundRandomData,
   AuthBackgroundType,
   AuthData,
-} from '@/data/account/default';
+} from '@/data/account/type';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import { Alert, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';

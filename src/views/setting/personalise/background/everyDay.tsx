@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2021-09-26 17:39:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-26 17:46:40
+ * @Last Modified time: 2021-10-22 15:27:16
  */
 
-import { AuthBackgroundRandomData } from '@/data/account/default';
+import { AuthBackgroundRandomData } from '@/data/account/type';
 import { css } from '@emotion/css';
 import { Alert } from '@material-ui/core';
 import classNames from 'classnames';

@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2021-09-20 16:53:59
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-20 19:32:51
+ * @Last Modified time: 2021-10-22 15:27:01
  */
 
-import { AuthData } from '@/data/account/default';
+import { AuthData } from '@/data/account/type';
 import { Avatar, Chip } from '@material-ui/core';
 import dayjs from 'dayjs';
 import React from 'react';

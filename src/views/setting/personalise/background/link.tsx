@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2021-09-27 13:55:54
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-27 17:56:47
+ * @Last Modified time: 2021-10-22 15:27:31
  */
 
-import { AuthBackgroundLinkData } from '@/data/account/default';
+import { AuthBackgroundLinkData } from '@/data/account/type';
 import { AccordionDetailItem } from '@/pages/setting/components/itemAccordion';
 import { isHttpLink } from '@/utils/regexp';
 import { css } from '@emotion/css';

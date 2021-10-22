@@ -1,12 +1,12 @@
 /*
  * @Author: Vir
  * @Date: 2021-09-29 17:50:58
- * @Last Modified by:   Vir
- * @Last Modified time: 2021-09-29 17:50:58
+ * @Last Modified by: Vir
+ * @Last Modified time: 2021-10-22 15:27:36
  */
 
 import { latestImg } from '@/apis/setting/background';
-import { AuthBackground, AuthBackgroundType } from '@/data/account/default';
+import { AuthBackground } from '@/data/account/type';
 import { getScale } from '@/utils/common';
 import React from 'react';
 

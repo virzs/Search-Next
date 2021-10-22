@@ -2,11 +2,11 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:05:05
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 19:04:18
+ * @Last Modified time: 2021-10-22 15:27:44
  */
 
 import { Router } from '@/config/router';
-import { AuthBackground, AuthData } from '@/data/account/default';
+import { AuthBackground, AuthData } from '@/data/account/type';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
