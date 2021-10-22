@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 16:08:53
+ * @Last Modified time: 2021-10-22 16:15:48
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -50,7 +50,6 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const renderClockLogo = () => {
     const clockType = logoData?.config?.clock?.type || 'clock1';
     const logo = ClockData.find((i) => i.value === clockType);
-    console.log(logo, clockType);
     return (
       <div
         className={classNames(
