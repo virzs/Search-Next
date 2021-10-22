@@ -2,45 +2,12 @@
  * @Author: Vir
  * @Date: 2021-08-15 00:00:37
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-24 14:14:32
+ * @Last Modified time: 2021-10-17 21:51:51
  */
 
-// 默认的用户数据
+// ! 账户默认数据
 
-export type AuthBackgroundType = 'color' | 'random' | 'everyday' | 'link';
-
-export interface AuthBackgroundRandomData {
-  url: string;
-  id: string;
-  hsh: string;
-  copyright: string;
-  copyrightlink: string;
-}
-
-export interface AuthBackgroundLinkData {
-  url: string;
-}
-
-export interface AuthBackground {
-  type: AuthBackgroundType; // 背景类型
-  data?: AuthBackgroundRandomData | AuthBackgroundLinkData; // 背景数据
-}
-
-export interface AuthData {
-  _id?: string;
-  username: string; // 用户名
-  avatar?: string; // 头像
-  type: 'local' | 'cloud'; // 账户类型 local本地 cloud云端
-  createdTime?: string;
-  updatedTime?: string;
-  language: 'zh-CN' | 'en-US'; // 账户所选语言
-  background: AuthBackground;
-  sync: {
-    setting: boolean; // 设置同步
-    website: boolean; // 常用网址同步
-    history: boolean; // 历史记录同步
-  }; // 是否同步，默认false
-}
+import { AuthData, SettingDefaultData } from './type';
 
 export const authDefaultData: AuthData = {
   username: '默认账户',
@@ -48,18 +15,28 @@ export const authDefaultData: AuthData = {
   type: 'local',
   language: 'zh-CN',
   background: { type: 'color' },
+  logo: {
+    show: true,
+    type: 'clock',
+    config: {
+      clock: {
+        type: 'clock1',
+      },
+      text: {
+        title: '',
+        subTitle: '',
+      },
+      image: {
+        url: '',
+      },
+    },
+  },
   sync: {
     setting: false,
     website: false,
     history: false,
   },
 };
-
-export interface SettingDefaultData {
-  background: any;
-  showWebsite: boolean;
-  language: 'zh-CN' | 'zn-US';
-}
 
 export const settingDefaultData: SettingDefaultData = {
   background: '',

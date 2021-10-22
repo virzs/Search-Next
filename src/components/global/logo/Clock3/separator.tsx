@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-03 13:32:19
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-21 17:00:39
+ * @Last Modified time: 2021-10-22 16:01:07
  */
 import React from 'react';
 import classNames from 'classnames';
@@ -23,13 +23,13 @@ const Separator: React.FC<SeparatorProps> = ({ number }) => {
       <i
         className={classNames(
           'w-2.5 h-2.5 rounded-sm transition-all',
-          refresh ? 'bg-var-main-10' : 'bg-var-main-2',
+          refresh ? 'bg-var-main-10' : 'bg-var-main-1',
         )}
       />
       <i
         className={classNames(
           'w-2.5 h-2.5 rounded-sm transition-all',
-          refresh ? 'bg-var-main-10' : 'bg-var-main-2',
+          refresh ? 'bg-var-main-10' : 'bg-var-main-1',
         )}
       />
     </div>

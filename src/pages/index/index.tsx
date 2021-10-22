@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-06 23:11:39
+ * @Last Modified time: 2021-10-22 15:57:12
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -18,7 +18,9 @@ import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
 import { setTheme } from '@/utils/theme';
-import DigitalClock from '@/components/global/logo/digital-clock';
+import { AuthLogo } from '@/data/account/type';
+import { logoSetting } from '@/apis/auth';
+import { ClockData } from '@/data/logo';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const { t, i18n } = useTranslation();
@@ -27,9 +29,36 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const [bg, setBg] = React.useState<SetBackgroundParams>();
 
   const [zoom, setZoom] = React.useState<boolean>(false);
+  const [logoData, setLogoData] = React.useState<AuthLogo>({
+    type: 'clock',
+    show: false,
+  } as AuthLogo);
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
     window.open(`${engine.href}${value}`);
+  };
+
+  const setLogoSetting = () => {
+    const id = localStorage.getItem('account');
+    if (!id) return;
+    const logoData = logoSetting(id);
+    setLogoData(logoData);
+  };
+
+  const renderClockLogo = () => {
+    const clockType = logoData.config.clock.type || 'clock1';
+    const logo = ClockData.find((i) => i.value === clockType);
+    console.log(logo, clockType);
+    return (
+      <div
+        className={classNames(
+          'delay-75 transform duration-300',
+          zoom ? 'scale-50' : 'scale-100',
+        )}
+      >
+        {React.createElement(logo ? logo.component : ClockData[0].component)}
+      </div>
+    );
   };
 
   const setBackground = () => {
@@ -61,6 +90,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
 
   React.useEffect(() => {
     setBackground();
+    setLogoSetting();
   }, []);
 
   return (
@@ -101,12 +131,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
               : '100%',
         }}
       >
-        <DigitalClock
-          className={classNames(
-            'delay-75 transform duration-300',
-            zoom ? 'scale-50' : 'scale-100',
-          )}
-        />
+        {logoData.show && logoData.type === 'clock' && renderClockLogo()}
       </div>
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
         <SearchInput

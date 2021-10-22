@@ -2,10 +2,11 @@
  * @Author: Vir
  * @Date: 2021-09-01 13:49:23
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-01 14:26:57
+ * @Last Modified time: 2021-10-22 15:04:39
  */
 
-import { AuthBackground } from '@/data/account/default';
+import { authDefaultData } from '@/data/account/default';
+import { AuthBackground, AuthData, AuthLogo } from '@/data/account/type';
 import StorageDB from '@/utils/storage';
 
 const BaseDB = new StorageDB({
@@ -64,4 +65,19 @@ export const addAccount = (data: any): any => {
 // 账户总数
 export const accountsCount = () => {
   return AuthDB.count();
+};
+
+// 获取账户中 logo 设置数据
+export const logoSetting = (id: string): AuthLogo => {
+  const account: AuthData = AuthDB.findOne(id);
+  if (!account) throw new Error('未找到该账户');
+  const logoSetting = account.logo;
+  if (logoSetting) return logoSetting;
+  AuthDB.update(id, { logo: authDefaultData.logo });
+  return authDefaultData.logo as AuthLogo;
+};
+
+// 单独更新 logo 设置数据
+export const updateLogoSetting = (id: string, data: AuthLogo) => {
+  return AuthDB.update(id, { logo: data });
 };

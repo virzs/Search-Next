@@ -2,11 +2,12 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 19:01:54
+ * @Last Modified time: 2021-10-11 22:10:55
  */
 
 import { lazy } from 'react';
 import {
+  Brush,
   ColorLens,
   ManageAccounts,
   PhotoLibrary,
@@ -26,6 +27,7 @@ import History from '@/views/setting/about/releases';
 import Releases from '@/views/setting/about/releases';
 import Commits from '../views/setting/about/commits';
 import Data from '@/views/setting/data';
+import Logo from '@/views/setting/personalise/logo';
 
 /**
  * 关于 component 额外说明
@@ -95,6 +97,12 @@ const routers: Router[] = [
             icon: <PhotoLibrary />,
             path: '/setting/personalise/background',
             component: Background,
+          },
+          {
+            title: 'Logo',
+            icon: <Brush />,
+            path: '/setting/personalise/logo',
+            component: Logo,
           },
           // ! 主题功能暂时不开发，优先重构
           // {
