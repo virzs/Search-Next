@@ -2,9 +2,8 @@
  * @Author: Vir
  * @Date: 2021-06-03 13:32:19
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 14:20:57
+ * @Last Modified time: 2021-10-22 14:22:17
  */
-import './style.less';
 import React from 'react';
 import classNames from 'classnames';
 

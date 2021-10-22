@@ -2,14 +2,13 @@
  * @Author: Vir
  * @Date: 2021-06-03 11:08:20
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 14:20:00
+ * @Last Modified time: 2021-10-22 14:22:22
  */
 
 import dayjs from 'dayjs';
 import React from 'react';
 import Digit, { DigitNum } from './digit';
 import Separator from './separator';
-import './style.less';
 
 export interface DigitalClockProps {
   className: any;

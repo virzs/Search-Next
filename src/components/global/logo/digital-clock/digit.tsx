@@ -2,13 +2,12 @@
  * @Author: Vir
  * @Date: 2021-06-03 11:55:10
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 14:14:27
+ * @Last Modified time: 2021-10-22 14:22:28
  */
 
 import classNames from 'classnames';
 import React from 'react';
 import digitNum from './data';
-import './style.less';
 
 interface DigitPropsType {
   value: DigitNum; //当前显示的数字
