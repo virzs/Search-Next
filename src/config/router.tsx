@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-11 22:10:55
+ * @Last Modified time: 2021-10-23 16:53:02
  */
 
 import { lazy } from 'react';
@@ -28,6 +28,7 @@ import Releases from '@/views/setting/about/releases';
 import Commits from '../views/setting/about/commits';
 import Data from '@/views/setting/data';
 import Logo from '@/views/setting/personalise/logo';
+import Lab from '@/views/setting/lab';
 
 /**
  * 关于 component 额外说明
@@ -98,12 +99,6 @@ const routers: Router[] = [
             path: '/setting/personalise/background',
             component: Background,
           },
-          {
-            title: 'Logo',
-            icon: <Brush />,
-            path: '/setting/personalise/logo',
-            component: Logo,
-          },
           // ! 主题功能暂时不开发，优先重构
           // {
           //   title: '主题',
@@ -118,6 +113,20 @@ const routers: Router[] = [
         exact: false,
         path: '/setting/data',
         component: Data,
+      },
+      {
+        title: '实验室',
+        exact: false,
+        path: '/setting/lab',
+        component: Lab,
+        routes: [
+          {
+            title: 'Logo',
+            icon: <Brush />,
+            path: '/setting/lab/logo',
+            component: Logo,
+          },
+        ],
       },
       {
         title: '关于',
