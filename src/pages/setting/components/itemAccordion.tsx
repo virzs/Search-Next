@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-21 10:50:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-24 14:18:31
+ * @Last Modified time: 2021-10-26 15:38:08
  */
 
 import { css } from '@emotion/css';
@@ -111,8 +111,8 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
       >
         <div className="flex items-center justify-between w-full mr-2">
           <div>
-            {title && <p className="mb-0 text-sm font-semibold">{title}</p>}
-            {desc && <p className="mb-0 text-xs">{desc}</p>}
+            {title && <p className="mb-0 text-sm">{title}</p>}
+            {desc && <p className="mb-0 text-xs text-gray-700">{desc}</p>}
           </div>
           <div className="flex items-center">{action}</div>
         </div>
