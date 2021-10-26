@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-03 11:08:20
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 14:10:14
+ * @Last Modified time: 2021-10-26 14:21:15
  */
 
 import React from 'react';
@@ -21,7 +21,7 @@ const Clock1: React.FC = () => {
     <TimeClockContext>
       {(value) => {
         return (
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center gap-2">
             <Digit value={mathNum(value?.hour)} />
             <Digit value={mathNum(value?.hour, false)} />
             <Separator number={value?.second || 0} />
