@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-04 17:12:15
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-05 15:47:11
+ * @Last Modified time: 2021-10-26 15:24:09
  */
 
 export type THEME_LIGHT = 'light';
@@ -52,11 +52,11 @@ export const setTheme = (
   has?: boolean,
   theme: ThemeValues = THEME.THEME_ON_BACKGROUND,
 ) => {
-  const body = document.getElementById('root');
+  const body = document.getElementById('IndexPage');
   if (has && body) {
-    body.className = theme;
+    body.classList.add(theme);
   } else if (!has && body) {
-    body.className = '';
+    body.classList.remove(theme);
   }
   // console.log(body?.classList);
 };
