@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-27 13:55:54
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:27:31
+ * @Last Modified time: 2021-10-26 16:35:35
  */
 
 import { AuthBackgroundLinkData } from '@/data/account/type';
@@ -27,7 +27,6 @@ const Link: React.FC<LinkProps> = (props) => {
   const [isUrl, setIsUrl] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    console.log(data);
     setUrl(data ? data.url : '');
     setIsUrl(true);
     setBlur(true);
