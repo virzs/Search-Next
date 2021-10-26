@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-11 21:56:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 15:28:29
+ * @Last Modified time: 2021-10-26 16:18:30
  */
 
 import { logoSetting, updateLogoSetting } from '@/apis/auth';
@@ -13,7 +13,7 @@ import LogoData, { ClockData } from '@/data/logo';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { Switch } from '@material-ui/core';
+import { Alert, Switch } from '@material-ui/core';
 import { message } from 'antd';
 import React from 'react';
 
@@ -78,8 +78,8 @@ const Logo: React.FC = () => {
             ></Select>
           }
         />
-        {logoData.type === 'clock' && (
-          <ItemAccordion title="Logo样式" desc="设置首页显示Logo的样式">
+        <ItemAccordion title="Logo样式" desc="设置首页显示Logo的样式">
+          {logoData.type === 'clock' && (
             <div className="flex flex-col gap-2">
               {ClockData.map((i) => (
                 <OutlineCard
@@ -104,8 +104,9 @@ const Logo: React.FC = () => {
                 </OutlineCard>
               ))}
             </div>
-          </ItemAccordion>
-        )}
+          )}
+          {logoData.type !== 'clock' && <Alert severity="info">敬请期待</Alert>}
+        </ItemAccordion>
       </ContentList>
     </div>
   );
