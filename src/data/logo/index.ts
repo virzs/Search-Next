@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-12 22:36:47
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:58:54
+ * @Last Modified time: 2021-10-26 15:27:56
  */
 
 import { Clock1, Clock2 } from '@/components/global/logo';
@@ -19,18 +19,21 @@ export const ClockData = [
     id: '2e47f2c6d0bb48ba98a58dbb8dfb2fd3',
     title: '时钟1',
     value: 'clock1',
+    tooltip: '经典的时钟样式',
     component: Clock1,
   },
   {
     id: 'cb229f5384094f32a7ba3228c78f0a68',
     title: '时钟2',
     value: 'clock2',
+    tooltip: '以日期为主的时钟样式',
     component: Clock2,
   },
   {
     id: '780ab9033f274f6bbb596adfc2ff66a2',
     title: '时钟3',
     value: 'clock3',
+    tooltip: '点阵时钟样式',
     component: Clock3,
   },
 ];

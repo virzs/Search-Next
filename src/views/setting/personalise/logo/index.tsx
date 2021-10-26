@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-11 21:56:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:59:11
+ * @Last Modified time: 2021-10-26 15:28:29
  */
 
 import { logoSetting, updateLogoSetting } from '@/apis/auth';
@@ -87,6 +87,7 @@ const Logo: React.FC = () => {
                   key={i.id}
                   id={i.value}
                   value={clockLogoData.type}
+                  tip={i.tooltip}
                   label={i.title}
                   onChange={(val) =>
                     updateLogoData({
