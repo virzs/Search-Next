@@ -7,7 +7,7 @@
 
 import instance from '@/utils/request';
 
-import StorageDB from '@/utils/storage';
+import StorageDB from 'bsdb';
 
 export interface BingImgListType {
   images: BingImage[];

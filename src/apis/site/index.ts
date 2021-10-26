@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-10-10 16:01:13
  */
 
-import StorageDB from '@/utils/storage';
+import StorageDB from 'bsdb';
 
 const BaseDB = new StorageDB({
   storage: localStorage,

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-11 21:56:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 16:18:30
+ * @Last Modified time: 2021-10-26 16:25:57
  */
 
 import { logoSetting, updateLogoSetting } from '@/apis/auth';
@@ -11,9 +11,11 @@ import Select from '@/components/md-custom/form/select';
 import { AuthLogo, ClockLogo } from '@/data/account/type';
 import LogoData, { ClockData } from '@/data/logo';
 import ContentList from '@/pages/setting/components/contentList';
-import ItemAccordion from '@/pages/setting/components/itemAccordion';
+import ItemAccordion, {
+  AccordionDetailItem,
+} from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { Alert, Switch } from '@material-ui/core';
+import { Alert, Switch, TextField } from '@material-ui/core';
 import { message } from 'antd';
 import React from 'react';
 
@@ -104,6 +106,22 @@ const Logo: React.FC = () => {
                 </OutlineCard>
               ))}
             </div>
+          )}
+          {logoData.type === 'image' && (
+            <AccordionDetailItem
+              title="在线图片地址"
+              action={
+                <TextField
+                  size="small"
+                  label="链接"
+                  value={''}
+                  placeholder="请输入图片链接"
+                  onFocus={() => {}}
+                  onChange={(e) => {}}
+                  onBlur={(e) => {}}
+                />
+              }
+            />
           )}
           {logoData.type !== 'clock' && <Alert severity="info">敬请期待</Alert>}
         </ItemAccordion>
