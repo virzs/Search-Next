@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-03 13:32:19
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 16:01:07
+ * @Last Modified time: 2021-10-26 13:40:45
  */
 import React from 'react';
 import classNames from 'classnames';
@@ -11,7 +11,7 @@ export interface SeparatorProps {
   number: number;
 }
 
-const Separator: React.FC<SeparatorProps> = ({ number }) => {
+const Separator: React.FC<SeparatorProps> = ({ number = 0 }) => {
   const [refresh, setRefresh] = React.useState<boolean>(true);
 
   React.useEffect(() => {

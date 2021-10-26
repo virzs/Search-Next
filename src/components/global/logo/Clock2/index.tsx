@@ -2,37 +2,36 @@
  * @Author: Vir
  * @Date: 2021-10-16 22:55:44
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-21 14:41:51
+ * @Last Modified time: 2021-10-26 14:08:25
  */
 import dayjs from 'dayjs';
 import React from 'react';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
+import TimeClockContext from '../timeClockContext';
 
 const Clock2: React.FC = () => {
-  const [date, setDate] = React.useState<string>('-');
-  const [time, setTime] = React.useState<string>('-');
-
-  const getTime = () => {
-    dayjs.extend(LocalizedFormat);
-    let date = dayjs().format('LL');
-    let time = dayjs().format('HH:mm:ss');
-    setDate(date);
-    setTime(time);
+  const renderDate = (date: dayjs.Dayjs = dayjs()) => {
+    return date.format('LL') || '-- -- --';
   };
 
-  React.useEffect(() => {
-    const timer = setInterval(getTime, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  const renderTime = (date: dayjs.Dayjs = dayjs()) => {
+    return date.format('HH:mm:ss') || '--:--:--';
+  };
 
   return (
-    <div className="text-left mx-auto text-var-main-10 border-l-8 border-var-main-10 px-5 py-3 font-mono">
-      <div className="font-semibold text-3xl tabular-nums">{date}</div>
-      <div className="text-2xl tabular-nums">{time}</div>
-    </div>
+    <TimeClockContext>
+      {(value) => {
+        return (
+          <div className="text-left mx-auto text-var-main-10 border-l-8 border-var-main-10 px-5 py-3 font-mono">
+            <div className="font-semibold text-5xl tabular-nums">
+              {renderDate(value?.date)}
+            </div>
+            <div className="text-4xl tabular-nums">
+              {renderTime(value?.date)}
+            </div>
+          </div>
+        );
+      }}
+    </TimeClockContext>
   );
 };
 

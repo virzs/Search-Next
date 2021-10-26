@@ -2,9 +2,10 @@
  * @Author: Vir
  * @Date: 2021-10-25 22:03:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-25 22:39:18
+ * @Last Modified time: 2021-10-26 14:11:44
  */
 import dayjs from 'dayjs';
+import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import React from 'react';
 
 export interface DateValue {
@@ -18,14 +19,14 @@ export interface DateValue {
 }
 
 export interface TimeClockContextProps {
-  children: (value: DateValue | undefined) => React.ReactNode;
+  children: (value: DateValue | undefined) => any;
 }
 
 const TimeClockContext: React.FC<TimeClockContextProps> = ({ children }) => {
   const [date, setDate] = React.useState<DateValue>();
-  const Context = React.createContext(date);
 
   const getTime = () => {
+    dayjs.extend(LocalizedFormat);
     const date = dayjs();
     setDate({
       year: date.year(),
@@ -39,6 +40,7 @@ const TimeClockContext: React.FC<TimeClockContextProps> = ({ children }) => {
   };
 
   React.useEffect(() => {
+    getTime();
     const timer = setInterval(getTime, 1000);
 
     return () => {
@@ -46,11 +48,7 @@ const TimeClockContext: React.FC<TimeClockContextProps> = ({ children }) => {
     };
   }, []);
 
-  return (
-    <Context.Provider value={date}>
-      <Context.Consumer>{children}</Context.Consumer>
-    </Context.Provider>
-  );
+  return children(date);
 };
 
 export default TimeClockContext;
