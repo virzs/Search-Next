@@ -76,7 +76,10 @@ const Logo: React.FC = () => {
               size="small"
               value={logoData?.type}
               onChange={(e) => updateLogoData({ type: e.target.value })}
-              options={LogoData.map((i) => ({ value: i.value, label: i.name }))}
+              options={LogoData.filter((i) => i.show).map((i) => ({
+                value: i.value,
+                label: i.name,
+              }))}
             ></Select>
           }
         />

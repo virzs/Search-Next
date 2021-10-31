@@ -44,16 +44,19 @@ const LogoData = [
     name: '时钟',
     value: 'clock',
     options: ClockData,
+    show: true,
   },
   {
     id: 'b733a3efbad94097bc04093e8f0f1904',
     name: '文字',
     value: 'text',
+    show: false,
   },
   {
     id: '4cf35023ddf0458da5f4425fb5b7b660',
     name: '图片',
     value: 'image',
+    show: false,
   },
 ];
 
