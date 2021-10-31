@@ -1681,10 +1681,10 @@ browserslist@^4.16.6, browserslist@^4.16.8, browserslist@^4.17.0:
     escalade "^3.1.1"
     node-releases "^1.1.75"
 
-bsdb@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/bsdb/-/bsdb-0.0.5.tgz#70e46cfa9c24495364bfb7e60b0ded9a86e96949"
-  integrity sha512-e2+GlaMOXQ3fX031etIQJ3Eo1nQTtVlAUp1xCyULvzULC6n+ccJ4z8b40yFJ3c+Bp+soEmjcah9PKxk7hPORgg==
+bsdb@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/bsdb/-/bsdb-0.0.8.tgz#2c00c250e36333623870407c13ce818fad7f3f1d"
+  integrity sha512-zF1BDyPreUhbuo3tkYdQ59xIb9prhg6ciQt0qCH+6zIgH2cgkGXPvCJIZ6pDj4Oi8jtmrqFlh/OACDVY9bYdkg==
 
 buffer-from@^1.0.0:
   version "1.1.2"
