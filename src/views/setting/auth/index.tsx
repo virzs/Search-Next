@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@/config/router';
-import { AuthData } from '@/data/account/type';
+import { AuthData } from '@/data/account/interface';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
 import { PageProps } from '@/typings';

@@ -18,7 +18,7 @@ import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
 import { setTheme } from '@/utils/theme';
-import { AuthLogo } from '@/data/account/type';
+import { AuthLogo } from '@/data/account/interface';
 import { logoSetting } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 

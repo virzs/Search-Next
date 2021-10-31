@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-10-26 16:35:35
  */
 
-import { AuthBackgroundLinkData } from '@/data/account/type';
+import { AuthBackgroundLinkData } from '@/data/account/interface';
 import { AccordionDetailItem } from '@/pages/setting/components/itemAccordion';
 import { isHttpLink } from '@/utils/regexp';
 import { css } from '@emotion/css';

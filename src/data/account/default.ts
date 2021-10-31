@@ -7,7 +7,7 @@
 
 // ! 账户默认数据
 
-import { AuthData, SettingDefaultData } from './type';
+import { AuthData, SettingDefaultData } from './interface';
 
 export const authDefaultData: AuthData = {
   username: '默认账户',

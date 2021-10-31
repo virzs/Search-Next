@@ -18,7 +18,7 @@ import OutlineCard from '@/components/global/card/outline-card';
 import React from 'react';
 import dayjs from 'dayjs';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
-import { AuthBackgroundRandomData } from '@/data/account/type';
+import { AuthBackgroundRandomData } from '@/data/account/interface';
 import classNames from 'classnames';
 import { css } from '@emotion/css';
 

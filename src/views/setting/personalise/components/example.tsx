@@ -6,7 +6,7 @@
  */
 
 import { latestImg } from '@/apis/setting/background';
-import { AuthBackground } from '@/data/account/type';
+import { AuthBackground } from '@/data/account/interface';
 import { getScale } from '@/utils/common';
 import React from 'react';
 

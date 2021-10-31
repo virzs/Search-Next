@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-10-22 15:27:01
  */
 
-import { AuthData } from '@/data/account/type';
+import { AuthData } from '@/data/account/interface';
 import { Avatar, Chip } from '@material-ui/core';
 import dayjs from 'dayjs';
 import React from 'react';

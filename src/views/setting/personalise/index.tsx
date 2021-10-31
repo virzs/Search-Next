@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@/config/router';
-import { AuthBackground, AuthData } from '@/data/account/type';
+import { AuthBackground, AuthData } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';

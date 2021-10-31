@@ -17,7 +17,7 @@ import {
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { Dialog } from '@/components/md-custom/dialog';
 import { authDefaultData } from '@/data/account/default';
-import { AuthData } from '@/data/account/type';
+import { AuthData } from '@/data/account/interface';
 import ItemAccordion, {
   AccordionDetailItem,
 } from '@/pages/setting/components/itemAccordion';

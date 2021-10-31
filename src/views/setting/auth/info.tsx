@@ -9,7 +9,7 @@ import { editAccount } from '@/apis/auth';
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import { Dialog } from '@/components/md-custom/dialog';
 import Form from '@/components/md-custom/form';
-import { AuthData } from '@/data/account/type';
+import { AuthData } from '@/data/account/interface';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { PageProps } from '@/typings';
 import { Button, TextField } from '@material-ui/core';

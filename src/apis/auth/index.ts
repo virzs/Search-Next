@@ -6,7 +6,7 @@
  */
 
 import { authDefaultData } from '@/data/account/default';
-import { AuthBackground, AuthData, AuthLogo } from '@/data/account/type';
+import { AuthBackground, AuthData, AuthLogo } from '@/data/account/interface';
 import StorageDB from 'bsdb';
 
 const BaseDB = new StorageDB({

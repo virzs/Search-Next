@@ -13,7 +13,7 @@ import {
   AuthBackgroundRandomData,
   AuthBackgroundType,
   AuthData,
-} from '@/data/account/type';
+} from '@/data/account/interface';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import { Alert, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';

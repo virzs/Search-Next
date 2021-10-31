@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-10-22 15:27:16
  */
 
-import { AuthBackgroundRandomData } from '@/data/account/type';
+import { AuthBackgroundRandomData } from '@/data/account/interface';
 import { css } from '@emotion/css';
 import { Alert } from '@material-ui/core';
 import classNames from 'classnames';

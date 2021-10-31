@@ -8,7 +8,7 @@
 import { logoSetting, updateLogoSetting } from '@/apis/auth';
 import OutlineCard from '@/components/global/card/outline-card';
 import Select from '@/components/md-custom/form/select';
-import { AuthLogo, ClockLogo } from '@/data/account/type';
+import { AuthLogo, ClockLogo } from '@/data/account/interface';
 import LogoData, { ClockData } from '@/data/logo';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion, {

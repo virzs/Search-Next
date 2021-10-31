@@ -7,7 +7,7 @@
 import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import BorderColorCard from '@/components/md-custom/card/BorderColorCard';
 import { Router } from '@/config/router';
-import { AuthData } from '@/data/account/type';
+import { AuthData } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import RenderContent from '@/pages/setting/components/renderContent';
