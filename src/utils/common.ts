@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 11:36:28
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 14:52:52
+ * @Last Modified time: 2021-11-01 22:34:09
  */
 
 import { gitemoji, GitEmoji } from '@/data/github/gitemoji';
@@ -238,4 +238,17 @@ export const formatText = (text: string) => {
     text = emoji ? text.replace(i, emoji) : text;
   });
   return text;
+};
+
+// 生成文件并下载
+export const exportFile = (file: any, fileName: string) => {
+  let link = document.createElement('a');
+  let blob = new Blob([file]);
+
+  link.download = fileName;
+  link.style.display = 'none';
+  link.href = URL.createObjectURL(blob);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
