@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-23 16:53:02
+ * @Last Modified time: 2021-11-01 21:58:19
  */
 
 import { lazy } from 'react';
@@ -11,6 +11,7 @@ import {
   ColorLens,
   ManageAccounts,
   PhotoLibrary,
+  SettingsBackupRestore,
   SupervisorAccount,
   Update,
 } from '@material-ui/icons';
@@ -29,6 +30,7 @@ import Commits from '../views/setting/about/commits';
 import Data from '@/views/setting/data';
 import Logo from '@/views/setting/personalise/logo';
 import Lab from '@/views/setting/lab';
+import Backup from '@/views/setting/data/backup';
 
 /**
  * 关于 component 额外说明
@@ -125,6 +127,12 @@ const routers: Router[] = [
             icon: <Brush />,
             path: '/setting/lab/logo',
             component: Logo,
+          },
+          {
+            title: '备份与恢复',
+            icon: <SettingsBackupRestore />,
+            path: '/setting/lab/backup',
+            component: Backup,
           },
         ],
       },
