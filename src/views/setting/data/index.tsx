@@ -2,10 +2,9 @@
  * @Author: Vir
  * @Date: 2021-10-10 19:01:36
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:27:09
+ * @Last Modified time: 2021-11-01 17:37:29
  */
-import ItemHeader from '@/components/layout/menu-layout/itemHeader';
-import BorderColorCard from '@/components/md-custom/card/BorderColorCard';
+import { BorderLinearProgress } from '@/components/md-custom/progress';
 import { Router } from '@/config/router';
 import { AuthData } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
@@ -45,7 +44,17 @@ const Data: React.FC<PageProps> = ({ history, route, children, ...props }) => {
       location={history.location as unknown as Location}
       pChildren={children}
     >
-      <ItemHeader title="占用空间" desc="当前占用本地存储的空间总量" />
+      <div className="mb-4">
+        <div className="mt-2">
+          <div className="flex justify-between mb-2 text-sm">
+            <p>占用空间</p>
+            <p>
+              已使用: <span>{occupySize}</span> / <span>5MB</span>
+            </p>
+          </div>
+          <BorderLinearProgress variant="determinate" value={percent} />
+        </div>
+      </div>
       <Alert severity="warning" style={{ marginBottom: '8px' }}>
         不同浏览器支持的 localStorage 和 sessionStorage
         容量上限不同。当前容量设定为标准容量 5MB。
@@ -53,15 +62,6 @@ const Data: React.FC<PageProps> = ({ history, route, children, ...props }) => {
           测试浏览器本地存储容量上限。
         </a>
       </Alert>
-      <div className="rounded border p-4">
-        <p className="text-sm">
-          当前占用：<span className="font-semibold">{occupySize}</span> 共计：
-          <span className="font-semibold">5MB</span>
-        </p>
-        <div className="mt-2">
-          <LinearProgress variant="determinate" value={percent} />
-        </div>
-      </div>
       <ContentList>
         {list.map((i) => (
           <ItemCard
