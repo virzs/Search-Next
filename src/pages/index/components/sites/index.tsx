@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-03 21:01:12
+ * @Last Modified time: 2021-11-02 16:45:06
  */
 import React from 'react';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
@@ -122,7 +122,7 @@ const Sites: React.FC = (props) => {
 
   return (
     <>
-      <div className="flex justify-center items-center gap-2 h-full">
+      <div className="flex justify-center items-end gap-2 h-full py-12">
         {siteList.map((i) => (
           <SiteCard
             key={i._id}
