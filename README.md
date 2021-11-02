@@ -60,33 +60,19 @@ yarn build
 - 首次进入消息提示
 - 导航页
 
-## 截图（21/8/28）
+## 截图（21/11/2）
 
-支持导航功能
+![image-20211102144351320](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021443364.png)
 
-![image-20210828222701576](http://imgs.virs.xyz/image-20210828222701576.png)
+![image-20211102144434101](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021444272.png)
 
-![image-20210828222751416](http://imgs.virs.xyz/image-20210828222751416.png)
+![image-20211102144456377](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021444525.png)
 
-21/7/8
+![image-20211102144519551](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445686.png)
 
-支持设置主页背景功能
+![image-20211102144540528](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445722.png)
 
-![image-20210708104121952](http://imgs.virs.xyz/image-20210708104121952.png)
-
-![image-20210708104145358](http://imgs.virs.xyz/image-20210708104145358.png)
-
-21/6/3
-
-支持首次进入消息提示功能
-
-![屏幕截图 2021-06-03 155137.png](http://imgs.virs.xyz/searchreactindex)
-
-21/4/2
-
-支持基础搜索功能，切换搜索引擎
-
-![image-20210402152903082](http://imgs.virs.xyz/searchreact210402.png)
+[历史截图](./docs/历史版本图片.md)
 
 ## 组件说明
 
