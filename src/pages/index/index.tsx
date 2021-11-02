@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 15:22:42
+ * @Last Modified time: 2021-11-02 14:27:21
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -98,7 +98,11 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
     <div
       id="IndexPage"
       className="index-page flex flex-col h-screen bg-cover bg-center bg-secondary"
-      style={{ backgroundImage: bg ? `url('${bg?.url}')` : undefined }}
+      style={{
+        backgroundImage: bg
+          ? `radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%), radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%), url('${bg?.url}')`
+          : undefined,
+      }}
     >
       <div className="index-navbar-box flex-grow max-h-12 text-right align-middle">
         <Tooltip title="网址导航">
