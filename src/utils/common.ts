@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 11:36:28
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-01 22:34:09
+ * @Last Modified time: 2021-11-02 11:22:04
  */
 
 import { gitemoji, GitEmoji } from '@/data/github/gitemoji';
@@ -251,4 +251,23 @@ export const exportFile = (file: any, fileName: string) => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+// 读取文件
+export const fileReader = (target: HTMLInputElement) => {
+  return new Promise<string>((resolve, reject) => {
+    if (!target.files) {
+      reject('No file');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function () {
+      if (reader.result) {
+        resolve(reader.result as string);
+      } else {
+        reject('Read failed');
+      }
+    };
+    reader.readAsText(target.files[0]);
+  });
 };
