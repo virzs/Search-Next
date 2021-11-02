@@ -2,8 +2,9 @@
  * @Author: Vir
  * @Date: 2021-11-01 21:56:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-02 10:50:25
+ * @Last Modified time: 2021-11-02 13:58:46
  */
+import confirm from '@/components/md-custom/dialog/confirm';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { exportFile, fileReader } from '@/utils/common';
@@ -50,11 +51,19 @@ const Backup: React.FC = () => {
     fileReader(e.target)
       .then((res) => {
         if (res) {
-          const data = JSON.parse(res);
-          Object.keys(data).forEach((i) => {
-            localStorage.setItem(i, data[i]);
+          confirm({
+            title: '导入数据',
+            content: '导入数据将覆盖现有数据，是否继续？',
+            onOk: () => {
+              const data = JSON.parse(res);
+              Object.keys(data).forEach((i) => {
+                localStorage.setItem(i, data[i]);
+              });
+              message.success('数据恢复成功');
+              e.target.value = '';
+            },
+            onCancel: () => (e.target.value = ''),
           });
-          message.success('数据恢复成功');
         }
       })
       .catch((err) => {
