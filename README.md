@@ -37,7 +37,7 @@ yarn
 启动项目：
 
 ```bash
-yarn start
+yarn dev
 ```
 
 编译项目：
@@ -73,14 +73,6 @@ yarn build
 ![image-20211102144540528](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445722.png)
 
 [历史截图](./docs/历史版本图片.md)
-
-## 组件说明
-
-组件文件夹路径 `src/components`
-
-- `material-ui-custom` 基于业务封装的 `material ui` 组件，如：`form 表单`、`card 卡片`、`dialog 对话框`、`popper 弹出提示工具`、`notistack 消息条`、`tabs 选项卡` 等。
-- `global` 通用组件
-- 其他组件
 
 ## 后端支持
 
