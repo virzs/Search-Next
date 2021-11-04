@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 18:40:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-07-25 18:43:02
+ * @Last Modified time: 2021-11-04 14:49:11
  */
 
 export interface Website {
@@ -15,13 +15,17 @@ export interface Website {
   isShow?: boolean;
 }
 
+export type NavigationType = 'website' | 'navigation';
+
 export interface Navigation {
   id: string;
   name: string;
-  path: string;
-  icon?: JSX.Element;
+  intro?: string;
+  path?: string;
+  url?: string;
+  icon?: any;
   color?: string;
   isShow?: boolean;
-  component?: JSX.Element;
-  children?: Website[] | '';
+  type?: NavigationType;
+  children?: Website[] | Navigation[] | '';
 }

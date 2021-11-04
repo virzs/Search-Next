@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-23 16:51:43
+ * @Last Modified time: 2021-11-04 10:14:38
  */
 
 import MenuLayout from '@/components/layout/menu-layout';
 import Header from '@/components/layout/menu-layout/header';
-import navigations from '@/data/navigation/data';
+import navigations from '@/data/navigation';
 import { Navigation } from '@/data/navigation/interface';
 import { PageProps } from '@/typings';
 import React from 'react';
