@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-02 16:45:06
+ * @Last Modified time: 2021-11-04 09:40:16
  */
 import React from 'react';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
@@ -19,6 +19,7 @@ import {
   Site,
 } from '@/apis/site';
 import { message } from 'antd';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 const Sites: React.FC = (props) => {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -122,18 +123,21 @@ const Sites: React.FC = (props) => {
 
   return (
     <>
-      <div className="flex justify-center items-end gap-2 h-full py-12">
+      <TransitionGroup className="flex justify-center items-end gap-2 h-full py-12">
         {siteList.map((i) => (
-          <SiteCard
-            key={i._id}
-            item={i}
-            onClick={() => itemClick(i)}
-            onEdit={onEdit}
-            onRemove={onRemove}
-          />
+          <CSSTransition classNames="transition" timeout={300} key={i._id}>
+            <SiteCard
+              item={i}
+              onClick={() => itemClick(i)}
+              onEdit={onEdit}
+              onRemove={onRemove}
+            />
+          </CSSTransition>
         ))}
-        <SiteCard type="add" onAdd={onAdd} />
-      </div>
+        <CSSTransition classNames="transition" timeout={300}>
+          <SiteCard type="add" onAdd={onAdd} />
+        </CSSTransition>
+      </TransitionGroup>
       <SiteDialog
         open={open}
         type={type}
