@@ -1,6 +1,6 @@
 ---
-name: Navigation Website report
-about: Create a report to help us improve
+name: 添加一个网站
+about: 推荐一个或多个网站到导航页面
 title: ''
 labels: ''
 assignees: ''
