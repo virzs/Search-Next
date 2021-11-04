@@ -27,3 +27,21 @@ code {
   --main-text-color-opacity-2: rgba(255, 255, 255, 0.2) !important;
   --main-text-color-opacity-7: rgba(255, 255, 255, 0.7) !important;
 }
+
+.transition-enter {
+  opacity: 0;
+}
+
+.transition-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.transition-exit {
+  opacity: 1;
+}
+
+.transition-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}
