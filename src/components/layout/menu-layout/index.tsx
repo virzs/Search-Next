@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:22:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-04 15:55:02
+ * @Last Modified time: 2021-11-04 16:02:17
  */
 
 import Copyright from '@/components/global/copyright';
@@ -14,6 +14,7 @@ import {
   ListItemText,
 } from '@material-ui/core';
 import { ArrowBack } from '@material-ui/icons';
+import classNames from 'classnames';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
@@ -67,7 +68,12 @@ const MenuLayout: React.FC<MenuLayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <div className="max-w-xs flex-grow py-7 px-7 pl-12 border-gray-200 border-r flex flex-col">
+      <div
+        className={classNames(
+          'max-w-xs flex-grow py-7 px-7 pl-12 border-gray-200 border-r flex flex-col',
+          !!menuFooter && 'pb-2',
+        )}
+      >
         <div className="flex items-center">
           <IconButton size="small" onClick={() => history.goBack()}>
             <ArrowBack />
