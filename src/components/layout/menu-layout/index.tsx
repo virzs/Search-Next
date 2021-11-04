@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:22:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-05 22:38:29
+ * @Last Modified time: 2021-11-04 15:55:02
  */
 
 import Copyright from '@/components/global/copyright';
@@ -30,6 +30,7 @@ export interface MenuLayoutProps extends RouteComponentProps {
   title?: string;
   basePath?: string;
   menu: MenuLayoutMenu[];
+  menuFooter?: JSX.Element | React.ReactNode;
   showCopyright?: boolean;
   onChange?: (id: string, item: MenuLayoutMenu) => void;
 }
@@ -38,6 +39,7 @@ export type RouteState = { search?: string } | null | undefined;
 
 const MenuLayout: React.FC<MenuLayoutProps> = ({
   menu,
+  menuFooter,
   basePath = '',
   showCopyright = true,
   children,
@@ -65,14 +67,14 @@ const MenuLayout: React.FC<MenuLayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <div className="max-w-xs flex-grow py-7 px-7 pl-12 border-gray-200 border-r">
+      <div className="max-w-xs flex-grow py-7 px-7 pl-12 border-gray-200 border-r flex flex-col">
         <div className="flex items-center">
           <IconButton size="small" onClick={() => history.goBack()}>
             <ArrowBack />
           </IconButton>
           <span className="text-xl font-semibold">{title}</span>
         </div>
-        <List dense>
+        <List dense className="flex-grow">
           {menu.map((i, j) => (
             <ListItem
               key={j}
@@ -88,6 +90,7 @@ const MenuLayout: React.FC<MenuLayoutProps> = ({
             </ListItem>
           ))}
         </List>
+        <div>{menuFooter}</div>
       </div>
       <div className="flex-grow h-full flex flex-col">
         <div
