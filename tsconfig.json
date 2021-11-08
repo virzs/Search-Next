@@ -23,7 +23,14 @@
       "@views/*": ["./src/views/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.md",
+    "src/**/*.mdx",
+    "types/**/*.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "lib",
