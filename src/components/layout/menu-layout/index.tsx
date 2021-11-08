@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:22:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-04 16:02:17
+ * @Last Modified time: 2021-11-04 16:20:07
  */
 
 import Copyright from '@/components/global/copyright';
@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
+  ListItemProps,
   ListItemText,
 } from '@material-ui/core';
 import { ArrowBack } from '@material-ui/icons';
@@ -37,6 +38,24 @@ export interface MenuLayoutProps extends RouteComponentProps {
 }
 
 export type RouteState = { search?: string } | null | undefined;
+
+export interface MenuListItemProps extends ListItemProps {
+  icon?: any;
+  primary: string;
+}
+
+export const MenuListItem: React.FC<MenuListItemProps> = ({
+  icon,
+  primary,
+  ...props
+}) => {
+  return (
+    <ListItem {...props} button>
+      <ListItemIcon className="min-w-min mr-2">{icon}</ListItemIcon>
+      <ListItemText primary={primary} />
+    </ListItem>
+  );
+};
 
 const MenuLayout: React.FC<MenuLayoutProps> = ({
   menu,
@@ -82,18 +101,16 @@ const MenuLayout: React.FC<MenuLayoutProps> = ({
         </div>
         <List dense className="flex-grow">
           {menu.map((i, j) => (
-            <ListItem
+            <MenuListItem
               key={j}
-              button
               selected={i.id === selected.id}
               onClick={() => {
                 setSelected(i);
                 if (onChange) onChange(i.id, i);
               }}
-            >
-              <ListItemIcon className="min-w-min mr-2">{i.icon}</ListItemIcon>
-              <ListItemText primary={i.name} />
-            </ListItem>
+              icon={i.icon}
+              primary={i.name}
+            />
           ))}
         </List>
         <div>{menuFooter}</div>
