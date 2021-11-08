@@ -100,7 +100,7 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
         'rounded border shadow-none bg-white my-0',
         css`
           &::before {
-            background-color: transparent;
+            background-color: transparent !important;
           }
         `,
       )}
