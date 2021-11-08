@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-01 21:58:19
+ * @Last Modified time: 2021-11-04 16:56:33
  */
 
 import { lazy } from 'react';
@@ -157,6 +157,11 @@ const routers: Router[] = [
         ],
       },
     ],
+  },
+  {
+    path: '/help/:text',
+    title: '帮助',
+    component: lazy(() => import('@pages/help')),
   },
 ];
 

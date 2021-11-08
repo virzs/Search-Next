@@ -2,19 +2,25 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-04 10:14:38
+ * @Last Modified time: 2021-11-04 16:56:50
  */
 
-import MenuLayout from '@/components/layout/menu-layout';
+import MenuLayout, {
+  MenuLayoutMenu,
+  MenuListItem,
+} from '@/components/layout/menu-layout';
 import Header from '@/components/layout/menu-layout/header';
 import navigations from '@/data/navigation';
 import { Navigation } from '@/data/navigation/interface';
 import { PageProps } from '@/typings';
+import { List } from '@material-ui/core';
+import { InsertComment } from '@material-ui/icons';
 import React from 'react';
 import WebsiteCard from './components/WebisteCard';
 
 const NavigationPage: React.FC<PageProps> = (props) => {
   const menu: Navigation[] = navigations;
+  const { history } = props;
   const [selected, setSelected] = React.useState<Navigation>({} as Navigation);
 
   const menuChange = (id: string) => {
@@ -31,10 +37,19 @@ const NavigationPage: React.FC<PageProps> = (props) => {
   return (
     <MenuLayout
       {...props}
-      menu={menu}
+      menu={menu as MenuLayoutMenu[]}
       title="导航"
       basePath="/navigation"
       onChange={menuChange}
+      menuFooter={
+        <List dense>
+          <MenuListItem
+            icon={<InsertComment />}
+            primary="提交网站"
+            onClick={() => history.push('/help/commit_website')}
+          />
+        </List>
+      }
     >
       {menu.map((i) => (
         <div
