@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-09 17:13:56
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 19:57:45
+ * @Last Modified time: 2021-11-05 10:04:46
  */
 
 import { releasesList } from '@/apis/github';
@@ -10,10 +10,10 @@ import { GithubReleaseType } from '@/apis/github/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import { formatText } from '@/utils/common';
-import { CardHeader, CardContent } from '@material-ui/core';
 import { Empty } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
+import Markdown from '@/components/global/markdown';
 
 const Releases: React.FC = () => {
   const [releases, setReleases] = React.useState([] as GithubReleaseType[]);
@@ -43,9 +43,9 @@ const Releases: React.FC = () => {
                   'YYYY-MM-DD',
                 )}`}
               >
-                <pre className="bg-gray-100 rounded p-2">
-                  {formatText(i.body)}
-                </pre>
+                <div className="bg-gray-100 rounded p-2">
+                  <Markdown children={formatText(i.body)} />
+                </div>
                 <a
                   className="flex justify-center mt-2 bg-gray-100 rounded p-1"
                   href={i.html_url}
