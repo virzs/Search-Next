@@ -44,7 +44,7 @@ const Releases: React.FC = () => {
                 )}`}
               >
                 <div className="bg-gray-100 rounded p-2">
-                  <Markdown children={formatText(i.body)} />
+                  <Markdown source={formatText(i.body)} />
                 </div>
                 <a
                   className="flex justify-center mt-2 bg-gray-100 rounded p-1"
