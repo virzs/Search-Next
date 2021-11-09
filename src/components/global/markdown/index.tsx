@@ -7,12 +7,13 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ReactMarkdownOptions } from 'react-markdown/lib/react-markdown';
 import 'github-markdown-css/github-markdown.css';
 import { css } from '@emotion/css';
 import classNames from 'classnames';
 
-export interface MarkdownProps extends ReactMarkdownOptions {}
+export interface MarkdownProps {
+  source: ((props: any) => JSX.Element) | string;
+}
 
 const markdownStyleCustom = css`
   background-color: transparent;
@@ -21,12 +22,20 @@ const markdownStyleCustom = css`
   }
 `;
 
-const Markdown: React.FC<MarkdownProps> = ({ ...props }) => {
+const Markdown: React.FC<MarkdownProps> = ({ source, ...props }) => {
   return (
     <div
       className={classNames('markdown-body box-border', markdownStyleCustom)}
     >
-      <ReactMarkdown {...props} remarkPlugins={[remarkGfm]} />
+      {typeof source === 'string' ? (
+        <ReactMarkdown
+          {...props}
+          children={source}
+          remarkPlugins={[remarkGfm]}
+        />
+      ) : (
+        React.createElement(source as React.FC)
+      )}
     </div>
   );
 };
