@@ -2,47 +2,10 @@
  * @Author: Vir
  * @Date: 2021-07-25 18:40:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-16 11:32:17
+ * @Last Modified time: 2021-11-17 16:18:42
  */
 
-import {
-  SOFTWARE,
-  ONLINETOOLS,
-  NEWS,
-  SOCIAL,
-  SHOPPING,
-  EMAIL,
-  VIDEO,
-  DIGITAL,
-  PICTURE,
-  COMMUNITY,
-  DEVELOP,
-  ICONS,
-  TOOLS,
-  COMMON,
-  WORK,
-} from './types/classify';
-
-/**
- * 网站分类
- * @desc 网站全部分类
- */
-export type WebsiteClassify =
-  | SOFTWARE
-  | ONLINETOOLS
-  | NEWS
-  | SOCIAL
-  | SHOPPING
-  | EMAIL
-  | VIDEO
-  | DIGITAL
-  | PICTURE
-  | COMMUNITY
-  | DEVELOP
-  | ICONS
-  | TOOLS
-  | COMMON
-  | WORK;
+import { WebsiteClassify } from './types/classify';
 
 /**
  * 网站

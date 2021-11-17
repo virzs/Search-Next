@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-16 11:17:47
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-16 11:32:09
+ * @Last Modified time: 2021-11-17 16:20:30
  */
 
 /**
@@ -94,3 +94,50 @@ export type COMMON = 'common';
  * @desc 网站分类 - 工作
  */
 export type WORK = 'work';
+
+/**
+ * 前端
+ * @desc 网站分类 - 前端
+ */
+export type FRONTEND = 'front-end';
+
+/**
+ * 设计
+ * @desc 网站分类 - 设计
+ */
+export type DESIGN = 'design';
+
+/**
+ * 网站分类
+ * @desc 网站全部分类
+ */
+export type WebsiteClassify =
+  | SOFTWARE
+  | ONLINETOOLS
+  | NEWS
+  | SOCIAL
+  | SHOPPING
+  | EMAIL
+  | VIDEO
+  | DIGITAL
+  | PICTURE
+  | COMMUNITY
+  | DEVELOP
+  | ICONS
+  | TOOLS
+  | COMMON
+  | WORK
+  | FRONTEND
+  | DESIGN;
+
+/**
+ * 网站分类数据
+ */
+export interface Classify {
+  id: string;
+  name: string;
+  path: WebsiteClassify;
+  intro?: string;
+  icon?: any;
+  children: Classify[];
+}
