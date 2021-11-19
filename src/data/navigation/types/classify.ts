@@ -2,8 +2,10 @@
  * @Author: Vir
  * @Date: 2021-11-16 11:17:47
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-17 16:20:30
+ * @Last Modified time: 2021-11-19 17:47:01
  */
+
+import { Website } from '../interface';
 
 /**
  * 软件
@@ -130,14 +132,3 @@ export type WebsiteClassify =
   | FRONTEND
   | DESIGN;
 
-/**
- * 网站分类数据
- */
-export interface Classify {
-  id: string;
-  name: string;
-  path: WebsiteClassify;
-  intro?: string;
-  icon?: any;
-  children: Classify[];
-}

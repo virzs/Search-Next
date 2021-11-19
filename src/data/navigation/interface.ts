@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 18:40:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-17 16:18:42
+ * @Last Modified time: 2021-11-19 17:47:36
  */
 
 import { WebsiteClassify } from './types/classify';
@@ -45,4 +45,17 @@ export interface Navigation {
   isShow?: boolean;
   type?: NavigationType;
   children?: Website[] | Navigation[] | '';
+}
+
+/**
+ * 网站分类数据
+ */
+export interface Classify {
+  id: string;
+  name: string;
+  path: WebsiteClassify;
+  intro?: string;
+  icon?: any;
+  subClassify?: Classify[];
+  children?: Website[];
 }
