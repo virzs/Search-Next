@@ -1,0 +1,17 @@
+{
+  "name": "nav-data-processing",
+  "version": "0.0.1",
+  "description": "navigation数据处理，导入导出插件",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "vir",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7"
+  }
+}
