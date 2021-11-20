@@ -6,3 +6,4 @@ dist-ssr
 /.history
 /.nyc_output
 *.log
+/tools/**/source
