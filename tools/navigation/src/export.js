@@ -2,11 +2,38 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:41:30
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-19 17:41:23
+ * @Last Modified time: 2021-11-20 22:58:04
  */
-const { allDataPath, classifyDataPath, exportPath } = require('../config');
-const readFile = require('./readFile');
+const {
+  allDataPath,
+  classifyDataPath,
+  exportPath,
+  classifyDataOutPath,
+  allDataOutPath,
+  typesPath,
+  typesOutPath,
+  interfacePath,
+  interfaceOutPath,
+} = require('../config');
+const { readFile, copyFile, tsToJs } = require('./file');
 const { writeFileSync } = require('fs');
+const exec = require('child_process').exec;
+
+const copyAndSwitchFile = () => {
+  const classify = copyFile(classifyDataPath, classifyDataOutPath);
+  const all = copyFile(allDataPath, allDataOutPath);
+  const types = copyFile(typesPath, typesOutPath);
+  const interface = copyFile(interfacePath, interfaceOutPath);
+
+  if (classify && all && types && interface) {
+    const classifyRes = tsToJs(classifyDataOutPath);
+    const allRes = tsToJs(allDataOutPath);
+    if (classifyRes) console.log('classify 转换成功');
+    if (allRes) console.log('all 转换成功');
+  } else {
+    console.error('执行失败');
+  }
+};
 
 const formatData = (classify = [], website = []) => {
   return classify.map((i) => {
@@ -41,4 +68,4 @@ const exportFile = () => {
   }
 };
 
-module.exports = exportFile;
+module.exports = { exportFile, copyAndSwitchFile };
