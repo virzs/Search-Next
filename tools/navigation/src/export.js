@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:41:30
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-20 22:58:04
+ * @Last Modified time: 2021-11-21 00:49:27
  */
 const {
   allDataPath,
@@ -15,8 +15,14 @@ const {
   interfacePath,
   interfaceOutPath,
 } = require('../config');
-const { readFile, copyFile, tsToJs } = require('./file');
-const { writeFileSync } = require('fs');
+const {
+  readFile,
+  copyFile,
+  tsToJs,
+  templete,
+  prettierFile,
+} = require('./file');
+const { writeFileSync, unlinkSync } = require('fs');
 const exec = require('child_process').exec;
 
 const copyAndSwitchFile = () => {
@@ -30,8 +36,10 @@ const copyAndSwitchFile = () => {
     const allRes = tsToJs(allDataOutPath);
     if (classifyRes) console.log('classify 转换成功');
     if (allRes) console.log('all 转换成功');
+    return true;
   } else {
     console.error('执行失败');
+    return false;
   }
 };
 
@@ -53,18 +61,22 @@ const formatData = (classify = [], website = []) => {
 };
 
 const exportFile = () => {
-  const filePath = allDataPath;
-  const data = readFile(filePath);
-  const classify = readFile(classifyDataPath);
+  const res = copyAndSwitchFile();
+  if (!res) return;
+  const data = require('./source/all');
+  const classify = require('./source/classify');
   if (data && classify) {
-    const jsonData = JSON.parse(data);
-    const jsonClassify = JSON.parse(classify);
-    const all = formatData(jsonClassify, jsonData);
-    const strWriteData = `import {Classify} from "./types/classify";const navigationData: Classify[] = ${JSON.stringify(
-      all,
-    )};export default navigationData;`;
-    writeFileSync(exportPath, strWriteData, 'utf8');
-    console.log('导出成功');
+    const all = formatData(classify.default, data.default);
+    const strWriteData = templete(all);
+    const pre = prettierFile(strWriteData);
+    if (pre) {
+      writeFileSync('./outFile.ts', pre, 'utf8');
+      copyFile('./outFile.ts', exportPath);
+      unlinkSync('./outFile.ts');
+      console.log(`导出成功 ${exportPath}`);
+    } else {
+      console.error('导出失败');
+    }
   }
 };
 
