@@ -7,7 +7,8 @@
     "serve": "vite preview",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "test": "npx nyc@latest mocha",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "nav": "cd ./tools/navigation && node index.js e"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
