@@ -4,6 +4,8 @@
   "description": "navigation数据处理，导入导出插件",
   "main": "index.js",
   "scripts": {
+    "export": "node index.js export",
+    "copy": "node index.js copy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "vir",

@@ -5,5 +5,13 @@
 ``` shell
 cd ./tools/navigation
 
-node index.js export
+yarn export
+```
+
+## 单独复制数据
+
+``` shell
+cd ./tools/navigation
+
+yarn copy
 ```
