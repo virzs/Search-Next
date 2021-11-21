@@ -2,18 +2,21 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:39:43
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-21 00:48:42
+ * @Last Modified time: 2021-11-21 16:07:56
  */
 
 const fs = require('fs');
 const exec = require('child_process').execSync;
 const prettier = require('prettier');
+const Log = require('./log');
+
+const log = new Log();
 
 const readFile = (path) => {
   try {
-    console.info(`正在读取文件 ${path}`);
+    log.info(`正在读取文件 ${path}`);
     const data = fs.readFileSync(path, 'utf8');
-    console.info(`文件读取成功 ${path}`);
+    log.success(`文件读取成功 ${path}`);
     return data;
   } catch (err) {
     console.error(err);
@@ -22,11 +25,11 @@ const readFile = (path) => {
 
 const copyFile = (path, outPath) => {
   try {
-    console.log(`正在复制文件 ${path}`);
+    log.info(`正在复制文件 ${path}`);
     const source = readFile(path);
     if (source) {
       fs.writeFileSync(outPath, source);
-      console.log(`文件复制成功 ${path} --> ${outPath}`);
+      log.success(`文件复制成功 ${path} --> ${outPath}`);
       return true;
     }
     return false;

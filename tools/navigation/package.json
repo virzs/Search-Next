@@ -9,7 +9,9 @@
   "author": "vir",
   "license": "ISC",
   "dependencies": {
-    "commander": "^8.3.0"
+    "colors": "^1.4.0",
+    "commander": "^8.3.0",
+    "single-line-log": "^1.1.2"
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
