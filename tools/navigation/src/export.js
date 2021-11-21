@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:41:30
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-21 16:07:32
+ * @Last Modified time: 2021-11-21 16:22:35
  */
 const {
   allDataPath,
@@ -42,7 +42,10 @@ const copyAndSwitchFile = () => {
 const formatData = (classify = [], website = []) => {
   return classify.map((i) => {
     if (i.subClassify) {
-      return { ...i, subClassify: formatData(i.subClassify, website) };
+      const classifyWebsite = website.filter((j) =>
+        j.classify.includes(i.path),
+      );
+      return { ...i, subClassify: formatData(i.subClassify, classifyWebsite) };
     } else {
       const { children, ...rest } = i;
       return {
