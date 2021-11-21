@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-16 13:57:51
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-20 22:57:46
+ * @Last Modified time: 2021-11-21 16:10:02
  */
 const { Command } = require('commander');
 const { exportFile, copyAndSwitchFile } = require('./src/export');
@@ -20,7 +20,7 @@ program
 program
   .command('copy')
   .alias('c')
-  .description('将数据处理为分类格式')
+  .description('复制最新文件到source文件夹')
   .action((options) => {
     copyAndSwitchFile();
   });
