@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-19 17:45:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-21 20:55:28
+ * @Last Modified time: 2021-11-22 17:39:21
  */
 
 import { Classify } from './interface';
@@ -26,6 +26,12 @@ const classify: Classify[] = [
         path: 'social',
         intro: '常用社交网站推荐',
       },
+      {
+        id: 'eb22ec2f483c47fdb776451d540d01cc',
+        name: '资讯',
+        path: 'news',
+        intro: '常用资讯网站推荐',
+      },
     ],
   },
   {
@@ -45,6 +51,38 @@ const classify: Classify[] = [
         name: '在线工具',
         path: 'onlineTools',
         intro: '在线工具',
+      },
+    ],
+  },
+  {
+    id: 'c3538088e0ed4ef8958f09c0b728adfe',
+    name: '开发',
+    path: 'develop',
+    intro: '',
+    subClassify: [
+      {
+        id: '74f09917fdc249fcb0b20ca5211a277f',
+        name: '前端',
+        path: 'front-end',
+        intro: '',
+      },
+      {
+        id: '305bc170bac34452b09f4c7bfd46523b',
+        name: '后端',
+        path: 'rear-end',
+        intro: '',
+      },
+      {
+        id: '66a7d3d3571d4cb58aae454ddb747293',
+        name: '移动端',
+        path: 'mobile terminal',
+        intro: '',
+      },
+      {
+        id: '411ae611bdb1455f910fe917ba9b0439',
+        name: '社区',
+        path: 'community',
+        intro: '',
       },
     ],
   },

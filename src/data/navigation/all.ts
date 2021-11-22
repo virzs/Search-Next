@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-19 17:45:03
+ * @Last Modified time: 2021-11-22 17:37:34
  */
 
 import { Website } from './interface';
@@ -374,7 +374,7 @@ const allWebsites: Website[] = [
     intro: '极速构建漂亮的原生应用。',
     icon: 'flutterchina',
     color: '#0091EA',
-    classify: ['develop'],
+    classify: ['develop', 'front-end', 'mobile terminal'],
   },
   {
     id: '879a26836b83420898d1e4daf45b5035',
@@ -384,7 +384,7 @@ const allWebsites: Website[] = [
       'Flutter 是 Google 开源的 UI 工具包，帮助开发者通过一套代码库高效构建多平台精美应用，支持移动、Web、桌面和嵌入式平台。',
     icon: 'fluttercn',
     color: '#ED4845',
-    classify: ['develop'],
+    classify: ['develop', 'front-end', 'mobile terminal'],
   },
   {
     id: '82d5e217d8fb4906a8b818e2052a0130',
@@ -403,7 +403,7 @@ const allWebsites: Website[] = [
     intro: 'Node.js® 是一个基于 Chrome V8 引擎 的 JavaScript 运行时环境。',
     icon: 'nodejs',
     color: '#3E863D',
-    classify: ['develop'],
+    classify: ['develop', 'rear-end'],
   },
   {
     id: '6864605527e74850ac7a62d5605891b4',
@@ -412,7 +412,7 @@ const allWebsites: Website[] = [
     intro: '让一切变得简单',
     icon: 'webpackjs',
     color: '#55A7DD',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: '2e33301054214c98997b8b273a7a41b9',
@@ -421,7 +421,7 @@ const allWebsites: Website[] = [
     intro: '插件化的企业级前端应用框架。',
     icon: 'umijs',
     color: '#1890FF',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: 'fae86853bc2147298985b624f0222b66',
@@ -430,7 +430,7 @@ const allWebsites: Website[] = [
     intro: '使用 JavaScript，HTML 和 CSS 构建跨平台的桌面应用程序',
     icon: 'electronjs',
     color: '#9FEAF9',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: 'c62839ace4d74d6e9f9ac4096e30a85a',
@@ -439,7 +439,7 @@ const allWebsites: Website[] = [
     intro: '使用 React 来创建 Android 和 iOS 的原生应用',
     icon: 'reactnative',
     color: '#61DAFB',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: '2d07a5cfbf5440fa83e615d2a5bccc11',
@@ -448,7 +448,7 @@ const allWebsites: Website[] = [
     intro: '基于VueJs的多端开发框架',
     icon: 'uniapp',
     color: '#2A9938',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: '26b9fc15b3c643f98ec3a31a76ca86c0',
@@ -457,7 +457,7 @@ const allWebsites: Website[] = [
     intro: 'build amazing things',
     icon: 'uniapp',
     color: '#CB0303',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: 'f2aedbbbcf844badad3dff3b3d965001',
@@ -466,7 +466,7 @@ const allWebsites: Website[] = [
     intro: '无需离开您的HTML，即可快速建立现代网站。',
     icon: 'tailwindcss',
     color: '#06B6D4',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: 'afc961364c5144689866add534c6719c',
@@ -475,7 +475,7 @@ const allWebsites: Website[] = [
     intro: '下一代前端开发与构建工具',
     icon: 'vitejs',
     color: '#646CFF',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: 'e5bab6816cf4495892a8bafaf436b400',
@@ -484,7 +484,7 @@ const allWebsites: Website[] = [
     intro: '让一切变得简单',
     icon: 'webpackjs',
     color: '#55A7DD',
-    classify: ['develop'],
+    classify: ['develop', 'front-end'],
   },
   {
     id: '8adc9d543405497b95279847ef9db1d4',
@@ -502,7 +502,7 @@ const allWebsites: Website[] = [
     intro: '全球最大的开源技术社区',
     icon: 'github',
     color: '#2D333B',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: 'c8647d41918e491d96ecf951ec2ed158',
@@ -511,7 +511,7 @@ const allWebsites: Website[] = [
     intro: '代码不止，掘金不停',
     icon: 'juejin',
     color: '#1E80FF',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: 'e984ca4cfb934a2d9848a5101641ef81',
@@ -520,7 +520,7 @@ const allWebsites: Website[] = [
     intro: '专业开发者社区',
     icon: 'csdn',
     color: '#FC5531',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: 'd8795f22326d4bbeaf58004f57de9eed',
@@ -529,7 +529,7 @@ const allWebsites: Website[] = [
     intro: '检索，交流和分享任何技术编程相关的问题及知识。',
     icon: 'segmentfault',
     color: '#39B95C',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: '52f700fa8bc7411cbfc86bf7f572ee80',
@@ -538,7 +538,7 @@ const allWebsites: Website[] = [
     intro: '促进软件开发及相关领域知识与创新的传播',
     icon: 'infoq',
     color: '#0B76DB',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: '94356aa909ab47fb86a45c5850bd1aaf',
@@ -556,7 +556,7 @@ const allWebsites: Website[] = [
     intro: '中文开源技术交流社区',
     icon: 'oschina',
     color: '#21B351',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: 'd380fc254f0b4428a7359c2ac654fc75',
@@ -565,7 +565,7 @@ const allWebsites: Website[] = [
     intro: '开发者的网上家园',
     icon: 'cnblogs',
     color: '#2E7ACC',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: '0237ea70b65b4facbce9d286030aee88',
@@ -574,7 +574,7 @@ const allWebsites: Website[] = [
     intro: 'Where Developers Learn, Share, & Build Careers',
     icon: 'stackoverflow',
     color: '#F48024',
-    classify: ['community'],
+    classify: ['community', 'develop'],
   },
   {
     id: 'ebc0a7c723224376a7a20016351c706b',
