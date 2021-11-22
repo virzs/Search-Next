@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-16 11:17:47
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-19 17:47:01
+ * @Last Modified time: 2021-11-22 17:37:06
  */
 
 import { Website } from '../interface';
@@ -104,6 +104,18 @@ export type WORK = 'work';
 export type FRONTEND = 'front-end';
 
 /**
+ * 后端
+ * @desc 网站分类 - 后端
+ */
+export type REAREND = 'rear-end';
+
+/**
+ * 移动端
+ * @desc 网站分类 - 移动端
+ */
+export type MT = 'mobile terminal';
+
+/**
  * 设计
  * @desc 网站分类 - 设计
  */
@@ -130,5 +142,6 @@ export type WebsiteClassify =
   | COMMON
   | WORK
   | FRONTEND
+  | REAREND
+  | MT
   | DESIGN;
-
