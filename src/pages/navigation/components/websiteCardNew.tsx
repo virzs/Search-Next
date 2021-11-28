@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-27 23:01:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-28 14:47:14
+ * @Last Modified time: 2021-11-28 16:08:48
  */
 import { Website } from '@/data/navigation/interface';
 import { hexToRgba } from '@/utils/color';
@@ -59,7 +59,7 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
             </Avatar>
             <div className="flex-grow overflow-hidden">
               <p className="font-bold text-base">{name}</p>
-              <Overflow>{intro || '暂无介绍'}</Overflow>
+              <Overflow>{(intro as any) || ('暂无介绍' as any)}</Overflow>
             </div>
           </div>
         </Tooltip>

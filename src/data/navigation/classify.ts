@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-19 17:45:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-28 14:16:44
+ * @Last Modified time: 2021-11-28 16:10:34
  */
 
 import { Classify } from './interface';
@@ -117,6 +117,14 @@ const classify: Classify[] = [
     name: '设计',
     path: 'design',
     intro: '',
+    subClassify: [
+      {
+        id: 'c72c26bf74374433ab41f25003b7356b',
+        name: '图标库',
+        path: 'icons',
+        intro: '',
+      },
+    ],
   },
 ];
 
