@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-22 17:37:34
+ * @Last Modified time: 2021-11-27 18:16:59
  */
 
 import { Website } from './interface';
@@ -160,7 +160,7 @@ const allWebsites: Website[] = [
     intro: '让新闻离你更近',
     icon: 'xinhuanet',
     color: '#083B90',
-    classify: ['news'],
+    classify: ['news', 'common'],
   },
   {
     id: 'c71edd4daad34f4bb51438d33b27c950',
@@ -169,7 +169,7 @@ const allWebsites: Website[] = [
     intro: '传播中国，影响世界',
     icon: 'chinadaily',
     color: '#083961',
-    classify: ['news'],
+    classify: ['news', 'common'],
   },
   {
     id: 'ecfbad28800f42c686e46c9616cacb65',
@@ -178,7 +178,7 @@ const allWebsites: Website[] = [
     intro: '全球生活新门户',
     icon: 'huanqiu',
     color: '#90080E',
-    classify: ['news'],
+    classify: ['news', 'common'],
   },
   {
     id: 'a0629197d9b34b4f99f19cad0904ab1d',
@@ -204,7 +204,7 @@ const allWebsites: Website[] = [
     url: 'https://www.qq.com/',
     icon: 'guancha',
     color: '#1479D7',
-    classify: ['news'],
+    classify: ['news', 'common'],
   },
   {
     id: '6ef1b75ca1514e38bb5e5eddc0f6e0ea',
@@ -212,7 +212,7 @@ const allWebsites: Website[] = [
     url: 'https://www.163.com/',
     icon: '163',
     color: '#E10000',
-    classify: ['news'],
+    classify: ['news', 'common'],
   },
   {
     id: '2e1b53aff19941abb4de1438692cf799',
@@ -240,7 +240,7 @@ const allWebsites: Website[] = [
     intro: '爱科技，爱这里',
     icon: 'ithome',
     color: '#D22222',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: 'cac91d6480324410a661730bca0288db',
@@ -249,7 +249,7 @@ const allWebsites: Website[] = [
     intro: '大中华区专业IT网站',
     icon: 'zol',
     color: '#3686F1',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: 'b5fdb91ab4cb4ce79abf483c07b80187',
@@ -258,7 +258,7 @@ const allWebsites: Website[] = [
     intro: '高效工作，品质生活',
     icon: 'sspai',
     color: '#751617',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: '65fb7df831234b4d886ae117b5682853',
@@ -267,7 +267,7 @@ const allWebsites: Website[] = [
     intro: '科技改变未来',
     icon: 'mydrivers',
     color: '#FF902C',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: '980359e6eeb84962b51240dfbe6de012',
@@ -276,7 +276,7 @@ const allWebsites: Website[] = [
     intro: '分享美好数字生活',
     icon: 'dgtle',
     color: '#9A9A9A',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: '56e0023b3fb94387b28f5827ba21b2b8',
@@ -285,7 +285,7 @@ const allWebsites: Website[] = [
     intro: '让未来触手可及',
     icon: 'ifanr',
     color: '#B52C02',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: '5683720e54e44d50a27a8f2e0f2687c5',
@@ -294,7 +294,7 @@ const allWebsites: Website[] = [
     intro: '我们只谈充电',
     icon: 'chongdiantouCC',
     color: '#23499E',
-    classify: ['digital'],
+    classify: ['digital', 'news'],
   },
   {
     id: '86dd7950cc984c1194358346bb408608',
@@ -757,6 +757,43 @@ const allWebsites: Website[] = [
     icon: 'gitmoji',
     color: '#FFDD67',
     classify: [],
+  },
+  {
+    id: 'cab0470e567445e6832971fdf9aefd73',
+    name: '老孟 Flutter',
+    url: 'http://laomengit.com/',
+    intro: '所有Flutter控件的详细用法、介绍、使用场景及注意问题',
+    icon: 'laomengit',
+    color: '#01B895',
+    classify: ['develop', 'mobile terminal', 'document', 'flutter'],
+  },
+  {
+    id: '8848034ad35f479798745b949169ab62',
+    name: 'Flutter 实战 第二版',
+    url: 'https://book.flutterchina.club/',
+    intro: '由浅入深的介绍了Flutter技术和开发流程。',
+    icon: 'bookflutterchina',
+    color: '#2C3E50',
+    classify: ['develop', 'flutter', 'document', 'mobile terminal'],
+  },
+  {
+    id: 'bcef02d38bad4bd4b9498e669c139d4b',
+    name: 'dayjs',
+    url: 'https://www.npmjs.com/package/dayjs',
+    intro:
+      'Day.js 是一个轻量的处理时间和日期的 JavaScript 库，和 Moment.js 的 API 设计保持完全一样. 如果您曾经用过 Moment.js, 那么您已经知道如何使用 Day.js',
+    icon: 'dayjs',
+    color: '#FF5F4C',
+    classify: ['develop', 'npm', 'package'],
+  },
+  {
+    id: '7b51bd4d0c454217b6a32b62fb94ff56',
+    name: 'Moment.js',
+    url: 'https://www.npmjs.com/package/moment',
+    intro: '用于解析、验证、操作和格式化日期的JavaScript日期库。',
+    icon: 'moment',
+    color: '#5E8381',
+    classify: ['develop', 'package', 'npm'],
   },
 ];
 

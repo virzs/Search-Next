@@ -122,6 +122,48 @@ export type MT = 'mobile terminal';
 export type DESIGN = 'design';
 
 /**
+ * 文档
+ * @desc 网站分类 - 文档
+ */
+export type DOCUMENT = 'document';
+
+/**
+ * 包
+ * @desc 网站分类 - 包
+ */
+export type PACKAGE = 'package';
+
+/**
+ * npm
+ * @desc 网站分类 - npm
+ */
+export type NPM = 'npm';
+
+/**
+ * flutter
+ * @desc 网站分类 - flutter
+ */
+export type FLUTTER = 'flutter';
+
+/**
+ * nodejs
+ * @desc 网站分类 - nodejs
+ */
+export type NODEJS = 'nodejs';
+
+/**
+ * react
+ * @desc 网站分类 - react
+ */
+export type REACT = 'react';
+
+/**
+ * 日期
+ * @desc 网站分类 - 日期
+ */
+export type DATE = 'date';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -144,4 +186,11 @@ export type WebsiteClassify =
   | FRONTEND
   | REAREND
   | MT
-  | DESIGN;
+  | DOCUMENT
+  | DESIGN
+  | PACKAGE
+  | NPM
+  | FLUTTER
+  | NODEJS
+  | REACT
+  | DATE;

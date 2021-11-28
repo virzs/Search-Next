@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-19 17:45:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-22 17:39:21
+ * @Last Modified time: 2021-11-28 14:16:44
  */
 
 import { Classify } from './interface';
@@ -31,6 +31,26 @@ const classify: Classify[] = [
         name: '资讯',
         path: 'news',
         intro: '常用资讯网站推荐',
+      },
+    ],
+  },
+  {
+    id: '19cc37a6fc924ae19112cef7c2e348eb',
+    name: '资讯',
+    path: 'news',
+    intro: '',
+    subClassify: [
+      {
+        id: 'a908cb2401da46b8890147862a5def23',
+        name: '常用',
+        path: 'common',
+        intro: '',
+      },
+      {
+        id: 'a57bc88ba97e46948fdde041da4954fe',
+        name: '数码',
+        path: 'digital',
+        intro: '',
       },
     ],
   },
@@ -79,12 +99,24 @@ const classify: Classify[] = [
         intro: '',
       },
       {
+        id: '40a3796a06a1448780adb7e2b3944576',
+        name: '文档',
+        path: 'document',
+        intro: '',
+      },
+      {
         id: '411ae611bdb1455f910fe917ba9b0439',
         name: '社区',
         path: 'community',
         intro: '',
       },
     ],
+  },
+  {
+    id: 'c99f76b6af884ba2be1be72fa072c290',
+    name: '设计',
+    path: 'design',
+    intro: '',
   },
 ];
 
