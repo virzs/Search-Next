@@ -2,8 +2,9 @@
  * @Author: Vir
  * @Date: 2021-11-27 23:01:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-28 16:08:48
+ * @Last Modified time: 2021-11-28 21:06:06
  */
+import { addSite } from '@/apis/site';
 import { Website } from '@/data/navigation/interface';
 import { hexToRgba } from '@/utils/color';
 import { css } from '@emotion/css';
@@ -29,7 +30,11 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
   const { name, intro, color, url } = datasource;
 
   const onAdd = () => {
-    message.warning('功能开发中...');
+    const res = addSite({
+      name,
+      url: url.substring(0, url.lastIndexOf('/')),
+    });
+    if (res) message.success('添加成功');
   };
 
   const onCopy = () => {
