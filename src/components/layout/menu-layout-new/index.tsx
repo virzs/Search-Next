@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-25 09:19:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-27 18:05:09
+ * @Last Modified time: 2021-11-28 14:46:48
  */
 import React from 'react';
 import { IconButton, Tooltip } from '@material-ui/core';
@@ -106,7 +106,7 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
       <div className="h-full overflow-hidden flex flex-col w-full px-6 py-4">
         <div>{contentHeader}</div>
         <div className="flex-grow overflow-y-auto w-full my-4 pb-2">
-          <div className="max-w-4xl">{children}</div>
+          <div className="max-w-4xl pl-1">{children}</div>
         </div>
         <div className="text-center max-w-4xl">
           <Copyright />
