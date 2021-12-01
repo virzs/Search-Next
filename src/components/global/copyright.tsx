@@ -33,7 +33,7 @@ const Copyright: React.FC = () => {
 
   return (
     <a
-      className="copyright inline-block text-sm text-gray-300 hover:text-gray-200 font-mono backdrop-filter backdrop-blur rounded p-1"
+      className="copyright inline-block text-sm text-gray-300 hover:text-gray-200 font-mono backdrop-filter backdrop-blur-sm rounded"
       href={copyright.href}
     >
       ©{copyright.startTime}-{endTime} by {copyright.author}. All rights
