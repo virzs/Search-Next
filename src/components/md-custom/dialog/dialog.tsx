@@ -15,6 +15,8 @@ import {
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 import { Close } from '@material-ui/icons';
+import classnames from 'classnames';
+import { css } from '@emotion/css';
 
 export interface DialogProps {
   open: boolean;
@@ -51,7 +53,15 @@ const Dialog: React.FC<DialogProps> = ({
       container={container}
     >
       <Fade in={open}>
-        <div className="bg-white rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100">
+        <div
+          className={classnames(
+            'rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100',
+            css`
+              background-color: rgba(253, 253, 253, 0.8);
+              backdrop-filter: blur(8px);
+            `,
+          )}
+        >
           <div className="p-3 py-2 font-bold text-base flex justify-between items-center">
             {title}
             <IconButton size="small" onClick={onCancel}>
