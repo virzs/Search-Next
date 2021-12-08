@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-28 14:38:09
+ * @Last Modified time: 2021-12-08 22:26:38
  */
 
 import { MenuLayoutMenu, MenuListItem } from '@/components/layout/menu-layout';
@@ -71,7 +71,10 @@ const NavigationPage: React.FC<PageProps> = (props) => {
           <div
             key={i.id}
             id={i.id}
-            style={{ scrollSnapAlign: 'start', scrollSnapStop: 'always' }}
+            style={{
+              scrollSnapAlign: 'start',
+              scrollSnapStop: 'always',
+            }}
           >
             <Header icon={i.icon} title={i.name} />
             <div className="grid grid-cols-3 gap-3 max-w-4xl">
