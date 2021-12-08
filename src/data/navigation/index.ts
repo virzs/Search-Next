@@ -389,6 +389,15 @@ const navigationData: Classify[] = [
             color: "#313642",
             classify: ["tools", "software"],
           },
+          {
+            id: "e192d3f5c99f46488c47b09ee9593ad9",
+            name: "PowerToys",
+            url: "https://github.com/microsoft/PowerToys",
+            intro: "",
+            icon: "powertoys",
+            color: "#F2E6CA",
+            classify: ["tools", "software"],
+          },
         ],
       },
       {
