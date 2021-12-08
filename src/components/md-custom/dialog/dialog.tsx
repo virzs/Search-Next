@@ -57,7 +57,7 @@ const Dialog: React.FC<DialogProps> = ({
           className={classnames(
             'rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100',
             css`
-              background-color: rgba(253, 253, 253, 0.8);
+              background-color: rgba(255, 255, 255, 0.90);
               backdrop-filter: blur(8px);
             `,
           )}
