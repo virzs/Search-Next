@@ -14,7 +14,6 @@ import { PageProps } from '@/typings';
 import { Input, List } from '@material-ui/core';
 import { InsertComment } from '@material-ui/icons';
 import React from 'react';
-import WebsiteCard from './components/WebisteCard';
 import WebsiteCardNew from './components/websiteCardNew';
 
 const basePath = '/navigation';
