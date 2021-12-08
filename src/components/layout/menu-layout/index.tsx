@@ -50,7 +50,7 @@ export const MenuListItem: React.FC<MenuListItemProps> = ({
   ...props
 }) => {
   return (
-    <ListItem {...props} button>
+    <ListItem {...props}>
       <ListItemIcon className="min-w-min mr-2">{icon}</ListItemIcon>
       <ListItemText primary={primary} />
     </ListItem>
