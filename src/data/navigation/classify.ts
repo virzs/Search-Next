@@ -110,6 +110,12 @@ const classify: Classify[] = [
         path: 'community',
         intro: '',
       },
+      {
+        id: '553c044927b1443ea388172989869a0e',
+        name: '博客',
+        path: 'blog',
+        intro: '',
+      },
     ],
   },
   {

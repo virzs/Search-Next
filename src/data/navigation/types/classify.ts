@@ -164,6 +164,12 @@ export type REACT = 'react';
 export type DATE = 'date';
 
 /**
+ * 博客
+ * @desc 网站分类 - 博客
+ */
+export type BLOG = 'blog';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -193,4 +199,5 @@ export type WebsiteClassify =
   | FLUTTER
   | NODEJS
   | REACT
-  | DATE;
+  | DATE
+  | BLOG;
