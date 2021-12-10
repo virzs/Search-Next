@@ -6,6 +6,8 @@ import { addAccount } from './apis/auth';
 import { authDefaultData } from './data/account/default';
 import { message } from 'antd';
 import '@/locales';
+import devtools from 'devtools-detect';
+import { randomLog } from './data/console/log';
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
@@ -15,6 +17,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const inset = addAccount(authDefaultData);
     localStorage.setItem('account', inset._id);
   }
+});
+
+// 控制台监听事件
+window.addEventListener('devtoolschange', (event) => {
+  randomLog(devtools.isOpen);
 });
 
 // 错误监听
