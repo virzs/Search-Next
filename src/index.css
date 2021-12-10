@@ -13,6 +13,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+html {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  scrollbar-width: inherit;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: hsl(214, 13%, 75%);
+  border-radius: 4px;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
