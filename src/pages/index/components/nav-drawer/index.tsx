@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-12-12 22:23:43
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-13 14:27:48
+ * @Last Modified time: 2021-12-13 14:57:12
  */
 import { Drawer } from '@/components/md-custom/drawer';
 import navigationData from '@/data/navigation';
@@ -100,7 +100,12 @@ const ClassifyEle: React.FC<ClassifyProps> = (props) => {
 
 const NavDrawer: React.FC<NavDrawerProps> = (props) => {
   return (
-    <Drawer {...props}>
+    <Drawer
+      ModalProps={{
+        keepMounted: true,
+      }}
+      {...props}
+    >
       {navigationData.map((i) => {
         return <ClassifyEle dataSource={i} />;
       })}
