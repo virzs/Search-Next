@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-27 18:16:59
+ * @Last Modified time: 2021-12-13 10:20:59
  */
 
 import { Website } from './interface';
@@ -858,6 +858,15 @@ const allWebsites: Website[] = [
     icon: 'gitee',
     color: '#C71D23',
     classify: ['develop', 'community'],
+  },
+  {
+    id: 'cb14868f569642d3896fc2c5e4dd1735',
+    name: 'Notion',
+    url: 'https://www.notion.so/product',
+    intro: 'The most flexible tool for managing all your work',
+    icon: 'notion',
+    color: '#000000',
+    classify: ['software', 'tools'],
   },
 ];
 

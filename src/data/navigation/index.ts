@@ -416,6 +416,15 @@ const navigationData: Classify[] = [
             color: "#F2E6CA",
             classify: ["tools", "software"],
           },
+          {
+            id: "cb14868f569642d3896fc2c5e4dd1735",
+            name: "Notion",
+            url: "https://www.notion.so/product",
+            intro: "The most flexible tool for managing all your work",
+            icon: "notion",
+            color: "#000000",
+            classify: ["software", "tools"],
+          },
         ],
       },
       {
