@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-12-12 18:19:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-12 21:22:13
+ * @Last Modified time: 2021-12-12 23:04:47
  */
 import React from 'react';
 import { Drawer as MDrawer, DrawerProps } from '@material-ui/core';
@@ -45,7 +45,7 @@ const Drawer: React.FC<DrawerCustomProps> = (props) => {
           `,
         )}
       >
-        <div className="font-semibold text-lg p-3">{title}</div>
+        {title && <div className="font-semibold text-lg p-3">{title}</div>}
         <div className="p-3 flex-grow">{children}</div>
       </div>
     </MDrawer>
