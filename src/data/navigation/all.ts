@@ -868,6 +868,15 @@ const allWebsites: Website[] = [
     color: '#000000',
     classify: ['software', 'tools'],
   },
+  {
+    id: '975c566fa1da4082920488e57f2b812e',
+    name: 'README',
+    url: 'https://readme.so/',
+    intro: '快速编写README文件',
+    icon: 'readme',
+    color: '#37CA99',
+    classify: ['develop', 'tools', 'onlineTools'],
+  },
 ];
 
 export default allWebsites;

@@ -116,6 +116,20 @@ const classify: Classify[] = [
         path: 'blog',
         intro: '',
       },
+      {
+        id: '6cc437590cf94141862de6000c09e0b8',
+        name: '工具',
+        path: 'tools',
+        intro: '',
+        subClassify: [
+          {
+            id: '37500ffad8aa4ccd8d3a5e5ac8dbf5d9',
+            name: '在线工具',
+            path: 'onlineTools',
+            intro: '',
+          },
+        ],
+      },
     ],
   },
   {
