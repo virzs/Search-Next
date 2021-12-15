@@ -9,9 +9,10 @@ import navigationData from '@/data/navigation';
 import { Classify, Website } from '@/data/navigation/interface';
 import { hexToRgba } from '@/utils/color';
 import { css } from '@emotion/css';
-import { CardActionArea, Tooltip } from '@material-ui/core';
+import { CardActionArea, Tooltip, Button } from '@material-ui/core';
 import classNames from 'classnames';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 export interface NavDrawerProps {
   open: boolean;
@@ -67,30 +68,32 @@ const WebsiteCard: React.FC<WebsiteCardProps> = (props) => {
   );
 };
 
-interface ClassifyProps {
-  dataSource: Classify;
-}
-
-const ClassifyEle: React.FC<ClassifyProps> = (props) => {
-  const { dataSource } = props;
+const ClassifyEle = (dataSource: Classify, parent?: Classify) => {
   return (
-    <div className="shadow p-2 mb-2 rounded" key={dataSource.path}>
-      <div className="text-base font-bold mb-2">{dataSource.name}</div>
-      <div className="mb-2">{dataSource.intro}</div>
+    <div
+      className={classNames(!parent && 'shadow p-2 mb-2 rounded')}
+      key={dataSource.path}
+    >
       <div>
-        {dataSource.children?.map((i) => {
-          return <WebsiteCard dataSource={i} />;
-        })}
+        {dataSource.children?.map((j) => (
+          <WebsiteCard dataSource={j} />
+        ))}
         {dataSource.subClassify?.map((j) => {
           return (
-            <div key={j.path}>
-              <div className="font-semibold mb-3">{j.name}</div>
-              <div className="grid gap-2.5 grid-cols-3 mb-3">
-                {j.children?.map((k) => {
-                  return <WebsiteCard dataSource={k} />;
-                })}
+            <>
+              <div key={j.path}>
+                <div className={classNames('font-semibold mb-3')}>{j.name}</div>
+                {j.children ? (
+                  <div className="grid gap-2.5 grid-cols-3 mb-3">
+                    {j.children?.map((k) => {
+                      return <WebsiteCard dataSource={k} />;
+                    })}
+                  </div>
+                ) : (
+                  ClassifyEle(j, dataSource)
+                )}
               </div>
-            </div>
+            </>
           );
         })}
       </div>
@@ -99,15 +102,39 @@ const ClassifyEle: React.FC<ClassifyProps> = (props) => {
 };
 
 const NavDrawer: React.FC<NavDrawerProps> = (props) => {
+  const history = useHistory();
   return (
     <Drawer
       ModalProps={{
         keepMounted: true,
       }}
+      fixedTitle
+      titleStyle={css`
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+      `}
+      title={
+        <div className="flex justify-between items-center">
+          <div className="text-lg font-semibold">导航</div>
+          <Button
+            onClick={() => {
+              history.push('/navigation');
+            }}
+          >
+            更多
+          </Button>
+        </div>
+      }
       {...props}
     >
       {navigationData.map((i) => {
-        return <ClassifyEle dataSource={i} />;
+        return (
+          <div>
+            <div className="text-base font-bold mb-2">{i.name}</div>
+            {i.intro && <div className="mb-2">{i.intro}</div>}
+            {ClassifyEle(i)}
+          </div>
+        );
       })}
     </Drawer>
   );

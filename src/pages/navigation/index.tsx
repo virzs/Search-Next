@@ -18,9 +18,12 @@ import WebsiteCardNew from './components/websiteCardNew';
 
 const basePath = '/navigation';
 
-const Recursion = (data: Classify, parent: Classify) => {
+const Recursion = (data: Classify, parent?: Classify) => {
   return (
     <>
+      {data?.children?.map((j) => (
+        <WebsiteCardNew key={j.id} datasource={j} />
+      ))}
       {data?.subClassify?.map((i) => {
         return (
           <>

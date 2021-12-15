@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-02 14:27:21
+ * @Last Modified time: 2021-12-12 22:27:00
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -21,6 +21,7 @@ import { setTheme } from '@/utils/theme';
 import { AuthLogo } from '@/data/account/interface';
 import { logoSetting } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
+import NavDrawer from './components/nav-drawer';
 
 const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const { t, i18n } = useTranslation();
@@ -33,6 +34,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
     type: 'clock',
     show: true,
   } as AuthLogo);
+  const [navOpen, setNavOpen] = React.useState(false);
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
     window.open(`${engine.href}${value}`);
@@ -106,7 +108,13 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
     >
       <div className="index-navbar-box flex-grow max-h-12 text-right align-middle">
         <Tooltip title="网址导航">
-          <IconButton onClick={() => history.push('/navigation')}>
+          <IconButton
+            onClick={() => {
+              setNavOpen(true);
+              return;
+              history.push('/navigation');
+            }}
+          >
             <Bookmarks
               className={classNames({
                 'text-var-main-10': !!bg,
@@ -155,6 +163,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
       <div className="index-copyright-box flex-grow max-h-8 text-center leading-8">
         <Copyright />
       </div>
+      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} />
     </div>
   );
 };
