@@ -29,4 +29,20 @@ const Header: React.FC<HeaderProps> = ({ title, action, icon }) => {
   );
 };
 
+export const SubHeader: React.FC<HeaderProps> = ({ title, action, icon }) => {
+  return (
+    <div className="pt-0 pb-4 font-semibold">
+      <div className="flex items-center justify-between">
+        <div className="flex justify-start items-center text-lg">
+          {icon && (
+            <div className="mr-2 flex items-center justify-center">{icon}</div>
+          )}
+          {title}
+        </div>
+        {action && <div>{action}</div>}
+      </div>
+    </div>
+  );
+};
+
 export default Header;
