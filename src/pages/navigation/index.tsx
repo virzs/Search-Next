@@ -7,7 +7,7 @@
 
 import { MenuLayoutMenu, MenuListItem } from '@/components/layout/menu-layout';
 import MenuLayoutNew from '@/components/layout/menu-layout-new';
-import Header from '@/components/layout/menu-layout/header';
+import Header, { SubHeader } from '@/components/layout/menu-layout/header';
 import navigations from '@/data/navigation';
 import { Classify } from '@/data/navigation/interface';
 import { PageProps } from '@/typings';
@@ -17,6 +17,43 @@ import React from 'react';
 import WebsiteCardNew from './components/websiteCardNew';
 
 const basePath = '/navigation';
+
+const Recursion = (data: Classify, parent: Classify) => {
+  return (
+    <>
+      {data?.subClassify?.map((i) => {
+        return (
+          <>
+            <div
+              key={i.id}
+              id={i.id}
+              style={{
+                scrollSnapAlign: 'start',
+                scrollSnapStop: 'always',
+              }}
+            >
+              {parent ? (
+                <SubHeader icon={i.icon} title={i.name} />
+              ) : (
+                <Header icon={i.icon} title={i.name} />
+              )}
+
+              {i.children ? (
+                <div className="grid grid-cols-3 gap-3 max-w-4xl">
+                  {i.children.map((j) => (
+                    <WebsiteCardNew key={i.id} datasource={j} />
+                  ))}
+                </div>
+              ) : (
+                Recursion(i, data)
+              )}
+            </div>
+          </>
+        );
+      })}
+    </>
+  );
+};
 
 const NavigationPage: React.FC<PageProps> = (props) => {
   const menu: Classify[] = navigations;
@@ -65,37 +102,7 @@ const NavigationPage: React.FC<PageProps> = (props) => {
         </List>
       }
     >
-      {selected?.subClassify?.map((i) => {
-        if (!i.children?.length) return;
-        return (
-          <div
-            key={i.id}
-            id={i.id}
-            style={{
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
-            }}
-          >
-            <Header icon={i.icon} title={i.name} />
-            <div className="grid grid-cols-3 gap-3 max-w-4xl">
-              {i.children &&
-                i.children.map((j) => (
-                  <WebsiteCardNew key={i.id} datasource={j} />
-                ))}
-            </div>
-          </div>
-        );
-      })}
-      {selected?.children && (
-        <>
-          <Header icon={selected.icon} title={selected.name} />
-          <div className="grid grid-cols-3 gap-3 max-w-4xl">
-            {selected?.children?.map((i) => (
-              <WebsiteCardNew key={i.id} datasource={i} />
-            ))}
-          </div>
-        </>
-      )}
+      {Recursion(selected)}
     </MenuLayoutNew>
   );
 };
