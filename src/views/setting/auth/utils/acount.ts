@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-20 17:07:20
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-20 17:08:59
+ * @Last Modified time: 2021-12-15 15:54:48
  */
 
 import { addAccount, editAccount, findAccount } from '@/apis/auth';
@@ -26,7 +26,7 @@ export const getAccount = () => {
       const Update = new UpdateData();
       const result = Update.object(authDefaultData, user);
       editAccount(userId, result);
-      return result;
+      return findAccount(userId);
     } else {
       return noAccountSet();
     }
