@@ -2,13 +2,13 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-04 16:56:33
+ * @Last Modified time: 2021-12-15 14:28:04
  */
 
 import { lazy } from 'react';
 import {
   Brush,
-  ColorLens,
+  Navigation as NavigationIcon,
   ManageAccounts,
   PhotoLibrary,
   SettingsBackupRestore,
@@ -31,6 +31,8 @@ import Data from '@/views/setting/data';
 import Logo from '@/views/setting/personalise/logo';
 import Lab from '@/views/setting/lab';
 import Backup from '@/views/setting/data/backup';
+import Features from '@/views/setting/features';
+import Navigation from '@/views/setting/navigation';
 
 /**
  * 关于 component 额外说明
@@ -134,6 +136,18 @@ const routers: Router[] = [
             path: '/setting/lab/backup',
             component: Backup,
           },
+          {
+            title: '导航页',
+            icon: <NavigationIcon />,
+            path: '/setting/lab/navigation',
+            component: Navigation,
+          },
+          // {
+          //   title: '功能',
+          //   icon: <FeaturedPlayList />,
+          //   path: '/setting/lab/features',
+          //   component: Features,
+          // },
         ],
       },
       {

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-17 21:26:07
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:37:53
+ * @Last Modified time: 2021-12-15 14:41:00
  */
 
 import { ClockLogoType, LogoType } from '../logo';
@@ -67,6 +67,13 @@ export interface AuthLogo {
   config: LogoConfigType;
 }
 
+// 导航显示类型
+export type NavigationType = 'page' | 'drawer';
+// 导航数据
+export interface Navigation {
+  type: NavigationType;
+}
+
 export interface AuthData {
   _id?: string;
   username: string; // 用户名
@@ -77,6 +84,7 @@ export interface AuthData {
   language: LanguageType; // 账户所选语言
   background: AuthBackground; // 背景
   logo?: AuthLogo;
+  navigation: Navigation;
   sync: {
     setting: boolean; // 设置同步
     website: boolean; // 常用网址同步

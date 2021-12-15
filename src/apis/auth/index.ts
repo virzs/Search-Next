@@ -2,11 +2,16 @@
  * @Author: Vir
  * @Date: 2021-09-01 13:49:23
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:04:39
+ * @Last Modified time: 2021-12-15 14:45:58
  */
 
 import { authDefaultData } from '@/data/account/default';
-import { AuthBackground, AuthData, AuthLogo } from '@/data/account/interface';
+import {
+  AuthBackground,
+  AuthData,
+  AuthLogo,
+  Navigation,
+} from '@/data/account/interface';
 import StorageDB from 'bsdb';
 
 const BaseDB = new StorageDB({
@@ -80,4 +85,19 @@ export const logoSetting = (id: string): AuthLogo => {
 // 单独更新 logo 设置数据
 export const updateLogoSetting = (id: string, data: AuthLogo) => {
   return AuthDB.update(id, { logo: data });
+};
+
+// 获取账户中 navigation 设置数据
+export const navigationSetting = (id: string): Navigation => {
+  const account: AuthData = AuthDB.findOne(id);
+  if (!account) throw new Error('未找到该账户');
+  const navigationSetting = account.navigation;
+  if (navigationSetting) return navigationSetting;
+  AuthDB.update(id, { logo: authDefaultData.navigation });
+  return authDefaultData.navigation as Navigation;
+};
+
+// 单独更新 navigation 设置数据
+export const updateNavigationSetting = (id: string, data: Navigation) => {
+  return AuthDB.update(id, { navigation: data });
 };

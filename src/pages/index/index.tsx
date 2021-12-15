@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-12 22:27:00
+ * @Last Modified time: 2021-12-15 14:57:35
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
@@ -18,8 +18,8 @@ import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
 import { setTheme } from '@/utils/theme';
-import { AuthLogo } from '@/data/account/interface';
-import { logoSetting } from '@/apis/auth';
+import { AuthLogo, Navigation } from '@/data/account/interface';
+import { logoSetting, navigationSetting } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
 
@@ -34,6 +34,9 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
     type: 'clock',
     show: true,
   } as AuthLogo);
+  const [navigationData, setNavigationData] = React.useState<Navigation>(
+    {} as Navigation,
+  );
   const [navOpen, setNavOpen] = React.useState(false);
 
   const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
@@ -62,6 +65,14 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
         {React.createElement(logo ? logo.component : ClockData[0].component)}
       </div>
     );
+  };
+
+  // 获取并设置 导航
+  const setNavigationSetting = () => {
+    const id = localStorage.getItem('account');
+    if (!id) return;
+    const navigationData = navigationSetting(id);
+    setNavigationData(navigationData);
   };
 
   const setBackground = () => {
@@ -94,6 +105,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   React.useEffect(() => {
     setBackground();
     setLogoSetting();
+    setNavigationSetting();
   }, []);
 
   return (
@@ -110,9 +122,16 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
         <Tooltip title="网址导航">
           <IconButton
             onClick={() => {
-              setNavOpen(true);
-              return;
-              history.push('/navigation');
+              const type = navigationData.type ?? 'page';
+              switch (type) {
+                case 'drawer':
+                  setNavOpen(true);
+                  break;
+                case 'page':
+                default:
+                  history.push('/navigation');
+                  break;
+              }
             }}
           >
             <Bookmarks
