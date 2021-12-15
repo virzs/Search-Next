@@ -13,6 +13,8 @@ import classNames from 'classnames';
 interface DrawerNewProps {
   title?: React.ReactNode | string;
   width?: string;
+  fixedTitle?: boolean;
+  titleStyle?: string;
 }
 
 export interface DrawerCustomProps
@@ -22,6 +24,8 @@ const Drawer: React.FC<DrawerCustomProps> = (props) => {
   const {
     anchor = 'right',
     title,
+    fixedTitle = false,
+    titleStyle,
     width = '378px',
     children,
     ...others
@@ -45,8 +49,19 @@ const Drawer: React.FC<DrawerCustomProps> = (props) => {
           `,
         )}
       >
-        {title && <div className="font-semibold text-lg p-3">{title}</div>}
-        <div className="p-3 flex-grow">{children}</div>
+        {title && (
+          <div className={classNames('font-semibold text-lg p-3 shadow-sm', titleStyle)}>
+            {title}
+          </div>
+        )}
+        <div
+          className={classNames(
+            'p-3 flex-grow',
+            fixedTitle && 'overflow-y-auto',
+          )}
+        >
+          {children}
+        </div>
       </div>
     </MDrawer>
   );
