@@ -2,21 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { addAccount } from './apis/auth';
-import { authDefaultData } from './data/account/default';
 import { message } from 'antd';
 import '@/locales';
 import devtools from 'devtools-detect';
 import { randomLog } from './data/console/log';
+import { getAccount } from './views/setting/auth/utils/acount';
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
-  // 初始化没有用户时添加新用户
-  const user = localStorage.getItem('account');
-  if (!user) {
-    const inset = addAccount(authDefaultData);
-    localStorage.setItem('account', inset._id);
-  }
+  // 初始化时获取用户
+  getAccount();
 });
 
 // 控制台监听事件

@@ -5,8 +5,9 @@
  * @Last Modified time: 2021-09-20 17:08:59
  */
 
-import { addAccount, findAccount } from '@/apis/auth';
+import { addAccount, editAccount, findAccount } from '@/apis/auth';
 import { authDefaultData } from '@/data/account/default';
+import UpdateData from '@/utils/updateData';
 
 // 不存在账户信息时设置
 const noAccountSet = () => {
@@ -15,12 +16,20 @@ const noAccountSet = () => {
   return inset;
 };
 
-// 获取账户信息
+// 获取账户信息，没有时自动新增一个，否则检查默认数据是否有更新并更新数据
 export const getAccount = () => {
   const userId = localStorage.getItem('account');
   if (userId) {
     const user = findAccount(userId);
-    return user ? user : noAccountSet();
+    // ! 账号存在时更新
+    if (user) {
+      const Update = new UpdateData();
+      const result = Update.object(authDefaultData, user);
+      editAccount(userId, result);
+      return result;
+    } else {
+      return noAccountSet();
+    }
   } else {
     return noAccountSet();
   }
