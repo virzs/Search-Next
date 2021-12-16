@@ -9,7 +9,8 @@ import React from 'react';
 import {
   alpha,
   Menu as MMenu,
-  MenuItem,
+  MenuItem as MMenuItem,
+  MenuItemProps,
   MenuProps as MMenuProps,
   styled,
   SvgIconTypeMap,
@@ -57,24 +58,29 @@ const StyledMenu = styled((props: MMenuProps) => (
     '& .MuiMenu-list': {
       padding: '4px',
     },
-    '& .MuiMenuItem-root': {
-      borderRadius: 4,
-      padding: '4px 8px',
-      fontSize: 14,
-      '& .MuiSvgIcon-root': {
-        fontSize: 14,
-        color: theme.palette.text.secondary,
-        marginRight: theme.spacing(1.5),
-      },
-      '&:active': {
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          theme.palette.action.selectedOpacity,
-        ),
-      },
-    },
   },
 }));
+
+const StyledMenuItem = styled((props: MenuItemProps) => (
+  <MMenuItem {...props} />
+))(({ theme }) => ({
+  borderRadius: 4,
+  padding: '4px 8px',
+  fontSize: 14,
+  '& .MuiSvgIcon-root': {
+    fontSize: 14,
+    color: theme.palette.text.secondary,
+    marginRight: theme.spacing(1.5),
+  },
+  '&:active': {
+    backgroundColor: alpha(
+      theme.palette.primary.main,
+      theme.palette.action.selectedOpacity,
+    ),
+  },
+}));
+
+export const MenuItem = StyledMenuItem;
 
 const Menu: React.FC<MenuProps> = ({ config, ...props }) => {
   return (
@@ -90,10 +96,10 @@ const Menu: React.FC<MenuProps> = ({ config, ...props }) => {
       {...props}
     >
       {config.map((i, j: number) => (
-        <MenuItem key={j} onClick={i.onClick}>
+        <StyledMenuItem key={j} onClick={i.onClick}>
           {i.icon && React.createElement(i.icon)}
           {i.label}
-        </MenuItem>
+        </StyledMenuItem>
       ))}
     </StyledMenu>
   );
