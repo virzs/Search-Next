@@ -55,10 +55,12 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
   };
 
   const handleEdit = () => {
+    setAnchorEl(null);
     if (onEdit && item) onEdit(item);
   };
 
   const handleRemove = () => {
+    setAnchorEl(null);
     if (onRemove && item) onRemove(item._id);
   };
 
