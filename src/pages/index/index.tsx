@@ -19,7 +19,7 @@ import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
 import { setTheme } from '@/utils/theme';
 import { AuthLogo, Navigation } from '@/data/account/interface';
-import { logoSetting, navigationSetting } from '@/apis/auth';
+import { getAuthDataByKey } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
 
@@ -47,7 +47,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const setLogoSetting = () => {
     const id = localStorage.getItem('account');
     if (!id) return;
-    const logoData = logoSetting(id);
+    const logoData = getAuthDataByKey(id, 'logo');
     setLogoData(logoData);
   };
 
@@ -71,7 +71,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
   const setNavigationSetting = () => {
     const id = localStorage.getItem('account');
     if (!id) return;
-    const navigationData = navigationSetting(id);
+    const navigationData = getAuthDataByKey(id, 'navigation');
     setNavigationData(navigationData);
   };
 

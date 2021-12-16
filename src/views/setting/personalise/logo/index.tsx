@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-10-26 16:25:57
  */
 
-import { logoSetting, updateLogoSetting } from '@/apis/auth';
+import { getAuthDataByKey, updateLogoSetting } from '@/apis/auth';
 import OutlineCard from '@/components/global/card/outline-card';
 import Select from '@/components/md-custom/form/select';
 import { AuthLogo, ClockLogo } from '@/data/account/interface';
@@ -32,7 +32,7 @@ const Logo: React.FC = () => {
   const initData = () => {
     const id = localStorage.getItem('account');
     if (!id) return;
-    const logoData = logoSetting(id);
+    const logoData = getAuthDataByKey(id, 'logo');
     setClockLogoData(logoData.config.clock);
     setLogoData(logoData);
   };

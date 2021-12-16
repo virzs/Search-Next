@@ -4,7 +4,7 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-12-15 14:50:32
  */
-import { navigationSetting, updateNavigationSetting } from '@/apis/auth';
+import { getAuthDataByKey, updateNavigationSetting } from '@/apis/auth';
 import Select from '@/components/md-custom/form/select';
 import {
   NavigationType,
@@ -37,7 +37,7 @@ const Navigation: React.FC<PageProps> = (props) => {
 
   const init = () => {
     const account = localStorage.getItem('account');
-    const result = navigationSetting(account ?? '');
+    const result = getAuthDataByKey(account ?? '', 'navigation');
     setValue(result.type ?? 'page');
     setNavigationData(result);
   };

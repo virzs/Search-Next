@@ -72,32 +72,26 @@ export const accountsCount = () => {
   return AuthDB.count();
 };
 
-// 获取账户中 logo 设置数据
-export const logoSetting = (id: string): AuthLogo => {
-  const account: AuthData = AuthDB.findOne(id);
-  if (!account) throw new Error('未找到该账户');
-  const logoSetting = account.logo;
-  if (logoSetting) return logoSetting;
-  AuthDB.update(id, { logo: authDefaultData.logo });
-  return authDefaultData.logo as AuthLogo;
-};
-
 // 单独更新 logo 设置数据
 export const updateLogoSetting = (id: string, data: AuthLogo) => {
   return AuthDB.update(id, { logo: data });
 };
 
-// 获取账户中 navigation 设置数据
-export const navigationSetting = (id: string): Navigation => {
-  const account: AuthData = AuthDB.findOne(id);
-  if (!account) throw new Error('未找到该账户');
-  const navigationSetting = account.navigation;
-  if (navigationSetting) return navigationSetting;
-  AuthDB.update(id, { logo: authDefaultData.navigation });
-  return authDefaultData.navigation as Navigation;
-};
-
 // 单独更新 navigation 设置数据
 export const updateNavigationSetting = (id: string, data: Navigation) => {
   return AuthDB.update(id, { navigation: data });
+};
+
+// 获取账户中指定字段
+export const getAuthDataByKey = (id: string, key: string) => {
+  const account = AuthDB.findOne(id);
+  if (!account) throw new Error('未找到该账户');
+  const result = account[key];
+  if (!result) throw new Error(`${key} is undefined`);
+  if (result) return result;
+  const defaultData = authDefaultData as any;
+  const defResult = defaultData[key];
+  if (!result) throw new Error(`${key} is undefined`);
+  AuthDB.update(id, { key: defResult });
+  return defaultData[key];
 };
