@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:26:24
+ * @Last Modified time: 2021-12-17 17:58:27
  */
 
 import { editAccount } from '@/apis/auth';
@@ -15,7 +15,7 @@ import {
   AuthData,
 } from '@/data/account/interface';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
-import { Alert, SelectChangeEvent } from '@material-ui/core';
+import { Alert, AlertTitle, SelectChangeEvent } from '@material-ui/core';
 import React from 'react';
 import { getAccount } from '../../auth/utils/acount';
 import Example from '../components/example';
@@ -111,6 +111,10 @@ const Background: React.FC = () => {
     <div>
       <Example data={userBgSetting} />
       <div className="flex gap-2 flex-col">
+        <Alert severity="info">
+          <AlertTitle>提示</AlertTitle>
+          近期必应在国内访问可能受阻，会导致图片无法加载，出现此情况非本网站原因。
+        </Alert>
         <ItemAccordion
           expanded={expanded}
           onChange={(_, expanded) => {
