@@ -2,12 +2,13 @@
  * @Author: Vir
  * @Date: 2021-03-27 16:37:20
  * @Last Modified by: Vir
- * @Last Modified time: 2021-04-19 13:43:18
+ * @Last Modified time: 2021-12-19 15:49:23
  */
 
 import mainData, { CopyrightType } from '@/data/main/index';
 import { ResultTypes } from '@/typings/index';
 import { replaceUrlHaveHttpsOrHttpToEmpty } from '@/utils/common';
+import { getOtherIconApi } from '../setting/otherApis';
 
 interface CopyrightTypeWithVersion extends CopyrightType {
   version: string;
@@ -27,7 +28,10 @@ export const copyright = () => {
 // 获取网站icon
 export const getWebIconByUrl = (url?: string) => {
   let newUrl = replaceUrlHaveHttpsOrHttpToEmpty(url || '');
-  return url
-    ? `http://statics.dnspod.cn/proxy_favicon/_/favicon?domain=${newUrl}`
-    : '';
+  const userId = localStorage.getItem('account');
+  const iconApiData = getOtherIconApi({
+    userId: userId ?? '',
+    type: 'icon',
+  });
+  return url ? `${iconApiData.url}${newUrl}` : '';
 };
