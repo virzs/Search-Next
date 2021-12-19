@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-15 14:28:04
+ * @Last Modified time: 2021-12-17 17:03:29
  */
 
 import { lazy } from 'react';
@@ -14,6 +14,7 @@ import {
   SettingsBackupRestore,
   SupervisorAccount,
   Update,
+  Api,
 } from '@material-ui/icons';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -33,6 +34,7 @@ import Lab from '@/views/setting/lab';
 import Backup from '@/views/setting/data/backup';
 import Features from '@/views/setting/features';
 import Navigation from '@/views/setting/navigation';
+import OtherApis from '@/views/setting/otherApis';
 
 /**
  * 关于 component 额外说明
@@ -141,6 +143,12 @@ const routers: Router[] = [
             icon: <NavigationIcon />,
             path: '/setting/lab/navigation',
             component: Navigation,
+          },
+          {
+            title: '第三方API',
+            icon: <Api />,
+            path: '/setting/lab/otherApis',
+            component: OtherApis,
           },
           // {
           //   title: '功能',
