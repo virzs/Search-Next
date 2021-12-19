@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-07 13:54:26
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-12 18:13:14
+ * @Last Modified time: 2021-12-18 19:44:47
  */
 import axios from 'axios';
 
@@ -54,7 +54,34 @@ instance.interceptors.response.use(
   },
 );
 
-export default instance;
+instance.jsonp = (url: string, data?: any) => {
+  if (!url) throw new Error('url is necessary');
+  const callback = 'CALLBACK' + Math.random().toString().substr(9, 18);
+  const JSONP = document.createElement('script');
+  JSONP.setAttribute('type', 'text/javascript');
+
+  const headEle = document.getElementsByTagName('head')[0];
+
+  let ret = '';
+  if (data) {
+    if (typeof data === 'string') ret = '&' + data;
+    else if (typeof data === 'object') {
+      for (let key in data)
+        ret += '&' + key + '=' + encodeURIComponent(data[key]);
+    }
+    ret += '&_time=' + Date.now();
+  }
+  JSONP.src = `${url}?callback=${callback}${ret}`;
+  const w = window as any;
+  return new Promise((resolve, reject) => {
+    w[callback] = (r: any) => {
+      resolve(r);
+      headEle.removeChild(JSONP);
+      delete w[callback];
+    };
+    headEle.appendChild(JSONP);
+  });
+};
 
 export const GetRequest = () => {};
 
@@ -63,3 +90,9 @@ export const PostRequest = () => {};
 export const PutRequest = () => {};
 
 export const DelRequest = () => {};
+
+export const JsonpRequest = (url: string, data?: any) => {
+  return instance.jsonp(url, data);
+};
+
+export default instance;
