@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 14:06:16
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 14:28:45
+ * @Last Modified time: 2021-12-19 01:27:18
  */
 
 import {
@@ -47,7 +47,6 @@ const Select: React.FC<SelectProps> = ({
   onChange,
 }) => {
   const theme = createTheme();
-  console.log(theme);
 
   return (
     <Box sx={{ minWidth: 120 }}>
