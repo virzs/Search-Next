@@ -5,20 +5,22 @@ import vitePluginImp from 'vite-plugin-imp';
 import { VitePWA } from 'vite-plugin-pwa';
 import mdx from 'vite-plugin-mdx';
 import { visualizer } from 'rollup-plugin-visualizer';
+import usePluginImport from 'vite-plugin-importer';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     reactRefresh(),
     VitePWA({}),
-    vitePluginImp({
-      libList: [
-        {
-          // antd 按需引入
-          libName: 'antd',
-          style: (name) => `antd/es/${name}/style`,
-        },
-      ],
+    usePluginImport({
+      libraryName: 'antd',
+      libraryDirectory: 'es',
+      style: true,
+    }),
+    usePluginImport({
+      libraryName: '@material/core',
+      libraryDirectory: 'es',
+      style: true,
     }),
     mdx(),
     // build 分析
