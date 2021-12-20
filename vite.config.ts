@@ -4,6 +4,7 @@ import reactRefresh from '@vitejs/plugin-react-refresh';
 import vitePluginImp from 'vite-plugin-imp';
 import { VitePWA } from 'vite-plugin-pwa';
 import mdx from 'vite-plugin-mdx';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,6 +21,8 @@ export default defineConfig({
       ],
     }),
     mdx(),
+    // build 分析
+    visualizer(),
   ],
   css: {
     preprocessorOptions: {

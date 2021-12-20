@@ -7,3 +7,4 @@ dist-ssr
 /.nyc_output
 *.log
 /tools/**/source
+stats.html
