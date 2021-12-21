@@ -87,11 +87,21 @@ export const getAuthDataByKey = (id: string, key: string) => {
   const account = AuthDB.findOne(id);
   if (!account) throw new Error('未找到该账户');
   const result = account[key];
-  if (!result) throw new Error(`${key} is undefined`);
   if (result) return result;
   const defaultData = authDefaultData as any;
   const defResult = defaultData[key];
-  if (!result) throw new Error(`${key} is undefined`);
-  AuthDB.update(id, { key: defResult });
-  return defaultData[key];
+  if (!result && !defResult) {
+    AuthDB.update(id, { key: defResult });
+    return defaultData[key];
+  }
+};
+
+// 更新账户中指定字段
+export const updateAuthDataByKey = (id: string, key: string, value: any) => {
+  const account = AuthDB.findOne(id);
+  if (!account) throw new Error('未找到该账户');
+  const data: { [x: string]: any } = {};
+  data[key] = value;
+
+  return AuthDB.update(id, data);
 };
