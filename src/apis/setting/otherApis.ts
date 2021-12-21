@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-12-18 23:10:06
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-19 01:29:29
+ * @Last Modified time: 2021-12-19 20:56:38
  */
 
 import websiteIconApis from '@/data/website';
@@ -43,7 +43,6 @@ export const getOtherIconApi = (params: GetOtherIconApiParams) => {
   const res = OtherApisDB.findOne({ userId: params.userId, type: params.type });
   if (res) {
     const data = websiteIconApis.find((i) => i.id === res.apiId);
-    console.log(data, res);
     return { ...res, ...data };
   } else {
     const newRecord = OtherApisDB.inset({
