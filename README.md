@@ -44,6 +44,12 @@ yarn dev
 yarn build
 ```
 
+代码重复率分析：
+
+``` bash
+yarn jscpd
+```
+
 部署项目：
 
 项目需要后端接口支持，后端部分详见文末说明。

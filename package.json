@@ -8,7 +8,8 @@
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "test": "npx nyc@latest mocha",
     "deploy": "gh-pages -d dist",
-    "nav": "cd ./tools/navigation && node index.js e"
+    "nav": "cd ./tools/navigation && node index.js e",
+    "jscpd": "jscpd -r html ./src/"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -50,7 +51,6 @@
     "react-transition-group": "^4.4.2",
     "react-virtuoso": "^2.2.7",
     "remark-gfm": "^3.0.1",
-    "vite-plugin-importer": "^0.2.5",
     "vmdc-ui": "^0.1.13"
   },
   "devDependencies": {
@@ -64,6 +64,7 @@
     "@vitejs/plugin-react-refresh": "^1.3.1",
     "autoprefixer": "^10.3.4",
     "gh-pages": "^3.2.3",
+    "jscpd": "^3.4.2",
     "mocha": "^9.1.1",
     "nyc": "^15.1.0",
     "postcss": "^8.3.6",
@@ -73,6 +74,7 @@
     "typescript": "^4.3.2",
     "vite": "^2.5.4",
     "vite-plugin-imp": "^2.0.8",
+    "vite-plugin-importer": "^0.2.5",
     "vite-plugin-mdx": "^3.5.10",
     "vite-plugin-pwa": "^0.11.2"
   }

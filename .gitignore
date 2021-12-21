@@ -8,3 +8,4 @@ dist-ssr
 *.log
 /tools/**/source
 stats.html
+/report/*
