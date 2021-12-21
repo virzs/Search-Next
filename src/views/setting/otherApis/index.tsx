@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-12-17 17:02:34
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-19 10:23:19
+ * @Last Modified time: 2021-12-19 20:56:08
  */
 
 import { getOtherIconApi, setOtherIconApi } from '@/apis/setting/otherApis';
@@ -34,7 +34,6 @@ const OtherApis: React.FC<PageProps> = (props) => {
       userId: account ?? '',
       type: 'icon',
     });
-    console.log(data, account);
     setIconApi(data.apiId);
     let map = {} as ApiStatus;
     websiteIconApis.forEach((i) => {
