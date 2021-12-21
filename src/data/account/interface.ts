@@ -74,6 +74,11 @@ export interface Navigation {
   type: NavigationType;
 }
 
+// 消息提示
+export interface Message {
+  update: boolean; // 版本更新消息提示
+}
+
 export interface AuthData {
   _id?: string;
   username: string; // 用户名
@@ -85,6 +90,7 @@ export interface AuthData {
   background: AuthBackground; // 背景
   logo?: AuthLogo;
   navigation: Navigation;
+  message: Message;
   sync: {
     setting: boolean; // 设置同步
     website: boolean; // 常用网址同步

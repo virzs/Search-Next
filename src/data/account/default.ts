@@ -34,6 +34,9 @@ export const authDefaultData: AuthData = {
   navigation: {
     type: 'page',
   },
+  message: {
+    update: true,
+  },
   sync: {
     setting: false,
     website: false,
