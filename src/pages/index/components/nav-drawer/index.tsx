@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-12-12 22:23:43
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-13 14:57:12
+ * @Last Modified time: 2021-12-20 09:36:04
  */
 import { Drawer } from '@/components/md-custom/drawer';
 import navigationData from '@/data/navigation';
@@ -72,28 +72,26 @@ const ClassifyEle = (dataSource: Classify, parent?: Classify) => {
   return (
     <div
       className={classNames(!parent && 'shadow p-2 mb-2 rounded')}
-      key={dataSource.path}
+      key={dataSource.path + parent}
     >
       <div>
-        {dataSource.children?.map((j) => (
-          <WebsiteCard dataSource={j} />
+        {dataSource.children?.map((j, ji) => (
+          <WebsiteCard dataSource={j} key={ji} />
         ))}
-        {dataSource.subClassify?.map((j) => {
+        {dataSource.subClassify?.map((j, ji) => {
           return (
-            <>
-              <div key={j.path}>
-                <div className={classNames('font-semibold mb-3')}>{j.name}</div>
-                {j.children ? (
-                  <div className="grid gap-2.5 grid-cols-3 mb-3">
-                    {j.children?.map((k) => {
-                      return <WebsiteCard dataSource={k} />;
-                    })}
-                  </div>
-                ) : (
-                  ClassifyEle(j, dataSource)
-                )}
-              </div>
-            </>
+            <div key={ji}>
+              <div className={classNames('font-semibold mb-3')}>{j.name}</div>
+              {j.children ? (
+                <div className="grid gap-2.5 grid-cols-3 mb-3">
+                  {j.children?.map((k, ki) => {
+                    return <WebsiteCard dataSource={k} key={ki} />;
+                  })}
+                </div>
+              ) : (
+                ClassifyEle(j, dataSource)
+              )}
+            </div>
           );
         })}
       </div>
@@ -127,9 +125,9 @@ const NavDrawer: React.FC<NavDrawerProps> = (props) => {
       }
       {...props}
     >
-      {navigationData.map((i) => {
+      {navigationData.map((i, ii) => {
         return (
-          <div>
+          <div key={ii}>
             <div className="text-base font-bold mb-2">{i.name}</div>
             {i.intro && <div className="mb-2">{i.intro}</div>}
             {ClassifyEle(i)}

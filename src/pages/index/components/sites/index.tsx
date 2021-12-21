@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-04 09:40:16
+ * @Last Modified time: 2021-12-20 09:34:34
  */
 import React from 'react';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
@@ -123,21 +123,18 @@ const Sites: React.FC = (props) => {
 
   return (
     <>
-      <TransitionGroup className="flex justify-center items-end gap-2 h-full py-12">
+      <div className="flex justify-center items-end gap-2 h-full py-12">
         {siteList.map((i) => (
-          <CSSTransition classNames="transition" timeout={300} key={i._id}>
-            <SiteCard
-              item={i}
-              onClick={() => itemClick(i)}
-              onEdit={onEdit}
-              onRemove={onRemove}
-            />
-          </CSSTransition>
+          <SiteCard
+            item={i}
+            key={i._id}
+            onClick={() => itemClick(i)}
+            onEdit={onEdit}
+            onRemove={onRemove}
+          />
         ))}
-        <CSSTransition classNames="transition" timeout={300}>
-          <SiteCard type="add" onAdd={onAdd} />
-        </CSSTransition>
-      </TransitionGroup>
+        <SiteCard type="add" onAdd={onAdd} />
+      </div>
       <SiteDialog
         open={open}
         type={type}
