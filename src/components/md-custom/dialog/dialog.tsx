@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-07 10:16:22
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 21:43:42
+ * @Last Modified time: 2021-12-20 09:33:04
  */
 
 import React from 'react';
@@ -34,6 +34,8 @@ const Dialog: React.FC<DialogProps> = ({
   title,
   onOk,
   onCancel,
+  okText,
+  cancelText,
   children,
   container,
 }) => {
@@ -57,7 +59,7 @@ const Dialog: React.FC<DialogProps> = ({
           className={classnames(
             'rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100',
             css`
-              background-color: rgba(255, 255, 255, 0.90);
+              background-color: rgba(255, 255, 255, 0.9);
               backdrop-filter: blur(8px);
             `,
           )}
@@ -71,10 +73,10 @@ const Dialog: React.FC<DialogProps> = ({
           <div className="p-4">{children}</div>
           <div className="p-2 flex justify-end gap-2">
             <Button variant="text" onClick={onCancel}>
-              {t('cancel')}
+              {cancelText ? cancelText : t('cancel')}
             </Button>
             <Button variant="text" onClick={onOk}>
-              {t('submit')}
+              {okText ? okText : t('submit')}
             </Button>
           </div>
         </div>

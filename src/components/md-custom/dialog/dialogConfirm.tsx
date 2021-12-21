@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-05-01 01:23:50
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-07 21:12:48
+ * @Last Modified time: 2021-12-20 09:32:13
  */
 
 import {
@@ -17,8 +17,8 @@ import Dialog, { DialogProps } from './dialog';
 export type confirmType = 'info' | 'success' | 'error' | 'warning';
 
 export interface DialogConfirm extends DialogProps {
-  type?: confirmType;
-  content?: string;
+  type?: confirmType | false;
+  content?: string | React.ReactNode;
 }
 
 const InfoContent = () => {
@@ -54,17 +54,7 @@ const WarningContent = () => {
 };
 
 const DialogConfirm: React.FC<DialogConfirm> = (props) => {
-  const {
-    open,
-    title,
-    content,
-    type,
-    okText,
-    cancelText,
-    onOk,
-    onCancel,
-    ...rest
-  } = props;
+  const { open, title, content, type, ...rest } = props;
 
   const getIconByType = () => {
     const typeMap = {
@@ -77,8 +67,8 @@ const DialogConfirm: React.FC<DialogConfirm> = (props) => {
   };
 
   return (
-    <Dialog open={open} onCancel={onCancel} onOk={onOk} title={title} {...rest}>
-      {getIconByType()}
+    <Dialog open={open} {...rest} title={title} {...rest}>
+      {type !== false && getIconByType()}
       {content}
     </Dialog>
   );
