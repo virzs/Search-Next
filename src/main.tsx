@@ -13,11 +13,12 @@ import Markdown from './components/global/markdown';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { formatText } from './utils/common';
-import { getAuthDataByKey } from './apis/auth';
+import { getAuthDataByKey, updateAuthDataByKey } from './apis/auth';
 
 const getVersionInfo = () => {
   const account = localStorage.getItem('account');
   const message = getAuthDataByKey(account ?? '', 'message');
+  const latestVersion = getAuthDataByKey(account ?? '', 'latestVersion');
 
   message?.update &&
     latest().then((res) => {
@@ -29,6 +30,9 @@ const getVersionInfo = () => {
           body = '',
           published_at = '',
         } = res.data;
+        if (latestVersion === tag_name) return;
+        updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
+
         confirm({
           title: '版本更新',
           type: false,
@@ -50,6 +54,12 @@ const getVersionInfo = () => {
             </div>
           ),
           cancelText: '不再提示',
+          onCancel: () => {
+            updateAuthDataByKey(account ?? '', 'message', {
+              ...message,
+              update: false,
+            });
+          },
         });
       }
     });
@@ -58,8 +68,8 @@ const getVersionInfo = () => {
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
   // 初始化时获取用户
-  getAccount();
-  getVersionInfo();
+  const res = getAccount();
+  res && getVersionInfo();
 });
 
 // 控制台监听事件
