@@ -27,6 +27,7 @@ export interface DialogProps {
   cancelText?: string;
   children?: any;
   container?: Element;
+  width?: string | number;
 }
 
 const Dialog: React.FC<DialogProps> = ({
@@ -38,6 +39,7 @@ const Dialog: React.FC<DialogProps> = ({
   cancelText,
   children,
   container,
+  width = 520,
 }) => {
   const { t } = useTranslation();
 
@@ -57,8 +59,10 @@ const Dialog: React.FC<DialogProps> = ({
       <Fade in={open}>
         <div
           className={classnames(
-            'rounded absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-100',
+            'rounded transform mx-auto relative top-28',
             css`
+              width: ${typeof width === 'number' ? width + 'px' : width};
+              max-width: calc(100vw - 32px);
               background-color: rgba(255, 255, 255, 0.9);
               backdrop-filter: blur(8px);
             `,
