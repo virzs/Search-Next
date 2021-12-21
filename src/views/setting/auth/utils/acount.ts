@@ -23,8 +23,8 @@ export const getAccount = () => {
     const user = findAccount(userId);
     // ! 账号存在时更新
     if (user) {
-      const Update = new UpdateData();
-      const result = Update.object(authDefaultData, user);
+      const Update = new UpdateData(authDefaultData);
+      const result = Update.object(user);
       editAccount(userId, result);
       return findAccount(userId);
     } else {
