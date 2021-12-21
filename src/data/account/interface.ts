@@ -91,6 +91,7 @@ export interface AuthData {
   logo?: AuthLogo;
   navigation: Navigation;
   message: Message;
+  latestVersion: string;
   sync: {
     setting: boolean; // 设置同步
     website: boolean; // 常用网址同步

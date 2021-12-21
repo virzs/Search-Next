@@ -37,6 +37,7 @@ export const authDefaultData: AuthData = {
   message: {
     update: true,
   },
+  latestVersion: '',
   sync: {
     setting: false,
     website: false,
