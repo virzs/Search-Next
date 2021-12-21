@@ -17,10 +17,9 @@ class UpdateData {
 
   private objRecursion(source: any = {}, data: any = {}) {
     const deepData = deepCopy(data);
-    const dataKeys = Object.keys(deepData);
     const sourceKeys = Object.keys(source);
 
-    let newObj: { [x: string]: any } = {};
+    let newObj: { [x: string]: any } = deepData;
 
     sourceKeys.forEach((i) => {
       if (deepData[i] === undefined) {
