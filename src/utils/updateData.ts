@@ -18,13 +18,12 @@ class UpdateData {
   private objRecursion(source: any = {}, data: any = {}) {
     const deepData = deepCopy(data);
     const dataKeys = Object.keys(deepData);
+    const sourceKeys = Object.keys(source);
 
     let newObj: { [x: string]: any } = {};
 
-    Object.keys(source).forEach((i) => {
-      // 校验数据源中存在模板数据中不存在的字段时忽略
-      if (!dataKeys.includes(i)) return;
-      if (!deepData[i]) {
+    sourceKeys.forEach((i) => {
+      if (deepData[i] === undefined) {
         // 模板数据中 i 在数据源中不存在时
         newObj[i] = source[i];
       } else {
@@ -34,7 +33,6 @@ class UpdateData {
       // 模板数据中 i 为 Object 类型时向下检查
       if (source[i] instanceof Object) {
         if (Object.keys(source[i]).length !== Object.keys(deepData[i]).length) {
-          console.log(source[i]);
           newObj[i] = this.objRecursion(source[i], deepData[i]);
         }
       }
