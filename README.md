@@ -18,10 +18,6 @@ QQ群：859791575
 
 欢迎提供意见或建议
 
-## 开发计划
-
-详细内容请查看[开发计划](https://github.com/virzs/Search-Next/projects)
-
 ## 启动项目
 
 需要nodejs（版本不限，建议最新）、yarn（npm也可以）
@@ -54,16 +50,6 @@ yarn jscpd
 
 项目需要后端接口支持，后端部分详见文末说明。
 
-## 功能
-
-- 搜索
-  - 切换搜索引擎
-- 添加常用网址
-- 设置
-  - 切换背景（数据来源必应壁纸，分辨率1920x1080，每日更新一张新壁纸）
-- 首次进入消息提示
-- 导航页
-
 ## 截图（21/11/2）
 
 ![image-20211102144351320](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021443364.png)
@@ -78,6 +64,14 @@ yarn jscpd
 
 [历史截图](./docs/历史版本图片.md)
 
+## Star趋势
+
+[![Stargazers over time](https://starchart.cc/virzs/Search-Next.svg)](https://starchart.cc/virzs/Search-Next)
+
+## 开发计划
+
+详细内容请查看[开发计划](https://github.com/virzs/Search-Next/projects)
+
 ## 常见问题说明
 
 为什么不支持在线账号？
@@ -85,14 +79,6 @@ yarn jscpd
 - 服务器需要成本
 - 目前处于开发过程中，功能变动比较多
 - 涉及到在线账号等功能，需要为用户负责，目前没有太多精力专注在此方面
-
-## 关于重构
-
-从 `umi` 迁移到 `vite` 项目整体重写，使用 `umi` 的最后一个版本为 `v0.6.1`
-
-[重构前最后一个版本](https://github.com/virzs/Search-Next/tree/v0.6.1)
-
-[重构详细说明](./docs/项目重构说明.md)
 
 ## 后端支持
 
