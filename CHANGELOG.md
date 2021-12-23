@@ -1,3 +1,5 @@
+* ci(添加依赖): add dotenv-cli (285cb2a)
+
 ### [0.7.6](https://github.com/virzs/Search-Next/compare/v0.7.5...v0.7.6) (2021-12-23)
 
 
