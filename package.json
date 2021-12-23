@@ -1,6 +1,6 @@
 {
   "name": "search-vite",
-  "version": "0.7.6",
+  "version": "0.7.4",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
