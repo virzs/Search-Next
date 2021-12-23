@@ -7,7 +7,7 @@
     "serve": "vite preview",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "changelog": "release-it patch changelog",
-    "release": "release-it --no-increment --github.release --github.update",
+    "release": "release-it --no-increment --github.release --github.update --no-github.draft",
     "test": "vitest",
     "coverage": "vitest --coverage",
     "deploy": "gh-pages -d dist",
