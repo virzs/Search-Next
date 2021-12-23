@@ -1,3 +1,10 @@
+### [0.7.6](https://github.com/virzs/Search-Next/compare/v0.7.5...v0.7.6) (2021-12-23)
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **添加依赖:** add dotenv-cli ([285cb2a](https://github.com/lpreterite/datagent/commit/285cb2a216cd359b43b88ff7a4a328e51a30afe9))
+
 * ci(添加依赖): add dotenv-cli (285cb2a)
 
 ### [0.7.6](https://github.com/virzs/Search-Next/compare/v0.7.5...v0.7.6) (2021-12-23)
