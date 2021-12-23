@@ -6,6 +6,7 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "release": "release-it patch changelog",
     "test": "vitest",
     "coverage": "vitest --coverage",
     "deploy": "gh-pages -d dist",
