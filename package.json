@@ -6,7 +6,8 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "test": "npx nyc@latest mocha",
+    "test": "vitest",
+    "coverage": "vitest --coverage",
     "deploy": "gh-pages -d dist",
     "nav": "cd ./tools/navigation && node index.js e",
     "jscpd": "jscpd -r html ./src/"
@@ -43,6 +44,7 @@
     "less": "^4.1.1",
     "path": "^0.12.7",
     "react": "^17.0.0",
+    "react-darkreader": "^1.5.6",
     "react-dom": "^17.0.0",
     "react-hook-form": "^7.15.2",
     "react-i18next": "^11.12.0",
@@ -56,6 +58,7 @@
   "devDependencies": {
     "@mdx-js/mdx": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
+    "@release-it/conventional-changelog": "^3.3.0",
     "@types/classnames": "^2.3.1",
     "@types/node": "^16.9.1",
     "@types/react": "^17.0.0",
@@ -63,19 +66,25 @@
     "@types/react-router-dom": "^5.1.8",
     "@vitejs/plugin-react-refresh": "^1.3.1",
     "autoprefixer": "^10.3.4",
+    "cz-conventional-changelog": "3.3.0",
     "gh-pages": "^3.2.3",
     "jscpd": "^3.4.2",
-    "mocha": "^9.1.1",
-    "nyc": "^15.1.0",
     "postcss": "^8.3.6",
     "prettier": "^2.4.0",
+    "release-it": "^14.11.8",
     "rollup-plugin-visualizer": "^5.5.2",
     "tailwindcss": "^2.2.14",
     "typescript": "^4.3.2",
-    "vite": "^2.5.4",
+    "vite": "^2.7.6",
     "vite-plugin-imp": "^2.0.8",
     "vite-plugin-importer": "^0.2.5",
     "vite-plugin-mdx": "^3.5.10",
-    "vite-plugin-pwa": "^0.11.2"
+    "vite-plugin-pwa": "^0.11.2",
+    "vitest": "^0.0.108"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
