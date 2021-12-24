@@ -1,3 +1,21 @@
+## [0.8.0](https://github.com/virzs/Search-Next/compare/v0.7.9...v0.8.0) (2021-12-24)
+
+
+### ✨ Features | 新功能
+
+* **更新提醒设置:** :sparkles: 版本更新信息提醒设置 ([d6e72ba](https://github.com/lpreterite/datagent/commit/d6e72ba4884af1e93fe42c6db94bb9e3d4af7a48))
+
+
+### 📦 Chores | 其他更新
+
+* **迁移:** :children_crossing: 备份与恢复 从 实验室  迁移到 数据 ([500a27b](https://github.com/lpreterite/datagent/commit/500a27b39d0652bbb3fe8a87bc60a398e7a80559))
+* **文档:** :fire: 删除无用文档 ([166f6c1](https://github.com/lpreterite/datagent/commit/166f6c19b4788ebbea28082f900166c1d002d49c))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **bug 修复:** :bug: 修复设置页面下方显示子页面的bug ([f9cee94](https://github.com/lpreterite/datagent/commit/f9cee94abe423aa847eb0ed2414010e59717a799))
+
 ### [0.7.9](https://github.com/virzs/Search-Next/compare/v0.7.8...v0.7.9) (2021-12-24)
 
 
