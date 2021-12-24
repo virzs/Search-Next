@@ -22,8 +22,9 @@ const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {
         route: i,
         pathname: `${basePath}/${i.path}`,
       };
+
       return (
-        <RenderContent {...newProps}>
+        <RenderContent {...newProps} noOutlet={['setting'].includes(i.path)}>
           {React.createElement(i.component, newProps)}
         </RenderContent>
       );

@@ -11,6 +11,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 export interface RenderContentProps {
   children: any; // 组件 children
   pathname: string;
+  noOutlet?: boolean; // 忽略显示子组件
 }
 
 /**
@@ -20,14 +21,14 @@ export interface RenderContentProps {
  */
 
 const RenderContent: React.FC<RenderContentProps> = (props) => {
-  const { children, pathname } = props;
+  const { children, pathname, noOutlet = false } = props;
   const location = useLocation();
   return (
     <>
       {(pathname === location.pathname ||
         (pathname && pathname.indexOf('undefined') !== -1)) &&
         children}
-      <Outlet />
+      {!noOutlet && <Outlet />}
     </>
   );
 };
