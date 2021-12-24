@@ -122,6 +122,14 @@ const routers: Router[] = [
         exact: false,
         path: 'data',
         component: Data,
+        routes: [
+          {
+            title: '备份与恢复',
+            icon: <SettingsBackupRestore />,
+            path: 'backup',
+            component: Backup,
+          },
+        ],
       },
       {
         title: '实验室',
@@ -134,12 +142,6 @@ const routers: Router[] = [
             icon: <Brush />,
             path: 'logo',
             component: Logo,
-          },
-          {
-            title: '备份与恢复',
-            icon: <SettingsBackupRestore />,
-            path: 'backup',
-            component: Backup,
           },
           {
             title: '导航页',
