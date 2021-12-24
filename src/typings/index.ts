@@ -6,9 +6,8 @@
  */
 
 import { Router } from '@/config/router';
-import { RouteComponentProps } from 'react-router-dom';
 
-export interface PageProps extends RouteComponentProps {
+export interface PageProps {
   route: Router;
   pathname: string;
 }

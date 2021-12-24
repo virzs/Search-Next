@@ -17,7 +17,7 @@ import {
 import { ArrowBack } from '@material-ui/icons';
 import classNames from 'classnames';
 import React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export interface MenuLayoutMenu {
   id: string;
@@ -27,7 +27,7 @@ export interface MenuLayoutMenu {
   [x: string]: any;
 }
 
-export interface MenuLayoutProps extends RouteComponentProps {
+export interface MenuLayoutProps {
   children?: any;
   title?: string;
   basePath?: string;
@@ -63,17 +63,18 @@ const MenuLayout: React.FC<MenuLayoutProps> = ({
   basePath = '',
   showCopyright = true,
   children,
-  history,
   title,
   onChange,
   ...props
 }) => {
+  const location = useLocation();
+  const history = useNavigate();
   const [selected, setSelected] = React.useState<MenuLayoutMenu>(
     [] as unknown as MenuLayoutMenu,
   );
 
   React.useEffect(() => {
-    const state = history.location?.state as RouteState;
+    const state = location?.state as RouteState;
     if (state && state?.search) {
       const sel = menu.find((i) => i.id === state?.search);
       const selected = sel ? sel : menu[0];
@@ -94,7 +95,7 @@ const MenuLayout: React.FC<MenuLayoutProps> = ({
         )}
       >
         <div className="flex items-center">
-          <IconButton size="small" onClick={() => history.goBack()}>
+          <IconButton size="small" onClick={() => history(-1)}>
             <ArrowBack />
           </IconButton>
           <span className="text-xl font-semibold">{title}</span>

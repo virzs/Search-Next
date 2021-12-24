@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 
 export interface MenuLayoutNewProps extends PageProps {
   children: any;
-  pathname?: string;
+  pathname: string;
   mode?: 'route' | 'page';
   menu?: MenuLayoutMenu[];
   onChange?: (id: string, item: any) => void;
