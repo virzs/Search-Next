@@ -1,3 +1,10 @@
+### [0.7.9](https://github.com/virzs/Search-Next/compare/v0.7.8...v0.7.9) (2021-12-24)
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **bug fix:** 修复打包报错 ([d1461fc](https://github.com/lpreterite/datagent/commit/d1461fc9189aec88e8ff3da56d15f8314f7ba26e))
+
 ### [0.7.8](https://github.com/virzs/Search-Next/compare/v0.7.7...v0.7.8) (2021-12-24)
 
 
