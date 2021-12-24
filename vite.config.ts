@@ -1,27 +1,15 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import reactRefresh from '@vitejs/plugin-react-refresh';
-import vitePluginImp from 'vite-plugin-imp';
 import { VitePWA } from 'vite-plugin-pwa';
 import mdx from 'vite-plugin-mdx';
 import { visualizer } from 'rollup-plugin-visualizer';
-import usePluginImport from 'vite-plugin-importer';
+import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    reactRefresh(),
+    react(),
     VitePWA({}),
-    usePluginImport({
-      libraryName: 'antd',
-      libraryDirectory: 'es',
-      style: true,
-    }),
-    usePluginImport({
-      libraryName: '@material/core',
-      libraryDirectory: 'es',
-      style: true,
-    }),
     mdx(),
     // build 分析
     visualizer(),
