@@ -1,3 +1,22 @@
+### [0.7.8](https://github.com/virzs/Search-Next/compare/v0.7.7...v0.7.8) (2021-12-24)
+
+
+### ♻ Code Refactoring | 代码重构
+
+* **代码重构:** :recycle: 重写路由 ([e78c4ec](https://github.com/lpreterite/datagent/commit/e78c4ecead229f6d20d405cb3cfb6835f6557b03))
+
+
+### 📦 Chores | 其他更新
+
+* **删除log:** :mute: 删除log ([d47d477](https://github.com/lpreterite/datagent/commit/d47d477170722c67ae77ac3aa261d8dd81aa00da))
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **安装依赖:** :heavy_plus_sign: add dotenv ([5ce908f](https://github.com/lpreterite/datagent/commit/5ce908f9a16d374621719f069ad9d0edaee5d6c6))
+* **依赖升级:** :arrow_up: react-router-dom5 -> react-router-dom6 ([11bc670](https://github.com/lpreterite/datagent/commit/11bc670ac0aa836348b638484e8fe43f041ec1e3))
+* **vite config:** :heavy_minus_sign: 删除 vite-plugin-imp vite-plugin-importer 依赖 ([9ca9658](https://github.com/lpreterite/datagent/commit/9ca9658130fd88a9b42079093a8f7c53525fcd98))
+
 ### [0.7.7](https://github.com/virzs/Search-Next/compare/v0.7.5...v0.7.7) (2021-12-23)
 
 
