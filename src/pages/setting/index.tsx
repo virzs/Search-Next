@@ -57,7 +57,6 @@ const SettingPage: React.FC<SettingPageProps> = ({
 
   React.useEffect(() => {
     const breads = getBreadCrumbs(route.routes || []);
-    console.log('breads', breads);
     setBreads(breads);
   }, [location]);
 

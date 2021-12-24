@@ -49,7 +49,7 @@ export const getOtherIconApi = (params: GetOtherIconApiParams) => {
       ...params,
       apiId: websiteIconApis[0].id,
     });
-    console.log(newRecord);
+
     return {
       ...newRecord,
       ...websiteIconApis[0],
