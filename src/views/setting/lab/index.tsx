@@ -8,12 +8,16 @@
 import { Router } from '@/config/router';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
-import RenderContent from '@/pages/setting/components/renderContent';
+
 import { PageProps } from '@/typings';
 import { Alert, AlertTitle } from '@material-ui/core';
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Lab: React.FC<PageProps> = ({ history, route, children, ...props }) => {
+const Lab: React.FC<PageProps> = (props) => {
+  const { route } = props;
+  const history = useNavigate();
+  const location = useLocation();
   const [list, setList] = React.useState<Router[]>([]);
 
   React.useEffect(() => {
@@ -21,10 +25,7 @@ const Lab: React.FC<PageProps> = ({ history, route, children, ...props }) => {
   }, []);
 
   return (
-    <RenderContent
-      location={history.location as unknown as Location}
-      pChildren={children}
-    >
+    <div {...props}>
       <Alert severity="info">
         <AlertTitle>提示</AlertTitle>
         实验室中的功能均处在开发中，不保证实际发布。
@@ -35,11 +36,11 @@ const Lab: React.FC<PageProps> = ({ history, route, children, ...props }) => {
             key={i.path}
             title={i.title}
             icon={i.icon}
-            onClick={() => history.push(i.path)}
+            onClick={() => history(i.path)}
           ></ItemCard>
         ))}
       </ContentList>
-    </RenderContent>
+    </div>
   );
 };
 

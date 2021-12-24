@@ -12,12 +12,15 @@ import ItemAccordion, {
   AccordionDetailText,
 } from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import RenderContent from '@/pages/setting/components/renderContent';
+
 import { PageProps } from '@/typings';
 import { getUA } from '@/utils/info';
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const About: React.FC<PageProps> = ({ history, route, children, ...props }) => {
+const About: React.FC<PageProps> = ({ route, children, ...props }) => {
+  const history = useNavigate();
+  const location = useLocation();
   const [list, setList] = React.useState<Router[]>([]);
   const [ua, setUA] = React.useState({} as Bowser.Parser.ParsedResult);
   const [lastData, setLastData] = React.useState({} as LatestType);
@@ -35,10 +38,7 @@ const About: React.FC<PageProps> = ({ history, route, children, ...props }) => {
   }, []);
 
   return (
-    <RenderContent
-      location={history.location as unknown as Location}
-      pChildren={children}
-    >
+    <div>
       <ContentList>
         <ItemAccordion title="设备信息">
           <AccordionDetailText title="浏览器" value={ua.browser?.name} />
@@ -65,11 +65,11 @@ const About: React.FC<PageProps> = ({ history, route, children, ...props }) => {
             key={i.path}
             title={i.title}
             icon={i.icon}
-            onClick={() => history.push(i.path)}
+            onClick={() => history(i.path)}
           ></ItemCard>
         ))}
       </ContentList>
-    </RenderContent>
+    </div>
   );
 };
 

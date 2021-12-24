@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-17 17:03:29
+ * @Last Modified time: 2021-12-24 10:19:15
  */
 
 import { lazy } from 'react';
@@ -15,6 +15,8 @@ import {
   SupervisorAccount,
   Update,
   Api,
+  FeaturedPlayList,
+  Message as MessageIcon,
 } from '@material-ui/icons';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -35,6 +37,7 @@ import Backup from '@/views/setting/data/backup';
 import Features from '@/views/setting/features';
 import Navigation from '@/views/setting/navigation';
 import OtherApis from '@/views/setting/otherApis';
+import Message from '@/views/setting/features/message';
 
 /**
  * 关于 component 额外说明
@@ -63,12 +66,12 @@ const routers: Router[] = [
     component: lazy(() => import('@pages/index')),
   },
   {
-    path: '/navigation/:classify?',
+    path: 'navigation',
     title: '导航',
     component: lazy(() => import('@pages/navigation')),
   },
   {
-    path: '/setting',
+    path: 'setting',
     title: '设置',
     exact: false,
     component: SettingPage,
@@ -76,19 +79,19 @@ const routers: Router[] = [
       {
         title: '账户',
         exact: false,
-        path: '/setting/auth',
+        path: 'auth',
         component: Auth,
         routes: [
           {
             title: '账户信息',
             icon: <ManageAccounts />,
-            path: '/setting/auth/info',
+            path: 'info',
             component: Info,
           },
           {
             title: '其他账户',
             icon: <SupervisorAccount />,
-            path: '/setting/auth/others',
+            path: 'others',
             component: Others,
           },
         ],
@@ -96,13 +99,13 @@ const routers: Router[] = [
       {
         title: '个性化',
         exact: false,
-        path: '/setting/personalise',
+        path: 'personalise',
         component: Personalise,
         routes: [
           {
             title: '背景',
             icon: <PhotoLibrary />,
-            path: '/setting/personalise/background',
+            path: 'background',
             component: Background,
           },
           // ! 主题功能暂时不开发，优先重构
@@ -117,63 +120,71 @@ const routers: Router[] = [
       {
         title: '数据',
         exact: false,
-        path: '/setting/data',
+        path: 'data',
         component: Data,
       },
       {
         title: '实验室',
         exact: false,
-        path: '/setting/lab',
+        path: 'lab',
         component: Lab,
         routes: [
           {
             title: 'Logo',
             icon: <Brush />,
-            path: '/setting/lab/logo',
+            path: 'logo',
             component: Logo,
           },
           {
             title: '备份与恢复',
             icon: <SettingsBackupRestore />,
-            path: '/setting/lab/backup',
+            path: 'backup',
             component: Backup,
           },
           {
             title: '导航页',
             icon: <NavigationIcon />,
-            path: '/setting/lab/navigation',
+            path: 'navigation',
             component: Navigation,
           },
           {
             title: '第三方API',
             icon: <Api />,
-            path: '/setting/lab/otherApis',
+            path: 'otherApis',
             component: OtherApis,
           },
-          // {
-          //   title: '功能',
-          //   icon: <FeaturedPlayList />,
-          //   path: '/setting/lab/features',
-          //   component: Features,
-          // },
+          {
+            title: '功能',
+            icon: <FeaturedPlayList />,
+            path: 'features',
+            component: Features,
+            routes: [
+              {
+                title: '消息',
+                icon: <MessageIcon />,
+                path: 'message',
+                component: Message,
+              },
+            ],
+          },
         ],
       },
       {
         title: '关于',
         exact: false,
-        path: '/setting/about',
+        path: 'about',
         component: About,
         routes: [
           {
             title: '历史版本记录',
             icon: <Update />,
-            path: '/setting/about/releases',
+            path: 'releases',
             component: Releases,
           },
           {
             title: '历史提交记录',
             icon: <Update />,
-            path: '/setting/about/commits',
+            path: 'commits',
             component: Commits,
           },
         ],

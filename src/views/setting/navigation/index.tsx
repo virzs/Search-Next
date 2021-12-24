@@ -12,13 +12,13 @@ import {
 } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
-import RenderContent from '@/pages/setting/components/renderContent';
+
 import { PageProps } from '@/typings';
 import { SelectChangeEvent } from '@material-ui/core';
 import React from 'react';
 
 const Navigation: React.FC<PageProps> = (props) => {
-  const { history, route, children } = props;
+  const { route, children } = props;
 
   const [value, setValue] = React.useState<NavigationType>('page');
   const [navigationData, setNavigationData] =
@@ -54,10 +54,7 @@ const Navigation: React.FC<PageProps> = (props) => {
   }, []);
 
   return (
-    <RenderContent
-      location={history.location as unknown as Location}
-      pChildren={children}
-    >
+    <div {...props}>
       <ContentList>
         <ItemCard
           title="默认效果"
@@ -73,7 +70,7 @@ const Navigation: React.FC<PageProps> = (props) => {
           }
         ></ItemCard>
       </ContentList>
-    </RenderContent>
+    </div>
   );
 };
 

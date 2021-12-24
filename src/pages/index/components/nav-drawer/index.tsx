@@ -12,7 +12,7 @@ import { css } from '@emotion/css';
 import { CardActionArea, Tooltip, Button } from '@material-ui/core';
 import classNames from 'classnames';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export interface NavDrawerProps {
   open: boolean;
@@ -100,7 +100,7 @@ const ClassifyEle = (dataSource: Classify, parent?: Classify) => {
 };
 
 const NavDrawer: React.FC<NavDrawerProps> = (props) => {
-  const history = useHistory();
+  const history = useNavigate();
   return (
     <Drawer
       ModalProps={{
@@ -116,7 +116,7 @@ const NavDrawer: React.FC<NavDrawerProps> = (props) => {
           <div className="text-lg font-semibold">导航</div>
           <Button
             onClick={() => {
-              history.push('/navigation');
+              history('/navigation');
             }}
           >
             更多

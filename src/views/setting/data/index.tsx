@@ -9,14 +9,17 @@ import { Router } from '@/config/router';
 import { AuthData } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
-import RenderContent from '@/pages/setting/components/renderContent';
+
 import { PageProps } from '@/typings';
 import { formatSize, storageSize } from '@/utils/common';
 import { Alert, CardContent, LinearProgress } from '@material-ui/core';
 import React from 'react';
 import { getAccount } from '../auth/utils/acount';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Data: React.FC<PageProps> = ({ history, route, children, ...props }) => {
+const Data: React.FC<PageProps> = ({ route, children, ...props }) => {
+  const history = useNavigate();
+  const location = useLocation();
   const [list, setList] = React.useState<Router[]>([]);
   const [percent, setPercent] = React.useState<number>(0);
   const [accountData, setAccountData] = React.useState<AuthData[]>([]);
@@ -40,10 +43,7 @@ const Data: React.FC<PageProps> = ({ history, route, children, ...props }) => {
   }, []);
 
   return (
-    <RenderContent
-      location={history.location as unknown as Location}
-      pChildren={children}
-    >
+    <div>
       <div className="mb-4">
         <div className="mt-2">
           <div className="flex justify-between mb-2 text-sm">
@@ -68,11 +68,11 @@ const Data: React.FC<PageProps> = ({ history, route, children, ...props }) => {
             key={i.path}
             title={i.title}
             icon={i.icon}
-            onClick={() => history.push(i.path)}
+            onClick={() => history(i.path)}
           ></ItemCard>
         ))}
       </ContentList>
-    </RenderContent>
+    </div>
   );
 };
 

@@ -2,15 +2,15 @@
  * @Author: Vir
  * @Date: 2021-09-18 16:56:05
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-18 17:04:25
+ * @Last Modified time: 2021-12-24 10:12:12
  */
 
 import React from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 
 export interface RenderContentProps {
-  pChildren: any; // 父级 children
   children: any; // 组件 children
-  location: Location;
+  pathname: string;
 }
 
 /**
@@ -19,16 +19,16 @@ export interface RenderContentProps {
  * location={history.location as unknown as Location}
  */
 
-const RenderContent: React.FC<RenderContentProps> = ({
-  pChildren,
-  children,
-  location,
-}) => {
-  return pChildren &&
-    pChildren.find((i: any) => i.key === location.pathname) ? (
-    <>{pChildren}</>
-  ) : (
-    children
+const RenderContent: React.FC<RenderContentProps> = (props) => {
+  const { children, pathname } = props;
+  const location = useLocation();
+  return (
+    <>
+      {(pathname === location.pathname ||
+        (pathname && pathname.indexOf('undefined') !== -1)) &&
+        children}
+      <Outlet />
+    </>
   );
 };
 

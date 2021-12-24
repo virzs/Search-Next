@@ -12,6 +12,7 @@ import { PageProps } from '@/typings';
 import { Router } from '@/config/router';
 import Menu from './menu';
 import { MenuLayoutMenu } from '../menu-layout';
+import { useNavigate } from 'react-router-dom';
 
 export interface MenuLayoutNewProps extends PageProps {
   children: any;
@@ -26,8 +27,6 @@ export interface MenuLayoutNewProps extends PageProps {
 const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
   children,
   route,
-  history,
-  location,
   pathname,
   mode = 'page',
   menu = [],
@@ -38,6 +37,7 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
 }) => {
   const [menuList, setMenuList] = React.useState<Router[] | undefined>([]);
   const [breads, setBreads] = React.useState<Router[]>([]);
+  const history = useNavigate();
 
   const getBreadCrumbs = (routes: Router[], newLocation?: any) => {
     let breadCrumbs: Router[] = [];
@@ -62,7 +62,7 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
   React.useEffect(() => {
     if (mode === 'route') {
       if (location.pathname === pathname) {
-        history.replace(route?.routes?.[0].path || pathname);
+        history(route?.routes?.[0].path || pathname, { replace: true });
       }
       setMenuList(route?.routes);
     } else {
@@ -83,7 +83,7 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
             <IconButton
               size="small"
               onClick={() => {
-                history.push('/');
+                history('/');
               }}
             >
               <Home />
@@ -93,7 +93,7 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
             <IconButton
               size="small"
               onClick={() => {
-                history.goBack();
+                history(-1);
               }}
             >
               <KeyboardBackspace />

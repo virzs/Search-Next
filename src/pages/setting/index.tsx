@@ -12,6 +12,7 @@ import React from 'react';
 import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
 import { Router } from '@/config/router';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
 export interface SettingPageProps extends PageProps {
   children: any;
@@ -20,10 +21,10 @@ export interface SettingPageProps extends PageProps {
 const SettingPage: React.FC<SettingPageProps> = ({
   children,
   route,
-  history,
-  location,
   ...props
 }) => {
+  const history = useNavigate();
+  const location = useLocation();
   const [menuList, setMenuList] = React.useState<Router[] | undefined>([]);
   const [breads, setBreads] = React.useState<Router[]>([]);
 
@@ -49,13 +50,14 @@ const SettingPage: React.FC<SettingPageProps> = ({
 
   React.useEffect(() => {
     if (location.pathname === '/setting') {
-      history.replace(route?.routes?.[0].path || '/setting');
+      history(route?.routes?.[0].path || '/setting', { replace: true });
     }
     setMenuList(route?.routes);
   }, []);
 
   React.useEffect(() => {
     const breads = getBreadCrumbs(route.routes || []);
+    console.log('breads', breads);
     setBreads(breads);
   }, [location]);
 
@@ -67,7 +69,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
             <IconButton
               size="small"
               onClick={() => {
-                history.push('/');
+                history('/');
               }}
             >
               <Home />
@@ -77,7 +79,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
             <IconButton
               size="small"
               onClick={() => {
-                history.goBack();
+                history(-1);
               }}
             >
               <KeyboardBackspace />
@@ -102,7 +104,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
                 },
               )}
               onClick={() => {
-                history.push(i.path);
+                history(i.path);
               }}
             >
               {i.title}
@@ -118,16 +120,24 @@ const SettingPage: React.FC<SettingPageProps> = ({
                 'font-semibold': index === breads.length - 1,
               })}
               key={i.path}
-              onClick={() =>
-                index !== breads.length - 1 ? history.push(i.path) : null
-              }
+              onClick={() => {
+                const path =
+                  '/setting/' +
+                  breads
+                    .map((i) => i.path)
+                    .filter((_, ji) => ji <= index)
+                    .join('/');
+                index !== breads.length - 1 ? history(path) : null;
+              }}
             >
               {i.title}
             </p>
           ))}
         </Breadcrumbs>
         <div className="flex-grow overflow-y-auto w-full pt-4">
-          <div className="max-w-4xl">{children}</div>
+          <div className="max-w-4xl">
+            <Outlet />
+          </div>
         </div>
         <div className="text-center max-w-4xl">
           <Copyright />

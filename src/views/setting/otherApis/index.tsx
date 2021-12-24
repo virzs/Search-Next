@@ -12,10 +12,16 @@ import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion, {
   AccordionDetailItem,
 } from '@/pages/setting/components/itemAccordion';
-import RenderContent from '@/pages/setting/components/renderContent';
+
 import { PageProps } from '@/typings';
 import { css } from '@emotion/css';
-import { Alert, AlertTitle, Chip, SelectChangeEvent } from '@material-ui/core';
+import {
+  Alert,
+  AlertTitle,
+  Chip,
+  dividerClasses,
+  SelectChangeEvent,
+} from '@material-ui/core';
 import { Done, Close, PendingOutlined } from '@material-ui/icons';
 import React from 'react';
 
@@ -24,7 +30,7 @@ interface ApiStatus {
 }
 
 const OtherApis: React.FC<PageProps> = (props) => {
-  const { history, route, children } = props;
+  const { route, children } = props;
   const [iconApi, setIconApi] = React.useState('');
   const [apiStatus, setApiStatus] = React.useState<ApiStatus>({});
 
@@ -89,10 +95,7 @@ const OtherApis: React.FC<PageProps> = (props) => {
   }, []);
 
   return (
-    <RenderContent
-      location={history.location as unknown as Location}
-      pChildren={children}
-    >
+    <div>
       <ContentList>
         <Alert severity="info">
           <AlertTitle>提示</AlertTitle>
@@ -148,7 +151,7 @@ const OtherApis: React.FC<PageProps> = (props) => {
           })}
         </ItemAccordion>
       </ContentList>
-    </RenderContent>
+    </div>
   );
 };
 

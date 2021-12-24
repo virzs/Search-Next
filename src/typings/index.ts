@@ -10,6 +10,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 export interface PageProps extends RouteComponentProps {
   route: Router;
+  pathname: string;
 }
 
 export interface ResultTypes {

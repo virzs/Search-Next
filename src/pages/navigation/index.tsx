@@ -15,6 +15,7 @@ import { Input, List } from '@material-ui/core';
 import { InsertComment } from '@material-ui/icons';
 import React from 'react';
 import WebsiteCardNew from './components/websiteCardNew';
+import { useNavigate, useLocation, useMatch } from 'react-router-dom';
 
 const basePath = '/navigation';
 
@@ -60,15 +61,16 @@ const Recursion = (data: Classify, parent?: Classify) => {
 
 const NavigationPage: React.FC<PageProps> = (props) => {
   const menu: Classify[] = navigations;
-  const { history, match } = props;
+  const history = useNavigate();
+  const location = useLocation();
   const [selected, setSelected] = React.useState<Classify>({} as Classify);
 
   const changeSelect = (path: string, type: 'push' | 'replace' = 'replace') => {
     const find = menu.find((i) => i.path === path);
     if (find) {
       const path = `${basePath}/${find.path}`;
-      if (type === 'push') history.push(path);
-      if (type === 'replace') history.replace(path);
+      if (type === 'push') history(path);
+      if (type === 'replace') history(path, { replace: true });
       setSelected(find);
     }
   };
@@ -78,13 +80,13 @@ const NavigationPage: React.FC<PageProps> = (props) => {
   };
 
   React.useEffect(() => {
-    const path = history.location.pathname;
+    const path = location.pathname;
     if (path === basePath) {
-      history.replace(`${basePath}/${menu[0].path}`);
+      history(`${basePath}/${menu[0].path}`, { replace: true });
       setSelected(menu[0]);
     } else {
-      const { classify } = match.params as any;
-      changeSelect(classify);
+      // const { classify } = match.params as any;
+      // changeSelect(classify);
     }
   }, []);
 
@@ -100,7 +102,7 @@ const NavigationPage: React.FC<PageProps> = (props) => {
           <MenuListItem
             icon={<InsertComment />}
             primary="提交网站"
-            onClick={() => history.push('/help/commit_website')}
+            onClick={() => history('/help/commit_website')}
           />
         </List>
       }

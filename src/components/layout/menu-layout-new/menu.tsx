@@ -7,7 +7,7 @@
 
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export interface MenuItemProps {
   title: string;
@@ -50,7 +50,7 @@ export interface MenuProps {
 
 const Menu: React.FC<MenuProps> = (props) => {
   const { datasource = [], mode = 'page', onChange } = props;
-  const history = useHistory();
+  const history = useNavigate();
   const location = useLocation();
 
   const [val, setVal] = useState<string>('');
@@ -69,7 +69,7 @@ const Menu: React.FC<MenuProps> = (props) => {
             if (mode === 'route') {
               if (onChange) onChange(i.id, i);
             } else {
-              history.push(i.path);
+              history(i.path);
               setVal(i.path);
             }
           }}

@@ -22,8 +22,10 @@ import { AuthLogo, Navigation } from '@/data/account/interface';
 import { getAuthDataByKey } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
+import { useNavigate } from 'react-router-dom';
 
-const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
+const IndexPage: React.FC<PageProps> = (props) => {
+  const history = useNavigate();
   const { t, i18n } = useTranslation();
   const logoRef = React.useRef<HTMLDivElement>(null);
 
@@ -129,7 +131,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
                   break;
                 case 'page':
                 default:
-                  history.push('/navigation');
+                  history('/navigation');
                   break;
               }
             }}
@@ -142,7 +144,7 @@ const IndexPage: React.FC<PageProps> = ({ history, ...props }) => {
           </IconButton>
         </Tooltip>
         <Tooltip title="设置">
-          <IconButton onClick={() => history.push('/setting')}>
+          <IconButton onClick={() => history('/setting')}>
             <Settings
               className={classNames({
                 'text-var-main-10': !!bg,

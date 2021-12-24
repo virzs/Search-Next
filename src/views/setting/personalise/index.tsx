@@ -9,18 +9,17 @@ import { Router } from '@/config/router';
 import { AuthBackground, AuthData } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
-import RenderContent from '@/pages/setting/components/renderContent';
+
 import { PageProps } from '@/typings';
 import React from 'react';
 import { getAccount } from '../auth/utils/acount';
 import Example from './components/example';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Personalise: React.FC<PageProps> = ({
-  history,
-  route,
-  children,
-  ...props
-}) => {
+const Personalise: React.FC<PageProps> = (props) => {
+  const { route } = props;
+  const history = useNavigate();
+  const location = useLocation();
   const [list, setList] = React.useState<Router[]>([]);
   const [userBgSetting, setUserBgSetting] = React.useState<AuthBackground>(
     {} as AuthBackground,
@@ -33,10 +32,7 @@ const Personalise: React.FC<PageProps> = ({
   }, []);
 
   return (
-    <RenderContent
-      location={history.location as unknown as Location}
-      pChildren={children}
-    >
+    <div {...props}>
       <Example data={userBgSetting} />
       <ContentList>
         {list.map((i) => (
@@ -44,11 +40,11 @@ const Personalise: React.FC<PageProps> = ({
             key={i.path}
             title={i.title}
             icon={i.icon}
-            onClick={() => history.push(i.path)}
+            onClick={() => history(i.path)}
           ></ItemCard>
         ))}
       </ContentList>
-    </RenderContent>
+    </div>
   );
 };
 
