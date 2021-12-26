@@ -1,3 +1,10 @@
+### [0.8.1](https://github.com/virzs/Search-Next/compare/v0.8.0...v0.8.1) (2021-12-26)
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **样式修复:** :bug: 修复antd样式丢失bug ([c5b3d10](https://github.com/lpreterite/datagent/commit/c5b3d10f3c2c0c3574dc3d36532254f8548c1c66))
+
 ## [0.8.0](https://github.com/virzs/Search-Next/compare/v0.7.9...v0.8.0) (2021-12-24)
 
 
