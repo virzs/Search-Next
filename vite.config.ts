@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import mdx from 'vite-plugin-mdx';
 import { visualizer } from 'rollup-plugin-visualizer';
 import react from '@vitejs/plugin-react';
+import vitePluginImp from 'vite-plugin-imp';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,6 +14,14 @@ export default defineConfig({
     mdx(),
     // build 分析
     visualizer(),
+    vitePluginImp({
+      libList: [
+        {
+          libName: 'antd',
+          style: (name) => `antd/es/${name}/style/index.less`,
+        },
+      ],
+    }),
   ],
   css: {
     preprocessorOptions: {

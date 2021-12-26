@@ -117,7 +117,7 @@
     semver "^6.3.0"
     source-map "^0.5.0"
 
-"@babel/core@^7.16.0":
+"@babel/core@^7.12.10", "@babel/core@^7.16.0":
   version "7.16.5"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.16.5.tgz#924aa9e1ae56e1e55f7184c8bf073a50d8677f5c"
   integrity sha512-wUcenlLzuWMZ9Zt8S0KmFwGlH6QKRh3vsm/dhDA3CHkiTA45YuG1XkHRcNRl73EFPXDp/d5kVOU0/y7x2w6OaQ==
@@ -138,6 +138,15 @@
     semver "^6.3.0"
     source-map "^0.5.0"
 
+"@babel/generator@^7.12.11", "@babel/generator@^7.16.5":
+  version "7.16.5"
+  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.16.5.tgz#26e1192eb8f78e0a3acaf3eede3c6fc96d22bedf"
+  integrity sha512-kIvCdjZqcdKqoDbVVdt5R99icaRtrtYhYK/xux5qiWCBmfdvEYMFZ68QCrpE5cbFM1JsuArUNs1ZkuKtTtUcZA==
+  dependencies:
+    "@babel/types" "^7.16.0"
+    jsesc "^2.5.1"
+    source-map "^0.5.0"
+
 "@babel/generator@^7.12.5", "@babel/generator@^7.16.0":
   version "7.16.0"
   resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.16.0.tgz#d40f3d1d5075e62d3500bccb67f3daa8a95265b2"
@@ -153,15 +162,6 @@
   integrity sha512-d3itta0tu+UayjEORPNz6e1T3FtvWlP5N4V5M+lhp/CxT4oAA7/NcScnpRyspUMLK6tu9MNHmQHxRykuN2R7hw==
   dependencies:
     "@babel/types" "^7.15.4"
-    jsesc "^2.5.1"
-    source-map "^0.5.0"
-
-"@babel/generator@^7.16.5":
-  version "7.16.5"
-  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.16.5.tgz#26e1192eb8f78e0a3acaf3eede3c6fc96d22bedf"
-  integrity sha512-kIvCdjZqcdKqoDbVVdt5R99icaRtrtYhYK/xux5qiWCBmfdvEYMFZ68QCrpE5cbFM1JsuArUNs1ZkuKtTtUcZA==
-  dependencies:
-    "@babel/types" "^7.16.0"
     jsesc "^2.5.1"
     source-map "^0.5.0"
 
@@ -534,6 +534,11 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
+"@babel/parser@^7.12.11", "@babel/parser@^7.16.5", "@babel/parser@^7.6.0", "@babel/parser@^7.9.6":
+  version "7.16.6"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.16.6.tgz#8f194828193e8fa79166f34a4b4e52f3e769a314"
+  integrity sha512-Gr86ujcNuPDnNOY8mi383Hvi8IYrJVJYuf3XcuBM/Dgd+bINn/7tHqsj+tKkoreMbmGsFLsltI/JJd8fOFWGDQ==
+
 "@babel/parser@^7.12.7", "@babel/parser@^7.16.0":
   version "7.16.2"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.16.2.tgz#3723cd5c8d8773eef96ce57ea1d9b7faaccd12ac"
@@ -543,11 +548,6 @@
   version "7.15.6"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.15.6.tgz#043b9aa3c303c0722e5377fef9197f4cf1796549"
   integrity sha512-S/TSCcsRuCkmpUuoWijua0Snt+f3ewU/8spLo+4AXJCZfT0bVCzLD5MuOKdrx0mlAptbKzn5AdgEIIKXxXkz9Q==
-
-"@babel/parser@^7.16.5", "@babel/parser@^7.6.0", "@babel/parser@^7.9.6":
-  version "7.16.6"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.16.6.tgz#8f194828193e8fa79166f34a4b4e52f3e769a314"
-  integrity sha512-Gr86ujcNuPDnNOY8mi383Hvi8IYrJVJYuf3XcuBM/Dgd+bINn/7tHqsj+tKkoreMbmGsFLsltI/JJd8fOFWGDQ==
 
 "@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@^7.15.4":
   version "7.15.4"
@@ -1237,6 +1237,22 @@
     "@babel/parser" "^7.15.4"
     "@babel/types" "^7.15.4"
 
+"@babel/traverse@^7.12.12", "@babel/traverse@^7.16.5":
+  version "7.16.5"
+  resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.16.5.tgz#d7d400a8229c714a59b87624fc67b0f1fbd4b2b3"
+  integrity sha512-FOCODAzqUMROikDYLYxl4nmwiLlu85rNqBML/A5hKRVXG2LV8d0iMqgPzdYTcIpjZEBB7D6UDU9vxRZiriASdQ==
+  dependencies:
+    "@babel/code-frame" "^7.16.0"
+    "@babel/generator" "^7.16.5"
+    "@babel/helper-environment-visitor" "^7.16.5"
+    "@babel/helper-function-name" "^7.16.0"
+    "@babel/helper-hoist-variables" "^7.16.0"
+    "@babel/helper-split-export-declaration" "^7.16.0"
+    "@babel/parser" "^7.16.5"
+    "@babel/types" "^7.16.0"
+    debug "^4.1.0"
+    globals "^11.1.0"
+
 "@babel/traverse@^7.12.9", "@babel/traverse@^7.16.0":
   version "7.16.0"
   resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.16.0.tgz#965df6c6bfc0a958c1e739284d3c9fa4a6e3c45b"
@@ -1264,22 +1280,6 @@
     "@babel/helper-split-export-declaration" "^7.15.4"
     "@babel/parser" "^7.15.4"
     "@babel/types" "^7.15.4"
-    debug "^4.1.0"
-    globals "^11.1.0"
-
-"@babel/traverse@^7.16.5":
-  version "7.16.5"
-  resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.16.5.tgz#d7d400a8229c714a59b87624fc67b0f1fbd4b2b3"
-  integrity sha512-FOCODAzqUMROikDYLYxl4nmwiLlu85rNqBML/A5hKRVXG2LV8d0iMqgPzdYTcIpjZEBB7D6UDU9vxRZiriASdQ==
-  dependencies:
-    "@babel/code-frame" "^7.16.0"
-    "@babel/generator" "^7.16.5"
-    "@babel/helper-environment-visitor" "^7.16.5"
-    "@babel/helper-function-name" "^7.16.0"
-    "@babel/helper-hoist-variables" "^7.16.0"
-    "@babel/helper-split-export-declaration" "^7.16.0"
-    "@babel/parser" "^7.16.5"
-    "@babel/types" "^7.16.0"
     debug "^4.1.0"
     globals "^11.1.0"
 
@@ -3532,6 +3532,14 @@ dom-helpers@^5.0.1:
     "@babel/runtime" "^7.8.7"
     csstype "^3.0.2"
 
+dot-case@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/dot-case/-/dot-case-3.0.4.tgz#9b2b670d00a431667a8a75ba29cd1b98809ce751"
+  integrity sha512-Kv5nKlh6yRrdrGvxeJ2e5y2eRUpkUosIW4A2AS38zwSz27zu7ufDwQPi5Jhs3XAlGNetl3bmnGhQsMtkKJnj3w==
+  dependencies:
+    no-case "^3.0.4"
+    tslib "^2.0.3"
+
 dot-prop@^5.1.0, dot-prop@^5.2.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/dot-prop/-/dot-prop-5.3.0.tgz#90ccce708cd9cd82cc4dc8c3ddd9abdd55b20e88"
@@ -5337,6 +5345,13 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
+lower-case@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-2.0.2.tgz#6fa237c63dbdc4a82ca0fd882e4722dc5e634e28"
+  integrity sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==
+  dependencies:
+    tslib "^2.0.3"
+
 lowercase-keys@^1.0.0, lowercase-keys@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
@@ -6025,6 +6040,14 @@ new-github-release-url@1.0.0:
   dependencies:
     type-fest "^0.4.1"
 
+no-case@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/no-case/-/no-case-3.0.4.tgz#d361fd5c9800f558551a8369fc0dcd4662b6124d"
+  integrity sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==
+  dependencies:
+    lower-case "^2.0.2"
+    tslib "^2.0.3"
+
 node-emoji@^1.11.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-1.11.0.tgz#69a0150e6946e2f115e9d7ea4df7971e2628301c"
@@ -6240,6 +6263,14 @@ package-json@^6.3.0:
     registry-auth-token "^4.0.0"
     registry-url "^5.0.0"
     semver "^6.2.0"
+
+param-case@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/param-case/-/param-case-3.0.4.tgz#7d17fe4aa12bde34d4a77d91acfb6219caad01c5"
+  integrity sha512-RXlj7zCYokReqWpOPH9oYivUzLYZ5vAPIfEmCTNViosC78F8F0H9y7T7gG2M39ymgutxF5gcFEsyZQSph9Bp3A==
+  dependencies:
+    dot-case "^3.0.4"
+    tslib "^2.0.3"
 
 parent-module@^1.0.0:
   version "1.0.1"
@@ -8301,7 +8332,7 @@ tslib@^1.10.0, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2:
+tslib@^2, tslib@^2.0.3:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
@@ -8714,6 +8745,18 @@ vfile@^5.0.0:
     is-buffer "^2.0.0"
     unist-util-stringify-position "^3.0.0"
     vfile-message "^3.0.0"
+
+vite-plugin-imp@^2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/vite-plugin-imp/-/vite-plugin-imp-2.0.11.tgz#821fd8548a7a18c2027bbf0a55f0865487b33052"
+  integrity sha512-98lCTKiGvE54O8qtJdmDuGaJv8d7bd2p2k140M1i2+L81DCn2eKKRkdAJxNUiYUugv+pucX0Ye0omQ5SGrFH+A==
+  dependencies:
+    "@babel/core" "^7.12.10"
+    "@babel/generator" "^7.12.11"
+    "@babel/parser" "^7.12.11"
+    "@babel/traverse" "^7.12.12"
+    chalk "^4.1.0"
+    param-case "^3.0.4"
 
 vite-plugin-mdx@^3.5.10:
   version "3.5.10"
