@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-07 10:16:22
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-27 14:03:53
+ * @Last Modified time: 2021-12-27 15:49:15
  */
 
 import React from 'react';
@@ -55,6 +55,7 @@ const Dialog: React.FC<DialogProps> = ({
         timeout: 500,
       }}
       container={container}
+      disableAutoFocus
     >
       <Fade in={open}>
         <div
