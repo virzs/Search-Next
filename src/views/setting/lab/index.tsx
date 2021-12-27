@@ -10,7 +10,7 @@ import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 
 import { PageProps } from '@/typings';
-import { Alert, AlertTitle } from '@material-ui/core';
+import { Alert, AlertTitle } from '@mui/material';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 

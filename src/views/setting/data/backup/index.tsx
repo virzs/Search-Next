@@ -8,13 +8,13 @@ import confirm from '@/components/md-custom/dialog/confirm';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { exportFile, fileReader } from '@/utils/common';
-import { Button, styled } from '@material-ui/core';
+import { Button, styled } from '@mui/material';
 import {
   Download,
   FileDownload,
   SettingsBackupRestore,
   Upload,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';

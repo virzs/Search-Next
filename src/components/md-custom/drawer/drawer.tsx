@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-12-12 23:04:47
  */
 import React from 'react';
-import { Drawer as MDrawer, DrawerProps } from '@material-ui/core';
+import { Drawer as MDrawer, DrawerProps } from '@mui/material';
 import { css } from '@emotion/css';
 import { Overwrite } from '@/typings/global';
 import classNames from 'classnames';

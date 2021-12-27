@@ -5,8 +5,8 @@
  * @Last Modified time: 2021-09-21 21:22:01
  */
 
-import { CardActionArea, CardContent } from '@material-ui/core';
-import { KeyboardArrowRight } from '@material-ui/icons';
+import { CardActionArea, CardContent } from '@mui/material';
+import { KeyboardArrowRight } from '@mui/icons-material';
 import React from 'react';
 
 export interface ItemCardProps {

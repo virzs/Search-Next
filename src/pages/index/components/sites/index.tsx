@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:33:12
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-20 09:34:34
+ * @Last Modified time: 2021-12-27 13:52:34
  */
 import React from 'react';
 import SiteDialog, { FormTypes, SiteDialogType } from './dialog';
@@ -18,10 +18,11 @@ import {
   repeal,
   Site,
 } from '@/apis/site';
-import { message } from 'antd';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { useSnackbar } from 'notistack';
+import { Button } from '@mui/material';
 
 const Sites: React.FC = (props) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState<boolean>(false);
   const [type, setType] = React.useState<SiteDialogType>('add');
   const [editValue, setEditValue] = React.useState({} as Site);
@@ -61,28 +62,25 @@ const Sites: React.FC = (props) => {
     if (result) {
       setConfirmOpen(false);
       getSiteList();
-      message.success('删除成功');
-      // TODO 删除后撤销功能
-      // enqueueSnackbar('删除成功', {
-      //   variant: 'info',
-      //   action: () => (
-      //     <Button
-      //       style={{ color: '#fff' }}
-      //       onClick={() => {
-      //         const result = repeal();
-      //         if (result) {
-      //           enqueueSnackbar('撤销成功', { variant: 'success' });
-      //           getSiteList();
-      //         }
-      //       }}
-      //     >
-      //       撤销
-      //     </Button>
-      //   ),
-      // });
+      enqueueSnackbar('删除成功', {
+        variant: 'info',
+        action: () => (
+          <Button
+            style={{ color: '#fff' }}
+            onClick={() => {
+              const result = repeal();
+              if (result) {
+                enqueueSnackbar('撤销成功', { variant: 'success' });
+                getSiteList();
+              }
+            }}
+          >
+            撤销
+          </Button>
+        ),
+      });
     } else {
-      message.error('删除成功');
-      // enqueueSnackbar('删除失败', { variant: 'warning' });
+      enqueueSnackbar('删除失败', { variant: 'warning' });
     }
   };
 
@@ -96,23 +94,19 @@ const Sites: React.FC = (props) => {
     if (type === 'add') {
       const result = addSite(val);
       if (result) {
-        message.success('添加成功');
-        // enqueueSnackbar('添加成功', { variant: 'success' });
+        enqueueSnackbar('添加成功', { variant: 'success' });
         dialogClose();
       } else {
-        message.error('添加失败');
-        // enqueueSnackbar('保存失败', { variant: 'warning' });
+        enqueueSnackbar('保存失败', { variant: 'warning' });
       }
     }
     if (type === 'edit') {
       const result = editSite(editValue._id, val);
       if (result) {
-        message.success('修改成功');
-        // enqueueSnackbar('修改成功', { variant: 'success' });
+        enqueueSnackbar('修改成功', { variant: 'success' });
         dialogClose();
       } else {
-        message.error('修改失败');
-        // enqueueSnackbar('保存失败', { variant: 'warning' });
+        enqueueSnackbar('保存失败', { variant: 'warning' });
       }
     }
   };

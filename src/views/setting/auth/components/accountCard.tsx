@@ -6,7 +6,7 @@
  */
 
 import { AuthData } from '@/data/account/interface';
-import { Avatar, Chip } from '@material-ui/core';
+import { Avatar, Chip } from '@mui/material';
 import dayjs from 'dayjs';
 import React from 'react';
 

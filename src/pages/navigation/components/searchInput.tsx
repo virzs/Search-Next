@@ -4,8 +4,8 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-11-27 17:46:35
  */
-import { Paper, IconButton, InputBase } from '@material-ui/core';
-import { Menu, Search } from '@material-ui/icons';
+import { Paper, IconButton, InputBase } from '@mui/material';
+import { Menu, Search } from '@mui/icons-material';
 import React from 'react';
 
 function SearchInput() {

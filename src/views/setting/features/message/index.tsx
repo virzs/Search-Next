@@ -9,7 +9,7 @@ import { Message as AuthMessage } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { PageProps } from '@/typings';
-import { Switch } from '@material-ui/core';
+import { Switch } from '@mui/material';
 import React from 'react';
 
 const Message: React.FC<PageProps> = (props) => {

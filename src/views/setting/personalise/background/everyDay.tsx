@@ -7,7 +7,7 @@
 
 import { AuthBackgroundRandomData } from '@/data/account/interface';
 import { css } from '@emotion/css';
-import { Alert } from '@material-ui/core';
+import { Alert } from '@mui/material';
 import classNames from 'classnames';
 import { Image } from 'antd';
 import React from 'react';

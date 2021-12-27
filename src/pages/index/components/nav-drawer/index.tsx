@@ -9,7 +9,7 @@ import navigationData from '@/data/navigation';
 import { Classify, Website } from '@/data/navigation/interface';
 import { hexToRgba } from '@/utils/color';
 import { css } from '@emotion/css';
-import { CardActionArea, Tooltip, Button } from '@material-ui/core';
+import { CardActionArea, Tooltip, Button } from '@mui/material';
 import classNames from 'classnames';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';

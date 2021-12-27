@@ -14,7 +14,7 @@ import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 
 import { PageProps } from '@/typings';
-import { SelectChangeEvent } from '@material-ui/core';
+import { SelectChangeEvent } from '@mui/material';
 import React from 'react';
 
 const Navigation: React.FC<PageProps> = (props) => {

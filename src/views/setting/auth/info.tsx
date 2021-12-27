@@ -12,7 +12,7 @@ import Form from '@/components/md-custom/form';
 import { AuthData } from '@/data/account/interface';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { PageProps } from '@/typings';
-import { Button, TextField } from '@material-ui/core';
+import { Button, TextField } from '@mui/material';
 import { message } from 'antd';
 import React from 'react';
 import AccountCard from './components/accountCard';

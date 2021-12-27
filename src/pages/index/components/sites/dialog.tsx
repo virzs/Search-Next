@@ -5,7 +5,7 @@
  * @Last Modified time: 2021-10-10 16:02:20
  */
 
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 import React from 'react';
 import { RegisterOptions } from 'react-hook-form';
 import Modal from '@/components/md-custom/dialog/dialog';

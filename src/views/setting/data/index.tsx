@@ -12,7 +12,7 @@ import ItemCard from '@/pages/setting/components/itemCard';
 
 import { PageProps } from '@/typings';
 import { formatSize, storageSize } from '@/utils/common';
-import { Alert, CardContent, LinearProgress } from '@material-ui/core';
+import { Alert, CardContent, LinearProgress } from '@mui/material';
 import React from 'react';
 import { getAccount } from '../auth/utils/acount';
 import { useLocation, useNavigate } from 'react-router-dom';

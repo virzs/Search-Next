@@ -11,9 +11,9 @@ import {
   checkedBg,
   setBackground,
 } from '@/apis/setting/background';
-import { Replay } from '@material-ui/icons';
+import { Replay } from '@mui/icons-material';
 import { Spin, Image } from 'antd';
-import { Button, CircularProgress, Tooltip } from '@material-ui/core';
+import { Button, CircularProgress, Tooltip } from '@mui/material';
 import OutlineCard from '@/components/global/card/outline-card';
 import React from 'react';
 import dayjs from 'dayjs';

@@ -14,8 +14,8 @@ import {
   MenuProps as MMenuProps,
   styled,
   SvgIconTypeMap,
-} from '@material-ui/core';
-import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+} from '@mui/material';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 export interface Item {
   label: string;

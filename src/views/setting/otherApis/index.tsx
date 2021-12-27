@@ -21,8 +21,8 @@ import {
   Chip,
   dividerClasses,
   SelectChangeEvent,
-} from '@material-ui/core';
-import { Done, Close, PendingOutlined } from '@material-ui/icons';
+} from '@mui/material';
+import { Done, Close, PendingOutlined } from '@mui/icons-material';
 import React from 'react';
 
 interface ApiStatus {

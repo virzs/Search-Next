@@ -16,8 +16,8 @@ import {
   Typography,
   DialogTitle,
   CardActions,
-} from '@material-ui/core';
-import { MoreHoriz } from '@material-ui/icons';
+} from '@mui/material';
+import { MoreHoriz } from '@mui/icons-material';
 import React from 'react';
 import { Overflow } from 'vmdc-ui';
 

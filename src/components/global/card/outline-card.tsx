@@ -5,8 +5,8 @@
  * @Last Modified time: 2021-10-11 22:17:43
  */
 
-import { Tooltip } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Tooltip } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import classNames from 'classnames';
 import React from 'react';
 

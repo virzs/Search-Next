@@ -15,7 +15,7 @@ import {
   AuthData,
 } from '@/data/account/interface';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
-import { Alert, AlertTitle, SelectChangeEvent } from '@material-ui/core';
+import { Alert, AlertTitle, SelectChangeEvent } from '@mui/material';
 import React from 'react';
 import { getAccount } from '../../auth/utils/acount';
 import Example from '../components/example';

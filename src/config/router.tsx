@@ -17,7 +17,7 @@ import {
   Api,
   FeaturedPlayList,
   Message as MessageIcon,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import React from 'react';
 import Auth from '@views/setting/auth';
 import Info from '@views/setting/auth/info';

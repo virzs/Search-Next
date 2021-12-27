@@ -7,7 +7,7 @@
 
 import { list } from '@/apis/search';
 import { SearchEngineValueTypes } from '@/data/engine';
-import { Chip } from '@material-ui/core';
+import { Chip } from '@mui/material';
 import classnames from 'classnames';
 import React from 'react';
 

@@ -9,7 +9,7 @@ import { AuthBackgroundLinkData } from '@/data/account/interface';
 import { AccordionDetailItem } from '@/pages/setting/components/itemAccordion';
 import { isHttpLink } from '@/utils/regexp';
 import { css } from '@emotion/css';
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 import { Image, message } from 'antd';
 import classNames from 'classnames';
 import React from 'react';

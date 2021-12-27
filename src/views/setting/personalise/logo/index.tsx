@@ -15,7 +15,7 @@ import ItemAccordion, {
   AccordionDetailItem,
 } from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { Alert, Switch, TextField } from '@material-ui/core';
+import { Alert, Switch, TextField } from '@mui/material';
 import { message } from 'antd';
 import React from 'react';
 

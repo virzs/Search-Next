@@ -15,7 +15,7 @@ import {
   SelectChangeEvent,
   SelectProps as MSelectProps,
   createTheme,
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { MenuItem } from '../menu';
 

@@ -22,7 +22,7 @@ import ItemAccordion, {
   AccordionDetailItem,
 } from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@pages/setting/components/itemCard';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import { message } from 'antd';
 import React from 'react';
 import AccountCard from './components/accountCard';

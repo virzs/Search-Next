@@ -20,19 +20,19 @@ const getVersionInfo = () => {
   const message = getAuthDataByKey(account ?? '', 'message');
   const latestVersion = getAuthDataByKey(account ?? '', 'latestVersion');
 
-  message?.update &&
-    latest().then((res) => {
-      if (res.data) {
-        const {
-          tag_name = '',
-          name = '',
-          author = {},
-          body = '',
-          published_at = '',
-        } = res.data;
-        if (latestVersion === tag_name) return;
-        updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
+  latest().then((res) => {
+    if (res.data) {
+      const {
+        tag_name = '',
+        name = '',
+        author = {},
+        body = '',
+        published_at = '',
+      } = res.data;
+      if (latestVersion === tag_name) return;
+      updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
 
+      message?.update &&
         confirm({
           title: '版本更新',
           type: false,
@@ -61,8 +61,8 @@ const getVersionInfo = () => {
             });
           },
         });
-      }
-    });
+    }
+  });
 };
 
 // 全局初始化事件

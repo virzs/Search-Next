@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-07 10:16:22
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-20 09:33:04
+ * @Last Modified time: 2021-12-27 14:03:53
  */
 
 import React from 'react';
@@ -12,9 +12,9 @@ import {
   Backdrop,
   Button,
   IconButton,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Close } from '@material-ui/icons';
+import { Close } from '@mui/icons-material';
 import classnames from 'classnames';
 import { css } from '@emotion/css';
 

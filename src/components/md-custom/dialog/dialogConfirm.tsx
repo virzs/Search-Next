@@ -10,7 +10,7 @@ import {
   InfoOutlined,
   HighlightOffOutlined,
   ReportProblemOutlined,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import React from 'react';
 import Dialog, { DialogProps } from './dialog';
 

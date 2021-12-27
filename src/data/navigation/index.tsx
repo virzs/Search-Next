@@ -18,7 +18,7 @@ import {
   Email,
   ShoppingCart,
   Search,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import React from 'react';
 import { Navigation } from './interface';
 

@@ -10,8 +10,8 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-} from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
+} from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import React from 'react';

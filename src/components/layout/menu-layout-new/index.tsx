@@ -5,8 +5,8 @@
  * @Last Modified time: 2021-11-28 14:46:48
  */
 import React from 'react';
-import { IconButton, Tooltip } from '@material-ui/core';
-import { Home, KeyboardBackspace } from '@material-ui/icons';
+import { IconButton, Tooltip } from '@mui/material';
+import { Home, KeyboardBackspace } from '@mui/icons-material';
 import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
 import { Router } from '@/config/router';

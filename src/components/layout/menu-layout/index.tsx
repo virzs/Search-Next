@@ -13,8 +13,8 @@ import {
   ListItemIcon,
   ListItemProps,
   ListItemText,
-} from '@material-ui/core';
-import { ArrowBack } from '@material-ui/icons';
+} from '@mui/material';
+import { ArrowBack } from '@mui/icons-material';
 import classNames from 'classnames';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

@@ -7,7 +7,7 @@
 
 import { baiduSug } from '@/apis/baidu';
 import useDebounce from '@/hooks/debounce';
-import { Popper, Card, List, ListItem } from '@material-ui/core';
+import { Popper, Card, List, ListItem } from '@mui/material';
 import React from 'react';
 import { Empty, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';

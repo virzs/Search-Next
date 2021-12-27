@@ -14,8 +14,8 @@ import {
   ButtonGroup,
   CardActionArea,
   Tooltip,
-} from '@material-ui/core';
-import { Add, CopyAll, MoreHoriz } from '@material-ui/icons';
+} from '@mui/material';
+import { Add, CopyAll, MoreHoriz } from '@mui/icons-material';
 import { message } from 'antd';
 import classNames from 'classnames';
 import React from 'react';

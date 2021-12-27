@@ -9,13 +9,13 @@ import { getWebIconByUrl } from '@/apis/common';
 import { Site } from '@/apis/site';
 import Menu from '@/components/md-custom/menu';
 import { css } from '@emotion/css';
-import { Avatar, MenuItem, IconButton } from '@material-ui/core';
+import { Avatar, MenuItem, IconButton } from '@mui/material';
 import {
   AddOutlined,
   DeleteOutlineOutlined,
   EditOutlined,
   MoreHorizOutlined,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import classNames from 'classnames';
 import React from 'react';
 

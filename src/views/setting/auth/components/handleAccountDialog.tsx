@@ -7,7 +7,7 @@
 
 import Form from '@/components/md-custom/form';
 import Modal from '@/components/md-custom/dialog/dialog';
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 import React from 'react';
 
 export interface HandleAccountDialogProps {
