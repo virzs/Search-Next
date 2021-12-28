@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-29 11:36:28
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-02 11:22:04
+ * @Last Modified time: 2021-12-28 17:21:40
  */
 
 import { gitemoji, GitEmoji } from '@/data/github/gitemoji';
@@ -99,7 +99,7 @@ export const checkUrlWithHttpsOrHttp = (url: string) => {
 // 网址存在https或http替换
 export const replaceUrlHaveHttpsOrHttpToEmpty = (url: string): string => {
   const reg = /^((ht|f)tps?:\/\/)/;
-  return url.replace(reg, '');
+  return url.replace(reg, '').split('/')[0];
 };
 
 // 网址不存在https或http替换

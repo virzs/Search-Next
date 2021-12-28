@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-27 23:01:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-28 21:06:06
+ * @Last Modified time: 2021-12-28 17:23:20
  */
 import { addSite } from '@/apis/site';
 import { Website } from '@/data/navigation/interface';
@@ -20,6 +20,7 @@ import { message } from 'antd';
 import classNames from 'classnames';
 import React from 'react';
 import { Overflow } from 'vmdc-ui';
+import { getWebIconByUrl } from '@/apis/common';
 
 export interface WebsiteCardNewProps {
   datasource: Website;
@@ -49,17 +50,21 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
   return (
     <div
       className={classNames(
-        'cursor-pointer shadow rounded',
+        'cursor-pointer shadow-md rounded border-b-2',
         css`
           --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
             0 1px 3px 0 ${hexToRgba(color ?? '#000', 0.45).rgba} !important;
+          border-bottom-color: ${color};
         `,
       )}
     >
       <CardActionArea>
         <Tooltip title={intro || '暂无介绍'}>
           <div className="p-3 flex gap-3" onClick={() => window.open(url)}>
-            <Avatar style={{ backgroundColor: color }}>
+            <Avatar
+              // style={{ backgroundColor: color }}
+              src={getWebIconByUrl(url)}
+            >
               {name.split('')[0].toUpperCase()}
             </Avatar>
             <div className="flex-grow overflow-hidden">
