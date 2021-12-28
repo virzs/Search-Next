@@ -105,7 +105,7 @@ const SiteCard: React.FC<SiteCardPropTypes> = ({
             {type === 'add' && <AddOutlined />}
           </Avatar>
           <p className="text-center flex justify-center mt-1 w-full text-var-main-10">
-            <a className="overflow-hidden overflow-ellipsis">{item?.name}</a>
+            <a className="overflow-hidden text-ellipsis">{item?.name}</a>
           </p>
         </div>
         {type === 'view' && (

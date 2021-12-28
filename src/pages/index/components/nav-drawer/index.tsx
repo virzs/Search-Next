@@ -42,7 +42,7 @@ const WebsiteCard: React.FC<WebsiteCardProps> = (props) => {
         href={dataSource.url}
         target="_blank"
       >
-        <div className="overflow-hidden whitespace-nowrap overflow-ellipsis">
+        <div className="overflow-hidden whitespace-nowrap text-ellipsis">
           {dataSource.name}
         </div>
       </a>

@@ -1,6 +1,5 @@
 module.exports = {
-  purge: ['./src/**/*.html', './src/**/*.tsx'],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./src/**/*.html', './src/**/*.tsx'],
   important: true,
   theme: {
     extend: {
@@ -35,9 +34,6 @@ module.exports = {
         '-0.75': '-0.1875rem',
       },
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: ['./index.html', './src/**/*.{ts,tsx}'],
 };

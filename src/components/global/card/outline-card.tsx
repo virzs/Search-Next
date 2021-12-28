@@ -96,7 +96,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
             </div>
             {label && (
               <div>
-                <label className="mt-1 overflow-hidden max-w-full whitespace-nowrap overflow-ellipsis text-xs leading-4 inline-block p-0 text-primary">
+                <label className="mt-1 overflow-hidden max-w-full whitespace-nowrap text-ellipsis text-xs leading-4 inline-block p-0 text-primary">
                   {loading ? (
                     <Skeleton variant="text" width={100} height={16} />
                   ) : (

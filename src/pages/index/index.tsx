@@ -157,7 +157,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
         ref={logoRef}
         className={classNames(
           'index-logo-box items-center flex justify-center transition-all duration-300',
-          zoom && logoData.show ? 'flex-grow-0' : 'flex-grow',
+          zoom && logoData.show ? 'grow-0' : 'flex-grow',
           logoData.show ? 'max-h-48 sm:max-h-72' : 'max-h-32',
         )}
         style={{
