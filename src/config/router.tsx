@@ -108,6 +108,12 @@ const routers: Router[] = [
             path: 'background',
             component: Background,
           },
+          {
+            title: 'Logo',
+            icon: <Brush />,
+            path: 'logo',
+            component: Logo,
+          },
           // ! 主题功能暂时不开发，优先重构
           // {
           //   title: '主题',
@@ -123,6 +129,12 @@ const routers: Router[] = [
         path: 'features',
         component: Features,
         routes: [
+          {
+            title: '导航页',
+            icon: <NavigationIcon />,
+            path: 'navigation',
+            component: Navigation,
+          },
           {
             title: '消息',
             icon: <MessageIcon />,
@@ -151,18 +163,6 @@ const routers: Router[] = [
         path: 'lab',
         component: Lab,
         routes: [
-          {
-            title: 'Logo',
-            icon: <Brush />,
-            path: 'logo',
-            component: Logo,
-          },
-          {
-            title: '导航页',
-            icon: <NavigationIcon />,
-            path: 'navigation',
-            component: Navigation,
-          },
           {
             title: '第三方API',
             icon: <Api />,
