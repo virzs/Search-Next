@@ -118,6 +118,20 @@ const routers: Router[] = [
         ],
       },
       {
+        title: '功能',
+        icon: <FeaturedPlayList />,
+        path: 'features',
+        component: Features,
+        routes: [
+          {
+            title: '消息',
+            icon: <MessageIcon />,
+            path: 'message',
+            component: Message,
+          },
+        ],
+      },
+      {
         title: '数据',
         exact: false,
         path: 'data',
@@ -154,20 +168,6 @@ const routers: Router[] = [
             icon: <Api />,
             path: 'otherApis',
             component: OtherApis,
-          },
-          {
-            title: '功能',
-            icon: <FeaturedPlayList />,
-            path: 'features',
-            component: Features,
-            routes: [
-              {
-                title: '消息',
-                icon: <MessageIcon />,
-                path: 'message',
-                component: Message,
-              },
-            ],
           },
         ],
       },
