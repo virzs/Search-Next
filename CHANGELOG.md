@@ -1,3 +1,22 @@
+### [0.8.2](https://github.com/virzs/Search-Next/compare/v0.8.1...v0.8.2) (2021-12-29)
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **依赖升级:** :arrow_up: [@material-ui](https://github.com/material-ui) -> [@mui](https://github.com/mui) ([bc7cb2a](https://github.com/lpreterite/datagent/commit/bc7cb2ad8165764d0d5def616bf035985d3dee8b))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **bug 修复:** :bug: 修复弹窗错误获取焦点bug ([0b4bf47](https://github.com/lpreterite/datagent/commit/0b4bf474f003b00a03e20ea7a51f44446494ec41))
+* **bug 修复:** :bug: 修复设置背景为必应壁纸后，刷新壁纸会导致重复选择已选择壁纸的bug ([4ee7b62](https://github.com/lpreterite/datagent/commit/4ee7b623b83e89598a6393e8f6f979574101b6bc))
+
+
+### 📦 Chores | 其他更新
+
+* **功能调整:** :necktie: 功能设置调整到主菜单 ([6bd4378](https://github.com/lpreterite/datagent/commit/6bd4378ef3d38a4116b01932b8665c2c1a899f48))
+* **功能调整:** :necktie: Logo和导航页设置移出实验室 ([b820ee1](https://github.com/lpreterite/datagent/commit/b820ee1d47ed81dc45d6a871e02c40b827e9ca73))
+
 ### [0.8.1](https://github.com/virzs/Search-Next/compare/v0.8.0...v0.8.1) (2021-12-26)
 
 
