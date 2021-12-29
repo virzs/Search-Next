@@ -95,6 +95,7 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
     if (!init) return setInit(true);
     const userId = localStorage.getItem('account');
     const image = imgList.find((i) => i.hsh === hsh);
+    if (image && image.hsh === data?.hsh) return;
     if (image && userId) {
       setBackground(userId, {
         check: true,
@@ -141,32 +142,32 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
       >
         {apiLoading
           ? demoList.map((i) => (
-            <OutlineCard key={i} label=" " disabled loading />
-          ))
+              <OutlineCard key={i} label=" " disabled loading />
+            ))
           : imgList.map((i, j) => (
-            <OutlineCard
-              key={i.hsh}
-              id={i.hsh}
-              value={checkHsh}
-              label={dayjs(i.enddate).format('YYYY/MM/DD')}
-              onChange={(val) => onCheckChange(val)}
-              tip={i.copyright}
-            >
-              <Spin
-                spinning={loadings[j]}
-                indicator={<CircularProgress size={18} color="inherit" />}
+              <OutlineCard
+                key={i.hsh}
+                id={i.hsh}
+                value={checkHsh}
+                label={dayjs(i.enddate).format('YYYY/MM/DD')}
+                onChange={(val) => onCheckChange(val)}
+                tip={i.copyright}
               >
-                <Image
-                  className="w-32 h-20 block"
-                  onLoad={() => imgLoad(j)}
-                  preview={false}
-                  placeholder
-                  src={i.url}
-                  alt={i.copyright}
-                />
-              </Spin>
-            </OutlineCard>
-          ))}
+                <Spin
+                  spinning={loadings[j]}
+                  indicator={<CircularProgress size={18} color="inherit" />}
+                >
+                  <Image
+                    className="w-32 h-20 block"
+                    onLoad={() => imgLoad(j)}
+                    preview={false}
+                    placeholder
+                    src={i.url}
+                    alt={i.copyright}
+                  />
+                </Spin>
+              </OutlineCard>
+            ))}
       </div>
     </div>
   );
