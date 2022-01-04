@@ -70,7 +70,7 @@ const Logo: React.FC = () => {
         />
         <ItemCard
           title="Logo缩放"
-          desc="设置首页Logo在点击搜索框是是否缩放"
+          desc="设置首页Logo在点击搜索框时是否缩放"
           action={
             <Switch
               checked={logoData?.zoom}
