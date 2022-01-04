@@ -18,6 +18,7 @@ export const authDefaultData: AuthData = {
   logo: {
     show: true,
     type: 'clock',
+    zoom: true,
     config: {
       clock: {
         type: 'clock1',

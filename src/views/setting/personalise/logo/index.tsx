@@ -23,6 +23,7 @@ const Logo: React.FC = () => {
   const [logoData, setLogoData] = React.useState<AuthLogo>({
     type: 'clock',
     show: true,
+    zoom: true,
   } as AuthLogo);
 
   const [clockLogoData, setClockLogoData] = React.useState<ClockLogo>(
@@ -64,6 +65,16 @@ const Logo: React.FC = () => {
             <Switch
               checked={logoData?.show}
               onChange={(e) => updateLogoData({ show: e.target.checked })}
+            />
+          }
+        />
+        <ItemCard
+          title="Logo缩放"
+          desc="设置首页Logo在点击搜索框是是否缩放"
+          action={
+            <Switch
+              checked={logoData?.zoom}
+              onChange={(e) => updateLogoData({ zoom: e.target.checked })}
             />
           }
         />

@@ -64,6 +64,7 @@ export type LogoConfigType = {
 export interface AuthLogo {
   show: boolean;
   type: LogoType;
+  zoom: boolean;
   config: LogoConfigType;
 }
 

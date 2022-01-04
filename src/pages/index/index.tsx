@@ -174,7 +174,9 @@ const IndexPage: React.FC<PageProps> = (props) => {
           placeholder={t('placeholder.qing-shu-ru-sou-suo-nei-rong')}
           onPressEnter={handleSearch}
           onBtnClick={handleSearch}
-          onFocus={() => setZoom(true)}
+          onFocus={() => {
+            logoData.zoom && setZoom(true);
+          }}
           onBlur={() => setZoom(false)}
         />
       </div>
