@@ -8,7 +8,7 @@ import axios from 'axios';
 
 //axios默认配置
 const instance = axios.create({
-  baseURL: 'http://api.virs.xyz',
+  baseURL: 'https://api.search.virs.xyz',
   timeout: 10000,
   validateStatus: (status: number) => status >= 200 && status <= 500,
 });

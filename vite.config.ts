@@ -37,7 +37,7 @@ export default defineConfig({
     open: false,
     proxy: {
       '/v1': {
-        target: 'http://api.virs.xyz/',
+        target: 'https://api.search.virs.xyz/',
         changeOrigin: true,
       },
     },
