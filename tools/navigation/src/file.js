@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:39:43
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-21 16:07:56
+ * @Last Modified time: 2022-01-07 11:49:31
  */
 
 const fs = require('fs');
@@ -39,7 +39,7 @@ const copyFile = (path, outPath) => {
 };
 
 const tsToJs = (path) => {
-  const result = exec(`tsc ${path} --removeComments`, (err) => {
+  const result = exec(`tsc ${path} --removeComments --skipLibCheck`, (err) => {
     return err ? err : true;
   });
   return result;
