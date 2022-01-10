@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:41:30
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-21 16:22:35
+ * @Last Modified time: 2022-01-10 13:37:59
  */
 const {
   allDataPath,
@@ -39,23 +39,27 @@ const copyAndSwitchFile = () => {
   }
 };
 
-const formatData = (classify = [], website = []) => {
+const formatData = (classify = [], website = [], level = 1) => {
   return classify.map((i) => {
-    if (i.subClassify) {
-      const classifyWebsite = website.filter((j) =>
-        j.classify.includes(i.path),
+    const { children, subClassify, ...rest } = i;
+    const childrenWebsite = website.filter((j) => j.classify.includes(i.path));
+    const classifyWebsite =
+      children?.filter((j) => j.classify.includes(i.path)) || [];
+    let res = { ...rest, level };
+
+    res.children = children ? classifyWebsite : childrenWebsite;
+
+    if (subClassify) {
+      res.subClassify = formatData(i.subClassify, childrenWebsite, level + 1);
+      // 过滤网站，保留子分类中不存在的网站
+      const filterChildren = res.children.filter((k) =>
+        res.subClassify
+          .map((l) => l.path)
+          .every((n) => !k.classify.includes(n)),
       );
-      return { ...i, subClassify: formatData(i.subClassify, classifyWebsite) };
-    } else {
-      const { children, ...rest } = i;
-      return {
-        ...rest,
-        children:
-          children !== undefined
-            ? children.filter((j) => j.classify.includes(i.path))
-            : website.filter((j) => j.classify.includes(i.path)),
-      };
+      res.children = filterChildren.length > 0 ? filterChildren : undefined;
     }
+    return res;
   });
 };
 
