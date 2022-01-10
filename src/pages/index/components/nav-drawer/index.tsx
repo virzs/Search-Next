@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-12-12 22:23:43
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-20 09:36:04
+ * @Last Modified time: 2022-01-10 13:51:27
  */
 import { Drawer } from '@/components/md-custom/drawer';
 import navigationData from '@/data/navigation';
@@ -69,31 +69,50 @@ const WebsiteCard: React.FC<WebsiteCardProps> = (props) => {
 };
 
 const ClassifyEle = (dataSource: Classify, parent?: Classify) => {
+  const notClassifiedData =
+    dataSource.children &&
+    dataSource.children.filter((k) =>
+      dataSource.subClassify
+        ?.map((l) => l.path)
+        .every((n) => !k.classify.includes(n)),
+    );
   return (
     <div
       className={classNames(!parent && 'shadow p-2 mb-2 rounded')}
       key={dataSource.path + parent}
     >
       <div>
-        {dataSource.children?.map((j, ji) => (
-          <WebsiteCard dataSource={j} key={ji} />
-        ))}
         {dataSource.subClassify?.map((j, ji) => {
           return (
             <div key={ji}>
               <div className={classNames('font-semibold mb-3')}>{j.name}</div>
-              {j.children ? (
+              {j.children && j.children.length > 0 && (
                 <div className="grid gap-2.5 grid-cols-3 mb-3">
                   {j.children?.map((k, ki) => {
                     return <WebsiteCard dataSource={k} key={ki} />;
                   })}
                 </div>
-              ) : (
-                ClassifyEle(j, dataSource)
               )}
+              {ClassifyEle(j, dataSource)}
             </div>
           );
         })}
+        {notClassifiedData &&
+          notClassifiedData.length > 0 &&
+          dataSource?.level === 1 && (
+            <div
+              className={css`
+                margin-top: 16px;
+              `}
+            >
+              <div className={classNames('font-semibold mb-3')}>未分类</div>
+              <div className="grid gap-2.5 grid-cols-3 mb-3">
+                {notClassifiedData.map((j) => (
+                  <WebsiteCard key={j.id} dataSource={j} />
+                ))}
+              </div>
+            </div>
+          )}
       </div>
     </div>
   );
