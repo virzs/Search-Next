@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-13 10:20:59
+ * @Last Modified time: 2022-01-07 14:24:50
  */
 
 import { Website } from './interface';
@@ -478,20 +478,11 @@ const allWebsites: Website[] = [
     classify: ['develop', 'front-end'],
   },
   {
-    id: 'e5bab6816cf4495892a8bafaf436b400',
-    name: 'webpack',
-    url: 'https://www.webpackjs.com/',
-    intro: '让一切变得简单',
-    icon: 'webpackjs',
-    color: '#55A7DD',
-    classify: ['develop', 'front-end'],
-  },
-  {
     id: '8adc9d543405497b95279847ef9db1d4',
     name: 'Amp What',
     url: 'http://www.amp-what.com/',
     intro: 'Discover your character',
-    icon: 'webpackjs',
+    icon: 'amp-what',
     color: '#333333',
     classify: ['develop'],
   },
@@ -876,6 +867,15 @@ const allWebsites: Website[] = [
     icon: 'readme',
     color: '#37CA99',
     classify: ['develop', 'tools', 'onlineTools'],
+  },
+  {
+    id: 'b99c088df8664298993e7b81b6278928',
+    name: 'TDesign',
+    url: 'https://tdesign.tencent.com/',
+    intro: '开源的企业级设计体系',
+    icon: 'tdesign',
+    color: '#0052D9',
+    classify: ['design', 'develop', 'front-end'],
   },
 ];
 

@@ -5,12 +5,25 @@ const navigationData: Classify[] = [
     name: "常用",
     path: "common",
     intro: "常用网站推荐",
+    level: 1,
+    children: [
+      {
+        id: "1e8cc25c39a94d499b3ca0abcd5e5be8",
+        name: "QQ邮箱",
+        url: "https://mail.qq.com/",
+        intro: "QQ邮箱，常联系！",
+        icon: "qqemail",
+        color: "#279BDF",
+        classify: ["common", "email"],
+      },
+    ],
     subClassify: [
       {
         id: "17e0e9a9e45140059a1f1d038e93d206",
         name: "购物",
         path: "shopping",
         intro: "常用购物网站推荐",
+        level: 2,
         children: [
           {
             id: "3238186bed334acaab3868275204ffaa",
@@ -46,6 +59,7 @@ const navigationData: Classify[] = [
         name: "社交",
         path: "social",
         intro: "常用社交网站推荐",
+        level: 2,
         children: [
           {
             id: "4e1c3a03242b4361a22a4daf8ced88bf",
@@ -81,6 +95,7 @@ const navigationData: Classify[] = [
         name: "资讯",
         path: "news",
         intro: "常用资讯网站推荐",
+        level: 2,
         children: [
           {
             id: "aacdc4b5794949fb8ad888446049bea8",
@@ -143,12 +158,34 @@ const navigationData: Classify[] = [
     name: "资讯",
     path: "news",
     intro: "",
+    level: 1,
+    children: [
+      {
+        id: "a0629197d9b34b4f99f19cad0904ab1d",
+        name: "央视网",
+        url: "https://www.cctv.com/",
+        intro: "世界就在眼前",
+        icon: "cctv",
+        color: "#BF0614",
+        classify: ["news"],
+      },
+      {
+        id: "05ec015eefa44e3eb1e157e7f3d07f85",
+        name: "观察者网",
+        url: "https://www.guancha.cn/",
+        intro: "为全球华人读者提供集新鲜、热点、深度、趣味于一体的时政资讯。",
+        icon: "guancha",
+        color: "#BD0509",
+        classify: ["news"],
+      },
+    ],
     subClassify: [
       {
         id: "a908cb2401da46b8890147862a5def23",
         name: "常用",
         path: "common",
         intro: "",
+        level: 2,
         children: [
           {
             id: "aacdc4b5794949fb8ad888446049bea8",
@@ -209,6 +246,7 @@ const navigationData: Classify[] = [
         name: "数码",
         path: "digital",
         intro: "",
+        level: 2,
         children: [
           {
             id: "322ac9b788c64d02bb28b158c14ea17c",
@@ -282,12 +320,14 @@ const navigationData: Classify[] = [
     name: "工具",
     path: "tools",
     intro: "软件，在线工具",
+    level: 1,
     subClassify: [
       {
         id: "39e6caea9ab24006888dc0e214abe9ae",
         name: "软件",
         path: "software",
         intro: "软件官网",
+        level: 2,
         children: [
           {
             id: "47e97fedff2d40779e072dc6ee7ddd16",
@@ -432,6 +472,7 @@ const navigationData: Classify[] = [
         name: "在线工具",
         path: "onlineTools",
         intro: "在线工具",
+        level: 2,
         children: [
           {
             id: "d1474b8bf88a4f33b33c54c26bd2479f",
@@ -460,12 +501,54 @@ const navigationData: Classify[] = [
     name: "开发",
     path: "develop",
     intro: "",
+    level: 1,
+    children: [
+      {
+        id: "82d5e217d8fb4906a8b818e2052a0130",
+        name: "Flutter Gallery",
+        url: "https://gallery.flutter.dev/#/",
+        intro:
+          "Flutter Gallery is a resource to help developers evaluate and use Flutter",
+        icon: "fluttergallery",
+        color: "#FF8383",
+        classify: ["develop"],
+      },
+      {
+        id: "8adc9d543405497b95279847ef9db1d4",
+        name: "Amp What",
+        url: "http://www.amp-what.com/",
+        intro: "Discover your character",
+        icon: "amp-what",
+        color: "#333333",
+        classify: ["develop"],
+      },
+      {
+        id: "bcef02d38bad4bd4b9498e669c139d4b",
+        name: "dayjs",
+        url: "https://www.npmjs.com/package/dayjs",
+        intro:
+          "Day.js 是一个轻量的处理时间和日期的 JavaScript 库，和 Moment.js 的 API 设计保持完全一样. 如果您曾经用过 Moment.js, 那么您已经知道如何使用 Day.js",
+        icon: "dayjs",
+        color: "#FF5F4C",
+        classify: ["develop", "npm", "package"],
+      },
+      {
+        id: "7b51bd4d0c454217b6a32b62fb94ff56",
+        name: "Moment.js",
+        url: "https://www.npmjs.com/package/moment",
+        intro: "用于解析、验证、操作和格式化日期的JavaScript日期库。",
+        icon: "moment",
+        color: "#5E8381",
+        classify: ["develop", "package", "npm"],
+      },
+    ],
     subClassify: [
       {
         id: "74f09917fdc249fcb0b20ca5211a277f",
         name: "前端",
         path: "front-end",
         intro: "",
+        level: 2,
         children: [
           {
             id: "038ce5a511564b74a02b566e1ad02e61",
@@ -585,14 +668,25 @@ const navigationData: Classify[] = [
             color: "#646CFF",
             classify: ["develop", "front-end"],
           },
+        ],
+        subClassify: [
           {
-            id: "e5bab6816cf4495892a8bafaf436b400",
-            name: "webpack",
-            url: "https://www.webpackjs.com/",
-            intro: "让一切变得简单",
-            icon: "webpackjs",
-            color: "#55A7DD",
-            classify: ["develop", "front-end"],
+            id: "0439561c202b40ccb22958c01ec6cd9a",
+            name: "UI 库",
+            path: "design",
+            intro: "",
+            level: 3,
+            children: [
+              {
+                id: "b99c088df8664298993e7b81b6278928",
+                name: "TDesign",
+                url: "https://tdesign.tencent.com/",
+                intro: "开源的企业级设计体系",
+                icon: "tdesign",
+                color: "#0052D9",
+                classify: ["design", "develop", "front-end"],
+              },
+            ],
           },
         ],
       },
@@ -601,6 +695,7 @@ const navigationData: Classify[] = [
         name: "后端",
         path: "rear-end",
         intro: "",
+        level: 2,
         children: [
           {
             id: "8a03034d7cb246f5bb9a77a435e6e772",
@@ -619,6 +714,7 @@ const navigationData: Classify[] = [
         name: "移动端",
         path: "mobile terminal",
         intro: "",
+        level: 2,
         children: [
           {
             id: "8d34bc84c31048a8beb9b0f144f3fa5e",
@@ -664,6 +760,7 @@ const navigationData: Classify[] = [
         name: "文档",
         path: "document",
         intro: "",
+        level: 2,
         children: [
           {
             id: "cab0470e567445e6832971fdf9aefd73",
@@ -690,6 +787,7 @@ const navigationData: Classify[] = [
         name: "社区",
         path: "community",
         intro: "",
+        level: 2,
         children: [
           {
             id: "464583eeb36d4e488ce0dbfd55f24757",
@@ -780,6 +878,7 @@ const navigationData: Classify[] = [
         name: "博客",
         path: "blog",
         intro: "",
+        level: 2,
         children: [
           {
             id: "4fcb3ac90a42440a886eebe1d82bc309",
@@ -824,12 +923,14 @@ const navigationData: Classify[] = [
         name: "工具",
         path: "tools",
         intro: "",
+        level: 2,
         subClassify: [
           {
             id: "37500ffad8aa4ccd8d3a5e5ac8dbf5d9",
             name: "在线工具",
             path: "onlineTools",
             intro: "",
+            level: 3,
             children: [
               {
                 id: "975c566fa1da4082920488e57f2b812e",
@@ -851,12 +952,25 @@ const navigationData: Classify[] = [
     name: "设计",
     path: "design",
     intro: "",
+    level: 1,
+    children: [
+      {
+        id: "b99c088df8664298993e7b81b6278928",
+        name: "TDesign",
+        url: "https://tdesign.tencent.com/",
+        intro: "开源的企业级设计体系",
+        icon: "tdesign",
+        color: "#0052D9",
+        classify: ["design", "develop", "front-end"],
+      },
+    ],
     subClassify: [
       {
         id: "c72c26bf74374433ab41f25003b7356b",
         name: "图标库",
         path: "icons",
         intro: "",
+        level: 2,
         children: [
           {
             id: "75f6ae67b74a4457bb91edc58654ade1",

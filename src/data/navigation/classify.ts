@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-19 17:45:40
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-28 16:10:34
+ * @Last Modified time: 2022-01-07 14:48:11
  */
 
 import { Classify } from './interface';
@@ -85,6 +85,14 @@ const classify: Classify[] = [
         name: '前端',
         path: 'front-end',
         intro: '',
+        subClassify: [
+          {
+            id: '0439561c202b40ccb22958c01ec6cd9a',
+            name: 'UI 库',
+            path: 'design',
+            intro: '',
+          },
+        ],
       },
       {
         id: '305bc170bac34452b09f4c7bfd46523b',

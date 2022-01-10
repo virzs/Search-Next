@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-08 22:26:38
+ * @Last Modified time: 2022-01-10 13:36:11
  */
 
 import { MenuLayoutMenu, MenuListItem } from '@/components/layout/menu-layout';
@@ -16,15 +16,21 @@ import { InsertComment } from '@mui/icons-material';
 import React from 'react';
 import WebsiteCardNew from './components/websiteCardNew';
 import { useNavigate, useLocation, useMatch } from 'react-router-dom';
+import { css } from '@emotion/css';
 
 const basePath = '/navigation';
 
 const Recursion = (data: Classify, parent?: Classify) => {
+  const notClassifiedData =
+    data.children &&
+    data.children.filter((k) =>
+      data.subClassify
+        ?.map((l) => l.path)
+        .every((n) => !k.classify.includes(n)),
+    );
+  console.log(notClassifiedData, data);
   return (
     <>
-      {data?.children?.map((j) => (
-        <WebsiteCardNew key={j.id} datasource={j} />
-      ))}
       {data?.subClassify?.map((i) => {
         return (
           <>
@@ -42,19 +48,32 @@ const Recursion = (data: Classify, parent?: Classify) => {
                 <Header icon={i.icon} title={i.name} />
               )}
 
-              {i.children ? (
+              {i.children && i.children.length > 0 && (
                 <div className="grid grid-cols-3 gap-3 max-w-4xl">
                   {i.children.map((j) => (
                     <WebsiteCardNew key={i.id} datasource={j} />
                   ))}
                 </div>
-              ) : (
-                Recursion(i, data)
               )}
+              {Recursion(i, data)}
             </div>
           </>
         );
       })}
+      {notClassifiedData && notClassifiedData.length > 0 && data?.level === 1 && (
+        <div
+          className={css`
+            margin-top: 16px;
+          `}
+        >
+          <SubHeader title="未分类" />
+          <div className="grid grid-cols-3 gap-3 max-w-4xl">
+            {notClassifiedData.map((j) => (
+              <WebsiteCardNew key={j.id} datasource={j} />
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 };

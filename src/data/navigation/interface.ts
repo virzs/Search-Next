@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 18:40:38
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-19 17:47:36
+ * @Last Modified time: 2022-01-10 13:37:14
  */
 
 import { WebsiteClassify } from './types/classify';
@@ -56,6 +56,7 @@ export interface Classify {
   path: WebsiteClassify;
   intro?: string;
   icon?: any;
+  level?: number;
   subClassify?: Classify[];
   children?: Website[];
 }
