@@ -15,7 +15,7 @@ import { Input, List } from '@mui/material';
 import { InsertComment } from '@mui/icons-material';
 import React from 'react';
 import WebsiteCardNew from './components/websiteCardNew';
-import { useNavigate, useLocation, useMatch } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { css } from '@emotion/css';
 
 const basePath = '/navigation';
@@ -82,6 +82,7 @@ const NavigationPage: React.FC<PageProps> = (props) => {
   const menu: Classify[] = navigations;
   const history = useNavigate();
   const location = useLocation();
+  const params = useParams();
   const [selected, setSelected] = React.useState<Classify>({} as Classify);
 
   const changeSelect = (path: string, type: 'push' | 'replace' = 'replace') => {
@@ -104,8 +105,8 @@ const NavigationPage: React.FC<PageProps> = (props) => {
       history(`${basePath}/${menu[0].path}`, { replace: true });
       setSelected(menu[0]);
     } else {
-      // const { classify } = match.params as any;
-      // changeSelect(classify);
+      const { classify } = params;
+      changeSelect(classify || '');
     }
   }, []);
 

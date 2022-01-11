@@ -66,7 +66,7 @@ const routers: Router[] = [
     component: lazy(() => import('@pages/index')),
   },
   {
-    path: 'navigation',
+    path: 'navigation/:classify',
     title: '导航',
     component: lazy(() => import('@pages/navigation')),
   },
