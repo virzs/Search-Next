@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-11 21:56:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 16:25:57
+ * @Last Modified time: 2022-01-11 21:38:19
  */
 
 import { getAuthDataByKey, updateLogoSetting } from '@/apis/auth';
@@ -80,7 +80,7 @@ const Logo: React.FC = () => {
         />
         <ItemCard
           title="Logo类型"
-          desc="设置首页是否显示Logo"
+          desc="设置首页显示Logo的类型"
           action={
             <Select
               label="Logo类型"
