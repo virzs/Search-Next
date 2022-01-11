@@ -131,7 +131,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
                   break;
                 case 'page':
                 default:
-                  history('/navigation');
+                  history('/navigation/*');
                   break;
               }
             }}

@@ -101,7 +101,7 @@ const NavigationPage: React.FC<PageProps> = (props) => {
 
   React.useEffect(() => {
     const path = location.pathname;
-    if (path === basePath) {
+    if (path === basePath + '/*') {
       history(`${basePath}/${menu[0].path}`, { replace: true });
       setSelected(menu[0]);
     } else {
@@ -115,7 +115,7 @@ const NavigationPage: React.FC<PageProps> = (props) => {
       {...props}
       mode="page"
       menu={menu as MenuLayoutMenu[]}
-      pathname="/navigation"
+      pathname={basePath}
       onChange={menuChange}
       menuFooter={
         <List dense>

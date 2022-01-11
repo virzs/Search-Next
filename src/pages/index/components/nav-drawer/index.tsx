@@ -135,7 +135,7 @@ const NavDrawer: React.FC<NavDrawerProps> = (props) => {
           <div className="text-lg font-semibold">导航</div>
           <Button
             onClick={() => {
-              history('/navigation');
+              history('/navigation/*');
             }}
           >
             更多
