@@ -77,6 +77,12 @@ window.addEventListener('devtoolschange', (event) => {
   randomLog(devtools.isOpen);
 });
 
+// 生产环境屏蔽右键菜单
+window.oncontextmenu = function (e) {
+  const prod = import.meta.env?.PROD;
+  prod && e.preventDefault();
+};
+
 // 错误监听
 window.onerror = function (msg, source, lineno, colno, error) {
   /* 错误信息（字符串）：message
