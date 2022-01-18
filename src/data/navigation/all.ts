@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-07 14:24:50
+ * @Last Modified time: 2022-01-12 14:16:25
  */
 
 import { Website } from './interface';
@@ -790,7 +790,7 @@ const allWebsites: Website[] = [
     id: 'e192d3f5c99f46488c47b09ee9593ad9',
     name: 'PowerToys',
     url: 'https://github.com/microsoft/PowerToys',
-    intro: '',
+    intro: 'Windows系统实用程序，最大限度地提高生产力',
     icon: 'powertoys',
     color: '#F2E6CA',
     classify: ['tools', 'software'],
@@ -876,6 +876,24 @@ const allWebsites: Website[] = [
     icon: 'tdesign',
     color: '#0052D9',
     classify: ['design', 'develop', 'front-end'],
+  },
+  {
+    id: '486b61d5a6654602945b3de0114d3dfc',
+    name: 'Microsoft Store - Generation Project',
+    url: 'https://store.rg-adguard.net/',
+    intro: '下载Microsoft Store应用离线包',
+    icon: 'store.rg-adguard',
+    color: '#007098',
+    classify: ['tools', 'onlineTools'],
+  },
+  {
+    id: '328b94f1aa634f1eb3dc3482d42b8d2f',
+    name: 'use-deep-compare-effect',
+    url: 'https://www.npmjs.com/package/use-deep-compare-effect',
+    intro: '代替 React useEffect hook，实现深度比较',
+    icon: 'use-deep-compare-effect',
+    color: '#00A6ED',
+    classify: ['develop', 'npm', 'package'],
   },
 ];
 
