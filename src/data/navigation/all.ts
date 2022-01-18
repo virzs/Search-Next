@@ -895,6 +895,34 @@ const allWebsites: Website[] = [
     color: '#00A6ED',
     classify: ['develop', 'npm', 'package'],
   },
+  {
+    id: '469c98ed1f7b4b8f97c762e7c934a31f',
+    name: 'TinyPng',
+    url: 'https://tinypng.com/',
+    intro: '智能WebP, PNG和JPEG压缩工具',
+    icon: 'tinypng',
+    color: '#83C12E',
+    classify: ['tools', 'onlineTools'],
+  },
+  {
+    id: '3e8be4406e4947a2bfe553890ae6db1a',
+    name: 'shields',
+    url: 'https://shields.io/',
+    intro: '开源项目的高质量元数据徽章生成工具',
+    icon: 'shields',
+    color: '#000000',
+    classify: ['tools', 'onlineTools'],
+  },
+  {
+    id: '1c583f13f9aa4918b9bdf646f13b536b',
+    name: '分流抢票',
+    url: 'https://www.bypass.cn/',
+    intro:
+      '分流抢票，是以用户为中心、人性化的抢票软件。不做广告、不做推广、不携带病毒、不收集隐私信息，并接受各方技术评测，全心全意为用户打造一款属于自己的抢票软件',
+    icon: 'bypass',
+    color: '#3186D6',
+    classify: ['tools', 'software'],
+  },
 ];
 
 export default allWebsites;
