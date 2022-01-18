@@ -2,12 +2,13 @@
  * @Author: Vir
  * @Date: 2021-09-18 15:41:42
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-21 21:22:01
+ * @Last Modified time: 2022-01-16 15:55:29
  */
 
 import { CardActionArea, CardContent } from '@mui/material';
 import { KeyboardArrowRight } from '@mui/icons-material';
 import React from 'react';
+import classNames from 'classnames';
 
 export interface ItemCardProps {
   icon?: any;
@@ -15,6 +16,7 @@ export interface ItemCardProps {
   desc?: string;
   action?: React.ReactNode;
   onClick?: () => void;
+  size?: 'small' | 'medium';
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
@@ -23,10 +25,16 @@ const ItemCard: React.FC<ItemCardProps> = ({
   icon,
   onClick,
   action,
+  size = 'medium',
   ...props
 }) => {
   const Content = (
-    <CardContent className="px-4 py-3">
+    <CardContent
+      className={classNames(
+        size === 'medium' && 'px-4 py-3',
+        size === 'small' && 'px-3 py-2',
+      )}
+    >
       <div className="flex">
         <div className="flex-grow flex items-center justify-start">
           {icon && <div className="mr-1">{icon}</div>}
