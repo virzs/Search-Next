@@ -8,8 +8,9 @@ import React, { useEffect } from 'react';
 import Form from '@/components/md-custom/form';
 import { FieldValues, RegisterOptions, UseFormReturn } from 'react-hook-form';
 import { TextField } from '@mui/material';
+import Select from '@/components/md-custom/form/select';
 
-export type FormFieldType = 'text' | 'textArea';
+export type FormFieldType = 'text' | 'textArea' | 'select';
 
 export interface FormItemPropType {
   name: string;
@@ -18,6 +19,7 @@ export interface FormItemPropType {
   type: FormFieldType;
   required?: boolean;
   rules?: Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
+  fieldProps?: any;
 }
 
 export interface ConfigFormProps {
@@ -35,8 +37,19 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
     value && reset(value);
   }, [value]);
 
-  const renderField = (type: FormFieldType, props: any) => {
+  const renderField = (
+    type: FormFieldType,
+    props: any,
+    { placeholder, label }: any,
+  ) => {
     switch (type) {
+      case 'select':
+        return (
+          <Select
+            placeholder={placeholder ? placeholder : '请选择' + label}
+            {...props}
+          />
+        );
       case 'textArea':
         return (
           <TextField
@@ -44,6 +57,7 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
             rows={2}
             fullWidth
             variant="outlined"
+            placeholder={placeholder ? placeholder : '请填写' + label}
             {...props}
           />
         );
@@ -53,32 +67,44 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
           <TextField
             fullWidth
             variant="outlined"
+            placeholder={placeholder ? placeholder : '请填写' + label}
             {...props}
-            {...props?.fieldProps}
           />
         );
     }
   };
   return (
     <Form form={form} size="small">
-      {config.map(
-        ({ type, placeholder, label, rules, required = false, ...i }, j) => {
-          return (
-            <Item
-              label={label}
-              rules={{
-                required: { value: required, message: '请输入' + label },
-                ...rules,
-              }}
-              {...i}
-            >
-              {renderField(type, {
-                placeholder: placeholder ? placeholder : '请输入' + label,
-              })}
-            </Item>
-          );
-        },
-      )}
+      {config.map((item, j) => {
+        const {
+          type,
+          placeholder,
+          label,
+          rules,
+          required = false,
+          fieldProps,
+          ...i
+        } = item;
+        return (
+          <Item
+            key={i.name}
+            label={label}
+            rules={{
+              required: { value: required, message: '请输入' + label },
+              ...rules,
+            }}
+            {...i}
+          >
+            {renderField(
+              type,
+              {
+                ...fieldProps,
+              },
+              item,
+            )}
+          </Item>
+        );
+      })}
     </Form>
   );
 };

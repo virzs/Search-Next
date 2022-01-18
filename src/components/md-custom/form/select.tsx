@@ -5,6 +5,7 @@
  * @Last Modified time: 2021-12-19 01:27:18
  */
 
+import { css } from '@emotion/css';
 import {
   alpha,
   styled,
@@ -45,14 +46,29 @@ const Select: React.FC<SelectProps> = ({
   options,
   optionsConfig,
   onChange,
+  ...props
 }) => {
   const theme = createTheme();
 
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id={`mui-select-label-${label}`}>{label}</InputLabel>
+        <InputLabel
+          id={`mui-select-label-${label}`}
+          className={css`
+            &.MuiFormLabel-root {
+              transform: translate(14px, 9px) scale(1);
+            }
+            &.Mui-focused,
+            &.MuiFormLabel-filled {
+              transform: translate(14px, -9px) scale(0.75);
+            }
+          `}
+        >
+          {label}
+        </InputLabel>
         <StyledSelect
+          {...props}
           labelId={`mui-select-label-${label}`}
           id={`mui-select-${label}`}
           value={value}
