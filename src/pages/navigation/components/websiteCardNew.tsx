@@ -68,7 +68,9 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
               {name.split('')[0].toUpperCase()}
             </Avatar>
             <div className="flex-grow overflow-hidden">
-              <p className="font-bold text-base">{name}</p>
+              <p className="font-bold text-base whitespace-nowrap overflow-x-hidden">
+                {name}
+              </p>
               <Overflow>{(intro as any) || ('暂无介绍' as any)}</Overflow>
             </div>
           </div>
