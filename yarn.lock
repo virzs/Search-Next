@@ -2584,10 +2584,10 @@ browserslist@^4.17.5:
     node-releases "^2.0.1"
     picocolors "^1.0.0"
 
-bsdb@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/bsdb/-/bsdb-0.0.8.tgz#2c00c250e36333623870407c13ce818fad7f3f1d"
-  integrity sha512-zF1BDyPreUhbuo3tkYdQ59xIb9prhg6ciQt0qCH+6zIgH2cgkGXPvCJIZ6pDj4Oi8jtmrqFlh/OACDVY9bYdkg==
+bsdb@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/bsdb/-/bsdb-0.1.0.tgz#5273405c61cb8446e97cc075b31fd35e54596265"
+  integrity sha512-enY7vI764aH4nYTdAlopJAE2sCNKAvG1JR3Zz2JkMlt1R7ZjEibSa8s5YsxJXS5+YHFzZlhwmXlDU5P+1ixuHw==
 
 buffer-from@^1.0.0:
   version "1.1.2"
