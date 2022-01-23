@@ -33,6 +33,9 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
   const { Item } = Form;
   const { reset } = form;
 
+  const PLACEHOLDER_TEXT = '请输入';
+  const PLACEHOLDER_SELECT = '请选择';
+
   useEffect(() => {
     value && reset(value);
   }, [value]);
@@ -46,7 +49,7 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
       case 'select':
         return (
           <Select
-            placeholder={placeholder ? placeholder : '请选择' + label}
+            placeholder={placeholder ? placeholder : PLACEHOLDER_SELECT + label}
             {...props}
           />
         );
@@ -57,7 +60,7 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
             rows={2}
             fullWidth
             variant="outlined"
-            placeholder={placeholder ? placeholder : '请填写' + label}
+            placeholder={placeholder ? placeholder : PLACEHOLDER_TEXT + label}
             {...props}
           />
         );
@@ -67,7 +70,7 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
           <TextField
             fullWidth
             variant="outlined"
-            placeholder={placeholder ? placeholder : '请填写' + label}
+            placeholder={placeholder ? placeholder : PLACEHOLDER_TEXT + label}
             {...props}
           />
         );

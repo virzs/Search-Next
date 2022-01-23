@@ -36,6 +36,9 @@ export interface SelectProps {
 const StyledSelect = styled((props: MSelectProps) => <MSelect {...props} />)(
   ({ theme }) => ({
     '& .MuiSelect-select': {},
+    input: {
+      padding: '8.5px 14px',
+    },
   }),
 );
 
