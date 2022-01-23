@@ -75,9 +75,8 @@ const Operator: Operators = {
 
 // 生成uuid
 const uuid = (len?: number, radix?: number) => {
-  var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(
-    '',
-  );
+  var chars =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
   var uuid = [],
     i;
   radix = radix || chars.length;
@@ -213,7 +212,7 @@ class Collection {
     let filterExp = new RegExp('^' + this.path);
 
     for (let key of Object.keys(this.storage)) {
-      if (filterExp.test(key)) {
+      if (filterExp.test(key) && this.path.length === key.length) {
         cache = JSON.parse(this.storage.getItem(key));
       }
     }
