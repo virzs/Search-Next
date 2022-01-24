@@ -2,9 +2,10 @@
  * @Author: Vir
  * @Date: 2021-10-23 15:49:56
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 14:02:00
+ * @Last Modified time: 2022-01-24 15:39:27
  */
 
+import { isBeta } from '@/apis/auth';
 import { Router } from '@/config/router';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
@@ -31,21 +32,27 @@ const Lab: React.FC<PageProps> = (props) => {
         实验室中的功能均处在开发中，不保证实际发布。
       </Alert>
       <ContentList>
-        {list.map((i) => (
-          <ItemCard
-            key={i.path}
-            title={
-              <div className="flex items-center gap-1">
-                {i.title}
-                {i?.status === 'process' && (
-                  <Chip color="warning" label="进行中" size="small" />
-                )}
-              </div>
-            }
-            icon={i.icon}
-            onClick={() => history(i.path)}
-          ></ItemCard>
-        ))}
+        {list
+          .filter((i) =>
+            i?.status && ['beta', 'process'].includes(i?.status)
+              ? isBeta()
+              : true,
+          )
+          .map((i) => (
+            <ItemCard
+              key={i.path}
+              title={
+                <div className="flex items-center gap-1">
+                  {i.title}
+                  {i?.status === 'process' && (
+                    <Chip color="warning" label="进行中" size="small" />
+                  )}
+                </div>
+              }
+              icon={i.icon}
+              onClick={() => history(i.path)}
+            ></ItemCard>
+          ))}
       </ContentList>
     </div>
   );
