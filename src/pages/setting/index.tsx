@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:08:48
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-21 00:14:32
+ * @Last Modified time: 2022-01-24 10:41:05
  */
 
-import { Breadcrumbs, IconButton, Link, Tooltip } from '@mui/material';
+import { Breadcrumbs, Chip, IconButton, Link, Tooltip } from '@mui/material';
 import { Home, KeyboardBackspace } from '@mui/icons-material';
 import classNames from 'classnames';
 import React from 'react';
@@ -112,7 +112,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
         </div>
       </div>
       <div className="h-full overflow-hidden flex flex-col w-full px-6 py-4">
-        <Breadcrumbs separator="›" aria-label="breadcrumb">
+        <Breadcrumbs separator="›" aria-label="breadcrumb" className="mb-4">
           {breads.map((i, index) => (
             <p
               className={classNames('text-2xl cursor-pointer mb-0', {
@@ -129,11 +129,16 @@ const SettingPage: React.FC<SettingPageProps> = ({
                 index !== breads.length - 1 ? history(path) : null;
               }}
             >
-              {i.title}
+              <div className="flex items-center gap-1">
+                {i.title}
+                {i?.status === 'process' && (
+                  <Chip color="warning" label="进行中" size="small" />
+                )}
+              </div>
             </p>
           ))}
         </Breadcrumbs>
-        <div className="flex-grow overflow-y-auto w-full pt-4">
+        <div className="flex-grow overflow-y-auto w-full">
           <div className="max-w-4xl">
             <Outlet />
           </div>

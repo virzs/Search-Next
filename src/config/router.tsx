@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-24 10:19:15
+ * @Last Modified time: 2022-01-24 10:37:30
  */
 
 import { lazy } from 'react';
@@ -17,6 +17,7 @@ import {
   Api,
   FeaturedPlayList,
   Message as MessageIcon,
+  Search,
 } from '@mui/icons-material';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -38,6 +39,7 @@ import Features from '@/views/setting/features';
 import Navigation from '@/views/setting/navigation';
 import OtherApis from '@/views/setting/otherApis';
 import Message from '@/views/setting/features/message';
+import Engine from '@/views/setting/features/engine';
 
 /**
  * 关于 component 额外说明
@@ -47,6 +49,7 @@ import Message from '@/views/setting/features/message';
  * 关于部分页面未使用按需加载
  * 部分layout中的页面使用按需加载时会显示loading页，造成闪屏问题
  */
+export type RouterStatus = 'done' | 'beta' | 'process';
 
 export interface Router {
   path: string;
@@ -57,6 +60,7 @@ export interface Router {
   wrappers?: string[];
   title?: string;
   icon?: any;
+  status?: RouterStatus;
 }
 
 const routers: Router[] = [
@@ -168,6 +172,13 @@ const routers: Router[] = [
             icon: <Api />,
             path: 'otherApis',
             component: OtherApis,
+          },
+          {
+            title: '搜索引擎',
+            icon: <Search />,
+            path: 'search-engine',
+            component: Engine,
+            status: 'process',
           },
         ],
       },
