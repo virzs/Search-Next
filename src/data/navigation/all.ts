@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-12 14:16:25
+ * @Last Modified time: 2022-01-24 09:11:15
  */
 
 import { Website } from './interface';
@@ -922,6 +922,34 @@ const allWebsites: Website[] = [
     icon: 'bypass',
     color: '#3186D6',
     classify: ['tools', 'software'],
+  },
+  {
+    id: '87c0a383527f4cadb552bb58f7ed4006',
+    name: 'FlowUs',
+    url: 'https://flowus.cn/product',
+    intro:
+      '个人及团队的新一代生产力工具，让复杂的信息管理更轻松、自由、充满创意。',
+    icon: '',
+    color: '#000000',
+    classify: ['tools', 'software', 'onlineTools'],
+  },
+  {
+    id: '4866f6b2bfcd4c0b9f4cb851f3a4066b',
+    name: 'Public APIs',
+    url: 'https://devresourc.es/',
+    intro: '公开的api分享',
+    icon: 'devresourc',
+    color: '#0A0B0D',
+    classify: ['develop'],
+  },
+  {
+    id: '641a965adcb44f8a87d79e9a52b5f7b5',
+    name: 'DevToys',
+    url: 'https://devtoys.app/',
+    intro: '一款离线Windows应用，帮助开发者完成日常任务',
+    icon: 'devtoys',
+    color: '#5E3685',
+    classify: ['tools', 'software', 'develop'],
   },
 ];
 

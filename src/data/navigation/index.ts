@@ -475,6 +475,25 @@ const navigationData: Classify[] = [
             color: "#3186D6",
             classify: ["tools", "software"],
           },
+          {
+            id: "87c0a383527f4cadb552bb58f7ed4006",
+            name: "FlowUs",
+            url: "https://flowus.cn/product",
+            intro:
+              "个人及团队的新一代生产力工具，让复杂的信息管理更轻松、自由、充满创意。",
+            icon: "",
+            color: "#000000",
+            classify: ["tools", "software", "onlineTools"],
+          },
+          {
+            id: "641a965adcb44f8a87d79e9a52b5f7b5",
+            name: "DevToys",
+            url: "https://devtoys.app/",
+            intro: "一款离线Windows应用，帮助开发者完成日常任务",
+            icon: "devtoys",
+            color: "#5E3685",
+            classify: ["tools", "software", "develop"],
+          },
         ],
       },
       {
@@ -528,6 +547,16 @@ const navigationData: Classify[] = [
             icon: "shields",
             color: "#000000",
             classify: ["tools", "onlineTools"],
+          },
+          {
+            id: "87c0a383527f4cadb552bb58f7ed4006",
+            name: "FlowUs",
+            url: "https://flowus.cn/product",
+            intro:
+              "个人及团队的新一代生产力工具，让复杂的信息管理更轻松、自由、充满创意。",
+            icon: "",
+            color: "#000000",
+            classify: ["tools", "software", "onlineTools"],
           },
         ],
       },
@@ -586,6 +615,15 @@ const navigationData: Classify[] = [
         icon: "use-deep-compare-effect",
         color: "#00A6ED",
         classify: ["develop", "npm", "package"],
+      },
+      {
+        id: "4866f6b2bfcd4c0b9f4cb851f3a4066b",
+        name: "Public APIs",
+        url: "https://devresourc.es/",
+        intro: "公开的api分享",
+        icon: "devresourc",
+        color: "#0A0B0D",
+        classify: ["develop"],
       },
     ],
     subClassify: [
@@ -970,6 +1008,17 @@ const navigationData: Classify[] = [
         path: "tools",
         intro: "",
         level: 2,
+        children: [
+          {
+            id: "641a965adcb44f8a87d79e9a52b5f7b5",
+            name: "DevToys",
+            url: "https://devtoys.app/",
+            intro: "一款离线Windows应用，帮助开发者完成日常任务",
+            icon: "devtoys",
+            color: "#5E3685",
+            classify: ["tools", "software", "develop"],
+          },
+        ],
         subClassify: [
           {
             id: "37500ffad8aa4ccd8d3a5e5ac8dbf5d9",
