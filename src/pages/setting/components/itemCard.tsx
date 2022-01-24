@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-18 15:41:42
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-16 15:55:29
+ * @Last Modified time: 2022-01-24 14:00:04
  */
 
 import { CardActionArea, CardContent } from '@mui/material';
@@ -12,7 +12,7 @@ import classNames from 'classnames';
 
 export interface ItemCardProps {
   icon?: any;
-  title?: string;
+  title?: string | React.ReactNode;
   desc?: string;
   action?: React.ReactNode;
   onClick?: () => void;
