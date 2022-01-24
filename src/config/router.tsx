@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 10:37:30
+ * @Last Modified time: 2022-01-24 14:46:20
  */
 
 import { lazy } from 'react';
@@ -18,6 +18,7 @@ import {
   FeaturedPlayList,
   Message as MessageIcon,
   Search,
+  BugReportOutlined,
 } from '@mui/icons-material';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -40,6 +41,7 @@ import Navigation from '@/views/setting/navigation';
 import OtherApis from '@/views/setting/otherApis';
 import Message from '@/views/setting/features/message';
 import Engine from '@/views/setting/features/engine';
+import Beta from '@/views/setting/about/beta';
 
 /**
  * 关于 component 额外说明
@@ -199,6 +201,12 @@ const routers: Router[] = [
             icon: <Update />,
             path: 'commits',
             component: Commits,
+          },
+          {
+            title: '用户体验计划',
+            icon: <BugReportOutlined />,
+            path: 'beta',
+            component: Beta,
           },
         ],
       },

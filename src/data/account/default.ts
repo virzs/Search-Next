@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-08-15 00:00:37
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-15 14:39:42
+ * @Last Modified time: 2022-01-24 15:26:10
  */
 
 // ! 账户默认数据
@@ -39,6 +39,7 @@ export const authDefaultData: AuthData = {
     update: true,
   },
   latestVersion: '',
+  beta: false,
   sync: {
     setting: false,
     website: false,
