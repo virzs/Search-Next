@@ -16,8 +16,8 @@ import {
   TableCellProps,
   styled,
   tableCellClasses,
-  TableTypeMap,
 } from '@mui/material';
+import { Empty } from 'antd';
 
 export interface Row {
   [x: string]: any;
@@ -83,6 +83,11 @@ const Table: React.FC<TableProps> = (props) => {
           ))}
         </TableBody>
       </MTable>
+      {dataSource.length === 0 && (
+        <div className="w-full">
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </div>
+      )}
     </TableContainer>
   );
 };
