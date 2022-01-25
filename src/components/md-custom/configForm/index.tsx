@@ -58,6 +58,7 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
         return (
           <Select
             placeholder={placeholder ? placeholder : PLACEHOLDER_SELECT + label}
+            label={label}
             {...props}
           />
         );

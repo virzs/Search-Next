@@ -37,7 +37,7 @@ const FormModal: React.FC<FormModalProps> = (props) => {
         reset();
       }}
     >
-      <ConfigForm form={form} config={config} value={value} />
+      {open && <ConfigForm form={form} config={config} value={value} />}
     </Modal>
   );
 };

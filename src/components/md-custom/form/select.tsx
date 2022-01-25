@@ -16,6 +16,7 @@ import {
   SelectChangeEvent,
   SelectProps as MSelectProps,
   createTheme,
+  FormHelperText,
 } from '@mui/material';
 import React from 'react';
 import { MenuItem } from '../menu';
@@ -31,24 +32,28 @@ export interface SelectProps {
   options: { label: string; value: string | number; [x: string]: any }[];
   // 选项字段自定义
   optionsConfig?: { label: string; value: string };
+  helperText?: string;
+  error?: boolean;
+  inputRef?: React.Ref<any>;
 }
 
-const StyledSelect = styled((props: MSelectProps) => <MSelect {...props} />)(
-  ({ theme }) => ({
-    '& .MuiSelect-select': {},
-    input: {
-      padding: '8.5px 14px',
-    },
-  }),
-);
+const StyledSelect = styled((props: MSelectProps) => (
+  <MSelect ref={props.inputRef} inputRef={props.inputRef} {...props} />
+))(({ theme }) => ({
+  '& .MuiSelect-select': {},
+  input: {
+    padding: '8.5px 14px',
+  },
+}));
 
 const Select: React.FC<SelectProps> = ({
-  value,
   label,
   size = 'medium',
   options,
   optionsConfig,
-  onChange,
+  helperText,
+  error,
+  inputRef,
   ...props
 }) => {
   const theme = createTheme();
@@ -74,10 +79,10 @@ const Select: React.FC<SelectProps> = ({
           {...props}
           labelId={`mui-select-label-${label}`}
           id={`mui-select-${label}`}
-          value={value}
+          inputRef={inputRef}
           label={label}
           size={size}
-          onChange={onChange}
+          error={error}
           onClose={(e) => e.stopPropagation()}
           MenuProps={{
             sx: {
@@ -132,6 +137,7 @@ const Select: React.FC<SelectProps> = ({
             );
           })}
         </StyledSelect>
+        <FormHelperText error={error}>{helperText}</FormHelperText>
       </FormControl>
     </Box>
   );

@@ -42,7 +42,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         rules={rules}
         defaultValue={defaultValue}
         render={({
-          field: { onChange: controllerOnChange, ...field },
+          field: { onChange: controllerOnChange, ref, ...field },
           fieldState: { error },
         }) =>
           React.cloneElement(children, {
@@ -52,6 +52,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
             },
             label,
             size,
+            inputRef: ref,
             ...field,
             error: !!error,
             helperText: error ? error.message : '',
