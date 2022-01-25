@@ -37,7 +37,15 @@ const ConfigForm: React.FC<ConfigFormProps> = (props) => {
   const PLACEHOLDER_SELECT = '请选择';
 
   useEffect(() => {
-    value && reset(value);
+    let filterValue: { [x: string]: any } = {};
+    config
+      .map((i) => i.name)
+      .forEach((i) => {
+        filterValue[i] = value[i];
+      });
+    value['id'] && (filterValue['id'] = value['id']);
+    value['_id'] && (filterValue['_id'] = value['_id']);
+    value && reset(filterValue);
   }, [value]);
 
   const renderField = (
