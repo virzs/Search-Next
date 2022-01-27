@@ -951,6 +951,15 @@ const allWebsites: Website[] = [
     color: '#5E3685',
     classify: ['tools', 'software', 'develop'],
   },
+  {
+    id: 'afa10e1bfd004e5593010815ba63ca91',
+    name: 'WakaTime',
+    url: 'https://wakatime.com/',
+    intro: '开发人员的仪表板开放源代码插件，用于统计编程时长',
+    icon: 'wakatime',
+    color: '#29333A',
+    classify: ['tools', 'onlineTools', 'develop'],
+  },
 ];
 
 export default allWebsites;
