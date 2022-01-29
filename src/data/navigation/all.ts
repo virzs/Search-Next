@@ -960,6 +960,25 @@ const allWebsites: Website[] = [
     color: '#29333A',
     classify: ['tools', 'onlineTools', 'develop'],
   },
+  {
+    id: '5c3bd8bf9338418780736a30b7e0a563',
+    name: 'Free Download Manager',
+    url: 'https://www.freedownloadmanager.org/',
+    intro:
+      '一款在Windows, macOS, Android 及Linux 作業系統下，強大又現代的下載加速組織器。',
+    icon: 'freedownloadmanager',
+    color: '#4E6680',
+    classify: ['tools', 'software'],
+  },
+  {
+    id: 'fc90a25b52d1460491e793392ef60bf7',
+    name: 'I Tell You',
+    url: 'https://next.itellyou.cn/',
+    intro: '提供可靠的原版软件',
+    icon: 'itellyou',
+    color: '#2273DB',
+    classify: ['tools', 'onlineTools'],
+  },
 ];
 
 export default allWebsites;
