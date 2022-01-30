@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-01-14 15:58:10
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-14 17:24:01
+ * @Last Modified time: 2022-01-30 23:04:07
  */
 import React from 'react';
 import Modal from '@/components/md-custom/dialog/dialog';
@@ -34,7 +34,6 @@ const FormModal: React.FC<FormModalProps> = (props) => {
         handleSubmit(onOk, (err) => {
           console.log(err);
         })();
-        reset();
       }}
     >
       {open && <ConfigForm form={form} config={config} value={value} />}
