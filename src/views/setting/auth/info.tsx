@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-19 23:23:36
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:26:53
+ * @Last Modified time: 2022-01-31 20:13:54
  */
 
 import { editAccount } from '@/apis/auth';
@@ -18,6 +18,10 @@ import React from 'react';
 import AccountCard from './components/accountCard';
 import { getAccount } from './utils/acount';
 
+export interface UpdateAccountForm {
+  username: string;
+}
+
 const Info: React.FC<PageProps> = () => {
   const [account, setAccount] = React.useState<AuthData>({} as AuthData);
   const [open, setOpen] = React.useState<boolean>(false);
@@ -29,7 +33,7 @@ const Info: React.FC<PageProps> = () => {
   );
 
   const { Item } = Form;
-  const form = Form.useForm();
+  const form = Form.useForm<UpdateAccountForm>();
   const { handleSubmit, reset, setValue } = form;
 
   // dialog取消
@@ -39,7 +43,7 @@ const Info: React.FC<PageProps> = () => {
     setValue('username', '');
   };
 
-  const updateAccount = ({ username }: { username: string }) => {
+  const updateAccount = ({ username }: UpdateAccountForm) => {
     const update = editAccount(editData._id, {
       username,
     });

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-08-22 22:06:08
  * @Last Modified by: Vir
- * @Last Modified time: 2021-08-24 17:59:04
+ * @Last Modified time: 2022-01-31 20:12:09
  */
 
 import React from 'react';
@@ -14,15 +14,15 @@ export interface FormItemProps {
   rules: Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
 }
 
-export interface FormProps {
+export interface FormProps<T> {
   id?: string;
   items?: FormItemProps[];
-  form: UseFormReturn<FieldValues>;
+  form: UseFormReturn<T>;
   size?: 'small' | 'medium';
   children: any;
 }
 
-const Form: React.FC<FormProps> = (props) => {
+function Form<T>(props: FormProps<T>) {
   const { id, form, size, children } = props;
 
   const [items, setItems] = React.useState<any[]>([]);
@@ -59,6 +59,6 @@ const Form: React.FC<FormProps> = (props) => {
       {items}
     </form>
   );
-};
+}
 
 export default Form;

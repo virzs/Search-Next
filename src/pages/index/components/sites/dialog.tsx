@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2021-04-10 21:52:45
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 16:02:20
+ * @Last Modified time: 2022-01-31 20:08:46
  */
 
 import { TextField } from '@mui/material';
 import React from 'react';
-import { RegisterOptions } from 'react-hook-form';
+import { RegisterOptions, SubmitHandler } from 'react-hook-form';
 import Modal from '@/components/md-custom/dialog/dialog';
 import Form from '@/components/md-custom/form';
 
@@ -51,7 +51,7 @@ const SiteDialog: React.FC<SiteDialogPropTypes> = ({
   onSubmit,
 }) => {
   const { Item } = Form;
-  const form = Form.useForm();
+  const form = Form.useForm<FormTypes>();
   const { handleSubmit, reset } = form;
 
   // dialog提交
