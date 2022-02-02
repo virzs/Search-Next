@@ -2,13 +2,14 @@
  * @Author: Vir
  * @Date: 2021-09-18 15:41:42
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 14:00:04
+ * @Last Modified time: 2022-02-02 17:43:21
  */
 
 import { CardActionArea, CardContent } from '@mui/material';
 import { KeyboardArrowRight } from '@mui/icons-material';
 import React from 'react';
 import classNames from 'classnames';
+import StyleCard from '@/components/global/card/styleCard';
 
 export interface ItemCardProps {
   icon?: any;
@@ -51,7 +52,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   );
 
   return (
-    <div className="bg-white rounded border hover:bg-gray-100 transition">
+    <StyleCard type="border">
       {action ? (
         Content
       ) : (
@@ -59,7 +60,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
           {Content}
         </CardActionArea>
       )}
-    </div>
+    </StyleCard>
   );
 };
 
