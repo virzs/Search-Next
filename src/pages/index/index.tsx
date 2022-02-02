@@ -2,12 +2,11 @@
  * @Author: Vir
  * @Date: 2021-03-14 15:22:13
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-15 14:57:35
+ * @Last Modified time: 2022-01-30 22:45:02
  */
 
 import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
 import Copyright from '@/components/global/copyright';
-import { SearchEngineValueTypes } from '@/data/engine';
 import { PageProps } from '@/typings';
 import { getAccount } from '@/views/setting/auth/utils/acount';
 import { IconButton, Tooltip } from '@mui/material';
@@ -23,6 +22,7 @@ import { getAuthDataByKey } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
 import { useNavigate } from 'react-router-dom';
+import { SearchEngine } from '@/data/engine/types';
 
 const IndexPage: React.FC<PageProps> = (props) => {
   const history = useNavigate();
@@ -41,7 +41,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
   );
   const [navOpen, setNavOpen] = React.useState(false);
 
-  const handleSearch = (value: string, engine: SearchEngineValueTypes) => {
+  const handleSearch = (value: string, engine: SearchEngine) => {
     window.open(`${engine.href}${value}`);
   };
 

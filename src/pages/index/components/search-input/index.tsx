@@ -2,15 +2,19 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-11 13:30:56
+ * @Last Modified time: 2022-02-02 21:51:19
  */
 
-import { SearchEngineValueTypes } from '@/data/engine';
 import { Button } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import EngineChip from './engineChip';
 import SugPopper from './sugPopper';
 import { useTranslation } from 'react-i18next';
+import { SearchEngine } from '@/data/engine/types';
+import EngineSelectPopper from './engineSelectPopper';
+import { findDOMNode } from 'react-dom';
+import { isBeta } from '@/apis/auth';
+import { getCurrentEngineApi, setCurrentEngineApi } from '@/apis/engine';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -30,10 +34,10 @@ export interface SearchInputProps {
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement>,
     value: string,
-    engine: SearchEngineValueTypes,
+    engine: SearchEngine,
   ) => void; // 输入框内容变化时回调
-  onPressEnter?: (value: string, engine: SearchEngineValueTypes) => void; // 按下回车回调
-  onBtnClick?: (value: string, engine: SearchEngineValueTypes) => void;
+  onPressEnter?: (value: string, engine: SearchEngine) => void; // 按下回车回调
+  onBtnClick?: (value: string, engine: SearchEngine) => void;
   onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onArrow?: (code: string) => void;
@@ -57,13 +61,16 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const [inputValue, setInputValue] = React.useState(
     defaultValue || value || '',
   );
-  const [engine, setEngine] = React.useState({} as SearchEngineValueTypes);
+  const [engine, setEngine] = React.useState({} as SearchEngine);
   const [sugOpen, setSugOpen] = React.useState<boolean>(false);
   const [wd, setWd] = React.useState<string>('');
   const [sugAnchorEl, setSugAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
   const [code, setCode] = React.useState<'ArrowDown' | 'ArrowUp' | null>(null);
+  const inputRef = React.useRef<HTMLDivElement>(null);
+  const [engineSelectOpen, setEngineSelectOpen] =
+    React.useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -97,15 +104,32 @@ const SearchInput: React.FC<SearchInputProps> = ({
     if (onBtnClick) onBtnClick(inputValue, engine);
   };
 
-  const chipChange = (value: SearchEngineValueTypes) => {
+  const chipChange = (value: SearchEngine) => {
     setEngine(value);
   };
+
+  const getCurrentEngine = () => {
+    getCurrentEngineApi().then((res) => {
+      setEngine(res);
+    });
+  };
+
+  const updateCurrentEngine = (value: SearchEngine) => {
+    setCurrentEngineApi(value).then((res) => {
+      setEngine(value);
+    });
+  };
+
+  useEffect(() => {
+    getCurrentEngine();
+  }, []);
 
   return (
     <div
       className="search-input max-w-2xl w-4/5"
       onFocus={(e) => {
         setSugOpen(true);
+        setEngineSelectOpen(false);
         setSugAnchorEl(e.currentTarget);
       }}
       onBlur={(e) => {
@@ -116,8 +140,26 @@ const SearchInput: React.FC<SearchInputProps> = ({
         }
       }}
     >
-      <EngineChip onChange={chipChange} />
-      <div className="flex justify-center items-center rounded-md shadow-xl overflow-hidden">
+      {isBeta() ? (
+        <EngineSelectPopper
+          anchorEl={inputRef?.current}
+          open={engineSelectOpen}
+          onBtnClick={(val) => {
+            setEngineSelectOpen(val);
+          }}
+          onEngineSelect={(val) => {
+            updateCurrentEngine(val);
+            setEngineSelectOpen(false);
+          }}
+          engine={engine}
+        />
+      ) : (
+        <EngineChip onChange={chipChange} />
+      )}
+      <div
+        ref={inputRef}
+        className="flex justify-center items-center rounded-md shadow-xl overflow-hidden"
+      >
         <input
           className="py-2 px-4 border-none leading-4 sm:leading-7 outline-none flex-grow rounded-tr-none rounded-br-none placeholder-gray-400 focus:placeholder-gray-200 transition-all"
           type="text"

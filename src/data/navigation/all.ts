@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 09:11:15
+ * @Last Modified time: 2022-01-30 12:05:21
  */
 
 import { Website } from './interface';
@@ -978,6 +978,15 @@ const allWebsites: Website[] = [
     icon: 'itellyou',
     color: '#2273DB',
     classify: ['tools', 'onlineTools'],
+  },
+  {
+    id: '8ec036f6c8614303ba68597e615778c9',
+    name: '软碟通',
+    url: 'https://cn.ultraiso.net/',
+    intro: '最专业的ISO工具',
+    icon: 'ultraiso',
+    color: '#4273C6',
+    classify: ['tools', 'software'],
   },
 ];
 

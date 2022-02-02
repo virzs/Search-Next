@@ -6,11 +6,11 @@
  */
 
 import engine from '@/data/engine';
+import { SearchEngine } from '@/data/engine/types';
 import { ResultTypes } from '@/typings/index';
-import { SearchEngineValueTypes } from '@/data/engine/index';
 
 export interface SearchEngineResultTypes extends ResultTypes {
-  data: SearchEngineValueTypes[];
+  data: SearchEngine[];
 }
 
 export const list = () => {
@@ -21,7 +21,7 @@ export const list = () => {
 
 export const detail = (id: string) => {
   return new Promise<ResultTypes>((resolve) => {
-    let item = engine.find((i) => i.id === id);
+    let item = engine.find((i) => i._id === id);
     if (item) {
       resolve({ code: 200, msg: '获取成功', data: item });
     } else {

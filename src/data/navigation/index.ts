@@ -504,6 +504,15 @@ const navigationData: Classify[] = [
             color: "#4E6680",
             classify: ["tools", "software"],
           },
+          {
+            id: "8ec036f6c8614303ba68597e615778c9",
+            name: "软碟通",
+            url: "https://cn.ultraiso.net/",
+            intro: "最专业的ISO工具",
+            icon: "ultraiso",
+            color: "#4273C6",
+            classify: ["tools", "software"],
+          },
         ],
       },
       {
