@@ -51,7 +51,7 @@ const Commits: React.FC = () => {
             html_url: i.author.html_url,
           },
           url: i.html_url,
-          ...getGithubCommitType(i.commit.message),
+          message: i.commit.message,
         };
       });
       setCommits(formatCommit);
