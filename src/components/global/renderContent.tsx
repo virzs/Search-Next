@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useMatch } from 'react-router-dom';
 
 export interface RenderContentProps {
   children: any; // 组件 children
@@ -23,9 +23,12 @@ export interface RenderContentProps {
 const RenderContent: React.FC<RenderContentProps> = (props) => {
   const { children, pathname, noOutlet = false } = props;
   const location = useLocation();
+  let match = useMatch(pathname);
+
   return (
     <>
       {(pathname === location.pathname ||
+        pathname === match?.pattern?.path ||
         (pathname && pathname.indexOf('undefined') !== -1)) &&
         children}
       {!noOutlet && <Outlet />}

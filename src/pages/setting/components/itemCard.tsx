@@ -34,7 +34,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
       className={classNames(
         size === 'medium' && 'px-4 py-3',
         size === 'small' && 'px-3 py-2',
+        onClick && 'cursor-pointer',
       )}
+      onClick={() => (onClick ? onClick() : null)}
     >
       <div className="flex">
         <div className="flex-grow flex items-center justify-start">
@@ -44,7 +46,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
             {desc && <p className="text-xs mb-0 text-gray-700">{desc}</p>}
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
           {action ? action : <KeyboardArrowRight fontSize="small" />}
         </div>
       </div>

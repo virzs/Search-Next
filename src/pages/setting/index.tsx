@@ -12,7 +12,7 @@ import React from 'react';
 import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
 import { Router } from '@/config/router';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet, useParams } from 'react-router-dom';
 
 export interface SettingPageProps extends PageProps {
   children: any;
@@ -25,25 +25,39 @@ const SettingPage: React.FC<SettingPageProps> = ({
 }) => {
   const history = useNavigate();
   const location = useLocation();
+  const params = useParams();
   const [menuList, setMenuList] = React.useState<Router[] | undefined>([]);
   const [breads, setBreads] = React.useState<Router[]>([]);
 
-  const getBreadCrumbs = (routes: Router[], newLocation?: any) => {
+  const getBreadCrumbs = (routes: Router[], parentPath: string = '') => {
     let breadCrumbs: Router[] = [];
 
-    const findRoute = (routes: Router[] | undefined) => {
+    const findRoute = (
+      routes: Router[] | undefined,
+      parentPath: string = '',
+    ) => {
       if (!routes) return routes;
-      const loc = newLocation ? newLocation : location;
+      const loc = location;
       routes.forEach((i) => {
-        if (loc.pathname.indexOf(i.path) !== -1) {
+        const fullPath = `${parentPath}/${i.path}`;
+        const splitPath = fullPath.split(':');
+        const paramsPath =
+          splitPath[0] +
+          Object.values(params)
+            .filter((u) => u !== '')
+            .join('/');
+        if (
+          loc.pathname.indexOf(i.path) !== -1 ||
+          loc.pathname === paramsPath
+        ) {
           breadCrumbs.push(i);
         }
         if (i.routes) {
-          findRoute(i.routes);
+          findRoute(i.routes, fullPath);
         }
       });
     };
-    findRoute(routes);
+    findRoute(routes, parentPath);
 
     return breadCrumbs;
   };
@@ -56,7 +70,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
   }, []);
 
   React.useEffect(() => {
-    const breads = getBreadCrumbs(route.routes || []);
+    const breads = getBreadCrumbs(route.routes || [], '/setting');
     setBreads(breads);
   }, [location]);
 
