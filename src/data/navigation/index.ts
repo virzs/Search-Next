@@ -321,6 +321,17 @@ const navigationData: Classify[] = [
     path: "tools",
     intro: "软件，在线工具",
     level: 1,
+    children: [
+      {
+        id: "303f7a88beab4dbb9127e012533d79d8",
+        name: "GitHub Copilot",
+        url: "https://copilot.github.com/",
+        intro: "AI智能代码工具",
+        icon: "copilot",
+        color: "#2C3C49",
+        classify: ["develop", "tools"],
+      },
+    ],
     subClassify: [
       {
         id: "39e6caea9ab24006888dc0e214abe9ae",
@@ -1054,6 +1065,15 @@ const navigationData: Classify[] = [
             icon: "devtoys",
             color: "#5E3685",
             classify: ["tools", "software", "develop"],
+          },
+          {
+            id: "303f7a88beab4dbb9127e012533d79d8",
+            name: "GitHub Copilot",
+            url: "https://copilot.github.com/",
+            intro: "AI智能代码工具",
+            icon: "copilot",
+            color: "#2C3C49",
+            classify: ["develop", "tools"],
           },
         ],
         subClassify: [

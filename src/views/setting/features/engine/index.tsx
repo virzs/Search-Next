@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-01-05 15:04:44
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 19:39:51
+ * @Last Modified time: 2022-02-03 17:14:05
  */
 import {
   addClassifyApi,
@@ -18,21 +18,26 @@ import {
   editEngineApi,
   delEngineApi,
   showEngineApi,
+  getCurrentEngineApi,
 } from '@/apis/engine';
+import confirm from '@/components/md-custom/dialog/confirm';
 import FormModal from '@/components/md-custom/formModal';
 import Table from '@/components/md-custom/table';
 import Tabs from '@/components/md-custom/tabs';
 import engine from '@/data/engine';
-import { SearchEngineClassify } from '@/data/engine/types';
+import { SearchEngine, SearchEngineClassify } from '@/data/engine/types';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { Button } from '@mui/material';
+import { css } from '@emotion/css';
+import { Button, Tooltip } from '@mui/material';
 import { Empty } from 'antd';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Engine: React.FC = () => {
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = useState(false);
   const [classifyData, setClassifyData] = useState({} as any);
@@ -40,6 +45,7 @@ const Engine: React.FC = () => {
   const [openEngine, setOpenEngine] = useState(false);
   const [classifyList, setClassifyList] = useState<SearchEngineClassify[]>([]);
   const [engineList, setEngineList] = useState<FullSearchEngine[]>([]);
+  const [currentEngine, setCurrentEngine] = useState<SearchEngine>({} as any);
 
   const getAllClassify = () => {
     getClassifyApi().then((res: any) => {
@@ -65,9 +71,16 @@ const Engine: React.FC = () => {
   };
 
   const delClassify = (id: string) => {
-    delClassifyApi(id).then((res) => {
-      getAllClassify();
-      enqueueSnackbar('删除分类成功', { variant: 'success' });
+    confirm({
+      type: 'warning',
+      title: '提示',
+      content: '确认删除该分类吗？',
+      onOk: () => {
+        delClassifyApi(id).then((res) => {
+          getAllClassify();
+          enqueueSnackbar('删除分类成功', { variant: 'success' });
+        });
+      },
     });
   };
 
@@ -106,15 +119,28 @@ const Engine: React.FC = () => {
   };
 
   const delEngine = (id: string) => {
-    delEngineApi(id).then((res) => {
-      enqueueSnackbar('删除搜索引擎成功', { variant: 'success' });
-      getEngineList();
+    confirm({
+      type: 'warning',
+      title: '提示',
+      content: '确认删除该搜索引擎？',
+      onOk: () => {
+        delEngineApi(id).then((res) => {
+          enqueueSnackbar('删除搜索引擎成功', { variant: 'success' });
+          getEngineList();
+        });
+      },
     });
   };
 
   const showEngine = (id: string, isShow: boolean) => {
     showEngineApi(id, isShow).then((res) => {
       getEngineList();
+    });
+  };
+
+  const getCurrentEngine = () => {
+    getCurrentEngineApi().then((res) => {
+      setCurrentEngine(res);
     });
   };
 
@@ -147,6 +173,7 @@ const Engine: React.FC = () => {
   useEffect(() => {
     getAllClassify();
     getEngineList();
+    getCurrentEngine();
   }, []);
 
   return (
@@ -256,11 +283,25 @@ const Engine: React.FC = () => {
                           修改
                         </Button>
                       )}
-                      {!i.isDefault && (
-                        <Button color="error" onClick={() => delEngine(i._id)}>
-                          删除
-                        </Button>
-                      )}
+                      {!i.isDefault &&
+                        (function () {
+                          const button = (
+                            <Button
+                              disabled={currentEngine?._id === i._id}
+                              color="error"
+                              onClick={() => delEngine(i._id)}
+                            >
+                              删除
+                            </Button>
+                          );
+                          return currentEngine?._id === i._id ? (
+                            <Tooltip title="使用中的搜索引擎无法删除" arrow>
+                              <span>{button}</span>
+                            </Tooltip>
+                          ) : (
+                            button
+                          );
+                        })()}
                       {
                         <Button
                           color="info"
@@ -271,6 +312,11 @@ const Engine: React.FC = () => {
                       }
                     </>
                   }
+                  onClick={() => {
+                    navigate(
+                      `/setting/lab/search-engine/engine-detail/${i._id}`,
+                    );
+                  }}
                 ></ItemCard>
               ))
             ) : (
@@ -331,7 +377,7 @@ const Engine: React.FC = () => {
           {
             name: 'href',
             label: '网址',
-            type: 'text',
+            type: 'textArea',
             required: true,
           },
           {

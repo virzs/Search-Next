@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 14:46:20
+ * @Last Modified time: 2022-02-03 17:02:16
  */
 
 import { lazy } from 'react';
@@ -42,6 +42,7 @@ import OtherApis from '@/views/setting/otherApis';
 import Message from '@/views/setting/features/message';
 import Engine from '@/views/setting/features/engine';
 import Beta from '@/views/setting/about/beta';
+import EngineDetail from '@/views/setting/features/engine/engineDetail';
 
 /**
  * 关于 component 额外说明
@@ -84,7 +85,6 @@ const routers: Router[] = [
     routes: [
       {
         title: '账户',
-        exact: false,
         path: 'auth',
         component: Auth,
         routes: [
@@ -104,7 +104,6 @@ const routers: Router[] = [
       },
       {
         title: '个性化',
-        exact: false,
         path: 'personalise',
         component: Personalise,
         routes: [
@@ -151,7 +150,6 @@ const routers: Router[] = [
       },
       {
         title: '数据',
-        exact: false,
         path: 'data',
         component: Data,
         routes: [
@@ -165,7 +163,6 @@ const routers: Router[] = [
       },
       {
         title: '实验室',
-        exact: false,
         path: 'lab',
         component: Lab,
         routes: [
@@ -181,12 +178,19 @@ const routers: Router[] = [
             path: 'search-engine',
             component: Engine,
             status: 'process',
+            routes: [
+              {
+                title: '搜索引擎详情',
+                icon: <Search />,
+                path: 'engine-detail/:id',
+                component: EngineDetail,
+              },
+            ],
           },
         ],
       },
       {
         title: '关于',
-        exact: false,
         path: 'about',
         component: About,
         routes: [

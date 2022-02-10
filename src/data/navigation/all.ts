@@ -988,6 +988,15 @@ const allWebsites: Website[] = [
     color: '#4273C6',
     classify: ['tools', 'software'],
   },
+  {
+    id: '303f7a88beab4dbb9127e012533d79d8',
+    name: 'GitHub Copilot',
+    url: 'https://copilot.github.com/',
+    intro: 'AI智能代码工具',
+    icon: 'copilot',
+    color: '#2C3C49',
+    classify: ['develop', 'tools'],
+  },
 ];
 
 export default allWebsites;

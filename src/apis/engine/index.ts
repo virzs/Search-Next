@@ -258,3 +258,20 @@ export const setCurrentEngineApi = (val: SearchEngine) => {
     result ? res(result) : rej(result);
   });
 };
+
+export interface SearchEngineData extends FullSearchEngine {
+  createdTime: string;
+  updatedTime: string;
+}
+
+// 获取搜索引擎详情
+export const getEngineDetailApi = (id: string) => {
+  return new Promise<SearchEngineData>((res, rej) => {
+    const engine = EngineDB.findOne(id);
+    const classify = EngineClassifyDB.findOne(engine.classifyId);
+    if (!engine || !classify) rej('error');
+    const result = { ...engine, classify };
+    delete result.classifyId;
+    res(result);
+  });
+};
