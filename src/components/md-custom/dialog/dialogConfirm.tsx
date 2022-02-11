@@ -19,6 +19,7 @@ export type confirmType = 'info' | 'success' | 'error' | 'warning';
 export interface DialogConfirm extends DialogProps {
   type?: confirmType | false;
   content?: string | React.ReactNode;
+  showFooter?: boolean;
 }
 
 const InfoContent = () => {

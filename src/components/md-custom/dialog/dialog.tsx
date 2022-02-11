@@ -28,6 +28,7 @@ export interface DialogProps {
   children?: any;
   container?: Element;
   width?: string | number;
+  showFooter?: boolean;
 }
 
 const Dialog: React.FC<DialogProps> = ({
@@ -40,6 +41,7 @@ const Dialog: React.FC<DialogProps> = ({
   children,
   container,
   width = 520,
+  showFooter = true,
 }) => {
   const { t } = useTranslation();
 
@@ -76,14 +78,16 @@ const Dialog: React.FC<DialogProps> = ({
             </IconButton>
           </div>
           <div className="p-4">{children}</div>
-          <div className="p-2 flex justify-end gap-2">
-            <Button variant="text" onClick={onCancel}>
-              {cancelText ? cancelText : t('cancel')}
-            </Button>
-            <Button variant="text" onClick={onOk}>
-              {okText ? okText : t('submit')}
-            </Button>
-          </div>
+          {showFooter && (
+            <div className="p-2 flex justify-end gap-2">
+              <Button variant="text" onClick={onCancel}>
+                {cancelText ? cancelText : t('cancel')}
+              </Button>
+              <Button variant="text" onClick={onOk}>
+                {okText ? okText : t('submit')}
+              </Button>
+            </div>
+          )}
         </div>
       </Fade>
     </MModal>

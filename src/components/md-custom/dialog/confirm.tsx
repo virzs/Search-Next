@@ -18,6 +18,7 @@ export interface ConfirmProps {
   cancelText?: string;
   onOk?: () => void;
   onCancel?: () => void;
+  showFooter?: boolean;
 }
 
 const confirm = (props: ConfirmProps) => {
@@ -29,6 +30,7 @@ const confirm = (props: ConfirmProps) => {
     cancelText,
     onOk,
     onCancel,
+    ...rest
   } = props;
 
   const div = document.createElement('div');
@@ -64,6 +66,7 @@ const confirm = (props: ConfirmProps) => {
       onOk={() => privateOnOk(onOk)}
       onCancel={() => privateOnCancel(onCancel)}
       container={div}
+      {...rest}
     />
   );
 
