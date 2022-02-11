@@ -313,6 +313,33 @@ const navigationData: Classify[] = [
           },
         ],
       },
+      {
+        id: "23b2a97b7daf4790a5b5c7ca87502471",
+        name: "生活",
+        path: "life",
+        intro: "",
+        level: 2,
+        children: [
+          {
+            id: "330e4e753a704c9e82430325270c6268",
+            name: "中国天气网",
+            url: "http://www.weather.com.cn/",
+            intro: "天气通讯社，百姓贴人心",
+            icon: "weather_cn",
+            color: "#0A5BAC",
+            classify: ["news", "life"],
+          },
+          {
+            id: "4c3cc03621c34f65b2b440fd35a362fe",
+            name: "中国台风网",
+            url: "http://typhoon.nmc.cn/",
+            intro: "中国气象局台风预警",
+            icon: "typhoon",
+            color: "#0C4C8D",
+            classify: ["news", "life"],
+          },
+        ],
+      },
     ],
   },
   {
@@ -748,7 +775,7 @@ const navigationData: Classify[] = [
           },
           {
             id: "fae86853bc2147298985b624f0222b66",
-            name: "Electronjs",
+            name: "Electron",
             url: "http://www.electronjs.org/",
             intro: "使用 JavaScript，HTML 和 CSS 构建跨平台的桌面应用程序",
             icon: "electronjs",

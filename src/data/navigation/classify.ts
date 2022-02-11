@@ -52,6 +52,12 @@ const classify: Classify[] = [
         path: 'digital',
         intro: '',
       },
+      {
+        id: '23b2a97b7daf4790a5b5c7ca87502471',
+        name: '生活',
+        path: 'life',
+        intro: '',
+      },
     ],
   },
   {

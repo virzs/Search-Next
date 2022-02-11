@@ -170,6 +170,12 @@ export type DATE = 'date';
 export type BLOG = 'blog';
 
 /**
+ * 生活
+ * @desc 网站分类 - 生活
+ */
+export type LIFE = 'life';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -200,4 +206,5 @@ export type WebsiteClassify =
   | NODEJS
   | REACT
   | DATE
-  | BLOG;
+  | BLOG
+  | LIFE;
