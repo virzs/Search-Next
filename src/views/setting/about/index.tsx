@@ -2,10 +2,11 @@
  * @Author: Vir
  * @Date: 2021-10-08 21:27:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-09 17:26:45
+ * @Last Modified time: 2022-02-10 23:29:06
  */
 import { latest } from '@/apis/github';
 import { LatestType } from '@/apis/github/interface';
+import { VersionInfoButton } from '@/components/global/versionModal';
 import { Router } from '@/config/router';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion, {
@@ -15,6 +16,7 @@ import ItemCard from '@/pages/setting/components/itemCard';
 
 import { PageProps } from '@/typings';
 import { getUA } from '@/utils/info';
+import { Button } from '@mui/material';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -45,7 +47,7 @@ const About: React.FC<PageProps> = ({ route, children, ...props }) => {
           <AccordionDetailText title="版本" value={ua.browser?.version} />
           <AccordionDetailText title="系统" value={ua.os?.name} />
         </ItemAccordion>
-        <ItemAccordion title="版本信息">
+        <ItemAccordion title="版本信息" action={<VersionInfoButton />}>
           <AccordionDetailText
             title="版本"
             value={lastData.tag_name}
