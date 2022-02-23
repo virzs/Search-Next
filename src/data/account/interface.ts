@@ -81,6 +81,14 @@ export interface Message {
   update: boolean; // 版本更新消息提示
 }
 
+// 搜索引擎设置
+export interface Engine {
+  mode: 'default' | 'custom';
+  indexCount: number;
+  sortType: 'default' | 'count';
+  selected?: string;
+}
+
 export interface AuthData {
   _id?: string;
   username: string; // 用户名
@@ -100,7 +108,7 @@ export interface AuthData {
     website: boolean; // 常用网址同步
     history: boolean; // 历史记录同步
   }; // 是否同步，默认false
-  engine?: SearchEngine;
+  engine?: Engine;
 }
 
 export interface SettingDefaultData {

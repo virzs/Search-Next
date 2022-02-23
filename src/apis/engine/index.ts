@@ -5,6 +5,7 @@
  * @Last Modified time: 2022-02-02 21:52:14
  */
 
+import { Engine } from '@/data/account/interface';
 import engine, { WebsiteEngineTemplete } from '@/data/engine';
 import classify, { SearchEngineClassifyTemplete } from '@/data/engine/classify';
 import {
@@ -234,31 +235,6 @@ export const getClassifyEngineListApi = () => {
   });
 };
 
-// 获取当前用户选中的搜索引擎
-export const getCurrentEngineApi = () => {
-  return new Promise<SearchEngine>((res, rej) => {
-    const userId = localStorage.getItem('account');
-    if (!userId) rej('用户未登录');
-    const result = getAuthDataByKey(userId || '', 'engine');
-    res(
-      result && Object.keys(result).length > 0
-        ? result
-        : engine.find((i) => i.isSelected),
-    );
-  });
-};
-
-// 设置当前用户选中的搜索引擎
-export const setCurrentEngineApi = (val: SearchEngine) => {
-  const userId = localStorage.getItem('account');
-  return new Promise((res, rej) => {
-    const userId = localStorage.getItem('account');
-    if (!userId) rej('用户未登录');
-    const result = updateAuthDataByKey(userId || '', 'engine', val);
-    result ? res(result) : rej(result);
-  });
-};
-
 export interface SearchEngineData extends FullSearchEngine {
   createdTime: string;
   updatedTime: string;
@@ -273,5 +249,44 @@ export const getEngineDetailApi = (id: string) => {
     const result = { ...engine, classify };
     delete result.classifyId;
     res(result);
+  });
+};
+
+// 搜索引擎计数
+export const setEngineCount = (id: string) => {
+  return new Promise((res, rej) => {
+    const detail = EngineDB.findOne(id);
+    if (!detail) rej('error');
+    const result = EngineDB.update(id, {
+      count: detail.count + 1,
+    });
+    res(result);
+  });
+};
+
+export interface AccountEngine extends Engine {
+  engine: SearchEngineData;
+}
+
+// 获取当前用户选中的搜索引擎
+export const getAccountEngineApi = () => {
+  return new Promise<AccountEngine>(async (res, rej) => {
+    const userId = localStorage.getItem('account');
+    if (!userId) rej('用户未登录');
+    const result = getAuthDataByKey(userId || '', 'engine');
+    const engineData = result?.selected
+      ? await getEngineDetailApi(result?.selected)
+      : engine.find((i) => i.isSelected);
+    res({ ...result, engine: engineData });
+  });
+};
+
+// 设置当前用户选中的搜索引擎
+export const setAccountEngineApi = (val: SearchEngine) => {
+  return new Promise((res, rej) => {
+    const userId = localStorage.getItem('account');
+    if (!userId) rej('用户未登录');
+    const result = updateAuthDataByKey(userId || '', 'engine', val);
+    result ? res(result) : rej(result);
   });
 };

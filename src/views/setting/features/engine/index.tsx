@@ -4,6 +4,7 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2022-02-03 17:14:05
  */
+
 import {
   addClassifyApi,
   addEngineApi,
@@ -18,18 +19,20 @@ import {
   editEngineApi,
   delEngineApi,
   showEngineApi,
-  getCurrentEngineApi,
+  getAccountEngineApi,
+  setAccountEngineApi,
+  SearchEngineData,
 } from '@/apis/engine';
+import { BorderCard } from '@/components/global/card/styleCard';
+import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 import confirm from '@/components/md-custom/dialog/confirm';
+import Select from '@/components/md-custom/form/select';
 import FormModal from '@/components/md-custom/formModal';
-import Table from '@/components/md-custom/table';
-import Tabs from '@/components/md-custom/tabs';
-import engine from '@/data/engine';
-import { SearchEngine, SearchEngineClassify } from '@/data/engine/types';
+import { Engine as AccountEngine } from '@/data/account/interface';
+import { SearchEngineClassify } from '@/data/engine/types';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { css } from '@emotion/css';
 import { Button, Tooltip } from '@mui/material';
 import { Empty } from 'antd';
 import { useSnackbar } from 'notistack';
@@ -45,7 +48,14 @@ const Engine: React.FC = () => {
   const [openEngine, setOpenEngine] = useState(false);
   const [classifyList, setClassifyList] = useState<SearchEngineClassify[]>([]);
   const [engineList, setEngineList] = useState<FullSearchEngine[]>([]);
-  const [currentEngine, setCurrentEngine] = useState<SearchEngine>({} as any);
+  const [currentEngine, setCurrentEngine] = useState<FullSearchEngine>(
+    {} as FullSearchEngine,
+  );
+  const [accountEngineData, setAccountEngineData] = useState({
+    mode: 'default',
+    indexCount: 4,
+    sortType: 'default',
+  } as AccountEngine);
 
   const getAllClassify = () => {
     getClassifyApi().then((res: any) => {
@@ -138,50 +148,108 @@ const Engine: React.FC = () => {
     });
   };
 
-  const getCurrentEngine = () => {
-    getCurrentEngineApi().then((res) => {
-      setCurrentEngine(res);
+  // 获取搜索引擎相关设置信息
+  const getAccountEngine = () => {
+    getAccountEngineApi().then((res) => {
+      [res.mode, res.indexCount, res.sortType].some((i) => i !== undefined) &&
+        setAccountEngineData(res);
+      res.selected && res.selected !== ''
+        ? setCurrentEngine(res.engine)
+        : setCurrentEngine(
+            engineList.find((i) => i.isSelected) || ({} as FullSearchEngine),
+          );
     });
   };
 
-  const columns = [
-    { field: 'name', name: '搜索引擎' },
-    { field: 'value', name: '关键字' },
-    { field: 'href', name: 'URL' },
-    {
-      field: 'operate',
-      name: '操作',
-      render: (_: any, r: any) => {
-        return (
-          <>
-            {!r.isDefault && (
-              <Button
-                size="small"
-                color="error"
-                onClick={() => delEngine(r._id)}
-              >
-                删除
-              </Button>
-            )}
-          </>
-        );
-      },
-    },
-  ];
+  const handleChange = (val: any, type: 'mode' | 'indexCount' | 'sortType') => {
+    const { mode, indexCount, sortType, selected } = accountEngineData;
+    let newData = {
+      mode,
+      indexCount,
+      sortType,
+      selected: selected || currentEngine?._id,
+    } as any;
+    newData[type] = val;
+    setAccountEngineApi(newData).then((res) => {
+      getAccountEngine();
+    });
+  };
+
+  useEffect(() => {
+    engineList.length &&
+      Object.keys(currentEngine).length === 0 &&
+      getAccountEngine();
+  }, [engineList]);
 
   // 初始化
   useEffect(() => {
     getAllClassify();
     getEngineList();
-    getCurrentEngine();
   }, []);
 
   return (
     <div>
       <ContentList>
+        <BorderCard>
+          <div className="p-2 px-4">
+            <ItemHeader title="当前使用" />
+            <p>名称: {currentEngine.name}</p>
+            <p>URL: {currentEngine.href}</p>
+            <p>使用次数: {currentEngine.count}</p>
+          </div>
+        </BorderCard>
+        <ItemHeader title="基础设置" />
+        <ItemCard
+          title="模式"
+          desc="设置搜索引擎模式"
+          action={
+            <Select
+              size="small"
+              label="模式"
+              options={[
+                { label: '基础', value: 'default' },
+                { label: '高级', value: 'custom' },
+              ]}
+              value={accountEngineData.mode}
+              onChange={(e) => handleChange(e.target.value, 'mode')}
+            />
+          }
+        />
+        <ItemCard
+          title="搜索引擎显示数量"
+          desc="设置搜索引擎在首页显示的数量"
+          action={
+            <Select
+              label="数量"
+              size="small"
+              options={Array.from(new Array(6).keys())
+                .slice(1)
+                .map((i) => ({ label: i.toString(), value: i }))}
+              value={accountEngineData.indexCount}
+              onChange={(e) => handleChange(e.target.value, 'indexCount')}
+            />
+          }
+        />
+        <ItemCard
+          title="排序方式"
+          desc="设置首页搜索引擎排序方式"
+          action={
+            <Select
+              size="small"
+              label="排序方式"
+              options={[
+                { label: '默认', value: 'default' },
+                { label: '按使用次数', value: 'count' },
+              ]}
+              value={accountEngineData.sortType}
+              onChange={(e) => handleChange(e.target.value, 'sortType')}
+            />
+          }
+        />
+        <ItemHeader title="高级设置" />
         <ItemAccordion
           title="全部分类"
-          desc="设置搜索引擎分类，并可通过拖拽对分类排序"
+          desc="设置搜索引擎分类"
           action={
             <Button
               size="small"
@@ -246,6 +314,7 @@ const Engine: React.FC = () => {
         </ItemAccordion>
         <ItemAccordion
           title="全部搜索引擎"
+          desc="设置搜索引擎"
           action={
             <Button
               size="small"
