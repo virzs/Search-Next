@@ -1015,6 +1015,15 @@ const allWebsites: Website[] = [
     color: '#0C4C8D',
     classify: ['news', 'life'],
   },
+  {
+    id: 'f8c8f8f8f8f8f8f8f8f8f8f8f8f8f8f8',
+    name: '程序员做饭指南',
+    url: 'https://cook.aiurs.co/',
+    intro: '程序员在家做饭方法指南。',
+    icon: 'cook',
+    color: '#159957',
+    classify: ['news', 'life'],
+  },
 ];
 
 export default allWebsites;
