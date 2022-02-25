@@ -339,7 +339,7 @@ const navigationData: Classify[] = [
             classify: ["news", "life"],
           },
           {
-            id: "f8c8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            id: "87142406ddab48b0999d57b82a2888e7",
             name: "程序员做饭指南",
             url: "https://cook.aiurs.co/",
             intro: "程序员在家做饭方法指南。",
@@ -708,6 +708,15 @@ const navigationData: Classify[] = [
         icon: "devresourc",
         color: "#0A0B0D",
         classify: ["develop"],
+      },
+      {
+        id: "18426961ce4745d9ac9ebbb05392914e",
+        name: "Lodash",
+        url: "https://www.lodashjs.com/",
+        intro: "Lodash 是一个一致性、模块化、高性能的 JavaScript 实用工具库。",
+        icon: "lodash",
+        color: "#3492FF",
+        classify: ["develop", "npm"],
       },
     ],
     subClassify: [
