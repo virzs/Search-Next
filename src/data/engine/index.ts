@@ -98,21 +98,6 @@ export default [
     sort: 5,
   },
   {
-    _id: 'db34d1185cdf42339f17dd34f25b897b',
-    name: 'Magi',
-    value: 'magi',
-    href: 'https://magi.com/search?q=',
-    sugurl:
-      'https://magi.com/suggest?size=8&q=#content#&callback=window.magi.sug',
-    icon: './img/engineLogo/magi.png',
-    isShow: true,
-    isSelected: false,
-    count: 0,
-    isDefault: true,
-    classifyId: '6c77e19433a1416d851ef898e0db5707',
-    sort: 6,
-  },
-  {
     _id: 'ace54031b5bb4b4693e4ffc4cc304199',
     name: '夸克',
     value: 'quark',
