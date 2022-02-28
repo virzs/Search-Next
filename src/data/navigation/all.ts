@@ -1033,6 +1033,15 @@ const allWebsites: Website[] = [
     color: '#3492FF',
     classify: ['develop', 'npm'],
   },
+  {
+    id: 'd33ede4e11da498e8353594e56bc4709',
+    name: 'Matter JS',
+    url: 'https://brm.io/matter-js/',
+    intro: 'Matter.js 是一个开源的 2D 物理引擎，用于制作游戏、动画和模拟。',
+    icon: 'matter',
+    color: '#000000',
+    classify: ['develop', 'npm'],
+  },
 ];
 
 export default allWebsites;
