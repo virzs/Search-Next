@@ -1042,6 +1042,15 @@ const allWebsites: Website[] = [
     color: '#000000',
     classify: ['develop', 'npm'],
   },
+  {
+    id: 'dff5f0f533b947e3816aa9c62cee9851',
+    name: 'Openbase',
+    url: 'https://openbase.com/',
+    intro: '选择合适的插件包',
+    icon: 'openbase',
+    color: '#E0F7F7',
+    classify: ['develop', 'onlineTools'],
+  },
 ];
 
 export default allWebsites;
