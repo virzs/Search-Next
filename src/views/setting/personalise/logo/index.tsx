@@ -68,11 +68,15 @@ const Logo: React.FC = () => {
             />
           }
         />
+        <Alert title="提示" severity="warning">
+          由于需求调整，Logo缩放功能将在未来删除
+        </Alert>
         <ItemCard
           title="Logo缩放"
           desc="设置首页Logo在点击搜索框时是否缩放"
           action={
             <Switch
+              disabled
               checked={logoData?.zoom}
               onChange={(e) => updateLogoData({ zoom: e.target.checked })}
             />
