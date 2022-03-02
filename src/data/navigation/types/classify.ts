@@ -176,6 +176,12 @@ export type BLOG = 'blog';
 export type LIFE = 'life';
 
 /**
+ * 图书
+ * @desc 网站分类 - 图书
+ */
+export type BOOK = 'book';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -207,4 +213,5 @@ export type WebsiteClassify =
   | REACT
   | DATE
   | BLOG
-  | LIFE;
+  | LIFE
+  | BOOK;

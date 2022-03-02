@@ -19,6 +19,14 @@ const classify: Classify[] = [
         name: '购物',
         path: 'shopping',
         intro: '常用购物网站推荐',
+        subClassify: [
+          {
+            id: '50d51b75bcd441659253a5c797b65046',
+            name: '图书',
+            path: 'book',
+            intro: '',
+          },
+        ],
       },
       {
         id: 'b983b45559084171809949369559f725',

@@ -53,6 +53,35 @@ const navigationData: Classify[] = [
             classify: ["common", "shopping"],
           },
         ],
+        subClassify: [
+          {
+            id: "50d51b75bcd441659253a5c797b65046",
+            name: "图书",
+            path: "book",
+            intro: "",
+            level: 3,
+            children: [
+              {
+                id: "09bbfb8b651b449b99763b49de32ad4a",
+                name: "图灵社区",
+                url: "https://www.ituring.com.cn/",
+                intro: "",
+                icon: "ituring",
+                color: "#00457A",
+                classify: ["common", "shopping", "book", "develop"],
+              },
+              {
+                id: "2abb9ca6308440d28f004555b024f7cc",
+                name: "当当网",
+                url: "http://book.dangdang.com/",
+                intro: "全球最大中文网上书店",
+                icon: "bookdangdang",
+                color: "#FE382F",
+                classify: ["common", "shopping", "book"],
+              },
+            ],
+          },
+        ],
       },
       {
         id: "b983b45559084171809949369559f725",
@@ -735,6 +764,15 @@ const navigationData: Classify[] = [
         icon: "openbase",
         color: "#E0F7F7",
         classify: ["develop", "onlineTools"],
+      },
+      {
+        id: "09bbfb8b651b449b99763b49de32ad4a",
+        name: "图灵社区",
+        url: "https://www.ituring.com.cn/",
+        intro: "",
+        icon: "ituring",
+        color: "#00457A",
+        classify: ["common", "shopping", "book", "develop"],
       },
     ],
     subClassify: [
