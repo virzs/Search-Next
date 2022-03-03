@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2022-01-29 21:09:38
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 22:03:08
+ * @Last Modified time: 2022-02-23 17:46:31
  */
 
-import { getClassifyEngineListApi } from '@/apis/engine';
+import { AccountEngine, getClassifyEngineListApi } from '@/apis/engine';
 import {
   SearchEngine,
   SearchEngineClassifyWithChildren,
@@ -22,7 +22,7 @@ export interface EngineSelectPopperProps {
   open: boolean;
   onBtnClick: (val: boolean) => void;
   onEngineSelect: (engine: SearchEngine) => void;
-  engine: SearchEngine;
+  engine: AccountEngine;
 }
 
 const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
@@ -38,23 +38,32 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
     SearchEngineClassifyWithChildren[]
   >([]);
   const [selected, setSelected] = useState<string>('');
+  const [engineList, setEngineList] = React.useState([] as SearchEngine[]);
 
   const getClassifyEngine = () => {
     getClassifyEngineListApi().then((res) => {
-      console.log(res);
+      const current = {
+        ...engine.engine,
+        classifyId: engine.engine.classify?._id,
+      } as SearchEngine;
+
+      const sortFilterEngines = res
+        .map((i) => i.children)
+        .flat()
+        .sort((r, t) => r.count - t.count)
+        .filter((u) => u._id !== engine.engine._id)
+        .slice(0, engine.indexCount - 1);
+      setEngineList([current, ...sortFilterEngines]);
       setClassifyEngineList(res);
       res.length > 0 && setSelected(res[0]._id);
     });
   };
 
   useEffect(() => {
-    getClassifyEngine();
-  }, []);
-
-  useEffect(() => {
-    if (engine.classifyId) {
-      setSelected(engine.classifyId);
+    if (engine?.engine?.classify?._id) {
+      setSelected(engine?.engine?.classify?._id);
     }
+    getClassifyEngine();
   }, [engine]);
 
   return (
@@ -92,7 +101,7 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
                     <div
                       className={classnames(
                         'px-1.5 py-0.5 cursor-pointer rounded text-sm',
-                        engine?._id === i._id
+                        engine?.engine?._id === i._id
                           ? 'bg-primary text-white'
                           : 'bg-white border',
                       )}
@@ -116,18 +125,36 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
           </Card>
         )}
       </Popper>
-      <Chip
-        onClick={(e: any) => {
-          onBtnClick(!open);
-        }}
-        size="small"
-        label={
-          <div className="text-sm flex gap-1 items-center">
-            {engine.name}
-            <Settings className="text-base" />
-          </div>
-        }
-      />
+      <div className="w-full text-left mb-1 flex justify-start items-center overflow-x-auto">
+        {engineList.map((i) => (
+          <Chip
+            key={i._id}
+            className={classnames(
+              'mx-1',
+              i._id === engine.engine._id
+                ? 'bg-primary text-white'
+                : 'bg-gray-100',
+            )}
+            size="small"
+            label={i.name}
+            onClick={(e) => onEngineSelect(i)}
+          ></Chip>
+        ))}
+        {engine.mode === 'custom' && (
+          <Chip
+            onClick={(e: any) => {
+              onBtnClick(!open);
+            }}
+            className={classnames('mx-1', 'bg-gray-100')}
+            size="small"
+            label={
+              <div className="text-sm flex gap-1 items-center">
+                <Settings className="text-base" />
+              </div>
+            }
+          />
+        )}
+      </div>
     </div>
   );
 };

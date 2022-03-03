@@ -271,3 +271,12 @@ export const fileReader = (target: HTMLInputElement) => {
     reader.readAsText(target.files[0]);
   });
 };
+
+// 剔除对象中不需要的字段并返回
+export const filterObj = (obj: { [x: string]: any }, keys: string[]) => {
+  let newObj: any = {};
+  keys.forEach((key) => {
+    newObj[key] = obj[key];
+  });
+  return newObj;
+};

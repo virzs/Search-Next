@@ -14,6 +14,7 @@ import {
   SearchEngineClassifyToApiUse,
   SearchEngineClassifyWithChildren,
 } from '@/data/engine/types';
+import { filterObj } from '@/utils/common';
 import StorageDB from 'bsdb';
 import { getAuthDataByKey, updateAuthDataByKey } from '../auth';
 
@@ -253,7 +254,7 @@ export const getEngineDetailApi = (id: string) => {
 };
 
 // 搜索引擎计数
-export const setEngineCount = (id: string) => {
+export const setEngineCountApi = (id: string) => {
   return new Promise((res, rej) => {
     const detail = EngineDB.findOne(id);
     if (!detail) rej('error');
@@ -281,12 +282,37 @@ export const getAccountEngineApi = () => {
   });
 };
 
-// 设置当前用户选中的搜索引擎
-export const setAccountEngineApi = (val: SearchEngine) => {
+// 设置当前用户搜索引擎设置
+export const setAccountEngineApi = (val: AccountEngine) => {
   return new Promise((res, rej) => {
     const userId = localStorage.getItem('account');
     if (!userId) rej('用户未登录');
     const result = updateAuthDataByKey(userId || '', 'engine', val);
+    result ? res(result) : rej(result);
+  });
+};
+
+// 设置当前用户搜索引擎设置，除了搜索引擎
+export const setAccountEngineExceptApi = (val: Omit<Engine, 'selected'>) => {
+  return new Promise(async (res, rej) => {
+    const keys = ['mode', 'indexCount', 'sortType'];
+    const localEngineSetting = await getAccountEngineApi();
+    const result = await setAccountEngineApi({
+      ...localEngineSetting,
+      ...filterObj(val, keys),
+    });
+    result ? res(result) : rej(result);
+  });
+};
+
+// 单独设置当前用户选中的搜索引擎
+export const setAccountCurretEngineApi = (id: string) => {
+  return new Promise(async (res, rej) => {
+    const localEngineSetting = await getAccountEngineApi();
+    const result = await setAccountEngineApi({
+      ...localEngineSetting,
+      selected: id,
+    });
     result ? res(result) : rej(result);
   });
 };

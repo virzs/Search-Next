@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 21:51:19
+ * @Last Modified time: 2022-02-23 16:52:26
  */
 
 import { Button } from '@mui/material';
@@ -10,11 +10,18 @@ import React, { useEffect } from 'react';
 import EngineChip from './engineChip';
 import SugPopper from './sugPopper';
 import { useTranslation } from 'react-i18next';
-import { SearchEngine } from '@/data/engine/types';
 import EngineSelectPopper from './engineSelectPopper';
-import { findDOMNode } from 'react-dom';
 import { isBeta } from '@/apis/auth';
-import { getCurrentEngineApi, setCurrentEngineApi } from '@/apis/engine';
+import {
+  AccountEngine,
+  getAccountEngineApi,
+  SearchEngineData,
+  setAccountCurretEngineApi,
+  setAccountEngineApi,
+  setEngineCountApi,
+} from '@/apis/engine';
+import { SearchEngine } from '@/data/engine/types';
+import Input from './input';
 
 // 自动填充内容，off不填充，on填充
 // 更多参数：https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input
@@ -34,10 +41,10 @@ export interface SearchInputProps {
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement>,
     value: string,
-    engine: SearchEngine,
+    accountEngine: SearchEngineData,
   ) => void; // 输入框内容变化时回调
-  onPressEnter?: (value: string, engine: SearchEngine) => void; // 按下回车回调
-  onBtnClick?: (value: string, engine: SearchEngine) => void;
+  onPressEnter?: (value: string, accountEngine: SearchEngineData) => void; // 按下回车回调
+  onBtnClick?: (value: string, accountEngine: SearchEngineData) => void;
   onFocus?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onArrow?: (code: string) => void;
@@ -61,7 +68,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const [inputValue, setInputValue] = React.useState(
     defaultValue || value || '',
   );
-  const [engine, setEngine] = React.useState({} as SearchEngine);
+  const [accountEngine, setAccountEngine] = React.useState({} as AccountEngine);
   const [sugOpen, setSugOpen] = React.useState<boolean>(false);
   const [wd, setWd] = React.useState<string>('');
   const [sugAnchorEl, setSugAnchorEl] = React.useState<null | HTMLElement>(
@@ -75,7 +82,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
     setWd(e.target.value);
-    if (onChange) onChange(e, e.target.value, engine);
+    if (onChange) onChange(e, e.target.value, accountEngine.engine);
   };
 
   const handleFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +95,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // 相应键盘 Enter 事件
-    if (e.code === 'Enter' && onPressEnter) onPressEnter(inputValue, engine);
+    if (e.code === 'Enter') {
+      onPressEnter && onPressEnter(inputValue, accountEngine.engine);
+      window.open(`${accountEngine.engine.href}${value}`);
+      setEngineCountApi(accountEngine.engine._id);
+    }
     // 相应键盘 方向键 上下 事件
     if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
       if (onArrow) onArrow(e.code);
@@ -101,22 +112,30 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   const handleBtnClick = () => {
-    if (onBtnClick) onBtnClick(inputValue, engine);
+    if (onBtnClick) onBtnClick(inputValue, accountEngine.engine);
+    window.open(`${accountEngine.engine.href}${value}`);
+    setEngineCountApi(accountEngine.engine._id);
   };
 
   const chipChange = (value: SearchEngine) => {
-    setEngine(value);
+    setAccountEngine({
+      ...accountEngine,
+      engine: value as unknown as SearchEngineData,
+    });
   };
 
   const getCurrentEngine = () => {
-    getCurrentEngineApi().then((res) => {
-      setEngine(res);
+    getAccountEngineApi().then((res) => {
+      setAccountEngine(res);
     });
   };
 
   const updateCurrentEngine = (value: SearchEngine) => {
-    setCurrentEngineApi(value).then((res) => {
-      setEngine(value);
+    setAccountCurretEngineApi(value._id).then((res) => {
+      setAccountEngine({
+        ...accountEngine,
+        engine: value as unknown as SearchEngineData,
+      });
     });
   };
 
@@ -151,36 +170,23 @@ const SearchInput: React.FC<SearchInputProps> = ({
             updateCurrentEngine(val);
             setEngineSelectOpen(false);
           }}
-          engine={engine}
+          engine={accountEngine}
         />
       ) : (
         <EngineChip onChange={chipChange} />
       )}
-      <div
-        ref={inputRef}
-        className="flex justify-center items-center rounded-md shadow-xl overflow-hidden"
-      >
-        <input
-          className="py-2 px-4 border-none leading-4 sm:leading-7 outline-none flex-grow rounded-tr-none rounded-br-none placeholder-gray-400 focus:placeholder-gray-200 transition-all"
-          type="text"
-          value={inputValue}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          onKeyUp={handleKeyUp}
-          {...props}
-        />
-        <Button
-          className="w-16 sm:w-24 rounded-tl-none px-2 sm:px-4 leading-4 sm:leading-7 text-center tracking-widest rounded-bl-none bg-primary text-white"
-          size="large"
-          variant="contained"
-          disableElevation
-          onClick={handleBtnClick}
-        >
-          {t('sou-suo')}
-        </Button>
-      </div>
+      <Input
+        inputRef={inputRef}
+        type="text"
+        value={inputValue}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
+        handleBtnClick={handleBtnClick}
+        {...props}
+      />
       <SugPopper
         open={sugOpen}
         wd={wd}
@@ -190,7 +196,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           setInputValue(content);
         }}
         onSelect={(content) => {
-          if (onBtnClick) onBtnClick(content, engine);
+          if (onBtnClick) onBtnClick(content, accountEngine.engine);
         }}
       />
     </div>

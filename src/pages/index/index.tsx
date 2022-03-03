@@ -23,6 +23,7 @@ import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
 import { useNavigate } from 'react-router-dom';
 import { SearchEngine } from '@/data/engine/types';
+import { SearchEngineData } from '@/apis/engine';
 
 const IndexPage: React.FC<PageProps> = (props) => {
   const history = useNavigate();
@@ -40,10 +41,6 @@ const IndexPage: React.FC<PageProps> = (props) => {
     {} as Navigation,
   );
   const [navOpen, setNavOpen] = React.useState(false);
-
-  const handleSearch = (value: string, engine: SearchEngine) => {
-    window.open(`${engine.href}${value}`);
-  };
 
   // 获取并设置logo
   const setLogoSetting = () => {
@@ -172,12 +169,6 @@ const IndexPage: React.FC<PageProps> = (props) => {
       <div className="index-input-box flex-grow max-h-20 flex justify-center items-center">
         <SearchInput
           placeholder={t('placeholder.qing-shu-ru-sou-suo-nei-rong')}
-          onPressEnter={handleSearch}
-          onBtnClick={handleSearch}
-          onFocus={() => {
-            logoData.zoom && setZoom(true);
-          }}
-          onBlur={() => setZoom(false)}
         />
       </div>
       <div className="index-content-box flex-grow">
