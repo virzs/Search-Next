@@ -2,12 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { message } from 'antd';
 import '@/locales';
 import devtools from 'devtools-detect';
 import { randomLog } from './data/console/log';
 import { getAccount } from './views/setting/auth/utils/acount';
 import getVersionInfo from './components/global/versionModal';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
@@ -36,7 +37,7 @@ window.onerror = function (msg, source, lineno, colno, error) {
       Error对象（对象）：error
       https://developer.mozilla.org/zh-CN/docs/Web/API/GlobalEventHandlers/onerror */
   console.log(msg, source, lineno, colno, error);
-  message.error(msg);
+  toast.error(msg);
   return false;
 };
 

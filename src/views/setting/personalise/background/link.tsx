@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-27 13:55:54
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 16:35:35
+ * @Last Modified time: 2022-03-02 14:48:22
  */
 
 import { AuthBackgroundLinkData } from '@/data/account/interface';
@@ -10,9 +10,10 @@ import { AccordionDetailItem } from '@/pages/setting/components/itemAccordion';
 import { isHttpLink } from '@/utils/regexp';
 import { css } from '@emotion/css';
 import { TextField } from '@mui/material';
-import { Image, message } from 'antd';
+import { Image } from 'antd';
 import classNames from 'classnames';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 export interface LinkProps {
   onChange: (url: string) => void;
@@ -51,7 +52,7 @@ const Link: React.FC<LinkProps> = (props) => {
               setBlur(true);
               const check = isHttpLink.test(url);
               if (!check && url.length > 0) {
-                message.error('请输入有效的链接');
+                toast.error('请输入有效的链接');
                 setIsUrl(false);
               }
               if (check && url.length > 0) {

@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-11 21:56:04
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-11 21:38:19
+ * @Last Modified time: 2022-03-02 14:48:34
  */
 
 import { getAuthDataByKey, updateLogoSetting } from '@/apis/auth';
@@ -16,8 +16,8 @@ import ItemAccordion, {
 } from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { Alert, Switch, TextField } from '@mui/material';
-import { message } from 'antd';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 const Logo: React.FC = () => {
   const [logoData, setLogoData] = React.useState<AuthLogo>({
@@ -46,7 +46,7 @@ const Logo: React.FC = () => {
       ...data,
     };
     const update = updateLogoSetting(id, newData);
-    if (!update) message.error('设置logo出现错误');
+    if (!update) toast.error('设置logo出现错误');
     setClockLogoData(newData.config.clock);
     setLogoData(newData);
   };

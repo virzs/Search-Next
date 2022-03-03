@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-19 23:23:36
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-31 20:13:54
+ * @Last Modified time: 2022-03-02 14:45:18
  */
 
 import { editAccount } from '@/apis/auth';
@@ -13,8 +13,8 @@ import { AuthData } from '@/data/account/interface';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { PageProps } from '@/typings';
 import { Button, TextField } from '@mui/material';
-import { message } from 'antd';
 import React from 'react';
+import { toast } from 'react-toastify';
 import AccountCard from './components/accountCard';
 import { getAccount } from './utils/acount';
 
@@ -51,7 +51,7 @@ const Info: React.FC<PageProps> = () => {
       handleCancel();
       setEditData({ _id: '', username: '' });
       setAccount(getAccount());
-      message.success('修改成功');
+      toast.success('修改成功');
     }
   };
 

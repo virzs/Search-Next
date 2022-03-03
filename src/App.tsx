@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-08 14:22:02
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-27 13:48:38
+ * @Last Modified time: 2022-03-02 14:28:05
  */
 
 import React, { Suspense } from 'react';
@@ -11,6 +11,7 @@ import GlobalLoading from './components/global/loading';
 import routers, { Router } from './config/router';
 import RenderContent from './components/global/renderContent';
 import { SnackbarProvider } from 'notistack';
+import ToastContainer from './components/global/feedback/toast/container';
 
 // 处理路由数据
 const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {
@@ -61,6 +62,7 @@ function App(props: any) {
           </HashRouter>
         </SnackbarProvider>
       </Suspense>
+      <ToastContainer />
     </div>
   );
 }

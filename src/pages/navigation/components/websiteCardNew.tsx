@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-27 23:01:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-28 17:23:20
+ * @Last Modified time: 2022-03-02 14:45:39
  */
 import { addSite } from '@/apis/site';
 import { Website } from '@/data/navigation/interface';
@@ -16,11 +16,11 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Add, CopyAll, MoreHoriz } from '@mui/icons-material';
-import { message } from 'antd';
 import classNames from 'classnames';
 import React from 'react';
 import { Overflow } from 'vmdc-ui';
 import { getWebIconByUrl } from '@/apis/common';
+import { toast } from 'react-toastify';
 
 export interface WebsiteCardNewProps {
   datasource: Website;
@@ -35,16 +35,16 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
       name,
       url: url.substring(0, url.lastIndexOf('/')),
     });
-    if (res) message.success('添加成功');
+    if (res) toast.success('添加成功');
   };
 
   const onCopy = () => {
     navigator.clipboard.writeText(url);
-    message.success(`已复制 ${name} (${url})`);
+    toast.success(`已复制 ${name} (${url})`);
   };
 
   const onMore = () => {
-    message.warning('功能开发中...');
+    toast.warning('功能开发中...');
   };
 
   return (

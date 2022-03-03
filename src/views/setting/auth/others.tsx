@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-20 23:42:17
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:28:15
+ * @Last Modified time: 2022-03-02 14:47:39
  */
 
 import {
@@ -23,10 +23,10 @@ import ItemAccordion, {
 } from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@pages/setting/components/itemCard';
 import { Button } from '@mui/material';
-import { message } from 'antd';
 import React from 'react';
 import AccountCard from './components/accountCard';
 import HandleAccountDialog from './components/handleAccountDialog';
+import { toast } from 'react-toastify';
 
 const Others: React.FC = () => {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -61,7 +61,7 @@ const Others: React.FC = () => {
   const submit = ({ username }: { username: string }) => {
     const user = findAccountByName(username);
     if (user) {
-      message.error('账户名称不能重复');
+      toast.error('账户名称不能重复');
       return;
     }
     let data = {
@@ -70,7 +70,7 @@ const Others: React.FC = () => {
     };
     const inset = addAccount(data);
     if (inset) {
-      message.success('添加成功');
+      toast.success('添加成功');
       setOpen(false);
       const accountId = localStorage.getItem('account');
       getOtherAccounts(accountId);
@@ -83,7 +83,7 @@ const Others: React.FC = () => {
       username,
     });
     if (update) {
-      message.success('修改成功');
+      toast.success('修改成功');
       setOpen(false);
       getOtherAccounts(account._id);
       setEditData({ _id: '', username: '' });
@@ -93,13 +93,13 @@ const Others: React.FC = () => {
   // 切换账户
   const changeAccount = (id?: string) => {
     if (!id) {
-      message.error('异常');
+      toast.error('异常');
       return;
     }
     const data = findAccount(id);
     localStorage.setItem('account', id);
     setAccount(data);
-    message.success('切换成功');
+    toast.success('切换成功');
     getOtherAccounts(id);
   };
 
@@ -108,7 +108,7 @@ const Others: React.FC = () => {
     const account = localStorage.getItem('account');
 
     if (account === id) {
-      message.error('使用中的账户无法删除');
+      toast.error('使用中的账户无法删除');
       return;
     }
 
@@ -119,7 +119,7 @@ const Others: React.FC = () => {
       onOk: () => {
         const remove = delAccount(id);
         if (remove) {
-          message.success('删除成功');
+          toast.success('删除成功');
           getOtherAccounts(account);
         }
       },
@@ -144,9 +144,7 @@ const Others: React.FC = () => {
             size="small"
             onClick={() => {
               const count = accountsCount();
-              count >= 10
-                ? message.error('最多可以创建10个账户')
-                : setOpen(true);
+              count >= 10 ? toast.error('最多可以创建10个账户') : setOpen(true);
             }}
           >
             添加账户
