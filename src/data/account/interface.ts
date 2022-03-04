@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-17 21:26:07
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 19:59:03
+ * @Last Modified time: 2022-03-04 13:49:21
  */
 
 import { SearchEngine } from '../engine/types';
@@ -76,9 +76,17 @@ export interface Navigation {
   type: NavigationType;
 }
 
+export type AccountUpdateMessageRemind = 'message' | 'notification' | 'popup';
+
+export interface AccountUpdateMessage {
+  update: boolean;
+  remind: AccountUpdateMessageRemind;
+  interval: number;
+}
+
 // 消息提示
 export interface Message {
-  update: boolean; // 版本更新消息提示
+  update: boolean | AccountUpdateMessage; // 版本更新消息提示
 }
 
 // 搜索引擎设置

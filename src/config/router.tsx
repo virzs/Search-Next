@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-03 17:02:16
+ * @Last Modified time: 2022-03-04 11:20:00
  */
 
 import { lazy } from 'react';
@@ -19,6 +19,7 @@ import {
   Message as MessageIcon,
   Search,
   BugReportOutlined,
+  NewReleases,
 } from '@mui/icons-material';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -43,6 +44,7 @@ import Message from '@/views/setting/features/message';
 import Engine from '@/views/setting/features/engine';
 import Beta from '@/views/setting/about/beta';
 import EngineDetail from '@/views/setting/features/engine/engineDetail';
+import ReleasesView from '@/views/setting/features/message/release';
 
 /**
  * 关于 component 额外说明
@@ -141,10 +143,18 @@ const routers: Router[] = [
             component: Navigation,
           },
           {
-            title: '消息',
+            title: '通知与消息',
             icon: <MessageIcon />,
             path: 'message',
             component: Message,
+            routes: [
+              {
+                title: '版本更新',
+                icon: <NewReleases />,
+                path: 'release',
+                component: ReleasesView,
+              },
+            ],
           },
         ],
       },
