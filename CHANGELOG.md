@@ -1,3 +1,94 @@
+## [0.9.0](https://github.com/virzs/Search-Next/compare/v0.8.2...v0.9.0) (2022-03-04)
+
+
+### 💄 Styles | 风格
+
+* **样式优化:** :lipstick: 优化导航页卡片样式 ([5dfda72](https://github.com/lpreterite/datagent/commit/5dfda72a90e7b08484c2637b04c35d958fb9e55d))
+
+
+### 📝 Documentation | 文档
+
+* **文档调整:** :memo: 文档添加许可说明 ([5adf4e1](https://github.com/lpreterite/datagent/commit/5adf4e11350cc0073550baf454217b48d659b53f))
+* **修正文字:** :speech_balloon: 修改错误文字 ([c109281](https://github.com/lpreterite/datagent/commit/c1092817b811fa3dd66dac7fb1444752e792ecc2))
+* **issues templete:** :memo: 修改 issues 模板 ([7a9de1e](https://github.com/lpreterite/datagent/commit/7a9de1e8d7b05b7cc7740dd41bf3138d140b7001))
+
+
+### ✨ Features | 新功能
+
+* **路由支持状态:** :sparkles: 路由添加开发状态显示 ([7834b1c](https://github.com/lpreterite/datagent/commit/7834b1caa8c82c96a27406f1c997e1075e6766fc))
+* **设置搜索引擎功能:** :sparkles: 新增设置搜索引擎功能 ([4de6ea7](https://github.com/lpreterite/datagent/commit/4de6ea74ebb3e3904fe50ac2fcdcb0e89b5cccd1))
+* **搜索引擎:** :sparkles: 支持查看搜索引擎详情 ([621c2fe](https://github.com/lpreterite/datagent/commit/621c2fe382b76f2c5cc73b4b72ba6a82de88957f))
+* **新功能:** :sparkles: 实验室支持相应用户体验计划设置 ([1ff7260](https://github.com/lpreterite/datagent/commit/1ff7260b0c3bcc27cc518c12bbb3bb5b58a4d22f))
+* **新功能:** :sparkles: 新增用户体验计划设置 ([0f75f0d](https://github.com/lpreterite/datagent/commit/0f75f0d3ed525a4cece4724ddb59923fac56c0e6))
+* **新功能:** :sparkles: logo支持设置是否缩放 ([87820c5](https://github.com/lpreterite/datagent/commit/87820c547ee44c5f53ae8fdeaff01f2074dbb983))
+* **新增通用组件:** :sparkles: 新增 Table Tabs 通用组件 ([e441e49](https://github.com/lpreterite/datagent/commit/e441e49af8d0ef0860b191c672cf4ec127e8bb7c))
+* **新增组件:** :sparkles: 新增 Form FormModal 组件 ([ab59342](https://github.com/lpreterite/datagent/commit/ab5934247cd6bc64e0f85ae63affa003115283e3))
+* **新增组件:** :sparkles: 新增 style card 组件 ([ca03165](https://github.com/lpreterite/datagent/commit/ca0316510832f80b75dcd200ea105e896bd0b380))
+
+
+### ♻ Code Refactoring | 代码重构
+
+* **更新提示:** :necktie: 更新提示代码分离，支持设置页查看当前版本信息 ([988e178](https://github.com/lpreterite/datagent/commit/988e1787cf61a879f9a01cf6dbc6a12e8ce585de))
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **脚本调整:** :necktie: 调整 navigation 生成脚本逻辑 ([9d20af4](https://github.com/lpreterite/datagent/commit/9d20af49fd3c9088bb0115d5dd6223825df37d42))
+* **配置:** :heavy_plus_sign: feat react toastify ([c4492df](https://github.com/lpreterite/datagent/commit/c4492df68309c5ba7823743fe7c16e47d930c544))
+* **配置调整:** :necktie: 调整 release 配置 ([9867e65](https://github.com/lpreterite/datagent/commit/9867e653e97c4ffcbf23ecfc2d9c638cc2efdccc))
+* **依赖更新:** :arrow_up: tailwindcss 升级 ([4c452ea](https://github.com/lpreterite/datagent/commit/4c452eaaa872ea9b6184517354a2b17afa4cfa7a))
+* **依赖升级:** :arrow_up: 升级 react-hook-form ([02d125b](https://github.com/lpreterite/datagent/commit/02d125b265bebe1453cb22a92d99e7f7beb9016e))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **搜索引擎:** :bug: 修复按使用次数排序时无效bug ([f5937ab](https://github.com/lpreterite/datagent/commit/f5937ab1f7150f48f5eddc01cfe0239ce78d4a76))
+* **搜索引擎:** :bug: 修复首次加载时搜索引擎报错bug ([386dfd8](https://github.com/lpreterite/datagent/commit/386dfd8f89581152ef6da8ebff2b31f62377c0bd))
+* **bug 修复:** :bug: 修复 bsdb 在某些情况下获取数据异常 ([15a9189](https://github.com/lpreterite/datagent/commit/15a91897f847f52669ad2b7000d3da2d36437039))
+* **bug 修复:** :bug: 修复 form 组件错误 ([a2b093f](https://github.com/lpreterite/datagent/commit/a2b093fd75f1cafd1e8fc61640796ea59b67dc26))
+* **bug 修复:** :bug: 修复 storage bug ([e6cc16c](https://github.com/lpreterite/datagent/commit/e6cc16c351fd74b2394a9aeb07436fa3297374af))
+* **bug 修复:** :bug: 修复导航页在某些情况下页面显示空白 ([36b7d93](https://github.com/lpreterite/datagent/commit/36b7d9342b644783bd965a3fd6bab6c58a3ec558))
+* **bug 修复:** :bug: 修复首次进入导航页空白问题 ([100c5ca](https://github.com/lpreterite/datagent/commit/100c5caf7aed35731b683538ca5c3926a8c60dc6))
+* **bug 修复:** :bug: fix 导航数据生成脚本 tsc 报错 ([8f9c502](https://github.com/lpreterite/datagent/commit/8f9c502c566ad04560034c447855d6f0749fb367))
+* **bug 修复:** :bug: fix form modal 无法提交bug ([359d093](https://github.com/lpreterite/datagent/commit/359d093e990a8e167d637ccebfd4b1b6fe126d5d))
+
+
+### 📦 Chores | 其他更新
+
+* **导航抽屉调整:** :necktie: 导航抽屉适配多级分类、未分类显示 ([280b7a9](https://github.com/lpreterite/datagent/commit/280b7a934abdc22a3041384712721dc36c90c51e))
+* **导航数据:** :card_file_box: 新增生活分类，增加网站 ([51062ab](https://github.com/lpreterite/datagent/commit/51062ab6ba15660e3eb48c993e8ce78602d8c9f4))
+* **导航数据:** :card_file_box: 新增图书分类 ([8ca69d0](https://github.com/lpreterite/datagent/commit/8ca69d00866064df89d89bc11c26c792bba9831a))
+* **导航数据:** :card_file_box: 增加导航数据 ([3865806](https://github.com/lpreterite/datagent/commit/3865806b0a1ebd664cc0560649dc58e4ee6bff11))
+* **导航数据:** :card_file_box: 增加导航数据 ([d897d52](https://github.com/lpreterite/datagent/commit/d897d52fd08cbef3557ffb35a1495bda1c12335a))
+* **导航数据:** :card_file_box: 增加导航数据 ([f0e6265](https://github.com/lpreterite/datagent/commit/f0e6265234ea9e7f5f97e08b89192e4c8bd39ac4))
+* **导航数据:** :card_file_box: 增加导航数据 ([f3aabde](https://github.com/lpreterite/datagent/commit/f3aabded36a8cfeffdbfdfa0d31e7c38b33ea93a))
+* **导航数据更新:** :card_file_box: 导航添加更多数据 ([90634ac](https://github.com/lpreterite/datagent/commit/90634ac53466a1060006fa40ee85e41f940cc003))
+* **导航页调整:** :necktie: 导航页适配多级分类，增加默认其他分类 ([fae961d](https://github.com/lpreterite/datagent/commit/fae961db958cc43af2f61b245d4910686c31a11f))
+* **历史提交记录:** :speech_balloon: 优化历史提交记录文字 ([5a12d16](https://github.com/lpreterite/datagent/commit/5a12d16beb8fa1efffdbc8c41317105a5b2ee0d9))
+* **路由:** :wrench: 搜索引擎设置去除 beta 限制 ([54f6835](https://github.com/lpreterite/datagent/commit/54f6835d784efe06944cd5a3e929006eb8e945a7))
+* **其他更新:** :sparkles: 生产环境禁用右键菜单 ([a62ecae](https://github.com/lpreterite/datagent/commit/a62ecaefff79f29b4f050434b32c11036039c95c))
+* **数据更新:** :card_file_box: 增加导航数据 ([80d713b](https://github.com/lpreterite/datagent/commit/80d713b7e28708a9c60ecc1ec402db077f4eb33d))
+* **搜索栏:** :recycle: 重写部分代码，适配新功能 ([967bcac](https://github.com/lpreterite/datagent/commit/967bcac05d063e78b4f0b805370415bd43ccb17a))
+* **搜索引擎:** :card_file_box: 由于 magi 已暂停服务，将 magi 从默认数据中移除 ([dc96cb5](https://github.com/lpreterite/datagent/commit/dc96cb5475ffa887e79a81d505d95d39333843f5))
+* **搜索引擎:** :necktie: 增加搜索引擎设置 ([6be5c66](https://github.com/lpreterite/datagent/commit/6be5c66a99e6085e239dea1a9134e218d9ae7421))
+* **添加数据:** :card_file_box: 添加导航数据 ([fd8ad84](https://github.com/lpreterite/datagent/commit/fd8ad8432d57da5f554d7bf8eeed8bebd0867b3a))
+* **通知:** :necktie: chore 部分页面 message 更换为 toast ([e9ee2df](https://github.com/lpreterite/datagent/commit/e9ee2df22881cc351798629e3d8a4ba96c33a348))
+* **文本调整:** :speech_balloon: chore 修改logo设置页错误文字 ([9fcc5db](https://github.com/lpreterite/datagent/commit/9fcc5db248b137f9404635a65b02a30b9ebe76fb))
+* **新增导航数据:** :card_file_box: 新增导航数据 ([8d8e64d](https://github.com/lpreterite/datagent/commit/8d8e64d3e61006b1bef2401f12a8af7d180e7512))
+* **增加数据:** :card_file_box: 增加导航数据 ([77c8a63](https://github.com/lpreterite/datagent/commit/77c8a6365b227da99eb557cbcfa9b66be2dec663))
+* **组件调整:** :necktie: 调整config form、form、select 组件 ([738fe69](https://github.com/lpreterite/datagent/commit/738fe69cc9dfb6da0a0c9ca8e816f4894682c08f))
+* **组件调整:** :necktie: 设置页部分组件支持设置 size ([ecaa5e6](https://github.com/lpreterite/datagent/commit/ecaa5e68bfdd043213494136e59788afb9b95575))
+* **组件调整:** :necktie: 优化 config form ([7982a95](https://github.com/lpreterite/datagent/commit/7982a95fc1e62c19196390a5ee194def1ce5baf4))
+* **组件调整:** :necktie: chore config form 支持 texttextArea ([6328987](https://github.com/lpreterite/datagent/commit/6328987e86b57100b0412c5e86929129b6d79cc4))
+* **组件调整:** :necktie: config form 支持 select ([8c4472c](https://github.com/lpreterite/datagent/commit/8c4472cc0a50dc698cf4418c95ce803e120c52fd))
+* **组件调整:** :necktie: config form 支持过滤非配置项数据 ([0d4d811](https://github.com/lpreterite/datagent/commit/0d4d8116e61f26751c6ea3063a93a4147cfb6f11))
+* **组件调整:** :necktie: itemCard 扩展、实验室支持显示开发中的功能状态 ([bcc02c0](https://github.com/lpreterite/datagent/commit/bcc02c0648cab2c1a9addb4d01643fb421db9fe5))
+* **组件调整:** :necktie: table 添加无数据效果 ([659533a](https://github.com/lpreterite/datagent/commit/659533a0290bdf79e9d0412cf01b029f4da9b5e6))
+* **组件优化:** :necktie: 优化设置页代码 ([ea31f6a](https://github.com/lpreterite/datagent/commit/ea31f6a2063c5dcce26979f1aacf69e5f5e4dda2))
+* **api调整:** :alien: 调整api地址 ([25aaae2](https://github.com/lpreterite/datagent/commit/25aaae2646d679a8d327adadefab5acdf181b625))
+* **confirm组件:** :necktie: confirm 支持隐藏底部按钮 ([df15982](https://github.com/lpreterite/datagent/commit/df15982009902b12aec92295b48d5361753a54bf))
+* **logo:** :necktie: 禁用 Logo 缩放设置 ([e7ba08c](https://github.com/lpreterite/datagent/commit/e7ba08c08bcb66c0ada0583b0f8eac47a5e551a1))
+
 ### [0.8.2](https://github.com/virzs/Search-Next/compare/v0.8.1...v0.8.2) (2021-12-29)
 
 
