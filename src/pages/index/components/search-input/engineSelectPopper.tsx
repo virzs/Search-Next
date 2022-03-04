@@ -47,15 +47,16 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
         classifyId: engine.engine?.classify?._id,
       } as SearchEngine;
       console.log(engine.engine);
-      const sortFilterEngines = res
+      let filterEngines = res
         .map((i) => i.children)
         .flat()
-        .sort((r, t) => r.count - t.count)
         .filter((u) => u._id !== engine.engine?._id)
         .slice(0, engine.indexCount - 1);
-      setEngineList([current, ...sortFilterEngines]);
+      if (engine.sortType === 'count') {
+        filterEngines = filterEngines.sort((r, t) => t.count - r.count);
+      }
+      setEngineList([current, ...filterEngines]);
       setClassifyEngineList(res);
-      console.log(res, current);
       res.length > 0 && setSelected(res[0]._id);
     });
   };
@@ -133,7 +134,7 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
             key={i._id}
             className={classnames(
               'mx-1',
-              i._id === engine.engine._id
+              i._id === engine?.engine?._id
                 ? 'bg-primary text-white'
                 : 'bg-gray-100',
             )}
