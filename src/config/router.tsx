@@ -177,7 +177,6 @@ const routers: Router[] = [
             icon: <Search />,
             path: 'search-engine',
             component: Engine,
-            status: 'process',
             routes: [
               {
                 title: '搜索引擎详情',
