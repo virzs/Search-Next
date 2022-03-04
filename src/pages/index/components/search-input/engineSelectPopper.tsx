@@ -44,17 +44,18 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
     getClassifyEngineListApi().then((res) => {
       const current = {
         ...engine.engine,
-        classifyId: engine.engine.classify?._id,
+        classifyId: engine.engine?.classify?._id,
       } as SearchEngine;
-
+      console.log(engine.engine);
       const sortFilterEngines = res
         .map((i) => i.children)
         .flat()
         .sort((r, t) => r.count - t.count)
-        .filter((u) => u._id !== engine.engine._id)
+        .filter((u) => u._id !== engine.engine?._id)
         .slice(0, engine.indexCount - 1);
       setEngineList([current, ...sortFilterEngines]);
       setClassifyEngineList(res);
+      console.log(res, current);
       res.length > 0 && setSelected(res[0]._id);
     });
   };
@@ -63,6 +64,7 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
     if (engine?.engine?.classify?._id) {
       setSelected(engine?.engine?.classify?._id);
     }
+    console.log(engine);
     getClassifyEngine();
   }, [engine]);
 

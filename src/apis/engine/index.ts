@@ -220,8 +220,8 @@ export const getClassifyEngineListApi = () => {
     });
     if (!result || !classifyList) rej('error');
 
-    let privClassifyList = classifyList.length ? classifyList : classify;
-    let privEngineList = result.length ? result : engine;
+    let privClassifyList = classifyList.length > 0 ? classifyList : classify;
+    let privEngineList = result.length > 0 ? result : engine;
 
     const format = privClassifyList
       .map((i) => {
@@ -244,10 +244,13 @@ export interface SearchEngineData extends FullSearchEngine {
 // 获取搜索引擎详情
 export const getEngineDetailApi = (id: string) => {
   return new Promise<SearchEngineData>((res, rej) => {
-    const engine = EngineDB.findOne(id);
-    const classify = EngineClassifyDB.findOne(engine.classifyId);
-    if (!engine || !classify) rej('error');
-    const result = { ...engine, classify };
+    const currentEngine =
+      EngineDB.findOne(id) || engine.find((i) => i._id === id);
+    const engineClassify =
+      EngineClassifyDB.findOne(currentEngine?.classifyId) ||
+      classify.find((i) => i._id === currentEngine?.classifyId);
+    if (!currentEngine || !engineClassify) rej('error');
+    const result = { ...currentEngine, classify: engineClassify };
     delete result.classifyId;
     res(result);
   });
