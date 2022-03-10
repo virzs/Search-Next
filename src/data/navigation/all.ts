@@ -1078,6 +1078,15 @@ const allWebsites: Website[] = [
     color: '#4d1db5',
     classify: ['develop', 'npm', 'front-end'],
   },
+  {
+    id: 'f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8',
+    name: 'Can I Use',
+    url: 'https://caniuse.com/',
+    intro: '查询浏览器支持的前端技术',
+    icon: 'caniuse',
+    color: '#c75000',
+    classify: ['develop', 'onlineTools', 'front-end'],
+  },
 ];
 
 export default allWebsites;
