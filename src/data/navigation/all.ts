@@ -1069,6 +1069,15 @@ const allWebsites: Website[] = [
     color: '#FE382F',
     classify: ['common', 'shopping', 'book'],
   },
+  {
+    id: '60d0bde78d7f44b0b2de118cbabb63f2',
+    name: 'Formily JS',
+    url: 'http://formilyjs.org/',
+    intro: '阿里巴巴统一前端表单解决方案',
+    icon: 'formily',
+    color: '#4d1db5',
+    classify: ['develop', 'npm', 'front-end'],
+  },
 ];
 
 export default allWebsites;
