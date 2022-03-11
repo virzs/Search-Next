@@ -80,6 +80,12 @@ yarn jscpd
 - 目前处于开发过程中，功能变动比较多
 - 涉及到在线账号等功能，需要为用户负责，目前没有太多精力专注在此方面
 
+## 插件
+
+规划中，预计采用微前端方案
+
+[Search Next Plugins](https://github.com/virzs/Search-Next-Plugins)
+
 ## 后端支持
 
 部分内容需要配合该项目的后端接口部分
