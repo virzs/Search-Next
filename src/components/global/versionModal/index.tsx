@@ -14,6 +14,8 @@ import React, { useEffect, useState } from 'react';
 import Markdown from '../markdown';
 import { Message } from '@/data/account/interface';
 import { LoadingButton } from '@mui/lab';
+import { isBoolean } from 'lodash';
+import { toast } from 'react-toastify';
 
 interface VersionData {
   data: Latest;
@@ -46,6 +48,14 @@ const VersionModalContent = ({ data }: VersionData) => {
   );
 };
 
+const updateToast = () => {
+  toast.info('已更新到最新版本');
+};
+
+const updateNotification = () => {
+  toast.info('已更新到最新版本');
+};
+
 const updateModal = (data: Latest, account: string, message: Message) => {
   confirm({
     title: '版本更新',
@@ -72,7 +82,40 @@ const getVersionInfo = () => {
       if (latestVersion === tag_name) return;
       updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
 
-      message?.update && updateModal(res.data, account || '', message);
+      if (isBoolean(message?.update)) {
+        updateModal(res.data, account || '', message);
+      } else {
+        const {
+          update: privUpdate,
+          remind = 'popup',
+          interval = 0,
+          lastTime,
+        } = message?.update || {};
+
+        let remindUpdate;
+
+        switch (remind) {
+          case 'message':
+            remindUpdate = updateToast;
+            break;
+          case 'notification':
+            remindUpdate = updateNotification;
+            break;
+          case 'popup':
+          default:
+            remindUpdate = updateModal;
+            break;
+        }
+        if (!interval) {
+          remindUpdate(res.data, account || '', message);
+        } else {
+          const now = dayjs();
+          const last = dayjs(lastTime);
+          if (last.isBefore(now.subtract(interval, 'day'))) {
+            remindUpdate(res.data, account || '', message);
+          }
+        }
+      }
     }
   });
 };

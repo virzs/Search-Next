@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-17 21:26:07
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-04 13:49:21
+ * @Last Modified time: 2022-03-04 14:03:38
  */
 
 import { SearchEngine } from '../engine/types';
@@ -82,6 +82,7 @@ export interface AccountUpdateMessage {
   update: boolean;
   remind: AccountUpdateMessageRemind;
   interval: number;
+  lastTime: string;
 }
 
 // 消息提示

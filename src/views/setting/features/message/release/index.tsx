@@ -2,12 +2,12 @@
  * @Author: Vir
  * @Date: 2022-03-04 10:59:42
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-04 14:01:29
+ * @Last Modified time: 2022-03-04 14:03:54
  */
 import { getAuthDataByKey, updateAuthDataByKey } from '@/apis/auth';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { SelectChangeEvent, Switch } from '@mui/material';
+import { Alert, AlertTitle, SelectChangeEvent, Switch } from '@mui/material';
 import {
   AccountUpdateMessage,
   AccountUpdateMessageRemind,
@@ -17,6 +17,7 @@ import React, { FC, useEffect } from 'react';
 import Select from '@/components/md-custom/form/select';
 import { isBoolean } from 'lodash';
 import { ValueOf } from '@/typings/global';
+import dayjs from 'dayjs';
 
 const Release: FC = () => {
   const [update, setUpdate] = React.useState(false);
@@ -52,6 +53,7 @@ const Release: FC = () => {
       update,
       interval,
       remind,
+      lastTime: dayjs(),
     };
     updateData[key] = val;
     const newMessageData = {
@@ -90,6 +92,10 @@ const Release: FC = () => {
   return (
     <div>
       <ContentList>
+        <Alert severity="info">
+          <AlertTitle>提示</AlertTitle>
+          修改任意配置都会重置版本更新时间间隔依赖的时间
+        </Alert>
         <ItemCard
           title="版本更新提醒"
           desc="设置版本更新时是否提醒"
@@ -105,7 +111,7 @@ const Release: FC = () => {
               value={remind}
               options={[
                 { label: '消息', value: 'message' },
-                { label: '通知', value: 'notification' },
+                // { label: '通知', value: 'notification' },
                 { label: '弹窗', value: 'popup' },
               ]}
               onChange={onRemindChange}
