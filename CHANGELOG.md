@@ -1,3 +1,27 @@
+## [0.10.0](https://github.com/virzs/Search-Next/compare/v0.9.0...v0.10.0) (2022-03-14)
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **添加依赖:** :heavy_plus_sign: add lodash ([9e4d232](https://github.com/lpreterite/datagent/commit/9e4d2326f784cc06e50b621d0686866080067ce2))
+
+
+### ✨ Features | 新功能
+
+* **版本更新通知:** :sparkles: 版本更新通知添加详细设置 ([3f98c00](https://github.com/lpreterite/datagent/commit/3f98c009dba13138f5750dd33a61b0008907f038))
+
+
+### 📝 Documentation | 文档
+
+* **readme:** :memo: 添加插件相关部分说明 ([8ea6ecd](https://github.com/lpreterite/datagent/commit/8ea6ecd8a84f74144de7b7a2c81a9bc616795fe2))
+
+
+### 📦 Chores | 其他更新
+
+* **版本更新:** :necktie: 版本更新支持更多设置 ([66fb214](https://github.com/lpreterite/datagent/commit/66fb214b26c90f643476f2ca8392265e9f1f3bbd))
+* **导航数据:** :card_file_box: 新增导航数据 ([da56f4d](https://github.com/lpreterite/datagent/commit/da56f4d0a25b2406e1136ba0d77a47705c908b84))
+* **导航数据:** :card_file_box: 新增数据 ([0a55c01](https://github.com/lpreterite/datagent/commit/0a55c0185cd335541fe3767efd07a75e6ad9489d))
+
 ## [0.9.0](https://github.com/virzs/Search-Next/compare/v0.8.2...v0.9.0) (2022-03-04)
 
 
