@@ -83,7 +83,7 @@ const getVersionInfo = () => {
       updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
 
       if (isBoolean(message?.update)) {
-        updateModal(res.data, account || '', message);
+        message?.update && updateModal(res.data, account || '', message);
       } else {
         const {
           update: privUpdate,
@@ -92,6 +92,9 @@ const getVersionInfo = () => {
           lastTime,
         } = message?.update || {};
 
+        if (!privUpdate) {
+          return;
+        }
         let remindUpdate;
 
         switch (remind) {
