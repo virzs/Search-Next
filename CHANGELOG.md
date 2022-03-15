@@ -1,3 +1,10 @@
+### [0.10.1](https://github.com/virzs/Search-Next/compare/v0.10.0...v0.10.1) (2022-03-15)
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **版本更新:** :bug: 修复某些情况下版本更新设置失效bug ([82582ab](https://github.com/lpreterite/datagent/commit/82582abd5ad43bf7138f8e113517a5fc1a8db15b))
+
 ## [0.10.0](https://github.com/virzs/Search-Next/compare/v0.9.0...v0.10.0) (2022-03-14)
 
 
