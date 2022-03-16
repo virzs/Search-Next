@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-01-29 21:09:38
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-23 17:46:31
+ * @Last Modified time: 2022-03-16 17:26:30
  */
 
 import { AccountEngine, getClassifyEngineListApi } from '@/apis/engine';
@@ -46,7 +46,6 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
         ...engine.engine,
         classifyId: engine.engine?.classify?._id,
       } as SearchEngine;
-      console.log(engine.engine);
       let filterEngines = res
         .map((i) => i.children)
         .flat()
@@ -65,7 +64,6 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
     if (engine?.engine?.classify?._id) {
       setSelected(engine?.engine?.classify?._id);
     }
-    console.log(engine);
     getClassifyEngine();
   }, [engine]);
 

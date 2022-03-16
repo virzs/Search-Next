@@ -2,9 +2,10 @@
  * @Author: Vir
  * @Date: 2022-01-14 14:28:58
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 21:52:14
+ * @Last Modified time: 2022-03-16 17:25:58
  */
 
+import { authDefaultData } from '@/data/account/default';
 import { Engine } from '@/data/account/interface';
 import engine, { WebsiteEngineTemplete } from '@/data/engine';
 import classify, { SearchEngineClassifyTemplete } from '@/data/engine/classify';
@@ -278,10 +279,20 @@ export const getAccountEngineApi = () => {
     const userId = localStorage.getItem('account');
     if (!userId) rej('用户未登录');
     const result = getAuthDataByKey(userId || '', 'engine');
-    const engineData = result?.selected
-      ? await getEngineDetailApi(result?.selected)
-      : engine.find((i) => i.isSelected);
-    res({ ...result, engine: engineData });
+    let checkedResult = {} as Engine;
+    checkedResult = result ? result : authDefaultData.engine;
+    const engineData = (
+      checkedResult?.selected
+        ? await getEngineDetailApi(checkedResult?.selected)
+        : engine.find((i) => i.isSelected)
+    ) as SearchEngineData;
+    const lastResult = { ...checkedResult, engine: engineData };
+    !result &&
+      updateAuthDataByKey(userId || '', 'engine', {
+        ...checkedResult,
+        selected: engineData?._id,
+      });
+    res({ ...lastResult, engine: engineData });
   });
 };
 

@@ -2,22 +2,18 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-23 16:52:26
+ * @Last Modified time: 2022-03-16 17:13:59
  */
 
-import { Button } from '@mui/material';
 import React, { useEffect } from 'react';
-import EngineChip from './engineChip';
 import SugPopper from './sugPopper';
 import { useTranslation } from 'react-i18next';
 import EngineSelectPopper from './engineSelectPopper';
-import { isBeta } from '@/apis/auth';
 import {
   AccountEngine,
   getAccountEngineApi,
   SearchEngineData,
   setAccountCurretEngineApi,
-  setAccountEngineApi,
   setEngineCountApi,
 } from '@/apis/engine';
 import { SearchEngine } from '@/data/engine/types';
@@ -117,13 +113,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
     setEngineCountApi(accountEngine.engine._id);
   };
 
-  const chipChange = (value: SearchEngine) => {
-    setAccountEngine({
-      ...accountEngine,
-      engine: value as unknown as SearchEngineData,
-    });
-  };
-
   const getCurrentEngine = () => {
     getAccountEngineApi().then((res) => {
       setAccountEngine(res);
@@ -159,22 +148,18 @@ const SearchInput: React.FC<SearchInputProps> = ({
         }
       }}
     >
-      {isBeta() ? (
-        <EngineSelectPopper
-          anchorEl={inputRef?.current}
-          open={engineSelectOpen}
-          onBtnClick={(val) => {
-            setEngineSelectOpen(val);
-          }}
-          onEngineSelect={(val) => {
-            updateCurrentEngine(val);
-            setEngineSelectOpen(false);
-          }}
-          engine={accountEngine}
-        />
-      ) : (
-        <EngineChip onChange={chipChange} />
-      )}
+      <EngineSelectPopper
+        anchorEl={inputRef?.current}
+        open={engineSelectOpen}
+        onBtnClick={(val) => {
+          setEngineSelectOpen(val);
+        }}
+        onEngineSelect={(val) => {
+          updateCurrentEngine(val);
+          setEngineSelectOpen(false);
+        }}
+        engine={accountEngine}
+      />
       <Input
         inputRef={inputRef}
         type="text"
