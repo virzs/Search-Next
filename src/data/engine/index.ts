@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-18 16:26:35
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-29 21:31:41
+ * @Last Modified time: 2022-03-16 15:56:48
  */
 
 import { SearchEngine } from './types';
@@ -110,6 +110,80 @@ export default [
     count: 0,
     isDefault: true,
     classifyId: '6c77e19433a1416d851ef898e0db5707',
+    sort: 7,
+  },
+  {
+    _id: 'ed44b0d5d032486a9aa8ada351a3a079',
+    name: '淘宝',
+    value: 'taobao',
+    href: 'https://s.taobao.com/search?q=',
+    sugurl:
+      'https://suggest.taobao.com/sug?code=utf-8&q=#content#&_ksTS=1579098382790_8&callback=jsonp9',
+    icon: './img/engineLogo/taobao.ico',
+    isShow: true,
+    isSelected: false,
+    count: 0,
+    isDefault: true,
+    classifyId: 'df75e91b979445d0943856b57da93226',
+    sort: 7,
+  },
+  {
+    _id: '3d6385859687456e8a886699f3a70996',
+    name: '天猫',
+    value: 'tmall',
+    href: 'https://list.tmall.com/search_product.htm?q=',
+    sugurl:
+      'https://suggest.taobao.com/sug?code=utf-8&q=#content#&_ksTS=1579098382790_9&callback=jsonp10',
+    icon: './img/engineLogo/tmall.ico',
+    isShow: true,
+    isSelected: false,
+    count: 0,
+    isDefault: true,
+    classifyId: 'df75e91b979445d0943856b57da93226',
+    sort: 7,
+  },
+  {
+    _id: '70cbbcee83d4410d9887aa10995da05b',
+    name: '京东',
+    value: 'jd',
+    href: 'https://search.jd.com/Search?keyword=',
+    sugurl:
+      'https://search.jd.com/sug?area=19_1601_1688_0&keyword=#content#&callback=jQuery110208972379058578898_1579098382790&_=1579098382791',
+    icon: './img/engineLogo/jd.ico',
+    isShow: true,
+    isSelected: false,
+    count: 0,
+    isDefault: true,
+    classifyId: 'df75e91b979445d0943856b57da93226',
+    sort: 7,
+  },
+  {
+    _id: '539bf705d9db4ecdb66a0893ae1fdfbd',
+    name: '苏宁',
+    value: 'suning',
+    href: 'https://search.suning.com/emall/searchV1Product.do?keyword=',
+    sugurl:
+      'https://suggest.suning.com/asynSuggest/asynSuggestQuery.do?keyword=#content#&callback=jQuery110208972379058578898_1579098382790&_=1579098382791',
+    icon: './img/engineLogo/suning.ico',
+    isShow: true,
+    isSelected: false,
+    count: 0,
+    isDefault: true,
+    classifyId: 'df75e91b979445d0943856b57da93226',
+    sort: 7,
+  },
+  {
+    _id: '27ad3bf876cc415fbb8846522a7e9fd9',
+    name: '亚马逊',
+    value: 'amazon',
+    href: 'https://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Daps&field-keywords=',
+    sugurl: '',
+    icon: './img/engineLogo/amazon.ico',
+    isShow: true,
+    isSelected: false,
+    count: 0,
+    isDefault: true,
+    classifyId: 'df75e91b979445d0943856b57da93226',
     sort: 7,
   },
 ] as SearchEngine[];

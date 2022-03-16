@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-01-16 15:39:56
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-17 13:55:31
+ * @Last Modified time: 2022-03-16 15:50:12
  */
 
 import { SearchEngineClassify } from './types';
@@ -25,6 +25,16 @@ export default [
     value: 'common',
     description: '',
     sort: 0,
+    isShow: true,
+    isDefault: true,
+    userId: '',
+  },
+  {
+    _id: 'df75e91b979445d0943856b57da93226',
+    name: '购物',
+    value: 'shopping',
+    description: '',
+    sort: 1,
     isShow: true,
     isDefault: true,
     userId: '',
