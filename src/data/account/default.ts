@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-08-15 00:00:37
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 19:59:36
+ * @Last Modified time: 2022-03-16 17:19:44
  */
 
 // ! 账户默认数据
@@ -45,7 +45,20 @@ export const authDefaultData: AuthData = {
     website: false,
     history: false,
   },
-  engine: undefined,
+  engine: {
+    mode: 'default',
+    indexCount: 4,
+    sortType: 'default',
+  },
+  theme: {
+    type: 'light',
+    darkSettings: {
+      brightness: 100,
+      contrast: 100,
+      grayscale: 0,
+      sepia: 0,
+    },
+  },
 };
 
 export const settingDefaultData: SettingDefaultData = {
