@@ -40,6 +40,7 @@
     "bowser": "^2.11.0",
     "bsdb": "^0.1.0",
     "classnames": "^2.3.1",
+    "darkreader": "^4.9.46",
     "dayjs": "^1.10.7",
     "devtools-detect": "^4.0.0",
     "github-markdown-css": "^5.0.0",

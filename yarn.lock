@@ -3333,6 +3333,11 @@ darkreader@^4.9.26:
   resolved "https://registry.yarnpkg.com/darkreader/-/darkreader-4.9.43.tgz#c88da02b4e533d18700b36281c053b19e23e1fb4"
   integrity sha512-L6TryKvQiwLcR6YDggkITcPRh9OZeobYkUXHowJOzrV17gT6e0weldbaIJTwdPCoI9tdehTuyyXC8b76/wXhPQ==
 
+darkreader@^4.9.46:
+  version "4.9.46"
+  resolved "https://registry.yarnpkg.com/darkreader/-/darkreader-4.9.46.tgz#03650217c90fd7a9d5e84298910e5e33282019c0"
+  integrity sha512-K+MG74C8mGXvrsY47geAQdAbKU2mw8zVCa/WT4vtW3UDgzYCmthCcLnY0+FR3RQRMOyY2fULxqREZhfVQ346AA==
+
 date-fns@2.x:
   version "2.23.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.23.0.tgz#4e886c941659af0cf7b30fafdd1eaa37e88788a9"

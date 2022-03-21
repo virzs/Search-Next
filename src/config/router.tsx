@@ -20,6 +20,7 @@ import {
   Search,
   BugReportOutlined,
   NewReleases,
+  ColorLens,
 } from '@mui/icons-material';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -121,13 +122,6 @@ const routers: Router[] = [
             path: 'logo',
             component: Logo,
           },
-          // ! 主题功能暂时不开发，优先重构
-          // {
-          //   title: '主题',
-          //   icon: <ColorLens />,
-          //   path: '/setting/personalise/theme',
-          //   component: Theme,
-          // },
         ],
       },
       {
@@ -195,6 +189,13 @@ const routers: Router[] = [
                 component: EngineDetail,
               },
             ],
+          },
+          {
+            title: '主题',
+            icon: <ColorLens />,
+            path: 'theme',
+            status: 'process',
+            component: Theme,
           },
         ],
       },
