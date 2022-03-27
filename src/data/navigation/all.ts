@@ -1087,6 +1087,24 @@ const allWebsites: Website[] = [
     color: '#c75000',
     classify: ['develop', 'onlineTools', 'front-end'],
   },
+  {
+    id: 'c0e0b1c25c854b4ba9d4fd56fbd9c6ba',
+    name: 'Yarn',
+    url: 'https://yarnpkg.com/',
+    intro: '安全、稳定、reproducible projects',
+    icon: 'yarn',
+    color: '#4386b2',
+    classify: ['develop', 'front-end'],
+  },
+  {
+    id: '39d1d3736dc34053851b742492ca2be5',
+    name: 'PNpm',
+    url: 'https://pnpm.js.org/',
+    intro: '速度快、节省磁盘空间的软件包管理器',
+    icon: 'pnpm',
+    color: '#e8973f',
+    classify: ['develop', 'front-end'],
+  },
 ];
 
 export default allWebsites;
