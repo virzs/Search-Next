@@ -58,7 +58,6 @@ const Theme: React.FC = () => {
       ...theme,
       darkSettings,
     });
-    console.log(darkSettings);
     setDarkSettings(darkSettings);
     handleThemeTypeChange(theme.type, darkSettings);
   };
