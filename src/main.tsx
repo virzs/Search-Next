@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 初始化时获取用户
   const res = getAccount();
   res && getVersionInfo();
-  console.log(res.theme);
+  // 设置主题
   if (res.theme) {
     res.theme?.type === 'light' ? disable() : enable(res.theme?.darkSettings);
   }
