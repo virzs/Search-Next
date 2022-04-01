@@ -9,12 +9,17 @@ import { getAccount } from './views/setting/auth/utils/acount';
 import getVersionInfo from './components/global/versionModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { disable, enable } from 'darkreader';
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
   // 初始化时获取用户
   const res = getAccount();
   res && getVersionInfo();
+  console.log(res.theme);
+  if (res.theme) {
+    res.theme?.type === 'light' ? disable() : enable(res.theme?.darkSettings);
+  }
 });
 
 // 控制台监听事件

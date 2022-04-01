@@ -19,18 +19,21 @@ import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { Slider, Switch } from '@mui/material';
 import { auto, disable, enable } from 'darkreader';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Theme: React.FC = () => {
   const [theme, setTheme] = React.useState<ThemeSetting>(
     authDefaultData.theme as ThemeSetting,
   );
+  const [darkSettings, setDarkSettings] = useState<DarkThemeSettings>(
+    {} as DarkThemeSettings,
+  );
 
   const handleThemeTypeChange = (
     val: ThemeType,
-    darkSettings?: DarkThemeSettings,
+    darkSettings: DarkThemeSettings,
   ) => {
-    setTheme({ ...theme, type: val });
+    setTheme({ ...theme, darkSettings, type: val });
     switch (val) {
       case 'system':
         auto({});
@@ -39,12 +42,13 @@ const Theme: React.FC = () => {
         disable();
         break;
       case 'dark':
-        enable(darkSettings ? darkSettings : theme.darkSettings);
+        enable(darkSettings);
         break;
     }
     updateUserThemeSetting({
       ...theme,
-      darkSettings: darkSettings ? darkSettings : theme.darkSettings,
+      darkSettings,
+      type: val,
     });
   };
 
@@ -54,15 +58,84 @@ const Theme: React.FC = () => {
       ...theme,
       darkSettings,
     });
+    console.log(darkSettings);
+    setDarkSettings(darkSettings);
     handleThemeTypeChange(theme.type, darkSettings);
   };
 
   useEffect(() => {
     getUserThemeSetting().then((res) => {
       setTheme(res);
+      res?.darkSettings && setDarkSettings({ ...res.darkSettings });
       console.log(res);
     });
   }, []);
+
+  const renderDarkSliders = () => {
+    const {
+      brightness = 100,
+      contrast = 100,
+      grayscale = 0,
+      sepia = 0,
+    } = darkSettings;
+
+    const sliders = [
+      {
+        title: '亮度',
+        desc: '设置深色模式亮度',
+        value: brightness,
+        min: 30,
+        max: 100,
+        onChange: (e: Event, val: number) =>
+          handleDarkThemeSettingChange('brightness', val as number),
+      },
+      {
+        title: '对比度',
+        desc: '设置深色模式对比度',
+        value: contrast,
+        min: 40,
+        max: 100,
+        onChange: (e: Event, val: number) =>
+          handleDarkThemeSettingChange('contrast', val as number),
+      },
+      {
+        title: '灰度',
+        desc: '设置深色模式灰度',
+        value: grayscale,
+        min: 0,
+        max: 100,
+        onChange: (e: Event, val: number) =>
+          handleDarkThemeSettingChange('grayscale', val as number),
+      },
+      {
+        title: '色相',
+        desc: '设置深色模式色相',
+        value: sepia,
+        min: 0,
+        max: 100,
+        onChange: (e: Event, val: number) =>
+          handleDarkThemeSettingChange('sepia', val as number),
+      },
+    ];
+
+    return sliders.map((item, index) => (
+      <ItemCard
+        title={item.title}
+        desc={item.desc}
+        key={index}
+        action={
+          <Slider
+            style={{ width: '100px' }}
+            valueLabelDisplay="auto"
+            min={item.min}
+            max={item.max}
+            value={item.value}
+            onChange={(e, val) => item.onChange(e, val as number)}
+          />
+        }
+      />
+    ));
+  };
 
   return (
     <div>
@@ -75,10 +148,10 @@ const Theme: React.FC = () => {
             <Select
               label="整体外观"
               options={[
-                {
-                  label: '跟随系统',
-                  value: 'system',
-                },
+                // {
+                //   label: '跟随系统',
+                //   value: 'system',
+                // },
                 {
                   label: '浅色',
                   value: 'light',
@@ -97,12 +170,12 @@ const Theme: React.FC = () => {
           }
         />
         <ContentTitle title="深色模式详细设置" />
-        <ItemCard
+        {/* <ItemCard
           title="自动开启"
           desc="设置是否自动开启深色模式"
           action={<Switch />}
-        />
-        <ItemAccordion
+        /> */}
+        {/* <ItemAccordion
           title="定时开启深色模式"
           desc="设置是否定时开启深色模式"
           action={
@@ -127,71 +200,8 @@ const Theme: React.FC = () => {
             <ItemCard title="开始时间" desc="自定义设置深色模式开启时间" />
             <ItemCard title="关闭时间" desc="自定义设置深色模式关闭时间" />
           </ContentList>
-        </ItemAccordion>
-        <ItemCard
-          title="亮度"
-          desc="设置深色模式亮度"
-          action={
-            <Slider
-              style={{ width: '100px' }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={100}
-              value={theme.darkSettings.brightness}
-              onChange={(e, val) =>
-                handleDarkThemeSettingChange('brightness', val as number)
-              }
-            />
-          }
-        />
-        <ItemCard
-          title="对比度"
-          desc="设置深色模式对比度"
-          action={
-            <Slider
-              style={{ width: '100px' }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={100}
-              value={theme.darkSettings.contrast}
-              onChange={(e, val) =>
-                handleDarkThemeSettingChange('contrast', val as number)
-              }
-            />
-          }
-        />
-        <ItemCard
-          title="灰度"
-          desc="设置深色模式灰度"
-          action={
-            <Slider
-              style={{ width: '100px' }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={100}
-              value={theme.darkSettings.grayscale}
-              onChange={(e, val) =>
-                handleDarkThemeSettingChange('grayscale', val as number)
-              }
-            />
-          }
-        />
-        <ItemCard
-          title="棕褐色滤镜"
-          desc="设置深色模式棕褐色滤镜"
-          action={
-            <Slider
-              style={{ width: '100px' }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={100}
-              value={theme.darkSettings.sepia}
-              onChange={(e, val) =>
-                handleDarkThemeSettingChange('sepia', val as number)
-              }
-            />
-          }
-        />
+        </ItemAccordion> */}
+        {renderDarkSliders()}
       </ContentList>
     </div>
   );
