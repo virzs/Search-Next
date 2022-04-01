@@ -1,3 +1,24 @@
+## [0.11.0](https://github.com/virzs/Search-Next/compare/v0.10.1...v0.11.0) (2022-04-01)
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **搜索引擎:** :bug: 修复某些情况下首页无法选择搜索引擎bug ([0a8e786](https://github.com/lpreterite/datagent/commit/0a8e786b30fa9eb067eb4b0e8fd938048ecc6408))
+
+
+### ✨ Features | 新功能
+
+* **主题设置:** :sparkles: 支持深色模式设置 ([8ab570f](https://github.com/lpreterite/datagent/commit/8ab570f6895b7daac15175c805538f1a233bf9f1))
+
+
+### 📦 Chores | 其他更新
+
+* **代码:** :coffin: 删除无用代码 ([9fd15c2](https://github.com/lpreterite/datagent/commit/9fd15c2fbbc93169f36c38266fa646baecf6521f))
+* **导航数据:** :card_file_box: 增加导航数据 ([03fe1f4](https://github.com/lpreterite/datagent/commit/03fe1f48e817bf628e5324ee77011784b5418b37))
+* **搜索引擎数据:** :card_file_box: 搜索引擎新增 购物 分类 ([18ee10d](https://github.com/lpreterite/datagent/commit/18ee10d1dfe4f26f7e305bd68a3f079f6177edfe))
+* **账户数据:** :card_file_box: 调整默认账户数据 ([5943085](https://github.com/lpreterite/datagent/commit/5943085f718df4b1b7689021110c476f6eef2908))
+* **主题:** :construction: 部分主题功能 ([9be35e5](https://github.com/lpreterite/datagent/commit/9be35e55dada55bf2ba455cf43e9dcf67162517a))
+
 ### [0.10.1](https://github.com/virzs/Search-Next/compare/v0.10.0...v0.10.1) (2022-03-15)
 
 
