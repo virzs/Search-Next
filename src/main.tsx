@@ -10,6 +10,8 @@ import getVersionInfo from './components/global/versionModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { disable, enable } from 'darkreader';
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
@@ -45,6 +47,16 @@ window.onerror = function (msg, source, lineno, colno, error) {
   toast.error(msg);
   return false;
 };
+
+Sentry.init({
+  dsn: 'https://0eb25ba527c5450d83135b29a601c447@o1191028.ingest.sentry.io/6312275',
+  integrations: [new BrowserTracing()],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
 
 ReactDOM.render(
   <React.StrictMode>
