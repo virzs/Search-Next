@@ -1,3 +1,11 @@
+### [0.11.1](https://github.com/virzs/Search-Next/compare/v0.11.0...v0.11.1) (2022-04-06)
+
+
+### 📦 Chores | 其他更新
+
+* **主题:** :bulb: 调整首次加载主题 ([4848de3](https://github.com/lpreterite/datagent/commit/4848de352bb9a8093db9f076e83db61355700e24))
+* **ci:** :construction_worker: chore 升级 vite；集成 Sentry 异常监控 ([e913e47](https://github.com/lpreterite/datagent/commit/e913e4739e46d7fc45f114f2a00c01889f2e3985))
+
 ## [0.11.0](https://github.com/virzs/Search-Next/compare/v0.10.1...v0.11.0) (2022-04-01)
 
 
