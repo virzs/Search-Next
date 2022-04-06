@@ -1,3 +1,10 @@
+### [0.11.2](https://github.com/virzs/Search-Next/compare/v0.11.1...v0.11.2) (2022-04-06)
+
+
+### 📦 Chores | 其他更新
+
+* **ci:** :construction_worker: chore 完善错误监控，增加说明 ([b6c3961](https://github.com/lpreterite/datagent/commit/b6c39615f9dd5d2479a2cba98426410996003e3d))
+
 ### [0.11.1](https://github.com/virzs/Search-Next/compare/v0.11.0...v0.11.1) (2022-04-06)
 
 
