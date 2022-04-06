@@ -13,7 +13,7 @@ import { disable, enable } from 'darkreader';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 
-const { env } = import.meta;
+const env = import.meta.env;
 
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {

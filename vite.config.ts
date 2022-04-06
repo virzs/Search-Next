@@ -5,6 +5,8 @@ import mdx from 'vite-plugin-mdx';
 import { visualizer } from 'rollup-plugin-visualizer';
 import react from '@vitejs/plugin-react';
 import vitePluginImp from 'vite-plugin-imp';
+import viteSentry from 'vite-plugin-sentry';
+import packageData from './package.json';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,6 +23,23 @@ export default defineConfig({
           style: (name) => `antd/es/${name}/style/index.less`,
         },
       ],
+    }),
+    viteSentry({
+      authToken: process.env?.SENTRY_TOKEN,
+      org: process.env?.SENTRY_ORG,
+      project: process.env?.SENTRY_PROJECT,
+      release: packageData.version,
+      deploy: {
+        env: 'production',
+      },
+      setCommits: {
+        auto: true,
+      },
+      sourceMaps: {
+        include: ['./dist/assets'],
+        ignore: ['node_modules'],
+        urlPrefix: '~/assets',
+      },
     }),
   ],
   css: {
@@ -49,5 +68,8 @@ export default defineConfig({
       '@views': resolve(__dirname, 'src/views'),
     },
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+  },
+  build: {
+    sourcemap: true,
   },
 });
