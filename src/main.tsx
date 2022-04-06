@@ -13,6 +13,8 @@ import { disable, enable } from 'darkreader';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 
+const { env } = import.meta;
+
 // 全局初始化事件
 window.addEventListener('DOMContentLoaded', () => {
   // 初始化时获取用户
@@ -31,7 +33,7 @@ window.addEventListener('devtoolschange', (event) => {
 
 // 生产环境屏蔽右键菜单
 window.oncontextmenu = function (e) {
-  const prod = import.meta.env?.PROD;
+  const prod = env?.PROD;
   prod && e.preventDefault();
 };
 
@@ -48,15 +50,12 @@ window.onerror = function (msg, source, lineno, colno, error) {
   return false;
 };
 
-Sentry.init({
-  dsn: 'https://0eb25ba527c5450d83135b29a601c447@o1191028.ingest.sentry.io/6312275',
-  integrations: [new BrowserTracing()],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
+env?.VITE_SENTRY_URL &&
+  Sentry.init({
+    dsn: env?.VITE_SENTRY_URL as string,
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 1.0,
+  });
 
 ReactDOM.render(
   <React.StrictMode>
