@@ -1,3 +1,17 @@
+## [0.12.0](https://github.com/virzs/Search-Next/compare/v0.11.2...v0.12.0) (2022-04-07)
+
+
+### ✨ Features | 新功能
+
+* **主题:** :sparkles: 主题设置支持跟随系统 ([f6c06f6](https://github.com/lpreterite/datagent/commit/f6c06f6e88cb39428bb069ef9439361161506f02))
+
+
+### 📦 Chores | 其他更新
+
+* **代码:** :fire: 删除冗余代码 ([d99eb87](https://github.com/lpreterite/datagent/commit/d99eb87ec12187d0246d08dd4d538c777fc90f76))
+* **链接组件:** :sparkles: 增加设置页链接组件 ([bdbb2d0](https://github.com/lpreterite/datagent/commit/bdbb2d038e2dac5b36a3e90f0f3c6dcbcdb7730c))
+* **主题:** :necktie: 主题迁移至个性化设置 ([33d4876](https://github.com/lpreterite/datagent/commit/33d48769a57b8c8e98205e47b775aa758c008a11))
+
 ### [0.11.2](https://github.com/virzs/Search-Next/compare/v0.11.1...v0.11.2) (2022-04-06)
 
 
