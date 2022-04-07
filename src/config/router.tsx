@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-04 11:20:00
+ * @Last Modified time: 2022-04-07 17:37:22
  */
 
 import { lazy } from 'react';
@@ -122,6 +122,12 @@ const routers: Router[] = [
             path: 'logo',
             component: Logo,
           },
+          {
+            title: '主题',
+            icon: <ColorLens />,
+            path: 'theme',
+            component: Theme,
+          },
         ],
       },
       {
@@ -189,13 +195,6 @@ const routers: Router[] = [
                 component: EngineDetail,
               },
             ],
-          },
-          {
-            title: '主题',
-            icon: <ColorLens />,
-            path: 'theme',
-            status: 'process',
-            component: Theme,
           },
         ],
       },
