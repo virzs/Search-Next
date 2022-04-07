@@ -147,10 +147,10 @@ const Theme: React.FC = () => {
             <Select
               label="整体外观"
               options={[
-                // {
-                //   label: '跟随系统',
-                //   value: 'system',
-                // },
+                {
+                  label: '跟随系统',
+                  value: 'system',
+                },
                 {
                   label: '浅色',
                   value: 'light',

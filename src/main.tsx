@@ -9,7 +9,7 @@ import { getAccount } from './views/setting/auth/utils/acount';
 import getVersionInfo from './components/global/versionModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { disable, enable } from 'darkreader';
+import { auto, disable, enable } from 'darkreader';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 
@@ -22,7 +22,11 @@ window.addEventListener('DOMContentLoaded', () => {
   res && getVersionInfo();
   // 设置主题
   if (res.theme) {
-    res.theme?.type === 'light' ? disable() : enable(res.theme?.darkSettings);
+    res.theme?.type === 'system'
+      ? auto(res.theme?.darkSettings)
+      : res.theme?.type === 'light'
+      ? disable()
+      : enable(res.theme?.darkSettings);
   }
 });
 
