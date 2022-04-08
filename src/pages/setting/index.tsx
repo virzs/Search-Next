@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:08:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 10:41:05
+ * @Last Modified time: 2022-04-08 16:09:41
  */
 
 import { Breadcrumbs, Chip, IconButton, Link, Tooltip } from '@mui/material';
@@ -146,7 +146,12 @@ const SettingPage: React.FC<SettingPageProps> = ({
               <div className="flex items-center gap-1">
                 {i.title}
                 {i?.status === 'process' && (
-                  <Chip color="warning" label="进行中" size="small" />
+                  <Chip
+                    color="warning"
+                    label={i?.status}
+                    size="small"
+                    variant="outlined"
+                  />
                 )}
               </div>
             </p>

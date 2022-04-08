@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-23 15:49:56
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 15:39:27
+ * @Last Modified time: 2022-04-08 16:09:15
  */
 
 import { isBeta } from '@/apis/auth';
@@ -45,7 +45,12 @@ const Lab: React.FC<PageProps> = (props) => {
                 <div className="flex items-center gap-1">
                   {i.title}
                   {i?.status === 'process' && (
-                    <Chip color="warning" label="进行中" size="small" />
+                    <Chip
+                      color="warning"
+                      label={i?.status}
+                      size="small"
+                      variant="outlined"
+                    />
                   )}
                 </div>
               }
