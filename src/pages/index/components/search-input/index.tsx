@@ -93,7 +93,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     // 相应键盘 Enter 事件
     if (e.code === 'Enter') {
       onPressEnter && onPressEnter(inputValue, accountEngine.engine);
-      window.open(`${accountEngine.engine.href}${value}`);
+      window.open(`${accountEngine.engine.href}${inputValue}`);
       setEngineCountApi(accountEngine.engine._id);
     }
     // 相应键盘 方向键 上下 事件
@@ -109,7 +109,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
   const handleBtnClick = () => {
     if (onBtnClick) onBtnClick(inputValue, accountEngine.engine);
-    window.open(`${accountEngine.engine.href}${value}`);
+    window.open(`${accountEngine.engine.href}${inputValue}`);
     setEngineCountApi(accountEngine.engine._id);
   };
 
