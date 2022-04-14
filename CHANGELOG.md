@@ -1,3 +1,15 @@
+### [0.12.1](https://github.com/virzs/Search-Next/compare/v0.12.0...v0.12.1) (2022-04-14)
+
+
+### 📦 Chores | 其他更新
+
+* **环境变量:** :memo: 增加 ftp 配置 ([623884a](https://github.com/lpreterite/datagent/commit/623884a6a711b43cbc4c502722569d2d2be7c680))
+
+
+### 💄 Styles | 风格
+
+* **设置页:** :lipstick: 优化设置页样式 ([54f66a4](https://github.com/lpreterite/datagent/commit/54f66a4c31807b4a08db417e218f9e83198f80da))
+
 ## [0.12.0](https://github.com/virzs/Search-Next/compare/v0.11.2...v0.12.0) (2022-04-07)
 
 
