@@ -1105,6 +1105,34 @@ const allWebsites: Website[] = [
     color: '#e8973f',
     classify: ['develop', 'front-end'],
   },
+  {
+    id: '91485a5424534246b072bfa815bc7fd0',
+    name: '人格测试',
+    url: 'https://www.16personalities.com/',
+    intro: '免费的人格测试，类型描述、关系与职业建议',
+    icon: '16personalities',
+    color: '#826396',
+    classify: ['tools', 'onlineTools', 'life'],
+  },
+  {
+    id: 'd297d287d5f241498bf329c65d51dafe',
+    name: 'The MostDangerousWriting App',
+    url: 'https://maebert.github.io/themostdangerouswritingapp/',
+    intro:
+      '一个在线的写作工具，停止输入会删除所有内容！！(Don’t stop typing, or all progress will be lost.)',
+    icon: 'themostdangerouswritingapp',
+    color: '#e26159',
+    classify: ['tools', 'onlineTools'],
+  },
+  {
+    id: '30c359aea04c4cd0954d62f2d30fec5d',
+    name: 'Thief',
+    url: 'https://thief.im/',
+    intro: '一款AI智能创新摸鱼神器',
+    icon: 'thief',
+    color: '#222529',
+    classify: ['tools', 'software'],
+  },
 ];
 
 export default allWebsites;
