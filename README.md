@@ -94,9 +94,25 @@ yarn jscpd
 
 新建 `development.env` 文件，按 `.env.example` 文件中内容配置
 
-安装依赖 `yarn`
+安装依赖
 
-运行 `yarn start:dev`
+``` bash
+> yarn
+
+or
+
+> npm i
+```
+
+运行
+
+``` bash
+> yarn start:dev
+```
+
+接口文档
+
+运行成功后浏览器打开终端中的地址，在后面加上 `/doc` 即可查看接口文档
 
 其他命令详见后端项目
 
