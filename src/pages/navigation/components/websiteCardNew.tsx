@@ -39,8 +39,12 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
   };
 
   const onCopy = () => {
-    navigator.clipboard.writeText(url);
-    toast.success(`已复制 ${name} (${url})`);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      toast.success(`已复制 ${name} (${url})`);
+    } else {
+      toast.warning(`您的浏览器不支持复制功能，请点击跳转到该网站手动复制地址`);
+    }
   };
 
   const onMore = () => {
