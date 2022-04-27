@@ -120,6 +120,11 @@ or
 
 [nestJs项目打包部署的方法](https://www.cnblogs.com/xianxiaobo/p/12162309.html)
 
+- 执行打包命令 `build`
+- 完成后将 `dist` 文件夹，`.env`、`package.json` 文件复制到服务器
+- 在根目录下执行 `npm i`
+- 以pm2管理器为例，项目根目录为复制后的文件夹，启动文件为 `/dist/main.js`
+
 **多语言：**
 
 VS Code 安装i18n Ally插件
