@@ -34,7 +34,7 @@ const Example: React.FC<ExampleProps> = ({ data }) => {
     latestImg().then((res) => {
       setPrivateData({
         type: data.type,
-        data: res.data.data[0],
+        data: res.data[0],
       });
     });
   };

@@ -47,7 +47,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (res) => {
     // 处理返回数据
-    return res;
+    return res.data;
   },
   (error) => {
     return Promise.reject(error);

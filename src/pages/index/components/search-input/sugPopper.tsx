@@ -59,7 +59,7 @@ const SugPopper: React.FC<SugPopperProps> = ({
     }
     setRefresh(true);
     baiduSug(wd).then((res) => {
-      let data = res.data.data;
+      let data = res.data;
       setSugList(data.sugs);
       setEngine(data.engine);
       setSelectedIndex(null);

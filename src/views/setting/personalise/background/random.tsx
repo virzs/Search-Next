@@ -49,7 +49,7 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
     setApiLoading(true);
     const hsh = initCheck();
     bingImg({ size: 10, hsh }).then((res) => {
-      let list = res.data.data;
+      let list = res.data;
       setImgList(list);
       setLoadings(list.map(() => true));
       setApiLoading(false);
