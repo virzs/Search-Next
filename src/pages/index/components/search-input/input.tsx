@@ -12,22 +12,24 @@ import { Search } from '@mui/icons-material';
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  inputRef: React.RefObject<HTMLDivElement>;
+  inputBoxRef: React.RefObject<HTMLDivElement>;
+  inputRef: React.RefObject<HTMLInputElement>;
   handleBtnClick: () => void;
 }
 
 const Input: FC<InputProps> = (props) => {
-  const { inputRef, handleBtnClick, ...rest } = props;
+  const { inputBoxRef, inputRef, handleBtnClick, ...rest } = props;
   const { t } = useTranslation();
 
   return (
     <div
-      ref={inputRef}
+      ref={inputBoxRef}
       className="flex justify-center items-center rounded-md shadow-xl overflow-hidden"
     >
       <input
         className="py-2 px-4 border-none leading-4 sm:leading-7 outline-none flex-grow rounded-tr-none rounded-br-none placeholder-gray-400 focus:placeholder-gray-200 transition-all"
         type="text"
+        ref={inputRef}
         {...rest}
       />
       <Button

@@ -71,7 +71,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
     null,
   );
   const [code, setCode] = React.useState<'ArrowDown' | 'ArrowUp' | null>(null);
-  const inputRef = React.useRef<HTMLDivElement>(null);
+  const inputBoxRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [engineSelectOpen, setEngineSelectOpen] =
     React.useState<boolean>(false);
 
@@ -161,6 +162,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         engine={accountEngine}
       />
       <Input
+        inputBoxRef={inputBoxRef}
         inputRef={inputRef}
         type="text"
         value={inputValue}
@@ -182,6 +184,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
         }}
         onSelect={(content) => {
           if (onBtnClick) onBtnClick(content, accountEngine.engine);
+          setInputValue(content);
+          inputRef.current?.focus();
+          handleBtnClick();
         }}
       />
     </div>
