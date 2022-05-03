@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-03-20 15:01:24
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-16 17:13:59
+ * @Last Modified time: 2022-05-04 01:21:10
  */
 
 import React, { useEffect } from 'react';
@@ -100,6 +100,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     // 相应键盘 方向键 上下 事件
     if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
       if (onArrow) onArrow(e.code);
+      e.stopPropagation();
       setCode(e.code);
     }
   };
