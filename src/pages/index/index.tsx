@@ -86,7 +86,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
         case 'everyday':
           setTheme(true, 'inverse');
           latestImg().then((res) => {
-            setBg(res.data.data[0]);
+            setBg(res.data[0]);
           });
           break;
         case 'link':
