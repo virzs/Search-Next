@@ -2,8 +2,16 @@
  * @Author: Vir 
  * @Date: 2021-06-16 11:10:37 
  * @Last Modified by: Vir
- * @Last Modified time: 2021-06-16 11:26:13
+ * @Last Modified time: 2022-05-04 19:28:05
  */
+
+.xkd(@n, @i: 1) when (@i =< @n) {
+  &:nth-child(@{i}) {
+    animation-delay: @i * 0.2s;
+  }
+  .xkd(@n, (@i + 1));
+}
+
 #loading {
   width: 100%;
   height: 100%;
@@ -31,15 +39,21 @@
       border-radius: 3px;
       background-color: #f66;
       animation: load 1.4s ease-in-out infinite;
-      .xkd(@n, @i: 1) when (@i =< @n) {
-        &:nth-child@{i} {
-          width: (@i * 100% / @n);
-          animation-delay: @i * 0.2s;
-        }
-        .xkd(@n, (@i + 1));
-      }
-
       .xkd(5);
     }
+  }
+}
+
+@keyframes load {
+  0%,
+  20%,
+  40%,
+  60%,
+  100% {
+    transform: scaleY(0.4);
+  }
+
+  20% {
+    transform: scaleY(1);
   }
 }
