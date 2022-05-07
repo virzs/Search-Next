@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-27 23:01:18
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-02 14:45:39
+ * @Last Modified time: 2022-05-07 17:08:37
  */
 import { addSite } from '@/apis/site';
 import { Website } from '@/data/navigation/interface';
@@ -21,6 +21,7 @@ import React from 'react';
 import { Overflow } from 'vmdc-ui';
 import { getWebIconByUrl } from '@/apis/common';
 import { toast } from 'react-toastify';
+import Clipboard from 'clipboard';
 
 export interface WebsiteCardNewProps {
   datasource: Website;
@@ -43,7 +44,15 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
       navigator.clipboard.writeText(url);
       toast.success(`已复制 ${name} (${url})`);
     } else {
-      toast.warning(`您的浏览器不支持复制功能，请点击跳转到该网站手动复制地址`);
+      const copy = new Clipboard(`.copy-button_${name}`);
+      copy.on('success', (e) => {
+        toast.success(`已复制 ${name} (${url})`);
+      });
+      copy.on('error', function (e) {
+        toast.warning(
+          `您的浏览器不支持复制功能，请点击跳转到该网站手动复制地址`,
+        );
+      });
     }
   };
 
@@ -102,7 +111,11 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
             </Button>
           </Tooltip>
           <Tooltip title="复制网站链接">
-            <Button onClick={onCopy}>
+            <Button
+              className={`copy-button_${name}`}
+              data-clipboard-text={url}
+              onClick={onCopy}
+            >
               <CopyAll />
             </Button>
           </Tooltip>
