@@ -2,9 +2,10 @@
  * @Author: Vir
  * @Date: 2021-10-09 21:25:26
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-10 14:39:53
+ * @Last Modified time: 2022-05-09 09:23:57
  */
 import { commitList } from '@/apis/github';
+import Loading from '@/components/global/loading/loading';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import {
@@ -38,24 +39,31 @@ export interface CommitSourceValueTypes {
 const Commits: React.FC = () => {
   const [commits, setCommits] = React.useState([] as CommitValueTypes[]);
   const [page, setPage] = React.useState<number>(1);
+  const [loading, setLoading] = React.useState(false);
 
   const getList = (page: number) => {
     setPage(page);
-    commitList(page).then((res) => {
-      const formatCommit = res.data.map((i: CommitSourceValueTypes) => {
-        let { email, ...author } = i.commit.author;
-        return {
-          author: {
-            ...author,
-            avatar_url: i.author.avatar_url,
-            html_url: i.author.html_url,
-          },
-          url: i.html_url,
-          message: i.commit.message,
-        };
+    setLoading(true);
+    commitList(page)
+      .then((res) => {
+        const formatCommit = res.data.map((i: CommitSourceValueTypes) => {
+          let { email, ...author } = i.commit.author;
+          return {
+            author: {
+              ...author,
+              avatar_url: i.author.avatar_url,
+              html_url: i.author.html_url,
+            },
+            url: i.html_url,
+            message: i.commit.message,
+          };
+        });
+        setCommits(formatCommit);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
       });
-      setCommits(formatCommit);
-    });
   };
 
   React.useEffect(() => {
@@ -64,22 +72,24 @@ const Commits: React.FC = () => {
 
   return (
     <div>
-      <ContentList>
-        {commits.length ? (
-          commits.map((i, j) => (
-            <ItemCard
-              key={j}
-              title={formatText(i.message)}
-              desc={`${i.author.name} ${dayjs(i.author.date).format(
-                'YYYY/MM/DD',
-              )}`}
-              onClick={() => window.open(i.url)}
-            ></ItemCard>
-          ))
-        ) : (
-          <Empty></Empty>
-        )}
-      </ContentList>
+      <Loading loading={loading}>
+        <ContentList>
+          {commits.length ? (
+            commits.map((i, j) => (
+              <ItemCard
+                key={j}
+                title={formatText(i.message)}
+                desc={`${i.author.name} ${dayjs(i.author.date).format(
+                  'YYYY/MM/DD',
+                )}`}
+                onClick={() => window.open(i.url)}
+              ></ItemCard>
+            ))
+          ) : (
+            <Empty></Empty>
+          )}
+        </ContentList>
+      </Loading>
       <a
         className="flex justify-center mt-2 bg-gray-100 rounded p-1"
         href="https://github.com/virzs/Search-Next/commits/master"
