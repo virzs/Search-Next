@@ -30,7 +30,7 @@ interface LinkProps {
 
 const Link: FC<LinkProps> = ({ name, version }) => {
   return (
-    <a href={`https://www.npmjs.com/package/${name}`}>
+    <a href={`https://www.npmjs.com/package/${name}`} target="_blank">
       <BorderCard>
         <p className="p-2 px-4 flex justify-between items-center">
           <span className="font-semibold">{name}</span>
