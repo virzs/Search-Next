@@ -5,8 +5,10 @@
  * @Last Modified time: 2022-04-02 16:31:42
  */
 import React, { FC } from 'react';
-import LinkIcon from '@mui/icons-material/Link';
-import FeedbackIcon from '@mui/icons-material/Feedback';
+import {
+  Link as LinkIcon,
+  Feedback as FeedbackIcon,
+} from '@mui/icons-material';
 
 type LinkIconType = 'link' | 'feedback';
 
@@ -33,7 +35,10 @@ const Link: FC<LinkProps> = (props) => {
   return (
     <p className="mb-2">
       <span className="mr-2">{renderIcon()}</span>
-      <a className="text-sm hover:text-blue-700 text-blue-900 transition-all" href={href}>
+      <a
+        className="text-sm hover:text-blue-700 text-blue-900 transition-all"
+        href={href}
+      >
         <span>{text}</span>
       </a>
     </p>
