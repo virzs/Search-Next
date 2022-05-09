@@ -1,5 +1,7 @@
 # Search导航页Next版
 
+[![wakatime](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4.svg)](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4)
+
 ## **原项目：**[Search](https://github.com/virzs/Search)
 
 Search项目的React版本，相较于原项目从原生js更改为React，引入新的设计和交互，原项目已实现或未实现的内容将移植到此项目,并且此项目将加入更多新功能。
