@@ -7,13 +7,17 @@
 import { Now, QWeatherCity, QWeatherNow } from '@/apis/weather/interface';
 import { BorderCard } from '@/components/global/card/styleCard';
 import Loading from '@/components/global/loading/loading';
+import { Refresh } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 import dayjs from 'dayjs';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 export interface WeatherCardProps {
   weather: QWeatherNow;
   city: QWeatherCity;
   loading?: boolean;
+  onRefresh?: () => void;
+  apiKey: string;
 }
 
 const getWeatherIcon = (code: string): string => {
@@ -28,6 +32,8 @@ const WeatherCard: FC<WeatherCardProps> = (props) => {
     weather = {} as QWeatherNow,
     city = {} as QWeatherCity,
     loading = false,
+    onRefresh,
+    apiKey,
   } = props;
 
   const extraList: {
@@ -58,13 +64,31 @@ const WeatherCard: FC<WeatherCardProps> = (props) => {
     },
   ];
 
+  const showLoading = useMemo(() => {
+    if (loading) return loading;
+    if (Object.keys(weather).length === 0 || Object.keys(city).length === 0)
+      return true;
+    return false;
+  }, [loading, weather, city]);
+
   return (
     <BorderCard>
-      <Loading loading={loading}>
+      <Loading loading={showLoading}>
         <a className="px-4 py-2 block" href={weather.fxLink} target="_blank">
-          <div className="flex gap-1 font-semibold text-lg">
+          <div className="flex gap-1 font-semibold text-lg items-center">
             <div>{city.location?.[0].adm2}</div>
             <div>{city.location?.[0].name}</div>
+            {apiKey && (
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onRefresh) onRefresh();
+                }}
+              >
+                <Refresh />
+              </IconButton>
+            )}
           </div>
           <div className="flex items-center justify-center gap-6 mb-2">
             <div className="flex items-center gap-3 mb-2">

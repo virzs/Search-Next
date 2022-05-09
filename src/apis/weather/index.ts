@@ -17,15 +17,28 @@ import {
 // 获取实时天气
 export const qweatherNow = (
   params: QweatherNowParams,
-): Promise<{ data: QWeatherNow }> => {
-  return instance.get('/v1/resource/qweather/now', {
-    params,
-  });
+): Promise<{ data: any }> => {
+  const { key } = params;
+  return instance.get(
+    key
+      ? 'https://devapi.qweather.com/v7/weather/now'
+      : '/v1/resource/qweather/now',
+    {
+      params,
+    },
+  );
 };
 
 // 获取城市信息
-export const locationInfo = (params: any): Promise<{ data: QWeatherCity }> => {
-  return instance.get('/v1/resource/qweather/city', { params });
+export const locationInfo = (params: any): Promise<{ data: any }> => {
+  const { key } = params;
+
+  return instance.get(
+    key
+      ? 'https://geoapi.qweather.com/v2/city/lookup'
+      : '/v1/resource/qweather/city',
+    { params },
+  );
 };
 
 // 根据用户id保存当前天气设置

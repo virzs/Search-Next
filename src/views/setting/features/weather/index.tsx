@@ -49,16 +49,18 @@ const Weather: FC = () => {
       const localData = getWeather(userId);
       const time = dayjs(localData?.updatedTime ?? localData?.createdTime);
       const diff = localData ? dayjs().diff(time, 'minute') > 10 : true;
-      if (diff || !localData?.key) {
+      setKey(localData.key ?? '');
+      if (diff || localData?.key) {
         const coords = position.coords;
         getLocationInfo({
+          key,
           location: coords.longitude + ',' + coords.latitude,
         });
         getWeatherInfo({
+          key,
           location: coords.longitude + ',' + coords.latitude,
         });
       } else if (localData) {
-        setKey(localData.key);
         setWeather(localData.weather);
         setLocation(localData.city);
       }
@@ -102,16 +104,18 @@ const Weather: FC = () => {
 
   const getLocationInfo = (params: QweatherCityParams) => {
     setLoading(true);
+    const { key } = params;
     locationInfo(params).then((res) => {
-      setLocation(res.data);
+      setLocation(key ? res : res.data);
       setLoading(false);
     });
   };
 
   const getWeatherInfo = (params: QweatherNowParams) => {
     setLoading(true);
+    const { key } = params;
     qweatherNow(params).then((res) => {
-      setWeather(res.data);
+      setWeather(key ? res : res.data);
       setLoading(false);
     });
   };
@@ -142,7 +146,13 @@ const Weather: FC = () => {
   return (
     <div>
       {geolocation && (
-        <WeatherCard weather={weather} city={location} loading={loading} />
+        <WeatherCard
+          apiKey={key}
+          onRefresh={() => getCurrentPosition()}
+          weather={weather}
+          city={location}
+          loading={loading}
+        />
       )}
       <ContentList>
         <ContentTitle title="权限"></ContentTitle>
