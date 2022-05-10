@@ -63,6 +63,7 @@
     "react-router-dom": "^6.2.1",
     "react-toastify": "^8.2.0",
     "react-transition-group": "^4.4.2",
+    "react-use": "^17.3.2",
     "react-virtuoso": "^2.2.7",
     "remark-gfm": "^3.0.1",
     "vmdc-ui": "^0.1.13"
