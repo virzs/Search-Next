@@ -2,8 +2,12 @@
  * @Author: Vir
  * @Date: 2022-04-08 16:02:55
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-09 17:47:17
+ * @Last Modified time: 2022-05-10 17:02:09
  */
+import {
+  getIndexWeatherSetting,
+  saveIndexWeatherSetting,
+} from '@/apis/pages/index';
 import {
   getWeather,
   locationInfo,
@@ -16,11 +20,13 @@ import {
   QWeatherNow,
   QweatherNowParams,
 } from '@/apis/weather/interface';
+import Select from '@/components/md-custom/form/select';
 import ContentLinkList from '@/pages/setting/components/contentLinkList';
 import Link from '@/pages/setting/components/contentLinkList/link';
 import ContentList from '@/pages/setting/components/contentList';
 import ContentTitle from '@/pages/setting/components/contentTitle';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
+import ItemCard from '@/pages/setting/components/itemCard';
 import { css } from '@emotion/css';
 import { Alert, AlertTitle, Switch, TextField } from '@mui/material';
 import dayjs from 'dayjs';
@@ -42,6 +48,17 @@ const Weather: FC = () => {
   const [geolocation, setGeolocation] = React.useState<boolean>(false);
   const [key, setKey] = useState('');
   const [loading, setLoading] = useState(false);
+  const [latlng, setLatlng] = useState<number[]>([]);
+  const [weatherInterval, setWeatherInterval] = useState(15);
+  const [show, setShow] = useState(true);
+
+  const refreshOptions = [
+    { label: '5分钟', value: 5 },
+    { label: '10分钟', value: 10 },
+    { label: '15分钟', value: 15 },
+    { label: '30分钟', value: 30 },
+    { label: '60分钟', value: 60 },
+  ];
 
   // 获取当前位置并获取天气
   const getCurrentPosition = () => {
@@ -52,6 +69,7 @@ const Weather: FC = () => {
       setKey(localData.key ?? '');
       if (diff || localData?.key) {
         const coords = position.coords;
+        setLatlng([coords.longitude, coords.latitude]);
         getLocationInfo({
           key,
           location: coords.longitude + ',' + coords.latitude,
@@ -120,8 +138,19 @@ const Weather: FC = () => {
     });
   };
 
+  // 获取主页 天气设置
+  const getWeatherSetting = () => {
+    const res = getIndexWeatherSetting(userId);
+    const setting = res?.navBar?.left?.weather;
+    if (setting) {
+      setWeatherInterval(setting.interval);
+      setShow(setting.show);
+    }
+  };
+
   useEffect(() => {
     applyPermission();
+    getWeatherSetting();
   }, []);
 
   useEffect(() => {
@@ -139,9 +168,18 @@ const Weather: FC = () => {
         weather: weather,
         city: location,
         key: key,
+        latlng,
       });
     }
   }, [weather, location]);
+
+  useEffect(() => {
+    saveIndexWeatherSetting({
+      userId,
+      interval: weatherInterval,
+      show,
+    });
+  }, [weatherInterval, show]);
 
   return (
     <div>
@@ -222,6 +260,29 @@ const Weather: FC = () => {
             helperText={key.length > 32 ? 'KEY长度不能超过32位' : ''}
           ></TextField>
         </ItemAccordion>
+        <ContentTitle title="高级设置" />
+        <ItemCard
+          title="刷新时间"
+          desc="设置天气自动更新时间间隔"
+          action={
+            <Select
+              disabled={!key}
+              value={weatherInterval}
+              onChange={(e) => setWeatherInterval(e.target.value)}
+              options={refreshOptions}
+            />
+          }
+        />
+        <ItemCard
+          title="首页展示"
+          desc="设置首页是否展示天气"
+          action={
+            <Switch
+              checked={show}
+              onChange={(e) => setShow(e.target.checked)}
+            />
+          }
+        />
       </ContentList>
       <ContentLinkList>
         <ContentTitle title="相关链接" />

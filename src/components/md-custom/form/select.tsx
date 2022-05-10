@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 14:06:16
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-19 01:27:18
+ * @Last Modified time: 2022-05-10 13:42:06
  */
 
 import { css } from '@emotion/css';
@@ -35,6 +35,7 @@ export interface SelectProps {
   helperText?: string;
   error?: boolean;
   inputRef?: React.Ref<any>;
+  disabled?: boolean;
 }
 
 const StyledSelect = styled((props: MSelectProps) => (
@@ -48,7 +49,7 @@ const StyledSelect = styled((props: MSelectProps) => (
 
 const Select: React.FC<SelectProps> = ({
   label,
-  size = 'medium',
+  size = 'small',
   options,
   optionsConfig,
   helperText,

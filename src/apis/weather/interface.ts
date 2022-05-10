@@ -225,4 +225,8 @@ export interface SaveWeatherData extends DB_BASE_COL {
    * @name 和风天气 key
    */
   key?: string;
+  /**
+   * @name 经纬度
+   */
+  latlng?: number[];
 }
