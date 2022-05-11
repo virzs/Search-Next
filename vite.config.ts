@@ -7,6 +7,8 @@ import react from '@vitejs/plugin-react';
 import vitePluginImp from 'vite-plugin-imp';
 import viteSentry from 'vite-plugin-sentry';
 import packageData from './package.json';
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -40,6 +42,12 @@ export default defineConfig({
         ignore: ['node_modules'],
         urlPrefix: '~/assets',
       },
+    }),
+    createSvgIconsPlugin({
+      iconDirs: [
+        path.resolve(process.cwd(), 'node_modules/qweather-icons/icons'),
+      ],
+      symbolId: 'icon-[name]',
     }),
   ],
   css: {

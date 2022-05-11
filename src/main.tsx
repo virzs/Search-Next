@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { auto, disable, enable } from 'darkreader';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
+import 'virtual:svg-icons-register';
 
 const env = import.meta.env;
 

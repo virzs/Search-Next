@@ -95,6 +95,7 @@
     "vite-plugin-mdx": "^3.5.10",
     "vite-plugin-pwa": "^0.11.2",
     "vite-plugin-sentry": "^1.0.14",
+    "vite-plugin-svg-icons": "^2.0.1",
     "vitest": "^0.0.108"
   },
   "config": {
