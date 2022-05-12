@@ -1,6 +1,6 @@
 # Search导航页Next版
 
-![stars](https://img.shields.io/github/stars/virzs/Search-Next?style=plastic)  ![forks](https://img.shields.io/github/forks/virzs/Search-Next)  ![license](https://img.shields.io/github/license/virzs/Search-Next)  [![wakatime](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4.svg)](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4)
+![stars](https://img.shields.io/github/stars/virzs/Search-Next)  ![forks](https://img.shields.io/github/forks/virzs/Search-Next)  ![license](https://img.shields.io/github/license/virzs/Search-Next)  [![wakatime](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4.svg)](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4)
 
 ## **原项目：**[Search](https://github.com/virzs/Search)
 
