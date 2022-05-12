@@ -2,10 +2,15 @@
  * @Author: Vir
  * @Date: 2022-05-10 11:30:22
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-10 12:00:37
+ * @Last Modified time: 2022-05-10 17:12:13
  */
 
 import { NavigationType } from '@/data/account/interface';
+
+export interface IndexPageWeatherSetting {
+  show: boolean;
+  interval: number;
+}
 
 /**
  * @name 首页设置相关
@@ -13,10 +18,7 @@ import { NavigationType } from '@/data/account/interface';
 export interface IndexPageSetting {
   navBar: {
     left: {
-      weather: {
-        show: boolean;
-        interval: number;
-      };
+      weather: IndexPageWeatherSetting;
     };
     right: {
       navigation: {
