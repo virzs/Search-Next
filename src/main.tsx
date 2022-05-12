@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import * as client from 'react-dom/client';
 import './index.css';
 import App from './App';
 import '@/locales';
@@ -62,9 +62,13 @@ env?.VITE_SENTRY_URL &&
     tracesSampleRate: 1.0,
   });
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root'),
-);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  const root = client.createRoot(rootElement);
+
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+}
