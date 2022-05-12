@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-01-29 21:09:38
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-16 17:26:30
+ * @Last Modified time: 2022-05-12 17:35:09
  */
 
 import { AccountEngine, getClassifyEngineListApi } from '@/apis/engine';
@@ -127,9 +127,9 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
         )}
       </Popper>
       <div className="w-full text-left mb-1 flex justify-start items-center overflow-x-auto">
-        {engineList.map((i) => (
+        {engineList.map((i, j) => (
           <Chip
-            key={i._id}
+            key={j}
             className={classnames(
               'mx-1',
               i._id === engine?.engine?._id
