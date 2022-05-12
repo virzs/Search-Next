@@ -30,7 +30,7 @@ const Weather: FC<WeatherProps> = (props) => {
   const [pluginLoading, setPluginLoading] = useState(false);
   const [qweatherPlugin, setQweatherPlugin] = useState<HTMLElement>();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
