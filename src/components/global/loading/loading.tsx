@@ -23,10 +23,12 @@ const load = keyframes`
 export interface LoadingProps {
   children?: any;
   loading?: boolean;
+  color?: string;
+  full?: boolean;
 }
 
 const Loading: FC<LoadingProps> = (props) => {
-  const { loading, children } = props;
+  const { loading, color = '#5f5f5f', children, full = false } = props;
   const icon = (
     <div className="w-16 h-16 flex gap-1 justify-center items-center">
       {new Array(5).fill('').map((i, j) => (
@@ -34,7 +36,7 @@ const Loading: FC<LoadingProps> = (props) => {
           className={cx(
             'w-1.5 h-10 rounded scale-y-50',
             css`
-              background-color: #5f5f5f;
+              background-color: ${color};
               animation: ${load} 1s ${j * 0.2}s infinite ease-in-out;
             `,
           )}
@@ -44,7 +46,12 @@ const Loading: FC<LoadingProps> = (props) => {
     </div>
   );
   return children ? (
-    <div className={cx(loading && 'flex justify-center items-center relative')}>
+    <div
+      className={cx(
+        loading && 'flex justify-center items-center relative',
+        full && 'w-full h-full',
+      )}
+    >
       <div className={cx(loading && 'opacity-0')}>{children}</div>
       {loading && (
         <div
@@ -56,6 +63,8 @@ const Loading: FC<LoadingProps> = (props) => {
         </div>
       )}
     </div>
+  ) : full ? (
+    <div className="w-full h-full flex justify-center items-center">{icon}</div>
   ) : (
     icon
   );
