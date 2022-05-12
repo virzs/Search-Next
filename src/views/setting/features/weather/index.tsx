@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-04-08 16:02:55
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-10 17:02:09
+ * @Last Modified time: 2022-05-12 16:57:01
  */
 import {
   getIndexWeatherSetting,
@@ -33,6 +33,7 @@ import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import WeatherCard from './components/weatherCard';
+import geolocation from './utils/geolocation';
 
 const Weather: FC = () => {
   let timer: number | undefined; // 定时器（点击授权时检查是否授权）
@@ -45,38 +46,38 @@ const Weather: FC = () => {
   );
   const [permission, setPermission] = React.useState<boolean>(false);
   const [status, setStatus] = React.useState<string>('');
-  const [geolocation, setGeolocation] = React.useState<boolean>(false);
+  const [geolocationStatus, setGeolocationStatusStatus] =
+    React.useState<boolean>(false);
   const [key, setKey] = useState('');
+  const [pluginKey, setPluginKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [latlng, setLatlng] = useState<number[]>([]);
   const [weatherInterval, setWeatherInterval] = useState(15);
   const [show, setShow] = useState(true);
 
   const refreshOptions = [
-    { label: '5分钟', value: 5 },
     { label: '10分钟', value: 10 },
     { label: '15分钟', value: 15 },
     { label: '30分钟', value: 30 },
-    { label: '60分钟', value: 60 },
   ];
 
   // 获取当前位置并获取天气
   const getCurrentPosition = () => {
-    navigator.geolocation.getCurrentPosition(function (position) {
+    geolocation.getCurrentPosition().then((res) => {
       const localData = getWeather(userId);
       const time = dayjs(localData?.updatedTime ?? localData?.createdTime);
       const diff = localData ? dayjs().diff(time, 'minute') > 10 : true;
       setKey(localData.key ?? '');
+      setPluginKey(localData.pluginKey ?? '');
       if (diff || localData?.key) {
-        const coords = position.coords;
-        setLatlng([coords.longitude, coords.latitude]);
+        setLatlng([res.longitude, res.latitude]);
         getLocationInfo({
           key,
-          location: coords.longitude + ',' + coords.latitude,
+          location: res.longitude + ',' + res.latitude,
         });
         getWeatherInfo({
           key,
-          location: coords.longitude + ',' + coords.latitude,
+          location: res.longitude + ',' + res.latitude,
         });
       } else if (localData) {
         setWeather(localData.weather);
@@ -86,18 +87,16 @@ const Weather: FC = () => {
   };
 
   const applyPermission = () => {
-    if ('geolocation' in navigator) {
+    if (geolocation.checkGeolocation) {
       /* 地理位置服务可用 */
       setPermission(true);
-      navigator.permissions.query({ name: 'geolocation' }).then((status) => {
-        setStatus(status.state);
-        if (status.state === 'granted') {
-          setGeolocation(true);
+      geolocation.getPermissionStatus().then((res) => {
+        if (res === 'granted') {
+          setGeolocationStatusStatus(true);
           getCurrentPosition();
         } else {
-          setGeolocation(false);
+          setGeolocationStatusStatus(false);
         }
-        // status 是一个 PermissionStatus 的实例
       });
     } else {
       /* 地理位置服务不可用 */
@@ -105,21 +104,24 @@ const Weather: FC = () => {
     }
   };
 
+  // 检查授权状态
   const checkPermission = () => {
     getCurrentPosition();
     timer = setInterval(async () => {
-      const result = await navigator.permissions.query({ name: 'geolocation' });
-      setGeolocation(result.state === 'granted');
-      setStatus(result.state);
-      if (result.state !== 'prompt') {
-        clearTimeout(timer);
-        !lastState && toast.info('已选择位置信息权限，请检查浏览器设置');
-        return;
-      }
-      lastState = result.state;
+      geolocation.getPermissionStatus().then((res) => {
+        setGeolocationStatusStatus(res === 'granted');
+        setStatus(res);
+        if (res !== 'prompt') {
+          clearTimeout(timer);
+          !lastState && toast.info('已选择位置信息权限，请检查浏览器设置');
+          return;
+        }
+        lastState = res;
+      });
     }, 100);
   };
 
+  // 获取位置城市信息
   const getLocationInfo = (params: QweatherCityParams) => {
     setLoading(true);
     const { key } = params;
@@ -129,6 +131,7 @@ const Weather: FC = () => {
     });
   };
 
+  // 获取天气信息
   const getWeatherInfo = (params: QweatherNowParams) => {
     setLoading(true);
     const { key } = params;
@@ -183,7 +186,7 @@ const Weather: FC = () => {
 
   return (
     <div>
-      {geolocation && (
+      {geolocationStatus && (
         <WeatherCard
           apiKey={key}
           onRefresh={() => getCurrentPosition()}
@@ -201,7 +204,7 @@ const Weather: FC = () => {
             <Switch
               disabled={!permission}
               onClick={(e) => e.stopPropagation()}
-              checked={geolocation}
+              checked={geolocationStatus}
               onChange={(e) => {
                 checkPermission();
               }}
@@ -227,10 +230,7 @@ const Weather: FC = () => {
           虽然和风天气提供了免费方案，但考虑到使用次数限制，最好的方式是自己申请KEY，然后填写到下方。
           当然不填写KEY也可以使用天气功能，但是查询次数会有限制，如果超过限制，则无法使用天气功能。
         </Alert>
-        <ItemAccordion
-          title="和风天气API KEY"
-          desc="设置和风天气API使用时必须的KEY"
-        >
+        <ItemAccordion title="和风天气KEY" desc="设置和风天气使用时必须的KEY">
           <Alert
             severity="warning"
             className={css`
@@ -242,9 +242,10 @@ const Weather: FC = () => {
           <TextField
             fullWidth
             variant="standard"
-            label="KEY"
+            label="和风天气API KEY"
             placeholder="请输入和风天气API KEY"
             value={key}
+            disabled={!permission}
             onChange={(e) => {
               setKey(e.target.value);
             }}
@@ -259,6 +260,36 @@ const Weather: FC = () => {
             error={key.length > 32}
             helperText={key.length > 32 ? 'KEY长度不能超过32位' : ''}
           ></TextField>
+          <div className="h-3"></div>
+          <Alert
+            severity="warning"
+            className={css`
+              margin-bottom: 8px;
+            `}
+          >
+            该KEY仅用作和风天气插件使用，不会保存到服务器，请勿将KEY泄露给他人。
+          </Alert>
+          <TextField
+            fullWidth
+            variant="standard"
+            label="和风天气插件 KEY"
+            placeholder="请输入和风天气天气插件 KEY"
+            value={pluginKey}
+            disabled={!permission}
+            onChange={(e) => {
+              setPluginKey(e.target.value);
+            }}
+            onBlur={() => {
+              saveWeather({
+                userId,
+                weather: weather,
+                city: location,
+                pluginKey,
+              });
+            }}
+            error={pluginKey.length > 32}
+            helperText={pluginKey.length > 32 ? 'KEY长度不能超过32位' : ''}
+          ></TextField>
         </ItemAccordion>
         <ContentTitle title="高级设置" />
         <ItemCard
@@ -266,7 +297,7 @@ const Weather: FC = () => {
           desc="设置天气自动更新时间间隔"
           action={
             <Select
-              disabled={!key}
+              disabled={!key || !permission}
               value={weatherInterval}
               onChange={(e) => setWeatherInterval(e.target.value)}
               options={refreshOptions}
@@ -278,6 +309,7 @@ const Weather: FC = () => {
           desc="设置首页是否展示天气"
           action={
             <Switch
+              disabled={!permission}
               checked={show}
               onChange={(e) => setShow(e.target.checked)}
             />

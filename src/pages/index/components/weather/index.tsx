@@ -25,7 +25,7 @@ const Weather: FC<WeatherProps> = (props) => {
     className,
   } = props;
   const { interval } = setting;
-  const { city, weather, key, latlng } = localWeatherData;
+  const { city, weather, key, pluginKey, latlng } = localWeatherData;
 
   const [pluginLoading, setPluginLoading] = useState(false);
   const [qweatherPlugin, setQweatherPlugin] = useState<HTMLElement>();
@@ -52,7 +52,7 @@ const Weather: FC<WeatherProps> = (props) => {
         height: '150',
         background: '1',
         dataColor: 'FFFFFF',
-        key: '30d4a4daf48546df9155c607b364f3a4',
+        key: pluginKey,
       },
     };
     const hePluginStandardEleBox = document.createElement('div');
@@ -70,7 +70,6 @@ const Weather: FC<WeatherProps> = (props) => {
     script.id = 'qweather-widget-script';
     script.onload = () => {
       setPluginLoading(false);
-      console.log('load');
     };
     const inHtml = document.getElementById('qweather-widget-script');
     inHtml && document.body.removeChild(inHtml);
@@ -102,10 +101,10 @@ const Weather: FC<WeatherProps> = (props) => {
     <div
       className="h-10 flex items-center"
       onMouseEnter={() => {
-        setOpen(true);
+        pluginKey && setOpen(true);
       }}
       onMouseLeave={() => {
-        setOpen(false);
+        pluginKey && setOpen(false);
       }}
     >
       <NoMaxWidthTooltip
@@ -123,7 +122,8 @@ const Weather: FC<WeatherProps> = (props) => {
         <div
           className={cx(
             className,
-            'flex items-center px-2 gap-2 mx-2  cursor-pointer',
+            'flex items-center px-2 gap-2 mx-2',
+            pluginKey && 'cursor-pointer',
           )}
         >
           {<SvgIcon name={weather.now?.icon + '-fill'} />}

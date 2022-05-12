@@ -226,6 +226,10 @@ export interface SaveWeatherData extends DB_BASE_COL {
    */
   key?: string;
   /**
+   * @name 和风天气插件 key
+   */
+  pluginKey?: string;
+  /**
    * @name 经纬度
    */
   latlng?: number[];
