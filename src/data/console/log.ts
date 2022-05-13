@@ -23,13 +23,21 @@ export const log: Log[] = [
     | |  | |  __/ | | (_) |     \\  /\  / (_) | |  | | (_| |
     |_|  |_|\\___|_|_|\\___/      \\/  \\/ \\___/|_|  |_|\\__,_|
                                                           `,
-    `
+      `
     ©2018-${dayjs().format('YYYY')} by Vir. All rights reserved.
+    `,
+      `
+    开源协议: GNU General Public License v3.0
+    项目地址: https://github.com/virzs/Search-Next
+    问题反馈: https://github.com/virzs/Search-Next/issues
     `,
     ],
     styles: [
       `
       color: green;
+    `,
+      `
+      color: red;
     `,
       `
       color: red;
