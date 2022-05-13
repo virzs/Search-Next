@@ -128,7 +128,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
       <div className="h-full overflow-hidden flex flex-col w-full px-6 py-4">
         <Breadcrumbs separator="›" aria-label="breadcrumb" className="mb-4">
           {breads.map((i, index) => (
-            <p
+            <div
               className={classNames('text-2xl cursor-pointer mb-0', {
                 'font-semibold': index === breads.length - 1,
               })}
@@ -154,7 +154,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
                   />
                 )}
               </div>
-            </p>
+            </div>
           ))}
         </Breadcrumbs>
         <div className="flex-grow overflow-y-auto w-full">
