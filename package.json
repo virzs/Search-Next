@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "dev--force": "vite --force",
-    "build": "tsc && vite build",
+    "build": "tsc --skipLibCheck && vite build",
     "serve": "vite preview",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "changelog": "release-it patch changelog",
