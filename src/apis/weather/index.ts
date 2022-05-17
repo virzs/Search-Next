@@ -18,26 +18,24 @@ import {
 export const qweatherNow = (
   params: QweatherNowParams,
 ): Promise<{ data: any }> => {
-  const { key } = params;
+  const { key, ...rest } = params;
   return instance.get(
     key
       ? 'https://devapi.qweather.com/v7/weather/now'
       : '/v1/resource/qweather/now',
-    {
-      params,
-    },
+    { params: key ? params : rest },
   );
 };
 
 // 获取城市信息
 export const locationInfo = (params: any): Promise<{ data: any }> => {
-  const { key } = params;
+  const { key, ...rest } = params;
 
   return instance.get(
     key
       ? 'https://geoapi.qweather.com/v2/city/lookup'
       : '/v1/resource/qweather/city',
-    { params },
+    { params: key ? params : rest },
   );
 };
 
@@ -55,5 +53,5 @@ export const saveWeather = (
 
 // 获取当前用户天气设置
 export const getWeather = (userId: string): SaveWeatherData => {
-  return SWDB.findOne({ userId });
+  return SWDB.findOne({ userId }) ?? {};
 };

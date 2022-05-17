@@ -14,7 +14,7 @@ export interface GetCurrentPositionResult {
  * 判断 geolocation api 是否可用
  * @returns boolean
  */
-export const checkGeolocation = 'geolocationStatus' in navigator;
+export const checkGeolocation = navigator.geolocation;
 
 /**
  * GeoLocation API 获取当前位置

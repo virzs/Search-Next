@@ -67,21 +67,21 @@ const Weather: FC = () => {
       const localData = getWeather(userId);
       const time = dayjs(localData?.updatedTime ?? localData?.createdTime);
       const diff = localData ? dayjs().diff(time, 'minute') > 10 : true;
-      setKey(localData.key ?? '');
-      setPluginKey(localData.pluginKey ?? '');
-      if (diff || localData?.key) {
+      setKey(localData?.key ?? '');
+      setPluginKey(localData?.pluginKey ?? '');
+      if (diff) {
         setLatlng([res.longitude, res.latitude]);
         getLocationInfo({
-          key,
+          key: key ?? localData?.key,
           location: res.longitude + ',' + res.latitude,
         });
         getWeatherInfo({
-          key,
+          key: key ?? localData?.key,
           location: res.longitude + ',' + res.latitude,
         });
       } else if (localData) {
-        setWeather(localData.weather);
-        setLocation(localData.city);
+        localData.weather && setWeather(localData.weather);
+        localData.city && setLocation(localData.city);
       }
     });
   };
