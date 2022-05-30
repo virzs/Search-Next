@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:41:30
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-10 13:37:59
+ * @Last Modified time: 2022-05-30 11:00:30
  */
 const {
   allDataPath,
@@ -18,6 +18,7 @@ const {
 const { copyFile, tsToJs, templete, prettierFile } = require('./file');
 const { writeFileSync, unlinkSync } = require('fs');
 const Log = require('./log');
+const dayjs = require('dayjs');
 
 const log = new Log();
 
@@ -42,10 +43,18 @@ const copyAndSwitchFile = () => {
 const formatData = (classify = [], website = [], level = 1) => {
   return classify.map((i) => {
     const { children, subClassify, ...rest } = i;
-    const childrenWebsite = website.filter((j) => j.classify.includes(i.path));
+    let childrenWebsite = website.filter((j) => j.classify.includes(i.path));
     const classifyWebsite =
       children?.filter((j) => j.classify.includes(i.path)) || [];
     let res = { ...rest, level };
+
+    if (i.path === 'new') {
+      childrenWebsite = website.filter(
+        (j) =>
+          j.createTime &&
+          dayjs().subtract(1, 'month').isAfter(dayjs(j.createTime)),
+      );
+    }
 
     res.children = children ? classifyWebsite : childrenWebsite;
 
