@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 18:40:38
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-10 13:37:14
+ * @Last Modified time: 2022-05-23 14:39:41
  */
 
 import { WebsiteClassify } from './types/classify';
@@ -27,6 +27,8 @@ export interface Website {
   icon?: string;
   color?: string;
   isShow?: boolean;
+  createTime?: string;
+  isNew?: boolean;
 }
 
 export type NavigationType = 'website' | 'navigation';

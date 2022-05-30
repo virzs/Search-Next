@@ -1,6 +1,25 @@
 import { Classify } from "./interface";
 const navigationData: Classify[] = [
   {
+    id: "236b7a65a1b644be81b6f7ade63da612",
+    name: "最近新增",
+    path: "new",
+    intro: "最近新增网站",
+    level: 1,
+    children: [
+      {
+        id: "2d43ee6b15c1455f8265805a08d7f723",
+        name: "MySelf动漫",
+        url: "https://myself-bbs.com/",
+        intro: "日本在线动漫，免费任您收看",
+        icon: "myself",
+        color: "#dd8034",
+        classify: ["common", "video"],
+        createTime: "2020-05-23",
+      },
+    ],
+  },
+  {
     id: "6da7ce69c09a41999c167f658647a40a",
     name: "常用",
     path: "common",
@@ -177,6 +196,44 @@ const navigationData: Classify[] = [
             icon: "huashuimoyu",
             color: "#FE6A4D",
             classify: ["common", "news"],
+          },
+        ],
+      },
+      {
+        id: "b65e17d4fc0e4376b6f2d9510145e25e",
+        name: "视频",
+        path: "video",
+        intro: "常用视频网站推荐",
+        level: 2,
+        children: [
+          {
+            id: "2e1b53aff19941abb4de1438692cf799",
+            name: "YouTube",
+            url: "https://www.youtube.com/",
+            intro:
+              "Enjoy the videos and music you love, upload original content, and share it all with friends.",
+            icon: "youtube",
+            color: "#FF0000",
+            classify: ["common", "video"],
+          },
+          {
+            id: "c4d166f506fe4f38aa7a33141d957a5f",
+            name: "bilibili",
+            url: "https://bilibili.com",
+            intro: "哔哩哔哩 (゜-゜)つロ 干杯~",
+            icon: "bilibili",
+            color: "#00A1D6",
+            classify: ["common", "video"],
+          },
+          {
+            id: "2d43ee6b15c1455f8265805a08d7f723",
+            name: "MySelf动漫",
+            url: "https://myself-bbs.com/",
+            intro: "日本在线动漫，免费任您收看",
+            icon: "myself",
+            color: "#dd8034",
+            classify: ["common", "video"],
+            createTime: "2020-05-23",
           },
         ],
       },

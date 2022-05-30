@@ -2,12 +2,18 @@
  * @Author: Vir
  * @Date: 2021-11-19 17:45:40
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-07 14:48:11
+ * @Last Modified time: 2022-05-30 10:52:29
  */
 
 import { Classify } from './interface';
 
 const classify: Classify[] = [
+  {
+    id: '236b7a65a1b644be81b6f7ade63da612',
+    name: '最近新增',
+    path: 'new',
+    intro: '最近新增网站',
+  },
   {
     id: '6da7ce69c09a41999c167f658647a40a',
     name: '常用',
@@ -39,6 +45,12 @@ const classify: Classify[] = [
         name: '资讯',
         path: 'news',
         intro: '常用资讯网站推荐',
+      },
+      {
+        id: 'b65e17d4fc0e4376b6f2d9510145e25e',
+        name: '视频',
+        path: 'video',
+        intro: '常用视频网站推荐',
       },
     ],
   },

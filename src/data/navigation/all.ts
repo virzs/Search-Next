@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-15 16:06:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-30 12:05:21
+ * @Last Modified time: 2022-05-23 14:38:58
  */
 
 import { Website } from './interface';
@@ -222,7 +222,7 @@ const allWebsites: Website[] = [
       'Enjoy the videos and music you love, upload original content, and share it all with friends.',
     icon: 'youtube',
     color: '#FF0000',
-    classify: ['video'],
+    classify: ['common', 'video'],
   },
   {
     id: 'c4d166f506fe4f38aa7a33141d957a5f',
@@ -231,7 +231,7 @@ const allWebsites: Website[] = [
     intro: '哔哩哔哩 (゜-゜)つロ 干杯~',
     icon: 'bilibili',
     color: '#00A1D6',
-    classify: ['video'],
+    classify: ['common', 'video'],
   },
   {
     id: '322ac9b788c64d02bb28b158c14ea17c',
@@ -1132,6 +1132,16 @@ const allWebsites: Website[] = [
     icon: 'thief',
     color: '#222529',
     classify: ['tools', 'software'],
+  },
+  {
+    id: '2d43ee6b15c1455f8265805a08d7f723',
+    name: 'MySelf动漫',
+    url: 'https://myself-bbs.com/',
+    intro: '日本在线动漫，免费任您收看',
+    icon: 'myself',
+    color: '#dd8034',
+    classify: ['common', 'video'],
+    createTime: '2020-05-23',
   },
 ];
 

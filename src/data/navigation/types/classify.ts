@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-16 11:17:47
  * @Last Modified by: Vir
- * @Last Modified time: 2021-11-22 17:37:06
+ * @Last Modified time: 2022-05-30 10:53:02
  */
 
 import { Website } from '../interface';
@@ -182,6 +182,12 @@ export type LIFE = 'life';
 export type BOOK = 'book';
 
 /**
+ * 最近新增
+ * @desc 网站分类 - 最近新增
+ */
+export type NEW = 'new';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -214,4 +220,5 @@ export type WebsiteClassify =
   | DATE
   | BLOG
   | LIFE
-  | BOOK;
+  | BOOK
+  | NEW;

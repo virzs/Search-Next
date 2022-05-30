@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-07-25 00:07:11
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-10 13:49:03
+ * @Last Modified time: 2022-05-30 11:06:33
  */
 
 import { MenuLayoutMenu, MenuListItem } from '@/components/layout/menu-layout';
@@ -25,8 +25,10 @@ const Recursion = (data: Classify, parent?: Classify) => {
     data.children &&
     data.children.filter((k) =>
       data.subClassify
-        ?.map((l) => l.path)
-        .every((n) => !k.classify.includes(n)),
+        ? data.subClassify
+            ?.map((l) => l.path)
+            .every((n) => !k.classify.includes(n))
+        : k,
     );
 
   return (
