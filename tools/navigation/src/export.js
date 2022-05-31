@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-11-17 17:41:30
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-30 11:00:30
+ * @Last Modified time: 2022-05-31 16:49:46
  */
 const {
   allDataPath,
@@ -49,11 +49,13 @@ const formatData = (classify = [], website = [], level = 1) => {
     let res = { ...rest, level };
 
     if (i.path === 'new') {
-      childrenWebsite = website.filter(
-        (j) =>
-          j.createTime &&
-          dayjs().subtract(1, 'month').isAfter(dayjs(j.createTime)),
-      );
+      childrenWebsite = website
+        .filter(
+          (j) =>
+            j.createTime &&
+            dayjs().subtract(1, 'month').isAfter(dayjs(j.createTime)),
+        )
+        .sort((a, b) => (a.createTime < b.createTime ? 1 : -1));
     }
 
     res.children = children ? classifyWebsite : childrenWebsite;
