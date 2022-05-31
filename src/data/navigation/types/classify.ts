@@ -188,6 +188,12 @@ export type BOOK = 'book';
 export type NEW = 'new';
 
 /**
+ * 图片处理
+ * @desc 网站分类 - 图片处理
+ */
+export type IMAGE_PROCESS = 'imageProcess';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -221,4 +227,5 @@ export type WebsiteClassify =
   | BLOG
   | LIFE
   | BOOK
-  | NEW;
+  | NEW
+  | IMAGE_PROCESS;

@@ -97,6 +97,14 @@ const classify: Classify[] = [
         name: '在线工具',
         path: 'onlineTools',
         intro: '在线工具',
+        subClassify: [
+          {
+            id: 'e605649dad88419ab7ce60c99e1f6169',
+            name: '图片处理',
+            path: 'imageProcess',
+            intro: '在线图片处理工具',
+          },
+        ],
       },
     ],
   },
