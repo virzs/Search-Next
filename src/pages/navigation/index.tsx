@@ -68,7 +68,7 @@ const Recursion = (data: Classify, parent?: Classify) => {
             margin-top: 16px;
           `}
         >
-          <SubHeader title="未分类" />
+          {data.path !== 'new' && <SubHeader title="未分类" />}
           <div className="grid grid-cols-3 gap-3 max-w-4xl">
             {notClassifiedData.map((j) => (
               <WebsiteCardNew key={j.id} datasource={j} />
