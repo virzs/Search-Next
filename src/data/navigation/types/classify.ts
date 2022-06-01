@@ -194,6 +194,30 @@ export type NEW = 'new';
 export type IMAGE_PROCESS = 'imageProcess';
 
 /**
+ * 学习
+ * @desc 网站分类 - 学习
+ */
+export type LEARN = 'learn';
+
+/**
+ * 平台
+ * @desc 网站分类 - 平台
+ */
+export type PLATFORM = 'platform';
+
+/**
+ * 教程
+ * @desc 网站分类 - 教程
+ */
+export type TUTORIAL = 'tutorial';
+
+/**
+ * 学术
+ * @desc 网站分类 - 学术
+ */
+export type ACADEMIC = 'academic';
+
+/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -228,4 +252,8 @@ export type WebsiteClassify =
   | LIFE
   | BOOK
   | NEW
-  | IMAGE_PROCESS;
+  | IMAGE_PROCESS
+  | LEARN
+  | PLATFORM
+  | TUTORIAL
+  | ACADEMIC;

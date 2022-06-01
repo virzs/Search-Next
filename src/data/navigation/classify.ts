@@ -81,6 +81,32 @@ const classify: Classify[] = [
     ],
   },
   {
+    id: 'b016b8351a984355ae8152218f2f4007',
+    name: '学习',
+    path: 'learn',
+    intro: '',
+    subClassify: [
+      {
+        id: 'e5b5a26dda204568bd0bc6703334d11a',
+        name: '平台',
+        path: 'platform',
+        intro: '',
+      },
+      {
+        id: 'b06a862079f24f38a2aedd988646c66f',
+        name: '教程',
+        path: 'tutorial',
+        intro: '',
+      },
+      {
+        id: 'cf19f08fc4ca442db2135b66cb1a3434',
+        name: '学术',
+        path: 'academic',
+        intro: '',
+      },
+    ],
+  },
+  {
     id: 'e9db130e300b4a85bdde455eb35ad12e',
     name: '工具',
     path: 'tools',
