@@ -119,11 +119,13 @@ const WebsiteCardNew: React.FC<WebsiteCardNewProps> = (props) => {
               <CopyAll />
             </Button>
           </Tooltip>
-          <Tooltip title="更多">
-            <Button onClick={onMore}>
-              <MoreHoriz />
-            </Button>
-          </Tooltip>
+          {false && (
+            <Tooltip title="更多">
+              <Button onClick={onMore}>
+                <MoreHoriz />
+              </Button>
+            </Tooltip>
+          )}
         </ButtonGroup>
       </div>
     </div>

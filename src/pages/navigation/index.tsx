@@ -50,12 +50,14 @@ const Recursion = (data: Classify, parent?: Classify) => {
                 <Header icon={i.icon} title={i.name} />
               )}
 
-              {i.children && i.children.length > 0 && (
+              {i.children && i.children.length > 0 ? (
                 <div className="grid grid-cols-3 gap-3 max-w-4xl">
                   {i.children.map((j) => (
                     <WebsiteCardNew key={i.id} datasource={j} />
                   ))}
                 </div>
+              ) : (
+                <div>暂无数据</div>
               )}
               {Recursion(i, data)}
             </div>
@@ -76,6 +78,8 @@ const Recursion = (data: Classify, parent?: Classify) => {
           </div>
         </div>
       )}
+      {(data.children?.length === 0 && data.subClassify?.length === 0) ||
+        (!data.children && !data.subClassify && <div>暂无数据</div>)}
     </>
   );
 };
