@@ -212,12 +212,6 @@ export type PLATFORM = 'platform';
 export type TUTORIAL = 'tutorial';
 
 /**
- * 学术
- * @desc 网站分类 - 学术
- */
-export type ACADEMIC = 'academic';
-
-/**
  * 网站分类
  * @desc 网站全部分类
  */
@@ -255,5 +249,4 @@ export type WebsiteClassify =
   | IMAGE_PROCESS
   | LEARN
   | PLATFORM
-  | TUTORIAL
-  | ACADEMIC;
+  | TUTORIAL;

@@ -98,12 +98,6 @@ const classify: Classify[] = [
         path: 'tutorial',
         intro: '',
       },
-      {
-        id: 'cf19f08fc4ca442db2135b66cb1a3434',
-        name: '学术',
-        path: 'academic',
-        intro: '',
-      },
     ],
   },
   {
