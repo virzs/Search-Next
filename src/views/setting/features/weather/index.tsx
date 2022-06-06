@@ -54,6 +54,7 @@ const Weather: FC = () => {
   const [latlng, setLatlng] = useState<number[]>([]);
   const [weatherInterval, setWeatherInterval] = useState(15);
   const [show, setShow] = useState(true);
+  const [init, setInit] = useState(false);
 
   const refreshOptions = [
     { label: '10分钟', value: 10 },
@@ -151,9 +152,22 @@ const Weather: FC = () => {
     }
   };
 
+  const onIndexSettingChange = (key: string, value: any) => {
+    key === 'interval' && setWeatherInterval(value);
+    key === 'show' && setShow(value);
+    const res = getIndexWeatherSetting(userId);
+    const setting = res?.navBar?.left?.weather;
+    saveIndexWeatherSetting({
+      ...setting,
+      userId,
+      [key]: value,
+    });
+  };
+
   useEffect(() => {
     applyPermission();
     getWeatherSetting();
+    setInit(true);
   }, []);
 
   useEffect(() => {
@@ -175,14 +189,6 @@ const Weather: FC = () => {
       });
     }
   }, [weather, location]);
-
-  useEffect(() => {
-    saveIndexWeatherSetting({
-      userId,
-      interval: weatherInterval,
-      show,
-    });
-  }, [weatherInterval, show]);
 
   return (
     <div>
@@ -299,7 +305,7 @@ const Weather: FC = () => {
             <Select
               disabled={!key || !permission}
               value={weatherInterval}
-              onChange={(e) => setWeatherInterval(e.target.value)}
+              onChange={(e) => onIndexSettingChange('interval', e.target.value)}
               options={refreshOptions}
             />
           }
@@ -311,7 +317,7 @@ const Weather: FC = () => {
             <Switch
               disabled={!permission}
               checked={show}
-              onChange={(e) => setShow(e.target.checked)}
+              onChange={(e) => onIndexSettingChange('show', e.target.checked)}
             />
           }
         />
