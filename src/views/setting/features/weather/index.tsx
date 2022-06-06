@@ -67,7 +67,9 @@ const Weather: FC = () => {
     geolocation.getCurrentPosition().then((res) => {
       const localData = getWeather(userId);
       const time = dayjs(localData?.updatedTime ?? localData?.createdTime);
-      const diff = localData ? dayjs().diff(time, 'minute') > 10 : true;
+      const diff = localData
+        ? dayjs().diff(time, 'minute') > weatherInterval
+        : true;
       setKey(localData?.key ?? '');
       setPluginKey(localData?.pluginKey ?? '');
       if (diff) {
