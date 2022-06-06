@@ -53,6 +53,7 @@
     "lodash": "^4.17.21",
     "notistack": "^2.0.3",
     "path": "^0.12.7",
+    "pinyin-match": "^1.2.2",
     "qweather-icons": "^1.1.1",
     "react": "^18.0.0",
     "react-darkreader": "^1.5.6",

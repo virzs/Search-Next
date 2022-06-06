@@ -4,7 +4,7 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2021-11-28 14:46:48
  */
-import React from 'react';
+import React, { FC } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import { Home, KeyboardBackspace } from '@mui/icons-material';
 import Copyright from '@/components/global/copyright';
@@ -22,7 +22,26 @@ export interface MenuLayoutNewProps extends PageProps {
   onChange?: (id: string, item: any) => void;
   contentHeader?: JSX.Element | React.ReactNode;
   menuFooter?: JSX.Element | React.ReactNode;
+  headerIcons?: JSX.Element[] | React.ReactNode[];
 }
+
+export interface HeaderIconProps {
+  title: string;
+  icon: JSX.Element | React.ReactNode;
+  onClick: () => void;
+}
+
+export const HeaderIcon: FC<HeaderIconProps> = (props) => {
+  const { title, icon, onClick } = props;
+
+  return (
+    <Tooltip title={title} arrow>
+      <IconButton size="small" onClick={onClick}>
+        {icon}
+      </IconButton>
+    </Tooltip>
+  );
+};
 
 const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
   children,
@@ -33,6 +52,7 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
   contentHeader,
   menuFooter,
   onChange,
+  headerIcons,
   ...props
 }) => {
   const [menuList, setMenuList] = React.useState<Router[] | undefined>([]);
@@ -79,26 +99,21 @@ const MenuLayoutNew: React.FC<MenuLayoutNewProps> = ({
     <div className="flex flex-row h-screen bg-gray-70">
       <div className="w-72 p-4 h-full flex flex-col">
         <div className="flex gap-1">
-          <Tooltip title="回到首页" arrow>
-            <IconButton
-              size="small"
-              onClick={() => {
-                history('/');
-              }}
-            >
-              <Home />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="返回上级" arrow>
-            <IconButton
-              size="small"
-              onClick={() => {
-                history(-1);
-              }}
-            >
-              <KeyboardBackspace />
-            </IconButton>
-          </Tooltip>
+          <HeaderIcon
+            title="回到首页"
+            icon={<Home />}
+            onClick={() => {
+              history('/');
+            }}
+          />
+          <HeaderIcon
+            title="返回上级"
+            icon={<KeyboardBackspace />}
+            onClick={() => {
+              history(-1);
+            }}
+          />
+          {headerIcons}
         </div>
         <Menu datasource={menuList} mode="route" onChange={onChange} />
         <div>{menuFooter}</div>
