@@ -1,3 +1,73 @@
+## [0.13.0](https://github.com/virzs/Search-Next/compare/v0.12.1...v0.13.0) (2022-06-06)
+
+
+### 💄 Styles | 风格
+
+* **版本记录和历史提交记录:** :children_crossing: 列表页加载 loading 状态 ([e2523fd](https://github.com/lpreterite/datagent/commit/e2523fdf536c918a16615f9163cb82abac2d44d0))
+
+
+### 📝 Documentation | 文档
+
+* **文档:** :memo: 修改部分描述 ([166cd46](https://github.com/lpreterite/datagent/commit/166cd46d11d3e9d8bcce35b20bd5a3d11f565f56))
+* **文档:** :memo: 修改部分描述 ([4f7767c](https://github.com/lpreterite/datagent/commit/4f7767cf74cfb473f3f8fd2dff47f5f8cc4030ad))
+* **文档:** :memo: 增加后端部分说明 ([7c8db9e](https://github.com/lpreterite/datagent/commit/7c8db9e31e53b050b277275214de82dc901d2f55))
+* **readme:** :memo: 更新文档 ([fa4a91a](https://github.com/lpreterite/datagent/commit/fa4a91ab7a7496da2c735068145f814a187172ce))
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **导航:** :wrench: 导航数据处理最近新增默认倒序 ([a3dc82e](https://github.com/lpreterite/datagent/commit/a3dc82ef73dbdb4fc1084c0118aeb5ce7e069c3b))
+* **脚本:** :sparkles: 脚本支持处理新增导航内容 ([20a4859](https://github.com/lpreterite/datagent/commit/20a4859895bf96fdc442f1113ed77c635c47f729))
+* **依赖:** :heavy_plus_sign: 添加 react-use ([1aeffba](https://github.com/lpreterite/datagent/commit/1aeffba6a0bf36fad1fd70ffc1c432c8a50813b5))
+* **package:** :green_heart: 修复 node_modules 校验失败导致无法 build ([ff7e018](https://github.com/lpreterite/datagent/commit/ff7e0186c278a98557cd7a692525432b3f0d9d23))
+
+
+### 📦 Chores | 其他更新
+
+* **导航:** :card_file_box: 调整导航数据 ([045c088](https://github.com/lpreterite/datagent/commit/045c088fb64fe04fa044ceb5268c9f68b0f60f1a))
+* **导航:** :card_file_box: 更新导航数据 ([9971397](https://github.com/lpreterite/datagent/commit/9971397a4e2caffb55c005ef532c8a1e54ad44f5))
+* **导航:** :card_file_box: 新增导航分类，网站数据 ([94cb0d7](https://github.com/lpreterite/datagent/commit/94cb0d762b79e6ca2769e9580e1012c9973a69d3))
+* **导航:** :card_file_box: 增加导航数据 ([7be5a72](https://github.com/lpreterite/datagent/commit/7be5a729ffa3e09e07f746dd9c79da6896c0519b))
+* **导航数据:** :card_file_box: 增加导航数据 ([622c006](https://github.com/lpreterite/datagent/commit/622c0069090765887ea7a8c6cc1774332924e3bd))
+* **导航页:** :children_crossing: 优化导航页使用体验 ([c9ea4b1](https://github.com/lpreterite/datagent/commit/c9ea4b1c5746af68235b7121ac38a231a452f174))
+* **导航页:** :children_crossing: 最近新增去掉未分类标题 ([38b7d89](https://github.com/lpreterite/datagent/commit/38b7d893e82678b312dece132edba91c156504f1))
+* **接口:** :necktie: 优化接口返回数据格式 ([2fd9558](https://github.com/lpreterite/datagent/commit/2fd9558e87e52bf13bde09f43a1d4ddae6fb8fac))
+* **首页:** :necktie: 优化接口返回数据格式 ([e8d00a2](https://github.com/lpreterite/datagent/commit/e8d00a2c787e29188ba19afea02476ec06e08b74))
+* **搜索框:** :children_crossing: 搜索热词支持鼠标选择 ([29c0509](https://github.com/lpreterite/datagent/commit/29c0509552a5eacce79569cf85d6cabe3a164f42))
+* **天气:** :children_crossing: 优化天气设置页用户体验 ([9b59416](https://github.com/lpreterite/datagent/commit/9b594167d195d4e0a77c6d2dbb005478bcafe6e4))
+* **天气:** :children_crossing: 增加更多配置，优化代码 ([8190980](https://github.com/lpreterite/datagent/commit/819098062e5d71548e9373141d7d65a8564c5254))
+* **天气:** :construction: 支持后台设置天气 ([db3e89c](https://github.com/lpreterite/datagent/commit/db3e89c845581b158ef92924344a9e7bbbba2d01))
+* **天气:** :necktie: 设置页增加更多天气设置 ([38907fe](https://github.com/lpreterite/datagent/commit/38907fee584970ad0caab34ab50c63c3e78d0c7a))
+* **天气:** :sparkles: 首页天气展示 ([7db7923](https://github.com/lpreterite/datagent/commit/7db79233ac4e8bb2ff33312a80240b94045833ae))
+* **图标:** :sparkles: 支持导入 svg 文件 ([d68d102](https://github.com/lpreterite/datagent/commit/d68d1020afcb085168ff2526dc766e53f0e5c031))
+* **项目依赖:** :children_crossing: 链接跳转新标签页 ([7d20693](https://github.com/lpreterite/datagent/commit/7d20693762e553fb548a14d4d89c5dbf32c68082))
+* **loading:** :necktie: Loading组件优化 ([565cac3](https://github.com/lpreterite/datagent/commit/565cac38f6736a1fa7b3dffebc87700cc79b0651))
+* **loading:** :sparkles: 新增 loading 组件 ([a019638](https://github.com/lpreterite/datagent/commit/a0196384fbc928e97aed71fc8e3a2e9bd71522ce))
+* **log:** :speech_balloon: 修改 log ([bef8121](https://github.com/lpreterite/datagent/commit/bef8121cbee44039fb8ca05bf9e4ce5309aad9c0))
+* **root:** :building_construction: render 适配 react 18.x ([5d12341](https://github.com/lpreterite/datagent/commit/5d1234183c996815061120887e7a3d836fa78902))
+* **svgicon:** :necktie: SvgIcon 优化 ([18f49eb](https://github.com/lpreterite/datagent/commit/18f49eb5fa684ae471c959ca387868b8b18ebc4c))
+
+
+### ✨ Features | 新功能
+
+* **导航页:** :sparkles: 导航页新增搜索功能 ([9ec6213](https://github.com/lpreterite/datagent/commit/9ec6213fb20fca3c0bf177e9110b574b1d067798))
+* **导航页:** :sparkles: 导航页支持显示最近新增网站 ([a74e7c8](https://github.com/lpreterite/datagent/commit/a74e7c858dd96134c91347d6fa8696f3e129a36a))
+* **项目依赖:** :sparkles: 关于页项目依赖展示 ([6e0df84](https://github.com/lpreterite/datagent/commit/6e0df8448f30475be7b733b036dac36eadade0b4))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **导航页:** :bug: 修复复制网址错误 ([dcf2ad4](https://github.com/lpreterite/datagent/commit/dcf2ad4e910b3656694896c0c78d7d8bfb9bd494))
+* **导航页:** :bug: 修复某些浏览器不支持复制功能报错 ([d7793e8](https://github.com/lpreterite/datagent/commit/d7793e880b5db7f98aa5e23fc8c32278eec075fb))
+* **加载中:** :bug: 修复加载动画丢失bug ([5d1ec0a](https://github.com/lpreterite/datagent/commit/5d1ec0a88d1ac08e71f3eb2b8853b40474adad4f))
+* **设置页:** :bug: 解决设置页报错 ([d586af9](https://github.com/lpreterite/datagent/commit/d586af976c0bf01331631302b5f2f5e8a0e78eaf))
+* **搜索框:** :bug: 修复键盘选择热词时，输入框光标位置不正确的bug ([7e0537d](https://github.com/lpreterite/datagent/commit/7e0537d2c9ee83a51f515a2f6b27057b0399339e))
+* **搜索引擎:** :bug: 解决某些情况下控制台报错 ([722d748](https://github.com/lpreterite/datagent/commit/722d748b02ae539fbc5b24fa94437268bb982802))
+* **天气:** :bug: 天气刷新设置时间无效 bug ([1b27df3](https://github.com/lpreterite/datagent/commit/1b27df30b860b6c7969ba73f58ce20f4e82f9a76))
+* **天气:** :bug: 修复部分天气设置不生效 bug ([7c39a98](https://github.com/lpreterite/datagent/commit/7c39a98c8d1edf3f443d23ebc5d609e0749eb9f8))
+* **天气:** :bug: 修复首次进入时天气插件自动打开bug ([3da1c64](https://github.com/lpreterite/datagent/commit/3da1c64634e14402368e2c42dfe8f3e223937d57))
+* **天气:** :bug: 修复天气报错 ([2b5e972](https://github.com/lpreterite/datagent/commit/2b5e9728d4098a2f2d46ec4cf6469a18a8b95a21))
+
 ### [0.12.1](https://github.com/virzs/Search-Next/compare/v0.12.0...v0.12.1) (2022-04-14)
 
 
