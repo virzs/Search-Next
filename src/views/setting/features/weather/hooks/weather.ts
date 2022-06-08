@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 /*
  * @Author: Vir
  * @Date: 2022-06-07 14:41:50
@@ -20,7 +19,6 @@ import {
   SaveWeatherData,
 } from '@/apis/weather/interface';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import geolocation from '../utils/geolocation';
 
 export interface Location {
