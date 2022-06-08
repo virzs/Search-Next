@@ -101,9 +101,8 @@ export interface SetDataParams {
 
 const useWeather = (): UseWeatherReturn => {
   const userId = localStorage.getItem('account') ?? '';
-  const timer = useRef();
 
-  const [lastState, setLastState] = useState<string | undefined>(undefined);
+  // ! 这部分参考上面的注释
   const [geoLocationStatus, setGeoLocationStatus] =
     useState<PermissionState>('prompt');
   const [loading, setLoading] = useState(false);
@@ -118,10 +117,10 @@ const useWeather = (): UseWeatherReturn => {
   const [localWeatherData, setLocalWeatherData] = useState<SaveWeatherData>();
 
   const setData = (params: SetDataParams) => {
-    const { key, pluginKey, interval, show } = params;
-    key && setKey(key);
-    pluginKey && setPluginKey(pluginKey);
-    show && setShow(show);
+    const { key, pluginKey, show } = params;
+    key !== undefined && setKey(key);
+    pluginKey !== undefined && setPluginKey(pluginKey);
+    show !== undefined && setShow(show);
   };
 
   const fetch = <W, T>(
@@ -203,6 +202,15 @@ const useWeather = (): UseWeatherReturn => {
     applyPermission();
     const data = getLocalWeather(userId);
     setLocalWeatherData(data);
+    if (data) {
+      const { location, weather, city, key, pluginKey, show } = data;
+      setLocation(location);
+      setWeather(weather);
+      setCity(city);
+      setKey(key ?? '');
+      setPluginKey(pluginKey ?? '');
+      setShow(show ?? false);
+    }
   }, []);
 
   const returnData = {

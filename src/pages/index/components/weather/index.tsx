@@ -4,37 +4,29 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2022-05-11 18:01:01
  */
-import { IndexPageWeatherSetting } from '@/apis/pages/index/interface';
-import {
-  QWeatherNow,
-  QweatherNowParams,
-  SaveWeatherData,
-} from '@/apis/weather/interface';
 import Loading from '@/components/global/loading/loading';
 import SvgIcon from '@/components/global/svgIcon';
+import useWeather from '@/views/setting/features/weather/hooks/weather';
 import { cx } from '@emotion/css';
 import { styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 import React, { FC, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useInterval } from 'react-use';
 
 export interface WeatherProps {
-  setting: IndexPageWeatherSetting;
-  weather: SaveWeatherData;
   className: string;
 }
 
 const Weather: FC<WeatherProps> = (props) => {
-  const {
-    setting = {} as IndexPageWeatherSetting,
-    weather: localWeatherData = {} as SaveWeatherData,
-    className,
-  } = props;
-  const { interval = 15 } = setting;
-  const { city, weather, key, pluginKey, latlng } = localWeatherData ?? {};
+  const history = useNavigate();
+  const { className } = props;
+
+  const [data, action] = useWeather();
+  const { weather, pluginKey, show } = data;
+  const { refresh } = action;
 
   const [pluginLoading, setPluginLoading] = useState(false);
   const [qweatherPlugin, setQweatherPlugin] = useState<HTMLElement>();
-  const [qweatherNow, setQweatherNow] = useState<QWeatherNow>();
 
   const [open, setOpen] = useState(false);
 
@@ -118,11 +110,9 @@ const Weather: FC<WeatherProps> = (props) => {
     initQweatherPlugin();
   }, []);
 
-  useEffect(() => {
-    if (weather) setQweatherNow(weather);
-  }, [weather]);
-
-  useInterval(() => {}, interval * 60 * 1000);
+  useInterval(() => {
+    refresh();
+  }, 5 * 60 * 1000);
 
   useEffect(() => {
     if (open) {
@@ -141,40 +131,53 @@ const Weather: FC<WeatherProps> = (props) => {
     }
   }, [open]);
 
-  if (!qweatherNow) return <div></div>;
+  if (!weather || !show) return <div></div>;
 
   return (
     <div
       className="h-10 flex items-center"
       onMouseEnter={() => {
-        pluginKey && setOpen(true);
+        setOpen(true);
       }}
       onMouseLeave={() => {
-        pluginKey && setOpen(false);
+        setOpen(false);
       }}
     >
       <NoMaxWidthTooltip
         open={open}
         title={
-          <Loading loading={pluginLoading} color="#fff" full>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: qweatherPlugin?.innerHTML ?? '',
-              }}
-            ></div>
-          </Loading>
+          pluginKey ? (
+            <Loading loading={pluginLoading} color="#fff" full>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: qweatherPlugin?.innerHTML ?? '',
+                }}
+              ></div>
+            </Loading>
+          ) : (
+            <div className="flex items-center justify-center h-full flex-col">
+              <p>请先配置 pluginKey</p>
+              <a
+                className="cursor-pointer"
+                onClick={() => {
+                  history('/setting/lab/weather');
+                }}
+              >
+                前往设置{'>>'}
+              </a>
+            </div>
+          )
         }
       >
         <div
           className={cx(
             className,
-            'flex items-center px-2 gap-2 mx-2',
-            pluginKey && 'cursor-pointer',
+            'flex items-center px-2 gap-2 mx-2 cursor-pointer',
           )}
         >
-          {<SvgIcon name={qweatherNow.now?.icon + '-fill'} />}
+          {<SvgIcon name={weather.now?.icon + '-fill'} />}
           <div className="flex gap-1 font-semibold">
-            <span>{qweatherNow.now?.temp}</span>
+            <span>{weather.now?.temp}</span>
             <span>℃</span>
           </div>
         </div>

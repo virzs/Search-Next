@@ -12,7 +12,7 @@ import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { css } from '@emotion/css';
 import { Alert, AlertTitle, Switch, TextField } from '@mui/material';
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import WeatherCard from './components/weatherCard';
 import useWeather from './hooks/weather';
 
@@ -115,6 +115,7 @@ const Weather: FC = () => {
             `}
           >
             该KEY仅用作和风天气插件使用，不会保存到服务器，请勿将KEY泄露给他人。
+            点击下方创建标准版天气插件链接，生成代码，将代码中的 KEY 填写在下方输入框中
           </Alert>
           <TextField
             fullWidth
@@ -136,6 +137,10 @@ const Weather: FC = () => {
       <ContentLinkList>
         <ContentTitle title="相关链接" />
         <Link text="和风天气开发平台" href="https://dev.qweather.com/" />
+        <Link
+          text="创建标准版天气插件"
+          href="https://widget.qweather.com/create-standard"
+        />
       </ContentLinkList>
     </div>
   );
