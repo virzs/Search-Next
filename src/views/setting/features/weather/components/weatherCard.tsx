@@ -13,8 +13,8 @@ import dayjs from 'dayjs';
 import React, { FC, useMemo } from 'react';
 
 export interface WeatherCardProps {
-  weather: QWeatherNow;
-  city: QWeatherCity;
+  weather?: QWeatherNow;
+  city?: QWeatherCity;
   loading?: boolean;
   onRefresh?: () => void;
   apiKey: string;
@@ -78,7 +78,7 @@ const WeatherCard: FC<WeatherCardProps> = (props) => {
           <div className="flex gap-1 font-semibold text-lg items-center">
             <div>{city.location?.[0].adm2}</div>
             <div>{city.location?.[0].name}</div>
-            {apiKey && (
+            {true && (
               <IconButton
                 size="small"
                 onClick={(e) => {
