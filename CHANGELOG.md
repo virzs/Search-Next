@@ -1,3 +1,21 @@
+### [0.13.1](https://github.com/virzs/Search-Next/compare/v0.13.0...v0.13.1) (2022-06-08)
+
+
+### 📝 Documentation | 文档
+
+* **readme:** :memo: 增加项目分支说明 ([e4ff4a2](https://github.com/lpreterite/datagent/commit/e4ff4a20dfe9535faca159c8e99ee39d01e4cd4d))
+
+
+### ⚡ Performance Improvements | 性能优化
+
+* **天气:** :recycle: 优化首页天气展示效果 ([e21e6f2](https://github.com/lpreterite/datagent/commit/e21e6f2f3e6cbbd3d1f9e1c7931c8668449a1d86))
+* **天气:** :recycle: 优化天气设置使用体验 ([07d6f2c](https://github.com/lpreterite/datagent/commit/07d6f2cff4155ec9ddbd32612dbea990e1754fd2))
+
+
+### 📦 Chores | 其他更新
+
+* **天气:** :art: 优化代码 ([6f0dc19](https://github.com/lpreterite/datagent/commit/6f0dc19a70b09dd12788dd082c7ec346717ea2d8))
+
 ## [0.13.0](https://github.com/virzs/Search-Next/compare/v0.12.1...v0.13.0) (2022-06-06)
 
 
