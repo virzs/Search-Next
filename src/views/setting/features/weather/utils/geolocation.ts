@@ -22,11 +22,16 @@ export const checkGeolocation = navigator.geolocation;
  */
 export const getCurrentPosition = (): Promise<GetCurrentPositionResult> => {
   return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      if (!position) reject();
-      const { latitude, longitude } = position.coords;
-      resolve({ latitude, longitude });
-    });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (!position) reject();
+        const { latitude, longitude } = position.coords;
+        resolve({ latitude, longitude });
+      },
+      (err) => {
+        reject(err);
+      },
+    );
   });
 };
 

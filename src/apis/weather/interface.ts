@@ -35,14 +35,14 @@ export interface QWeatherCity {
   /**
    * @name 地区 / 城市列表
    */
-  location: Location[];
+  location: CityLocation[];
   /**
    * @name 数据描述
    */
   refer: Refer;
 }
 
-export interface Location {
+export interface CityLocation {
   /**
    * @name 地区/城市名称
    */
@@ -208,6 +208,11 @@ export interface Refer {
   license?: string[];
 }
 
+export interface Location {
+  longitude: number;
+  latitude: number;
+}
+
 export interface SaveWeatherData extends DB_BASE_COL {
   /**
    * @name 用户id
@@ -232,5 +237,13 @@ export interface SaveWeatherData extends DB_BASE_COL {
   /**
    * @name 经纬度
    */
-  latlng?: number[];
+  location?: Location;
+  /**
+   * @name 刷新间隔
+   */
+  interval?: number;
+  /**
+   * @name 首页是否显示
+   */
+  show?: boolean;
 }

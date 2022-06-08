@@ -22,10 +22,7 @@ import { getAuthDataByKey } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
 import { useNavigate } from 'react-router-dom';
-import { getIndexPageSetting } from '@/apis/pages/index';
-import { IndexPageSetting } from '@/apis/pages/index/interface';
 import Weather from './components/weather';
-import { getWeather } from '@/apis/weather';
 import { SaveWeatherData } from '@/apis/weather/interface';
 
 const IndexPage: React.FC<PageProps> = (props) => {
@@ -44,9 +41,6 @@ const IndexPage: React.FC<PageProps> = (props) => {
     {} as Navigation,
   );
   const [navOpen, setNavOpen] = React.useState(false);
-  const [indexSetting, setIndexSetting] = useState<IndexPageSetting>(
-    {} as IndexPageSetting,
-  );
   const [weather, setWeather] = useState<SaveWeatherData>(
     {} as SaveWeatherData,
   );
@@ -110,19 +104,10 @@ const IndexPage: React.FC<PageProps> = (props) => {
     }
   };
 
-  const getIndexSetting = () => {
-    const userId = localStorage.getItem('account') ?? '';
-    const res = getIndexPageSetting(userId);
-    const weather = getWeather(userId ?? '');
-    setWeather(weather);
-    setIndexSetting(res);
-  };
-
   React.useEffect(() => {
     setBackground();
     setLogoSetting();
     setNavigationSetting();
-    getIndexSetting();
   }, []);
 
   return (
@@ -136,15 +121,11 @@ const IndexPage: React.FC<PageProps> = (props) => {
       }}
     >
       <div className="index-navbar-box flex flex-grow max-h-12 text-right align-middle">
-        {indexSetting?.navBar?.left?.weather?.show && (
-          <Weather
-            setting={indexSetting?.navBar?.left?.weather}
-            weather={weather}
-            className={classNames({
-              'text-var-main-10': !!bg,
-            })}
-          />
-        )}
+        <Weather
+          className={classNames({
+            'text-var-main-10': !!bg,
+          })}
+        />
         <div className="flex-1"></div>
         <Tooltip title="网址导航">
           <IconButton
