@@ -5,6 +5,7 @@
  * @Last Modified time: 2021-10-11 22:17:43
  */
 
+import { css, cx } from '@emotion/css';
 import { Tooltip } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import classNames from 'classnames';
@@ -19,6 +20,7 @@ export interface OutlineCardProps {
   disabled?: boolean; //是否禁用
   loading?: boolean; //是否加载中，显示skeleton
   fullWidth?: boolean;
+  labelWidth?: number;
 }
 
 const OutlineCard: React.FC<OutlineCardProps> = ({
@@ -31,6 +33,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   fullWidth = false,
   children,
   onChange,
+  labelWidth,
 }) => {
   const [radioChecked, setChecked] = React.useState<boolean>(id === value);
 
@@ -96,7 +99,15 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
             </div>
             {label && (
               <div>
-                <label className="mt-1 overflow-hidden max-w-full whitespace-nowrap text-ellipsis text-xs leading-4 inline-block p-0 text-primary">
+                <label
+                  className={cx(
+                    'mt-1 overflow-hidden max-w-full whitespace-nowrap text-ellipsis text-xs leading-4 inline-block p-0 text-primary',
+                    labelWidth !== undefined &&
+                      css`
+                        width: ${labelWidth}px;
+                      `,
+                  )}
+                >
                   {loading ? (
                     <Skeleton variant="text" width={100} height={16} />
                   ) : (
