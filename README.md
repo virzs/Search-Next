@@ -28,8 +28,7 @@ QQ群：859791575
 
 ## 更新路线
 
-![版本更新路线](https://user-images.githubusercontent.com/44538687/173008587-162f64e6-8703-43cb-b009-4765bb805033.png)
-
+![版本更新路线](https://user-images.githubusercontent.com/44538687/173037626-ea8f26f3-8b8f-4a96-ab6d-69132fe09432.png)
 
 ## 启动项目
 
