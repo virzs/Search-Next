@@ -26,6 +26,11 @@ QQ群：859791575
 - dev 开发分支
 - feature-* 单个功能开发分支，功能开发结束后转到 dev 分支
 
+## 更新路线
+
+![版本更新路线](https://user-images.githubusercontent.com/44538687/173008587-162f64e6-8703-43cb-b009-4765bb805033.png)
+
+
 ## 启动项目
 
 需要nodejs（版本不限，建议最新）、yarn（npm也可以）
