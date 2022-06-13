@@ -14,6 +14,20 @@ Search项目的React版本，相较于原项目从原生js更改为React，引�
 
 另外，在线地址中为开发环境，仅用于展示功能，不保证数据在每个版本兼容。
 
+## 截图（21/11/2）
+
+![image-20211102144351320](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021443364.png)
+
+![image-20211102144434101](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021444272.png)
+
+![image-20211102144456377](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021444525.png)
+
+![image-20211102144519551](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445686.png)
+
+![image-20211102144540528](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445722.png)
+
+[历史截图](./docs/历史版本图片.md)
+
 ## 在线交流
 
 QQ群：859791575
@@ -25,10 +39,6 @@ QQ群：859791575
 - master 正式分支
 - dev 开发分支
 - feature-* 单个功能开发分支，功能开发结束后转到 dev 分支
-
-## 更新路线
-
-![版本更新路线](https://user-images.githubusercontent.com/44538687/173040514-db4e6685-d8fd-4f08-8ee0-63f3e85cebd3.png)
 
 ## 启动项目
 
@@ -62,27 +72,13 @@ yarn jscpd
 
 项目需要后端接口支持，后端部分详见文末说明。
 
-## 截图（21/11/2）
-
-![image-20211102144351320](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021443364.png)
-
-![image-20211102144434101](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021444272.png)
-
-![image-20211102144456377](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021444525.png)
-
-![image-20211102144519551](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445686.png)
-
-![image-20211102144540528](https://raw.githubusercontent.com/virzs/cloud/project/img/202111021445722.png)
-
-[历史截图](./docs/历史版本图片.md)
-
 ## Star趋势
 
 [![Stargazers over time](https://starchart.cc/virzs/Search-Next.svg)](https://starchart.cc/virzs/Search-Next)
 
-## 开发计划
+## 更新路线
 
-详细内容请查看[开发计划](https://github.com/virzs/Search-Next/projects)
+![版本更新路线](https://user-images.githubusercontent.com/44538687/173040514-db4e6685-d8fd-4f08-8ee0-63f3e85cebd3.png)
 
 ## 常见问题说明
 
