@@ -78,7 +78,7 @@ yarn jscpd
 
 ## 更新路线
 
-![版本更新路线](https://user-images.githubusercontent.com/44538687/173040514-db4e6685-d8fd-4f08-8ee0-63f3e85cebd3.png)
+![版本更新路线](https://user-images.githubusercontent.com/44538687/173269566-fd3ba5cc-bbb7-45b7-81b8-3dc2fd09512c.png)
 
 ## 常见问题说明
 
