@@ -8,6 +8,16 @@ const navigationData: Classify[] = [
     level: 1,
     children: [
       {
+        id: "f1c4c20fcb1d4acb83eacde1974368e8",
+        name: "Cloudflare",
+        url: "https://www.cloudflare.com/",
+        intro: "智能化云服务平台，免费CDN安全防护",
+        icon: "cloudflare",
+        color: "#e7883b",
+        classify: ["develop", "tools", "onlineTools"],
+        createTime: "2020-06-17",
+      },
+      {
         id: "df7657a771f6474b87c8cf212bf260f2",
         name: "菜鸟教程",
         url: "https://www.runoob.com/",
@@ -984,6 +994,16 @@ const navigationData: Classify[] = [
             color: "#e26159",
             classify: ["tools", "onlineTools"],
           },
+          {
+            id: "f1c4c20fcb1d4acb83eacde1974368e8",
+            name: "Cloudflare",
+            url: "https://www.cloudflare.com/",
+            intro: "智能化云服务平台，免费CDN安全防护",
+            icon: "cloudflare",
+            color: "#e7883b",
+            classify: ["develop", "tools", "onlineTools"],
+            createTime: "2020-06-17",
+          },
         ],
         subClassify: [
           {
@@ -1603,6 +1623,16 @@ const navigationData: Classify[] = [
                 icon: "wakatime",
                 color: "#29333A",
                 classify: ["tools", "onlineTools", "develop"],
+              },
+              {
+                id: "f1c4c20fcb1d4acb83eacde1974368e8",
+                name: "Cloudflare",
+                url: "https://www.cloudflare.com/",
+                intro: "智能化云服务平台，免费CDN安全防护",
+                icon: "cloudflare",
+                color: "#e7883b",
+                classify: ["develop", "tools", "onlineTools"],
+                createTime: "2020-06-17",
               },
             ],
           },

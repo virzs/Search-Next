@@ -1264,6 +1264,16 @@ const allWebsites: Website[] = [
     classify: ['learn', 'tutorial'],
     createTime: '2020-06-01',
   },
+  {
+    id: 'f1c4c20fcb1d4acb83eacde1974368e8',
+    name: 'Cloudflare',
+    url: 'https://www.cloudflare.com/',
+    intro: '智能化云服务平台，免费CDN安全防护',
+    icon: 'cloudflare',
+    color: '#e7883b',
+    classify: ['develop', 'tools', 'onlineTools'],
+    createTime: '2020-06-17',
+  },
 ];
 
 export default allWebsites;
