@@ -45,6 +45,7 @@
     "clipboard": "^2.0.11",
     "darkreader": "^4.9.46",
     "dayjs": "^1.10.7",
+    "devtools-detect": "^4.0.0",
     "github-markdown-css": "^5.0.0",
     "i18next": "^21.2.4",
     "i18next-browser-languagedetector": "^6.1.2",
