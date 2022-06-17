@@ -9,7 +9,7 @@ import { css, cx } from '@emotion/css';
 import { Tooltip } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 
 export interface OutlineCardProps {
   label?: React.ReactNode; //标题
@@ -35,6 +35,7 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
   onChange,
   labelWidth,
 }) => {
+  const [init, setInit] = useState(false);
   const [radioChecked, setChecked] = React.useState<boolean>(id === value);
 
   React.useEffect(() => {
@@ -43,8 +44,9 @@ const OutlineCard: React.FC<OutlineCardProps> = ({
 
   React.useEffect(() => {
     if (radioChecked) {
-      if (onChange && id) onChange(id);
+      if (onChange && id && init) onChange(id);
     }
+    setInit(true);
   }, [radioChecked]);
 
   const radio = () => {

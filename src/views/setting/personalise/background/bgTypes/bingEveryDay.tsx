@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-26 17:39:27
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 15:27:16
+ * @Last Modified time: 2022-06-15 13:59:04
  */
 
 import { AuthBackgroundRandomData } from '@/data/account/interface';
@@ -16,7 +16,7 @@ export interface EveryDayProps {
   data: AuthBackgroundRandomData;
 }
 
-const EveryDay: React.FC<EveryDayProps> = ({ data }) => {
+const BingEveryDay: React.FC<EveryDayProps> = ({ data }) => {
   const [url, setUrl] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -46,4 +46,4 @@ const EveryDay: React.FC<EveryDayProps> = ({ data }) => {
   );
 };
 
-export default EveryDay;
+export default BingEveryDay;

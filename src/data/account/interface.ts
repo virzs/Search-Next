@@ -2,10 +2,9 @@
  * @Author: Vir
  * @Date: 2021-10-17 21:26:07
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-04 14:03:38
+ * @Last Modified time: 2022-06-09 11:37:54
  */
 
-import { SearchEngine } from '../engine/types';
 import { ClockLogoType, LogoType } from '../logo';
 
 // 默认的用户数据
@@ -17,7 +16,12 @@ export type AuthType = 'local' | 'cloud';
 export type LanguageType = 'zh-CN' | 'en-US';
 
 // 背景类型
-export type AuthBackgroundType = 'color' | 'random' | 'everyday' | 'link';
+export type BackgroundType =
+  | 'color'
+  | 'bing'
+  | 'bing_everyday'
+  | 'link'
+  | 'picsum';
 
 // 随机背景数据
 export interface AuthBackgroundRandomData {
@@ -35,7 +39,7 @@ export interface AuthBackgroundLinkData {
 
 // 背景数据
 export interface AuthBackground {
-  type: AuthBackgroundType; // 背景类型
+  type: BackgroundType; // 背景类型
   data?: AuthBackgroundRandomData | AuthBackgroundLinkData; // 背景数据
 }
 
