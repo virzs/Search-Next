@@ -56,6 +56,7 @@ window.onerror = function (msg, source, lineno, colno, error) {
 };
 
 env?.VITE_SENTRY_URL &&
+  env?.PROD &&
   Sentry.init({
     dsn: env?.VITE_SENTRY_URL as string,
     integrations: [new BrowserTracing()],
