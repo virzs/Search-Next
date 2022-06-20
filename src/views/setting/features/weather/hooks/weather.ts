@@ -5,6 +5,7 @@
  * @Last Modified time: 2022-06-07 18:02:09
  */
 
+import { isBeta } from '@/apis/auth';
 import {
   locationInfo,
   qweatherNow,
@@ -192,7 +193,8 @@ const useWeather = (): UseWeatherReturn => {
   };
 
   useEffect(() => {
-    if (!location) return;
+    const beta = isBeta();
+    if (!location && !beta) return;
     refresh();
   }, [location]);
 
