@@ -41,12 +41,16 @@ export const getCurrentPosition = (): Promise<GetCurrentPositionResult> => {
  */
 export const getPermissionStatus = (): Promise<PermissionState> => {
   return new Promise((resolve, reject) => {
-    navigator.permissions
-      .query({ name: 'geolocation' })
-      .then((status) => {
-        resolve(status.state);
-      })
-      .catch((err) => reject(err));
+    if (navigator.permissions) {
+      navigator.permissions
+        .query({ name: 'geolocation' })
+        .then((status) => {
+          resolve(status.state);
+        })
+        .catch((err) => reject(err));
+    } else {
+      reject('navigator.permissions.query is undefined');
+    }
   });
 };
 
