@@ -1,3 +1,30 @@
+### [0.13.2](https://github.com/virzs/Search-Next/compare/v0.13.1...v0.13.2) (2022-06-20)
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **依赖:** :heavy_plus_sign: devtools-detect ([e0f22a8](https://github.com/lpreterite/datagent/commit/e0f22a8e77e7d7d6d6efcfe4327b7b453b9fa56d))
+* **依赖:** :pushpin: devtools-detect 依赖调整 ([be9267d](https://github.com/lpreterite/datagent/commit/be9267dda86b8b7071ea5b93ef50f835621a79a2))
+
+
+### 📦 Chores | 其他更新
+
+* **导航:** :card_file_box: 增加导航数据 ([70965e3](https://github.com/lpreterite/datagent/commit/70965e3a0138b9acc8a9bae5afaac707629f8812))
+* **导航:** :card_file_box: 增加导航数据 ([10e0627](https://github.com/lpreterite/datagent/commit/10e06278b5a4099a6996b637d9dd284492088c8f))
+* **异常监控:** :technologist: 取消开发环境异常监控 ([593f87f](https://github.com/lpreterite/datagent/commit/593f87f2fd61e3cdba32d06ecf437003df75ff62))
+
+
+### 📝 Documentation | 文档
+
+* **readme:** :memo: 修改说明文档 ([857a49d](https://github.com/lpreterite/datagent/commit/857a49d7d07380631a35cc8aa1410abc3195db94))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **天气:** :bug: 修复 812130d 未解决的问题 ([64adf85](https://github.com/lpreterite/datagent/commit/64adf85485ee3d442780a83e53d3c49e49ed2f99))
+* **天气:** :bug: 修复首次进入未设置天气时申请定位问题 ([812130d](https://github.com/lpreterite/datagent/commit/812130d565f36d7a9fef90027ed3464d8d065db4))
+* **天气:** :bug: 修复api兼容性问题 ([00472d7](https://github.com/lpreterite/datagent/commit/00472d79217138314eba8e1eea4be94777c44187))
+
 ### [0.13.1](https://github.com/virzs/Search-Next/compare/v0.13.0...v0.13.1) (2022-06-08)
 
 
