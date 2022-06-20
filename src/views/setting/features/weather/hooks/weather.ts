@@ -199,6 +199,8 @@ const useWeather = (): UseWeatherReturn => {
   }, [location]);
 
   useEffect(() => {
+    const beta = isBeta();
+    if (!beta) return;
     applyPermission();
     const data = getLocalWeather(userId);
     setLocalWeatherData(data);
