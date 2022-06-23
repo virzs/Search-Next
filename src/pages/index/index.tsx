@@ -5,14 +5,12 @@
  * @Last Modified time: 2022-05-10 17:53:54
  */
 
-import { latestImg, SetBackgroundParams } from '@/apis/setting/background';
 import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
-import { getAccount } from '@/views/setting/auth/utils/acount';
 import { IconButton, Tooltip } from '@mui/material';
 import { Bookmarks, Settings } from '@mui/icons-material';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
@@ -24,13 +22,14 @@ import NavDrawer from './components/nav-drawer';
 import { useNavigate } from 'react-router-dom';
 import Weather from './components/weather';
 import { SaveWeatherData } from '@/apis/weather/interface';
+import { usePreview } from '@/views/setting/personalise/background/hooks/preview';
 
 const IndexPage: React.FC<PageProps> = (props) => {
   const history = useNavigate();
   const { t, i18n } = useTranslation();
-  const logoRef = React.useRef<HTMLDivElement>(null);
+  const [{ css, isImage, url: bgUrl }] = usePreview();
 
-  const [bg, setBg] = React.useState<SetBackgroundParams>();
+  const logoRef = React.useRef<HTMLDivElement>(null);
 
   const [zoom, setZoom] = React.useState<boolean>(false);
   const [logoData, setLogoData] = React.useState<AuthLogo>({
@@ -77,53 +76,29 @@ const IndexPage: React.FC<PageProps> = (props) => {
     setNavigationData(navigationData);
   };
 
-  const setBackground = () => {
-    const user = getAccount();
-    const background = user.background;
-    if (user && background) {
-      switch (background.type) {
-        case 'random':
-          setTheme(true, 'inverse');
-          setBg(user.background.data);
-          break;
-        case 'everyday':
-          setTheme(true, 'inverse');
-          latestImg().then((res) => {
-            setBg(res.data[0]);
-          });
-          break;
-        case 'link':
-          setTheme(true, 'inverse');
-          setBg(user.background.data);
-          break;
-        case 'color':
-          setTheme(false);
-          break;
-      }
-    } else {
-    }
-  };
-
   React.useEffect(() => {
-    setBackground();
     setLogoSetting();
     setNavigationSetting();
   }, []);
+
+  useEffect(() => {
+    isImage ? setTheme(true, 'inverse') : setTheme(false);
+  }, [isImage]);
 
   return (
     <div
       id="IndexPage"
       className="index-page flex flex-col h-screen bg-cover bg-center bg-secondary"
       style={{
-        backgroundImage: bg
-          ? `radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%), radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%), url('${bg?.url}')`
+        backgroundImage: isImage
+          ? `radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%), radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%), url('${bgUrl}')`
           : undefined,
       }}
     >
       <div className="index-navbar-box flex flex-grow max-h-12 text-right align-middle">
         <Weather
           className={classNames({
-            'text-var-main-10': !!bg,
+            'text-var-main-10': isImage,
           })}
         />
         <div className="flex-1"></div>
@@ -144,7 +119,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
           >
             <Bookmarks
               className={classNames({
-                'text-var-main-10': !!bg,
+                'text-var-main-10': isImage,
               })}
             />
           </IconButton>
@@ -153,7 +128,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
           <IconButton onClick={() => history('/setting')}>
             <Settings
               className={classNames({
-                'text-var-main-10': !!bg,
+                'text-var-main-10': isImage,
               })}
             />
           </IconButton>

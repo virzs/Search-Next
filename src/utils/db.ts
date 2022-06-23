@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-05-09 15:51:47
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-10 11:41:14
+ * @Last Modified time: 2022-06-15 16:30:46
  */
 
 import StorageDB from 'bsdb';
@@ -19,8 +19,8 @@ export const SETTING_THEME = `${DB_USER_SETTING_NAME}_THEME`;
 // 默认用户设置天气表名
 export const SETTING_WEATHER = `${DB_USER_SETTING_NAME}_WEATHER`;
 
-// 首页设置表名
-export const SETTING_PAGE_INDEX = `${DB_USER_SETTING_NAME}_PAGE_INDEX`;
+// 默认用户设置背景表名
+export const SETTING_BACKGROUND = `${DB_USER_SETTING_NAME}_BACKGROUND`;
 
 export interface DB_BASE_COL {
   createdTime: string;
@@ -45,6 +45,7 @@ export const STDB = DB.get(SETTING_THEME);
 export const SWDB = DB.get(SETTING_WEATHER);
 
 /**
- * @name 首页相关设置数据库
+ * @name 背景相关设置数据库
+ * @desc 存储用户设置的背景相关设置
  */
-export const SPIDB = DB.get(SETTING_PAGE_INDEX);
+export const SBDB = DB.get(SETTING_BACKGROUND);

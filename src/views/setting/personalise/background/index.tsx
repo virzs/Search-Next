@@ -2,30 +2,25 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2021-12-17 17:58:27
+ * @Last Modified time: 2022-06-20 17:35:44
  */
 
-import { editAccount } from '@/apis/auth';
 import Select from '@/components/md-custom/form/select';
-import {
-  AuthBackground,
-  AuthBackgroundLinkData,
-  AuthBackgroundRandomData,
-  AuthBackgroundType,
-  AuthData,
-} from '@/data/account/interface';
 import ItemAccordion from '@/pages/setting/components/itemAccordion';
-import { Alert, AlertTitle, SelectChangeEvent } from '@mui/material';
-import React from 'react';
-import { getAccount } from '../../auth/utils/acount';
+import React, { useEffect } from 'react';
 import Example from '../components/example';
-import EveryDay from './everyDay';
-import Link from './link';
-import Random from './random';
+import Link from './bgTypes/link';
+import LoremPicsum from './bgTypes/loremPicsum';
+import Bing from './bgTypes/bing';
+import BingEveryDay from './bgTypes/bingEveryDay';
+import Color from './bgTypes/color';
+import { BackgroundType } from '@/apis/setting/background';
+import useBackground from './hooks/background';
+import { usePreview } from './hooks/preview';
 
 export interface BgOptions {
   label: string;
-  value: AuthBackgroundType;
+  value: BackgroundType;
   canSelect?: boolean;
   autoExpaneded: boolean;
 }
@@ -33,88 +28,50 @@ export interface BgOptions {
 // TODO 设置为必应壁纸时，历史记录及细节重构
 
 const Background: React.FC = () => {
-  const [value, setValue] = React.useState<BgOptions>({} as BgOptions); // 选择背景类型
-  const [selected, setSelected] = React.useState<AuthBackgroundType>('color');
-  const [account, setAccount] = React.useState<AuthData>({} as AuthData); // 当前账户
-  const [userBgSetting, setUserBgSetting] = React.useState<AuthBackground>(
-    {} as AuthBackground,
-  ); // 当前账户的背景设置数据
   const [expanded, setExpanded] = React.useState(false);
 
   const bgOptions: BgOptions[] = [
     { label: '纯色', value: 'color', canSelect: true, autoExpaneded: false },
     {
       label: '必应壁纸',
-      value: 'random',
+      value: 'bing',
       canSelect: true,
       autoExpaneded: true,
     },
+    // {
+    //   label: 'Lorem Picsum',
+    //   value: 'picsum',
+    //   canSelect: true,
+    //   autoExpaneded: true,
+    // },
     {
       label: '每日一图',
-      value: 'everyday',
+      value: 'bing_everyday',
       canSelect: true,
       autoExpaneded: false,
     },
     { label: '在线图片', value: 'link', canSelect: true, autoExpaneded: true },
   ];
 
-  // 更新设置
-  const updateBgSetting = (id: string, setting: AuthBackground) => {
-    editAccount(id, {
-      background: setting,
-    });
-  };
+  const [data, action] = useBackground();
+  const { type, color, bing, picsum, bing_everyday, link } = data;
+  const { onChange } = action;
 
-  // 选择背景类型
-  const handleChange = (event: SelectChangeEvent<any>) => {
-    const selected: AuthBackgroundType = event.target.value;
-    const data = bgOptions.find((i) => i.value === selected);
-    if (!data) return;
-    setSelected(selected);
-    setValue(data);
-    setExpanded(data.autoExpaneded);
-    if (data.canSelect === true) {
-      const setting = {
-        type: selected,
-      };
-      account._id && updateBgSetting(account._id, setting);
-      setUserBgSetting(setting);
-    }
-  };
+  const [preData, { refresh }] = usePreview();
 
-  // 初始化背景设置
-  const init = () => {
-    const data: AuthData = getAccount();
-    setAccount(data);
-    if (data && data.background) {
-      const type = data.background.type;
-      const option = bgOptions.find((i) => i.value === type);
-      setValue(option || bgOptions[0]);
-      setSelected(type || bgOptions[0].value);
-      setUserBgSetting(data.background);
-    } else {
-      data._id &&
-        updateBgSetting(data._id, {
-          type: bgOptions[0].value,
-        });
-      setValue(bgOptions[0]);
-      setSelected(bgOptions[0].value);
-      setUserBgSetting({ type: bgOptions[0].value });
-    }
-  };
+  useEffect(() => {
+    const opt = bgOptions.find((item) => item.value === type);
+    opt?.autoExpaneded && setExpanded(true);
+  }, [type]);
 
-  React.useEffect(() => {
-    init();
-  }, []);
+  useEffect(() => {
+    refresh();
+  }, [data]);
 
   return (
     <div>
-      <Example data={userBgSetting} />
+      <Example data={preData} />
       <div className="flex gap-2 flex-col">
-        <Alert severity="info">
-          <AlertTitle>提示</AlertTitle>
-          近期必应在国内访问可能受阻，会导致图片无法加载，出现此情况非本网站原因。
-        </Alert>
         <ItemAccordion
           expanded={expanded}
           onChange={(_, expanded) => {
@@ -125,47 +82,46 @@ const Background: React.FC = () => {
           action={
             <Select
               label="背景类型"
-              value={selected}
+              value={type}
               size="small"
-              onChange={handleChange}
+              onChange={(e) => {
+                onChange({ type: e.target.value });
+              }}
               options={bgOptions}
             />
           }
           disableDetailPadding
         >
-          {value.value === 'color' && (
-            <Alert severity="info">
-              设置为纯色背景，在纯色设置时，会自动应用当前主题配色。
-            </Alert>
-          )}
-          {value.value === 'random' && (
-            <Random
-              data={userBgSetting.data as AuthBackgroundRandomData}
-              onChange={(data) => {
-                if (userBgSetting.type === 'random') {
-                  const setting = { ...userBgSetting, data };
-                  setUserBgSetting(setting);
-                  account._id && updateBgSetting(account._id, setting);
-                }
-              }}
-            />
-          )}
-          {value.value === 'everyday' && (
-            <EveryDay data={userBgSetting.data as AuthBackgroundRandomData} />
-          )}
-          {value.value === 'link' && (
-            <Link
-              data={userBgSetting.data as AuthBackgroundLinkData}
-              onChange={(url) => {
-                if (userBgSetting.type === 'link') {
-                  const data = { url };
-                  const setting = { ...userBgSetting, data: data };
-                  setUserBgSetting(setting);
-                  account._id && updateBgSetting(account._id, setting);
-                }
-              }}
-            />
-          )}
+          {(() => {
+            switch (type) {
+              case 'color':
+                return <Color />;
+              case 'bing':
+                return (
+                  <Bing
+                    dataSource={bing}
+                    onChange={(data) => {
+                      onChange({ type, bing: data });
+                    }}
+                  />
+                );
+              case 'bing_everyday':
+                return <BingEveryDay dataSource={bing_everyday} />;
+              case 'picsum':
+                return <LoremPicsum />;
+              case 'link':
+                return (
+                  <Link
+                    dataSource={link}
+                    onChange={(url) => {
+                      onChange({ type, link: { url } });
+                    }}
+                  />
+                );
+              default:
+                return null;
+            }
+          })()}
         </ItemAccordion>
       </div>
     </div>

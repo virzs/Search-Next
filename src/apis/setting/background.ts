@@ -2,12 +2,11 @@
  * @Author: Vir
  * @Date: 2021-09-01 15:20:59
  * @Last Modified by: Vir
- * @Last Modified time: 2021-09-23 17:31:01
+ * @Last Modified time: 2022-06-15 17:39:16
  */
 
+import { SBDB } from '@/utils/db';
 import instance from '@/utils/request';
-
-import StorageDB from 'bsdb';
 
 export interface BingImgListType {
   images: BingImage[];
@@ -33,6 +32,15 @@ export interface BingImage {
   hs: any[];
 }
 
+export interface Color {
+  color?: string; // 当前颜色
+  common?: string[]; // 最近选过的颜色
+}
+
+export interface Link {
+  url: string;
+}
+
 export interface Tooltips {
   loading: string;
   previous: string;
@@ -46,13 +54,6 @@ export interface bingImgParamsType {
   hsh?: string;
 }
 
-const BaseDB = new StorageDB({
-  storage: localStorage,
-  database: 'database',
-});
-
-export const BackgroundDB = BaseDB.get('background');
-
 // 获取bing随机壁纸
 export const bingImg = (params?: bingImgParamsType) => {
   return instance.get('/v1/resource/bing/random', {
@@ -60,76 +61,81 @@ export const bingImg = (params?: bingImgParamsType) => {
   });
 };
 
+export interface UseBackgroundTypeColorData {
+  data?: Color;
+  history?: Color[];
+}
+
+export interface UseBackgroundTypeBingData {
+  data?: BingImage;
+  history?: BingImage[];
+}
+
+export interface UseBackgroundTypePicsumData {
+  data?: LoremPicsumImage;
+  history?: LoremPicsumImage[];
+}
+
+export interface UseBackgroundTypeBingEverydayData {
+  data?: BingImage;
+  history?: BingImage[];
+}
+
+export interface UseBackgroundTypeLinkData {
+  data?: Link;
+  history?: Link[];
+}
+
+export interface Datas {
+  color?: UseBackgroundTypeColorData;
+  bing?: UseBackgroundTypeBingData;
+  picsum?: UseBackgroundTypePicsumData;
+  bing_everyday?: UseBackgroundTypeBingEverydayData;
+  link?: UseBackgroundTypeLinkData;
+}
+
+export type BackgroundType = keyof Datas;
+
+export interface UseBackgroundData extends Datas {
+  type: BackgroundType;
+}
+
 // 获取最新壁纸/每日一图
 export const latestImg = () => {
   return instance.get('/v1/resource/bing/latest');
 };
 
-export interface SetBackgroundParams {
-  check: boolean; // 当前选中
-  userId?: string; // 用户id
-  url: string; // 背景url
-  bgId: string; //背景id
-  copyright: string; // 版权信息描述
-  copyrightlink: string; // 版权信息链接
-  hsh: string;
+export interface LoremPicsumParams {
+  page: number;
 }
 
+export interface LoremPicsumImage {
+  author: string;
+  download_url: string;
+  height: number;
+  id: string;
+  url: string;
+  width: number;
+}
+
+// 获取 Lorem Picsum 图片列表
+export const loremPicsumImg = (params: LoremPicsumParams) => {
+  return instance.get('https://picsum.photos/v2/list', {
+    params,
+  });
+};
+
 // 设置背景
-// 设置背景考虑到主页加载，保留基础信息
-// 每次选择完毕将当前用户选中的其他壁纸 check 状态设为 false
-// params为空时，当前用户所有历史选择的背景 check 均为 false
-export const setBackground = (userId: string, params?: SetBackgroundParams) => {
-  let inset;
-  if (params) {
-    params.userId = userId;
-    inset = BackgroundDB.inset(params);
+export const setBackgroundApi = (userId: string, data: UseBackgroundData) => {
+  const localData = SBDB.findOne({ userId });
+  if (localData) {
+    return SBDB.update({ userId }, data);
+  } else {
+    return SBDB.inset({ userId, ...data });
   }
-  let idQuery = params
-    ? {
-        _id: {
-          $ne: inset._id,
-        },
-      }
-    : {};
-  BackgroundDB.update(
-    {
-      userId: {
-        $eq: userId,
-      },
-      check: {
-        $eq: true,
-      },
-      ...idQuery,
-    },
-    { check: false },
-    { multi: true },
-  );
-  return inset;
 };
 
-// 获取当前用户使用的背景
-export const checkedBg = (userId?: string | null) => {
-  if (!userId) return null;
-  const res = BackgroundDB.findOne({
-    userId: {
-      $eq: userId,
-    },
-    check: {
-      $eq: true,
-    },
-  });
-
-  return res;
-};
-
-// 获取选中背景历史
-export const backgroundHistory = (userId: string) => {
-  const res = BackgroundDB.find({
-    userId: {
-      $eq: userId,
-    },
-  });
-
-  return res;
+// 获取背景
+export const getBackgroundApi = (userId: string) => {
+  return SBDB.findOne({ userId });
 };

@@ -5,19 +5,20 @@
  * @Last Modified time: 2021-10-22 15:27:36
  */
 
-import { latestImg } from '@/apis/setting/background';
-import { AuthBackground } from '@/data/account/interface';
 import { getScale } from '@/utils/common';
+import { cx } from '@emotion/css';
 import React from 'react';
+import { UsePreviewData } from '../background/hooks/preview';
 
 export interface ExampleProps {
-  data: AuthBackground;
+  data: UsePreviewData;
 }
 
 const Example: React.FC<ExampleProps> = ({ data }) => {
   const [scale, setScale] = React.useState<[number, number]>([0, 0]);
   const [height, setHeight] = React.useState<number>(0);
-  const [privateData, setPrivateData] = React.useState({} as AuthBackground);
+
+  const { css: localCss } = data ?? {};
 
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -29,16 +30,6 @@ const Example: React.FC<ExampleProps> = ({ data }) => {
     setHeight(h);
   }, []);
 
-  // 获取每日一图
-  const getEveryDay = () => {
-    latestImg().then((res) => {
-      setPrivateData({
-        type: data.type,
-        data: res.data[0],
-      });
-    });
-  };
-
   React.useEffect(() => {
     onResize();
     window.addEventListener('resize', onResize);
@@ -47,24 +38,16 @@ const Example: React.FC<ExampleProps> = ({ data }) => {
     };
   }, []);
 
-  React.useEffect(() => {
-    if (data.type === 'everyday') {
-      getEveryDay();
-    } else {
-      setPrivateData(data);
-    }
-  }, [data]);
-
   return (
     <div className="grid grid-cols-2 gap-8">
       <div
         ref={ref}
-        className="rounded border my-2 bg-cover bg-center flex flex-col items-center justify-center"
+        className={cx(
+          'rounded border my-2 bg-cover bg-center flex flex-col items-center justify-center',
+          localCss,
+        )}
         style={{
           height: `${height}px`,
-          background: privateData.data
-            ? `url(${privateData.data.url})`
-            : undefined,
         }}
       >
         <div className="rounded h-5 w-48 mb-6 flex justify-end overflow-hidden">

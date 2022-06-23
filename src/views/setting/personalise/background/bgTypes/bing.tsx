@@ -2,14 +2,13 @@
  * @Author: Vir
  * @Date: 2021-09-23 15:34:04
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-22 14:44:47
+ * @Last Modified time: 2022-06-20 17:34:55
  */
 
 import {
   BingImage,
   bingImg,
-  checkedBg,
-  setBackground,
+  UseBackgroundTypeBingData,
 } from '@/apis/setting/background';
 import { Replay } from '@mui/icons-material';
 import { Spin, Image } from 'antd';
@@ -23,27 +22,17 @@ import classNames from 'classnames';
 import { css } from '@emotion/css';
 
 export interface RandomProps {
-  data?: AuthBackgroundRandomData;
-  onChange?: (selected?: AuthBackgroundRandomData) => void;
+  dataSource?: UseBackgroundTypeBingData;
+  onChange?: (selected?: UseBackgroundTypeBingData['data']) => void;
 }
 
-const Random: React.FC<RandomProps> = ({ data, onChange }) => {
+const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
+  const { data, history = [] } = dataSource ?? {};
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
   const [loadings, setLoadings] = React.useState<boolean[]>([]); //图片加载数组
   const [checkHsh, setCheckHsh] = React.useState<string>(''); //选中图片的hsh值
   const [apiLoading, setApiLoading] = React.useState<boolean>(false);
   const demoList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-  const [init, setInit] = React.useState<boolean>(false);
-
-  const formatItem = (data: BingImage): AuthBackgroundRandomData => {
-    return {
-      id: data._id,
-      url: data.url,
-      hsh: data.hsh,
-      copyright: data.copyright,
-      copyrightlink: data.copyrightlink,
-    };
-  };
 
   const getList = () => {
     setApiLoading(true);
@@ -55,10 +44,10 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
       setApiLoading(false);
       const image = list[0];
       if (data) {
-        setCheckHsh(data.hsh);
+        setCheckHsh(data?._id);
       } else {
-        if (onChange) onChange(formatItem(image));
-        setCheckHsh(image.hsh);
+        if (onChange) onChange(image);
+        setCheckHsh(image._id);
       }
     });
   };
@@ -75,36 +64,18 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
     let hsh = '';
     if (check) {
       hsh = check.hsh;
+      setCheckHsh(check?._id);
     }
-    setCheckHsh(hsh);
     return hsh;
   };
 
   // 选择背景
-  const onCheckChange = (hsh: string) => {
-    setCheckHsh(hsh);
-    findImgToStroage(hsh);
-    const selected: any = imgList.find((i) => i.hsh === hsh);
+  const onCheckChange = (_id: string) => {
+    setCheckHsh(_id);
+    const selected: any =
+      imgList.find((i) => i._id === _id) || history.find((i) => i._id === _id);
     if (selected && onChange) {
-      onChange(formatItem(selected));
-    }
-  };
-
-  const findImgToStroage = (hsh: string) => {
-    // 解决初始化时每个card都触发onChange事件的问题
-    if (!init) return setInit(true);
-    const userId = localStorage.getItem('account');
-    const image = imgList.find((i) => i.hsh === hsh);
-    if (image && image.hsh === data?.hsh) return;
-    if (image && userId) {
-      setBackground(userId, {
-        check: true,
-        url: image.url,
-        bgId: image._id,
-        hsh: image.hsh,
-        copyright: image.copyright,
-        copyrightlink: image.copyrightlink,
-      });
+      onChange(selected);
     }
   };
 
@@ -130,9 +101,50 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
           </Tooltip>
         }
       />
+      {history.length > 0 && (
+        <>
+          <ItemHeader title="最近使用的背景" />
+          <div
+            className={classNames(
+              'justify-center flex flex-wrap mt-4 mb-4 gap-3',
+              css`
+                .ant-image {
+                  display: block;
+                }
+              `,
+            )}
+          >
+            {history.map((i, j) => (
+              <OutlineCard
+                key={i._id}
+                id={i._id}
+                value={checkHsh}
+                label={dayjs(i.enddate).format('YYYY/MM/DD')}
+                onChange={(val) => onCheckChange(val)}
+                tip={i.copyright}
+              >
+                <Spin
+                  spinning={loadings[j]}
+                  indicator={<CircularProgress size={18} color="inherit" />}
+                >
+                  <Image
+                    className="w-32 h-20 block"
+                    onLoad={() => imgLoad(j)}
+                    preview={false}
+                    placeholder
+                    src={i.url}
+                    alt={i.copyright}
+                  />
+                </Spin>
+              </OutlineCard>
+            ))}
+          </div>
+        </>
+      )}
+      <ItemHeader title="可选背景" />
       <div
         className={classNames(
-          'p-4 justify-center flex flex-wrap mt-2 mb-4 gap-3',
+          'justify-center flex flex-wrap mt-4 mb-4 gap-3',
           css`
             .ant-image {
               display: block;
@@ -146,8 +158,8 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
             ))
           : imgList.map((i, j) => (
               <OutlineCard
-                key={i.hsh}
-                id={i.hsh}
+                key={i._id}
+                id={i._id}
                 value={checkHsh}
                 label={dayjs(i.enddate).format('YYYY/MM/DD')}
                 onChange={(val) => onCheckChange(val)}
@@ -173,4 +185,4 @@ const Random: React.FC<RandomProps> = ({ data, onChange }) => {
   );
 };
 
-export default Random;
+export default Bing;
