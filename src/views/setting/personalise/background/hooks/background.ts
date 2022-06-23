@@ -2,12 +2,13 @@
  * @Author: Vir
  * @Date: 2022-06-09 11:08:34
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-15 17:43:07
+ * @Last Modified time: 2022-06-20 17:19:37
  */
 
 import {
   BackgroundType,
   getBackgroundApi,
+  latestImg,
   setBackgroundApi,
   UseBackgroundData,
   UseBackgroundTypeBingData,
@@ -16,6 +17,7 @@ import {
   UseBackgroundTypeLinkData,
   UseBackgroundTypePicsumData,
 } from '@/apis/setting/background';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
 // ! onChange 修改时不需要传每个类型得 history 参数
@@ -45,22 +47,30 @@ const useBackground = (): UseBackgroundResult => {
     useState<UseBackgroundTypeBingEverydayData>();
   const [link, setLink] = useState<UseBackgroundTypeLinkData>();
 
-  const updateData = <T, K>(value: T, data: K) => {
+  const updateData = (
+    value: any,
+    data: any,
+    hasHistory: boolean = true,
+    customMatch?: (item: any, value: any) => boolean,
+  ) => {
     if (!value) return data ?? {};
     const { data: oldData, history = [] } = data ?? ({} as any);
-    const inHistory = history.find((item: any) => item.id === value.id);
-    const newHistory = inHistory
-      ? [...history.filter((item: any) => item.id !== value.id), oldData]
-      : [...history, oldData];
+    const inHistory = history.find((item: any) =>
+      customMatch ? customMatch(item, value) : item._id === value._id,
+    );
+
+    const newHistory = !!inHistory ? history : [...history, value];
     const newData = {
       data: value,
-      history: newHistory.filter((i: any) => i !== undefined).slice(-5),
+      history: hasHistory
+        ? newHistory.filter((i: any) => i !== undefined).slice(-5)
+        : [],
     };
-    console.log(newData);
-    return newData;
+    return JSON.parse(JSON.stringify(newData));
   };
 
   const onChange = (data: UseBackgroundActionOnChangeParams) => {
+    if (!init) return;
     const _type = data.type || type;
     let _value;
     let _data;
@@ -82,14 +92,28 @@ const useBackground = (): UseBackgroundResult => {
         setPicsum(updateData(_value, _data));
         break;
       case 'bing_everyday':
-        _value = data.bing_everyday;
-        _data = bing_everyday;
-        setBingEveryday(updateData(_value, _data));
+        const latestData = data.bing_everyday;
+        const over = latestData
+          ? dayjs().format('YYYYMMDD') !== latestData.enddate
+          : true;
+        if (over) {
+          latestImg().then((res) => {
+            if (res.data[0]) {
+              _value = res.data[0];
+              _data = bing_everyday;
+              setBingEveryday(updateData(_value, _data, false));
+            }
+          });
+        } else {
+          _value = data.bing_everyday;
+          _data = bing_everyday;
+          setBingEveryday(updateData(_value, _data, false));
+        }
         break;
       case 'link':
         _value = data.link;
         _data = link;
-        setLink(updateData(_value, _data));
+        setLink(updateData(_value, _data, true, (i, v) => i.url === v.url));
         break;
     }
   };
@@ -108,6 +132,7 @@ const useBackground = (): UseBackgroundResult => {
 
   useEffect(() => {
     if (init) return;
+    setInit(true);
     const localData = getBackgroundApi(userId ?? '');
     if (localData) {
       setType(localData.type);
@@ -116,7 +141,14 @@ const useBackground = (): UseBackgroundResult => {
       setPicsum(localData.picsum);
       setBingEveryday(localData.bing_everyday);
       setLink(localData.link);
-      setInit(true);
+      onChange({
+        type: localData.type,
+        color: localData.color?.data,
+        bing: localData.bing?.data,
+        picsum: localData.picsum?.data,
+        bing_everyday: localData.bing_everyday?.data,
+        link: localData.link?.data,
+      });
     }
   }, []);
 

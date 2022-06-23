@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 11:39:25
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-15 17:46:43
+ * @Last Modified time: 2022-06-20 17:35:44
  */
 
 import Select from '@/components/md-custom/form/select';
@@ -16,6 +16,7 @@ import BingEveryDay from './bgTypes/bingEveryDay';
 import Color from './bgTypes/color';
 import { BackgroundType } from '@/apis/setting/background';
 import useBackground from './hooks/background';
+import { usePreview } from './hooks/preview';
 
 export interface BgOptions {
   label: string;
@@ -37,12 +38,12 @@ const Background: React.FC = () => {
       canSelect: true,
       autoExpaneded: true,
     },
-    {
-      label: 'Lorem Picsum',
-      value: 'picsum',
-      canSelect: true,
-      autoExpaneded: true,
-    },
+    // {
+    //   label: 'Lorem Picsum',
+    //   value: 'picsum',
+    //   canSelect: true,
+    //   autoExpaneded: true,
+    // },
     {
       label: '每日一图',
       value: 'bing_everyday',
@@ -56,14 +57,20 @@ const Background: React.FC = () => {
   const { type, color, bing, picsum, bing_everyday, link } = data;
   const { onChange } = action;
 
+  const [preData, { refresh }] = usePreview();
+
   useEffect(() => {
     const opt = bgOptions.find((item) => item.value === type);
     opt?.autoExpaneded && setExpanded(true);
   }, [type]);
 
+  useEffect(() => {
+    refresh();
+  }, [data]);
+
   return (
     <div>
-      <Example data={{}} />
+      <Example data={preData} />
       <div className="flex gap-2 flex-col">
         <ItemAccordion
           expanded={expanded}
@@ -99,11 +106,18 @@ const Background: React.FC = () => {
                   />
                 );
               case 'bing_everyday':
-                return <BingEveryDay data={{}} />;
+                return <BingEveryDay dataSource={bing_everyday} />;
               case 'picsum':
                 return <LoremPicsum />;
               case 'link':
-                return <Link data={{}} onChange={(url) => {}} />;
+                return (
+                  <Link
+                    dataSource={link}
+                    onChange={(url) => {
+                      onChange({ type, link: { url } });
+                    }}
+                  />
+                );
               default:
                 return null;
             }

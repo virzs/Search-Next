@@ -2,33 +2,34 @@
  * @Author: Vir
  * @Date: 2021-09-26 17:39:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-15 13:59:04
+ * @Last Modified time: 2022-06-20 17:27:54
  */
 
-import { AuthBackgroundRandomData } from '@/data/account/interface';
 import { css } from '@emotion/css';
 import { Alert } from '@mui/material';
 import classNames from 'classnames';
 import { Image } from 'antd';
-import React from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { UseBackgroundTypeBingEverydayData } from '@/apis/setting/background';
+import ItemHeader from '@/components/layout/menu-layout/itemHeader';
 
 export interface EveryDayProps {
-  data: AuthBackgroundRandomData;
+  dataSource?: UseBackgroundTypeBingEverydayData;
 }
 
-const BingEveryDay: React.FC<EveryDayProps> = ({ data }) => {
-  const [url, setUrl] = React.useState<string>('');
+const BingEveryDay: FC<EveryDayProps> = ({ dataSource }) => {
+  const [data, setData] = useState<UseBackgroundTypeBingEverydayData['data']>();
 
-  React.useEffect(() => {
-    if (data && data?.url) {
-      setUrl(data?.url);
+  useEffect(() => {
+    if (dataSource && dataSource?.data) {
+      setData(dataSource?.data);
     }
-  }, [data]);
+  }, [dataSource]);
 
   return (
     <div>
       <Alert severity="info">每天更新背景，来源：必应壁纸</Alert>
-      {url && (
+      {data?.url && (
         <div
           className={classNames(
             'm-2 rounded overflow-hidden',
@@ -39,7 +40,12 @@ const BingEveryDay: React.FC<EveryDayProps> = ({ data }) => {
             `,
           )}
         >
-          <Image src={url} />
+          <ItemHeader
+            title={data?.title}
+            desc={data?.copyright}
+            descLink={data?.copyrightlink}
+          />
+          <Image src={data?.url} preview={false} alt={data?.copyright} />
         </div>
       )}
     </div>

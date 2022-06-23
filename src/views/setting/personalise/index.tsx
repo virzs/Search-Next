@@ -6,34 +6,30 @@
  */
 
 import { Router } from '@/config/router';
-import { AuthBackground, AuthData } from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 
 import { PageProps } from '@/typings';
 import React from 'react';
-import { getAccount } from '../auth/utils/acount';
 import Example from './components/example';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { usePreview } from './background/hooks/preview';
 
 const Personalise: React.FC<PageProps> = (props) => {
   const { route } = props;
   const history = useNavigate();
   const location = useLocation();
   const [list, setList] = React.useState<Router[]>([]);
-  const [userBgSetting, setUserBgSetting] = React.useState<AuthBackground>(
-    {} as AuthBackground,
-  ); // 当前账户的背景设置数据
+
+  const [preData] = usePreview();
 
   React.useEffect(() => {
-    const data: AuthData = getAccount();
-    setUserBgSetting(data.background);
     setList(route?.routes || []);
   }, []);
 
   return (
     <div {...props}>
-      <Example data={userBgSetting} />
+      <Example data={preData} />
       <ContentList>
         {list.map((i) => (
           <ItemCard

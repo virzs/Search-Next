@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-23 15:34:04
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-15 17:41:16
+ * @Last Modified time: 2022-06-20 17:34:55
  */
 
 import {
@@ -23,7 +23,7 @@ import { css } from '@emotion/css';
 
 export interface RandomProps {
   dataSource?: UseBackgroundTypeBingData;
-  onChange?: (selected?: AuthBackgroundRandomData) => void;
+  onChange?: (selected?: UseBackgroundTypeBingData['data']) => void;
 }
 
 const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
@@ -33,16 +33,6 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
   const [checkHsh, setCheckHsh] = React.useState<string>(''); //选中图片的hsh值
   const [apiLoading, setApiLoading] = React.useState<boolean>(false);
   const demoList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-
-  const formatItem = (data: BingImage): AuthBackgroundRandomData => {
-    return {
-      id: data._id,
-      url: data.url,
-      hsh: data.hsh,
-      copyright: data.copyright,
-      copyrightlink: data.copyrightlink,
-    };
-  };
 
   const getList = () => {
     setApiLoading(true);
@@ -54,10 +44,10 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
       setApiLoading(false);
       const image = list[0];
       if (data) {
-        setCheckHsh(data?.hsh);
+        setCheckHsh(data?._id);
       } else {
-        if (onChange) onChange(formatItem(image));
-        setCheckHsh(image.hsh);
+        if (onChange) onChange(image);
+        setCheckHsh(image._id);
       }
     });
   };
@@ -74,17 +64,18 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
     let hsh = '';
     if (check) {
       hsh = check.hsh;
+      setCheckHsh(check?._id);
     }
-    setCheckHsh(hsh);
     return hsh;
   };
 
   // 选择背景
-  const onCheckChange = (hsh: string) => {
-    setCheckHsh(hsh);
-    const selected: any = imgList.find((i) => i.hsh === hsh);
+  const onCheckChange = (_id: string) => {
+    setCheckHsh(_id);
+    const selected: any =
+      imgList.find((i) => i._id === _id) || history.find((i) => i._id === _id);
     if (selected && onChange) {
-      onChange(formatItem(selected));
+      onChange(selected);
     }
   };
 
@@ -110,7 +101,6 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
           </Tooltip>
         }
       />
-      {console.log(history.length)}
       {history.length > 0 && (
         <>
           <ItemHeader title="最近使用的背景" />
@@ -126,8 +116,8 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
           >
             {history.map((i, j) => (
               <OutlineCard
-                key={i.hsh}
-                id={i.hsh}
+                key={i._id}
+                id={i._id}
                 value={checkHsh}
                 label={dayjs(i.enddate).format('YYYY/MM/DD')}
                 onChange={(val) => onCheckChange(val)}
@@ -168,8 +158,8 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
             ))
           : imgList.map((i, j) => (
               <OutlineCard
-                key={i.hsh}
-                id={i.hsh}
+                key={i._id}
+                id={i._id}
                 value={checkHsh}
                 label={dayjs(i.enddate).format('YYYY/MM/DD')}
                 onChange={(val) => onCheckChange(val)}
