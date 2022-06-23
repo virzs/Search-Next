@@ -1,9 +1,9 @@
 export interface Windows11Color {
-  id: string;
-  name: string;
-  mainColor: string;
-  subColor: string;
-  thirdColor: string;
+  id?: string;
+  name?: string;
+  mainColor?: string;
+  subColor?: string;
+  thirdColor?: string;
 }
 
 const windows11Colors: Windows11Color[] = [
