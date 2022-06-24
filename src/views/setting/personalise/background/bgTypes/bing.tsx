@@ -29,6 +29,7 @@ export interface RandomProps {
 const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
   const { data, history = [] } = dataSource ?? {};
   const [imgList, setImgList] = React.useState([] as BingImage[]); //图片列表
+  const [hisLoadings, setHisLoadings] = React.useState<boolean[]>([]); //图片加载数组
   const [loadings, setLoadings] = React.useState<boolean[]>([]); //图片加载数组
   const [checkHsh, setCheckHsh] = React.useState<string>(''); //选中图片的hsh值
   const [apiLoading, setApiLoading] = React.useState<boolean>(false);
@@ -53,7 +54,13 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
   };
 
   // 图片加载状态
-  const imgLoad = (index: number) => {
+  const imgLoad = (index: number, isHistory?: boolean) => {
+    if (isHistory) {
+      let historyLoadings = hisLoadings;
+      historyLoadings[index] = false;
+      setHisLoadings(historyLoadings.map((i) => i));
+      return;
+    }
     let imgLoadings = loadings;
     imgLoadings[index] = false;
     setLoadings(imgLoadings.map((i) => i));
@@ -124,12 +131,12 @@ const Bing: React.FC<RandomProps> = ({ dataSource, onChange }) => {
                 tip={i.copyright}
               >
                 <Spin
-                  spinning={loadings[j]}
+                  spinning={hisLoadings[j]}
                   indicator={<CircularProgress size={18} color="inherit" />}
                 >
                   <Image
                     className="w-32 h-20 block"
-                    onLoad={() => imgLoad(j)}
+                    onLoad={() => imgLoad(j, true)}
                     preview={false}
                     placeholder
                     src={i.url}
