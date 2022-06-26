@@ -1,3 +1,28 @@
+### [0.13.3](https://github.com/virzs/Search-Next/compare/v0.13.2...v0.13.3) (2022-06-26)
+
+
+### 📝 Documentation | 文档
+
+* **readme:** :memo: 修改链接 ([3ad2466](https://github.com/lpreterite/datagent/commit/3ad2466c88d10a753515f1282025e283d1ab57b2))
+
+
+### ♻ Code Refactoring | 代码重构
+
+* **背景:** :recycle: 重写背景设置，支持保存历史 ([a964fb9](https://github.com/lpreterite/datagent/commit/a964fb9097228aa7266ae7bbe770515500022e13))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **背景:** :bug: 修复背景设置为必应壁纸时预览加载问题 ([9b27262](https://github.com/lpreterite/datagent/commit/9b272627895ab8a4066b764f57e0b0f3c2d7083f))
+* **build:** :bug: fix build error ([c198a4d](https://github.com/lpreterite/datagent/commit/c198a4d6c2f50defcde531a90451ead1fa08b811))
+
+
+### 📦 Chores | 其他更新
+
+* **背景:** :construction: 优化背景设置代码 ([ecee38d](https://github.com/lpreterite/datagent/commit/ecee38d93aa8a983ce832d936e8f7cb62136d9c5))
+* **背景:** :necktie: 背景设置支持 picsum 壁纸 ([56092c7](https://github.com/lpreterite/datagent/commit/56092c7e715edecbe2b3556650f252c19247ad52))
+* **组件:** :sparkles: outlineCard 支持设置 label 宽度 ([0d97f12](https://github.com/lpreterite/datagent/commit/0d97f126bc1639ddbb84a1f696744d83ccc794b3))
+
 ### [0.13.2](https://github.com/virzs/Search-Next/compare/v0.13.1...v0.13.2) (2022-06-20)
 
 
