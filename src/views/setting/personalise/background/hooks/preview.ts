@@ -88,6 +88,14 @@ export const usePreview = (): UsePreviewResult => {
         break;
       case 'picsum':
         setIsImage(true);
+        const w = document.body.offsetWidth;
+        const h = document.body.offsetHeight;
+        const id = data.picsum?.id;
+        const url = `https://picsum.photos/id/${id}/${w.toFixed()}/${h.toFixed()}`;
+        _css = css`
+          background-image: url(${url});
+        `;
+        setUrl(url);
         break;
       case 'link':
         const linkUrl = data.link?.url;

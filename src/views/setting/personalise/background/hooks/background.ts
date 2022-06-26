@@ -89,7 +89,7 @@ const useBackground = (): UseBackgroundResult => {
       case 'picsum':
         _value = data.picsum;
         _data = picsum;
-        setPicsum(updateData(_value, _data));
+        setPicsum(updateData(_value, _data, true, (i, v) => i.id === v.id));
         break;
       case 'bing_everyday':
         const latestData = data.bing_everyday;

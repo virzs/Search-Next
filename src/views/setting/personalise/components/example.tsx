@@ -6,19 +6,22 @@
  */
 
 import { getScale } from '@/utils/common';
-import { cx } from '@emotion/css';
-import React from 'react';
+import { css, cx } from '@emotion/css';
+import React, { useEffect, useState } from 'react';
 import { UsePreviewData } from '../background/hooks/preview';
 
 export interface ExampleProps {
   data: UsePreviewData;
 }
 
-const Example: React.FC<ExampleProps> = ({ data }) => {
+const Example: React.FC<ExampleProps> = ({ data: dataSource }) => {
   const [scale, setScale] = React.useState<[number, number]>([0, 0]);
+  const [width, setWidth] = useState(0);
   const [height, setHeight] = React.useState<number>(0);
 
-  const { css: localCss } = data ?? {};
+  const [privCss, setPrivCss] = useState('');
+
+  const { css: localCss, type } = dataSource ?? {};
 
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -27,6 +30,7 @@ const Example: React.FC<ExampleProps> = ({ data }) => {
     const width = ref.current ? ref.current.clientWidth : 384;
     const h = (width / scale[0]) * scale[1];
     setScale(scale);
+    setWidth(width);
     setHeight(h);
   }, []);
 
@@ -38,13 +42,28 @@ const Example: React.FC<ExampleProps> = ({ data }) => {
     };
   }, []);
 
+  useEffect(() => {
+    // 这个格式的可以根据宽高优化图像，所以这里这样写
+    if (type === 'picsum') {
+      const id = dataSource?.picsum?.data?.id;
+      if (id) {
+        const privateCss = css`
+          background-image: url(https://picsum.photos/id/${id}/${width.toFixed()}/${height.toFixed()});
+        `;
+        setPrivCss(privateCss);
+      }
+    } else {
+      privCss !== '' && setPrivCss('');
+    }
+  }, [dataSource, width, height]);
+
   return (
     <div className="grid grid-cols-2 gap-8">
       <div
         ref={ref}
         className={cx(
           'rounded border my-2 bg-cover bg-center flex flex-col items-center justify-center',
-          localCss,
+          privCss === '' ? localCss : privCss,
         )}
         style={{
           height: `${height}px`,

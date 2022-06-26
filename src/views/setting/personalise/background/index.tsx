@@ -38,12 +38,12 @@ const Background: React.FC = () => {
       canSelect: true,
       autoExpaneded: true,
     },
-    // {
-    //   label: 'Lorem Picsum',
-    //   value: 'picsum',
-    //   canSelect: true,
-    //   autoExpaneded: true,
-    // },
+    {
+      label: 'Lorem Picsum',
+      value: 'picsum',
+      canSelect: true,
+      autoExpaneded: true,
+    },
     {
       label: '每日一图',
       value: 'bing_everyday',
@@ -108,7 +108,14 @@ const Background: React.FC = () => {
               case 'bing_everyday':
                 return <BingEveryDay dataSource={bing_everyday} />;
               case 'picsum':
-                return <LoremPicsum />;
+                return (
+                  <LoremPicsum
+                    dataSource={picsum}
+                    onChange={(data) => {
+                      onChange({ type, picsum: data });
+                    }}
+                  />
+                );
               case 'link':
                 return (
                   <Link
