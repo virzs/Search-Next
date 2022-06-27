@@ -16,7 +16,7 @@ export interface MarkdownProps {
 }
 
 const markdownStyleCustom = css`
-  background-color: transparent;
+  background-color: transparent !important;
   ul {
     list-style: disc;
   }
