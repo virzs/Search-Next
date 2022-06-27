@@ -175,13 +175,15 @@ const LoremPicsum: FC<LoremPicsumProps> = (props) => {
       <div className="flex justify-center">
         <ButtonGroup variant="outlined" aria-label="outlined button group">
           <Button
-            disabled={current === 1}
+            disabled={current === 1 || loading}
             onClick={() => setCurrent(current - 1)}
           >
             上一页
           </Button>
           <Button
-            disabled={imageList.length === 0 || imageList.length < 30}
+            disabled={
+              imageList.length === 0 || imageList.length < 30 || loading
+            }
             onClick={() => setCurrent(current + 1)}
           >
             下一页
