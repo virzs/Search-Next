@@ -1338,11 +1338,22 @@ const allWebsites: Website[] = [
     id: '8b27f72c42024597bd4bff78fb9dd27e',
     name: 'CSS GG',
     url: 'https://css.gg/',
-    intro: 'Open-source CSS, SVG and Figma UI Icons Available in SVG Sprite, styled-components, NPM & API',
+    intro:
+      'Open-source CSS, SVG and Figma UI Icons Available in SVG Sprite, styled-components, NPM & API',
     icon: 'cssgg',
     color: '#571ed4',
     classify: ['design', 'icons'],
     createTime: '2020-06-20',
+  },
+  {
+    id: 'be74563a62284e8cb72b9c7be77cf5f4',
+    name: 'Rufus',
+    url: 'https://rufus.ie/',
+    intro: '轻松创建USB启动盘',
+    icon: 'rufus',
+    color: '#404554',
+    classify: ['tools', 'software'],
+    createTime: '2020-06-27',
   },
 ];
 
