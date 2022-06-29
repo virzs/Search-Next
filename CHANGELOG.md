@@ -1,3 +1,10 @@
+### [0.13.5](https://github.com/virzs/Search-Next/compare/v0.13.4...v0.13.5) (2022-06-29)
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **设置:** :bug: 修复设置页面包屑文字渲染 ([755a8f8](https://github.com/lpreterite/datagent/commit/755a8f820da1c724536a589b278042806f7fdf64))
+
 ### [0.13.4](https://github.com/virzs/Search-Next/compare/v0.13.3...v0.13.4) (2022-06-29)
 
 
