@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-18 15:41:42
  * @Last Modified by: Vir
- * @Last Modified time: 2022-02-02 17:43:21
+ * @Last Modified time: 2022-06-29 17:27:38
  */
 
 import { CardActionArea, CardContent } from '@mui/material';
@@ -40,7 +40,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
     >
       <div className="flex">
         <div className="flex-grow flex items-center justify-start">
-          {icon && <div className="mr-1">{icon}</div>}
+          {icon && <div className="mr-2">{icon}</div>}
           <div>
             <p className="text-sm mb-0">{title}</p>
             {desc && <p className="text-xs mb-0 text-gray-700">{desc}</p>}

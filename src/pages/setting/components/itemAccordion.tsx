@@ -2,21 +2,18 @@
  * @Author: Vir
  * @Date: 2021-09-21 10:50:18
  * @Last Modified by: Vir
- * @Last Modified time: 2021-10-26 15:38:08
+ * @Last Modified time: 2022-06-29 17:37:28
  */
 
-import { css } from '@emotion/css';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-} from '@mui/material';
+import { css, cx } from '@emotion/css';
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import React from 'react';
 
 export interface ItemAccordionProps {
+  icon?: any;
   title?: string;
   desc?: string;
   action?: React.ReactNode;
@@ -84,6 +81,7 @@ export const AccordionDetailText: React.FC<AccordionDetailTextProps> = ({
 };
 
 const ItemAccordion: React.FC<ItemAccordionProps> = ({
+  icon,
   title,
   desc,
   action,
@@ -110,9 +108,16 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
         expandIcon={<ExpandMore />}
       >
         <div className="flex items-center justify-between w-full mr-2">
-          <div>
-            {title && <p className="mb-0 text-sm">{title}</p>}
-            {desc && <p className="mb-0 text-xs text-gray-700">{desc}</p>}
+          <div className="flex-grow flex items-center justify-start">
+            {icon && <div className="mr-2">{icon}</div>}
+            <div>
+              {title && (
+                <p className={cx('mb-0 text-sm', desc && 'font-bold')}>
+                  {title}
+                </p>
+              )}
+              {desc && <p className="mb-0 text-xs text-gray-700">{desc}</p>}
+            </div>
           </div>
           <div className="flex items-center">{action}</div>
         </div>
