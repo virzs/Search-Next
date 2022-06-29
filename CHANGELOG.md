@@ -1,3 +1,27 @@
+### [0.13.4](https://github.com/virzs/Search-Next/compare/v0.13.3...v0.13.4) (2022-06-29)
+
+
+### 📦 Chores | 其他更新
+
+* **背景:** :children_crossing: 优化背景使用体验 ([efa6e56](https://github.com/lpreterite/datagent/commit/efa6e56022ecada8dc124b4b8aff60048602b9ed))
+* **导航:** :card_file_box: 增加导航数据 ([14fa51a](https://github.com/lpreterite/datagent/commit/14fa51aed2aefacd211c1c4815335ad5c9b2fba4))
+
+
+### 💄 Styles | 风格
+
+* **背景:** :lipstick: 优化背景列表样式 ([2490b3d](https://github.com/lpreterite/datagent/commit/2490b3d40505098700656f966ec8e9c281748f51))
+
+
+### ♻ Code Refactoring | 代码重构
+
+* **默认数据:** :coffin: 账户默认数据删除背景相关 ([1d5873f](https://github.com/lpreterite/datagent/commit/1d5873fb3fc7676de55e57f19a320ca808b2d9ae))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **更新信息弹窗:** :bug: 修复更新信息背景样式问题 ([f27b481](https://github.com/lpreterite/datagent/commit/f27b481e6a4e1ca6e71c12a18d8342287ccc7d41))
+* **设置:** :bug: 修复设置页面包屑某些情况下渲染错误 ([d4b5967](https://github.com/lpreterite/datagent/commit/d4b596707082100791b96a0e950c113493a8e74c))
+
 ### [0.13.3](https://github.com/virzs/Search-Next/compare/v0.13.2...v0.13.3) (2022-06-26)
 
 

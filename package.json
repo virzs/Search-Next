@@ -1,6 +1,6 @@
 {
   "name": "search-vite",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "scripts": {
     "dev": "vite",
     "dev--force": "vite --force",
