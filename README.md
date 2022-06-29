@@ -9,6 +9,7 @@ Search项目的React版本，相较于原项目从原生js更改为React，引�
 ## 在线地址
 
 - [master.search.virs.xyz (稳定版)](https://master.search.virs.xyz)
+- [beta.search.virs.xyz (预览版)](https://beta.search.virs.xyz)
 - [dev.search.virs.xyz (开发版)](https://dev.search.virs.xyz)
 
 ## 截图（21/11/2）
