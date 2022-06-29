@@ -35,7 +35,16 @@ QQ群：859791575
 
 - master 正式分支
 - dev 开发分支
+- beta 预览分支
 - feature-* 单个功能开发分支，功能开发结束后转到 dev 分支
+
+### 开发流程
+
+标准流程
+
+`feature-*` -> `dev` -> `beta` -> `master`
+
+实际流程可能会直接跳过 `beta` 分支，例如 bug fix
 
 ## 启动项目
 
