@@ -14,7 +14,6 @@ export const authDefaultData: AuthData = {
   avatar: '',
   type: 'local',
   language: 'zh-CN',
-  background: { type: 'color' },
   logo: {
     show: true,
     type: 'clock',

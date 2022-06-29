@@ -109,6 +109,7 @@ const LoremPicsum: FC<LoremPicsumProps> = (props) => {
           >
             {history.map((i, j) => (
               <OutlineCard
+                labelWidth={128}
                 key={i.id}
                 id={i.id}
                 value={checked}
@@ -137,7 +138,7 @@ const LoremPicsum: FC<LoremPicsumProps> = (props) => {
       <Loading loading={loading}>
         <div
           className={cx(
-            'p-4 grid grid-cols-5 mt-2 mb-4 gap-3',
+            'justify-center flex flex-wrap mt-4 mb-4 gap-3',
             css`
               .ant-image {
                 display: block;
@@ -147,8 +148,7 @@ const LoremPicsum: FC<LoremPicsumProps> = (props) => {
         >
           {imageList.map((item, index) => (
             <OutlineCard
-              fullWidth
-              labelWidth={140}
+              labelWidth={128}
               key={item.id}
               id={item.id}
               value={checked}
@@ -160,7 +160,7 @@ const LoremPicsum: FC<LoremPicsumProps> = (props) => {
                 indicator={<CircularProgress size={18} color="inherit" />}
               >
                 <AImage
-                  className="w-full h-20 block"
+                  className="w-32 h-20 block"
                   onLoad={() => imgLoad(index)}
                   preview={false}
                   placeholder
@@ -175,13 +175,15 @@ const LoremPicsum: FC<LoremPicsumProps> = (props) => {
       <div className="flex justify-center">
         <ButtonGroup variant="outlined" aria-label="outlined button group">
           <Button
-            disabled={current === 1}
+            disabled={current === 1 || loading}
             onClick={() => setCurrent(current - 1)}
           >
             上一页
           </Button>
           <Button
-            disabled={imageList.length === 0 || imageList.length < 30}
+            disabled={
+              imageList.length === 0 || imageList.length < 30 || loading
+            }
             onClick={() => setCurrent(current + 1)}
           >
             下一页

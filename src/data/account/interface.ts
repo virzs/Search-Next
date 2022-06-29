@@ -15,34 +15,6 @@ export type AuthType = 'local' | 'cloud';
 // 语言
 export type LanguageType = 'zh-CN' | 'en-US';
 
-// 背景类型
-export type BackgroundType =
-  | 'color'
-  | 'bing'
-  | 'bing_everyday'
-  | 'link'
-  | 'picsum';
-
-// 随机背景数据
-export interface AuthBackgroundRandomData {
-  url: string;
-  id: string;
-  hsh: string;
-  copyright: string;
-  copyrightlink: string;
-}
-
-// 在线图片背景数据
-export interface AuthBackgroundLinkData {
-  url: string;
-}
-
-// 背景数据
-export interface AuthBackground {
-  type: BackgroundType; // 背景类型
-  data?: AuthBackgroundRandomData | AuthBackgroundLinkData; // 背景数据
-}
-
 // 时钟类型设置
 export interface ClockLogo {
   type: ClockLogoType;
@@ -125,7 +97,6 @@ export interface AuthData {
   createdTime?: string;
   updatedTime?: string;
   language: LanguageType; // 账户所选语言
-  background: AuthBackground; // 背景
   logo?: AuthLogo;
   navigation: Navigation;
   message: Message;

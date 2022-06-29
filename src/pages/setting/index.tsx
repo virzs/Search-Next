@@ -46,10 +46,9 @@ const SettingPage: React.FC<SettingPageProps> = ({
           Object.values(params)
             .filter((u) => u !== '')
             .join('/');
-        if (
-          loc.pathname.indexOf(i.path) !== -1 ||
-          loc.pathname === paramsPath
-        ) {
+        // ! 修复路由参数匹配异常 20220629
+        const locPathNameArr = loc.pathname.split('/');
+        if (locPathNameArr.includes(i.path) || loc.pathname === paramsPath) {
           breadCrumbs.push(i);
         }
         if (i.routes) {
@@ -145,6 +144,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
             >
               <div className="flex items-center gap-1">
                 {i.title}
+                {i.path}
                 {i?.status === 'process' && (
                   <Chip
                     color="warning"

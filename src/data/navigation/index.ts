@@ -8,6 +8,16 @@ const navigationData: Classify[] = [
     level: 1,
     children: [
       {
+        id: "be74563a62284e8cb72b9c7be77cf5f4",
+        name: "Rufus",
+        url: "https://rufus.ie/",
+        intro: "轻松创建USB启动盘",
+        icon: "rufus",
+        color: "#404554",
+        classify: ["tools", "software"],
+        createTime: "2020-06-27",
+      },
+      {
         id: "8b27f72c42024597bd4bff78fb9dd27e",
         name: "CSS GG",
         url: "https://css.gg/",
@@ -964,6 +974,16 @@ const navigationData: Classify[] = [
             icon: "thief",
             color: "#222529",
             classify: ["tools", "software"],
+          },
+          {
+            id: "be74563a62284e8cb72b9c7be77cf5f4",
+            name: "Rufus",
+            url: "https://rufus.ie/",
+            intro: "轻松创建USB启动盘",
+            icon: "rufus",
+            color: "#404554",
+            classify: ["tools", "software"],
+            createTime: "2020-06-27",
           },
         ],
       },
