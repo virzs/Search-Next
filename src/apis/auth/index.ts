@@ -6,12 +6,7 @@
  */
 
 import { authDefaultData } from '@/data/account/default';
-import {
-  AuthBackground,
-  AuthData,
-  AuthLogo,
-  Navigation,
-} from '@/data/account/interface';
+import { AuthData, AuthLogo, Navigation } from '@/data/account/interface';
 import StorageDB from 'bsdb';
 
 const BaseDB = new StorageDB({
@@ -55,10 +50,7 @@ export const delAccount = (id: string): any => {
 };
 
 // 修改账户
-export const editAccount = (
-  id: string,
-  query: { username?: string; background?: AuthBackground },
-) => {
+export const editAccount = (id: string, query: { username?: string }) => {
   return AuthDB.update(id, query);
 };
 
