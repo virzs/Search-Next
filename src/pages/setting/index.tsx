@@ -144,7 +144,6 @@ const SettingPage: React.FC<SettingPageProps> = ({
             >
               <div className="flex items-center gap-1">
                 {i.title}
-                {i.path}
                 {i?.status === 'process' && (
                   <Chip
                     color="warning"
