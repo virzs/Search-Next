@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-21 10:50:18
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-29 17:37:28
+ * @Last Modified time: 2022-06-30 11:53:39
  */
 
 import { css, cx } from '@emotion/css';
@@ -18,6 +18,7 @@ export interface ItemAccordionProps {
   desc?: string;
   action?: React.ReactNode;
   expanded?: boolean;
+  defaultExpanded?: boolean;
   onChange?:
     | ((event: React.SyntheticEvent<Element, Event>, expanded: boolean) => void)
     | undefined;
@@ -86,12 +87,14 @@ const ItemAccordion: React.FC<ItemAccordionProps> = ({
   desc,
   action,
   expanded,
+  defaultExpanded,
   onChange,
   children,
   disableDetailPadding = false,
 }) => {
   return (
     <Accordion
+      defaultExpanded={defaultExpanded}
       expanded={expanded}
       onChange={onChange}
       className={classNames(
