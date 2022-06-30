@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-05-09 15:51:47
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-15 16:30:46
+ * @Last Modified time: 2022-06-29 17:14:53
  */
 
 import StorageDB from 'bsdb';
@@ -21,6 +21,9 @@ export const SETTING_WEATHER = `${DB_USER_SETTING_NAME}_WEATHER`;
 
 // 默认用户设置背景表名
 export const SETTING_BACKGROUND = `${DB_USER_SETTING_NAME}_BACKGROUND`;
+
+// 默认用户设置预览体验渠道表名
+export const SETTING_PREVIEW_CHANNEL = `${DB_USER_SETTING_NAME}_PREVIEW_CHANNEL`;
 
 export interface DB_BASE_COL {
   createdTime: string;
@@ -49,3 +52,9 @@ export const SWDB = DB.get(SETTING_WEATHER);
  * @desc 存储用户设置的背景相关设置
  */
 export const SBDB = DB.get(SETTING_BACKGROUND);
+
+/**
+ * @name 预览铜套相关设置数据库
+ * @desc 存储用户设置的预览通道相关设置
+ */
+export const SPCDB = DB.get(SETTING_PREVIEW_CHANNEL);

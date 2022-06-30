@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-07 17:36:01
+ * @Last Modified time: 2022-06-30 11:55:29
  */
 
 import { lazy } from 'react';
@@ -45,7 +45,7 @@ import Navigation from '@/views/setting/navigation';
 import OtherApis from '@/views/setting/otherApis';
 import Message from '@/views/setting/features/message';
 import Engine from '@/views/setting/features/engine';
-import Beta from '@/views/setting/about/beta';
+import Channel from '@/views/setting/about/channel';
 import EngineDetail from '@/views/setting/features/engine/engineDetail';
 import ReleasesView from '@/views/setting/features/message/release';
 import Weather from '@/views/setting/features/weather';
@@ -235,10 +235,10 @@ const routers: Router[] = [
             component: Commits,
           },
           {
-            title: '用户体验计划',
+            title: '预览渠道',
             icon: <BugReportOutlined />,
-            path: 'beta',
-            component: Beta,
+            path: 'channel',
+            component: Channel,
           },
           {
             title: '项目依赖',
