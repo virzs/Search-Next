@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-30 11:55:29
+ * @Last Modified time: 2022-06-30 15:52:25
  */
 
 import { lazy } from 'react';
@@ -51,6 +51,7 @@ import ReleasesView from '@/views/setting/features/message/release';
 import Weather from '@/views/setting/features/weather';
 import SearchBar from '@/views/setting/personalise/searchBar';
 import Dependencies from '@/views/setting/about/dependencies';
+import { ChannelType } from '@/data/channel';
 
 /**
  * 关于 component 额外说明
@@ -71,7 +72,8 @@ export interface Router {
   wrappers?: string[];
   title?: string;
   icon?: any;
-  status?: RouterStatus;
+  status?: RouterStatus; // 当前状态
+  channel?: ChannelType; // 预览渠道
 }
 
 const routers: Router[] = [
@@ -206,7 +208,7 @@ const routers: Router[] = [
             icon: <WbSunny />,
             path: 'weather',
             component: Weather,
-            status: 'process',
+            channel: 'beta',
           },
           {
             title: '搜索框',
@@ -214,6 +216,7 @@ const routers: Router[] = [
             path: 'search-bar',
             component: SearchBar,
             status: 'process',
+            channel: 'dev',
           },
         ],
       },

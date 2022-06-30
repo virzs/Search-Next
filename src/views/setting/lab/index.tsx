@@ -2,10 +2,10 @@
  * @Author: Vir
  * @Date: 2021-10-23 15:49:56
  * @Last Modified by: Vir
- * @Last Modified time: 2022-04-08 16:09:15
+ * @Last Modified time: 2022-06-30 15:58:00
  */
 
-import { isBeta } from '@/apis/auth';
+import { checkChannel, getChannelOption } from '@/apis/setting/channel';
 import { Router } from '@/config/router';
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
@@ -33,24 +33,30 @@ const Lab: React.FC<PageProps> = (props) => {
       </Alert>
       <ContentList>
         {list
-          .filter((i) =>
-            i?.status && ['beta', 'process'].includes(i?.status)
-              ? isBeta()
-              : true,
-          )
+          .filter((i) => {
+            let flag = true;
+            if (i?.status && ['beta', 'process'].includes(i?.status)) {
+              flag = true;
+            }
+            if (i.channel) {
+              flag = checkChannel(i.channel);
+            }
+            return flag;
+          })
           .map((i) => (
             <ItemCard
               key={i.path}
               title={
                 <div className="flex items-center gap-1">
                   {i.title}
-                  {i?.status === 'process' && (
+                  {i?.channel && (
                     <Chip
-                      color="warning"
-                      label={i?.status}
+                      label={getChannelOption(i.channel)?.label}
                       size="small"
-                      variant="outlined"
                     />
+                  )}
+                  {i?.status === 'process' && (
+                    <Chip label={i?.status?.toLocaleUpperCase()} size="small" />
                   )}
                 </div>
               }

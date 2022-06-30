@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-01 13:49:23
  * @Last Modified by: Vir
- * @Last Modified time: 2022-01-24 15:32:15
+ * @Last Modified time: 2022-06-29 17:51:08
  */
 
 import { authDefaultData } from '@/data/account/default';
@@ -96,17 +96,4 @@ export const updateAuthDataByKey = (id: string, key: string, value: any) => {
   data[key] = value;
 
   return AuthDB.update(id, data);
-};
-
-// 获取当前用户是否为beta状态
-export const isBeta = () => {
-  const account = localStorage.getItem('account');
-  const result = getAuthDataByKey(account || '', 'beta');
-  return result === undefined ? false : result;
-};
-
-export const setBeta = (beta: boolean) => {
-  const account = localStorage.getItem('account');
-  const result = updateAuthDataByKey(account || '', 'beta', beta);
-  return result === undefined ? false : result;
 };

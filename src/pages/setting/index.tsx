@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:08:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-04-08 16:09:41
+ * @Last Modified time: 2022-06-30 15:57:59
  */
 
 import { Breadcrumbs, Chip, IconButton, Link, Tooltip } from '@mui/material';
@@ -13,6 +13,7 @@ import Copyright from '@/components/global/copyright';
 import { PageProps } from '@/typings';
 import { Router } from '@/config/router';
 import { useNavigate, useLocation, Outlet, useParams } from 'react-router-dom';
+import { getChannelOption } from '@/apis/setting/channel';
 
 export interface SettingPageProps extends PageProps {
   children: any;
@@ -144,13 +145,14 @@ const SettingPage: React.FC<SettingPageProps> = ({
             >
               <div className="flex items-center gap-1">
                 {i.title}
-                {i?.status === 'process' && (
+                {i?.channel && (
                   <Chip
-                    color="warning"
-                    label={i?.status}
+                    label={getChannelOption(i.channel)?.label}
                     size="small"
-                    variant="outlined"
                   />
+                )}
+                {i?.status === 'process' && (
+                  <Chip label={i?.status?.toLocaleUpperCase()} size="small" />
                 )}
               </div>
             </div>

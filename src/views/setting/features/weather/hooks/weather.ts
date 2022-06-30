@@ -2,10 +2,9 @@
  * @Author: Vir
  * @Date: 2022-06-07 14:41:50
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-07 18:02:09
+ * @Last Modified time: 2022-06-30 10:23:18
  */
 
-import { isBeta } from '@/apis/auth';
 import {
   locationInfo,
   qweatherNow,
@@ -193,14 +192,11 @@ const useWeather = (): UseWeatherReturn => {
   };
 
   useEffect(() => {
-    const beta = isBeta();
-    if (!location && !beta) return;
+    if (!location) return;
     refresh();
   }, [location]);
 
   useEffect(() => {
-    const beta = isBeta();
-    if (!beta) return;
     applyPermission();
     const data = getLocalWeather(userId);
     setLocalWeatherData(data);
