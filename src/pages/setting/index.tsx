@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-06-10 11:08:48
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-30 15:57:59
+ * @Last Modified time: 2022-06-30 17:50:30
  */
 
 import { Breadcrumbs, Chip, IconButton, Link, Tooltip } from '@mui/material';
@@ -159,7 +159,7 @@ const SettingPage: React.FC<SettingPageProps> = ({
           ))}
         </Breadcrumbs>
         <div className="flex-grow overflow-y-auto w-full">
-          <div className="max-w-4xl">
+          <div className="max-w-4xl h-full">
             <Outlet />
           </div>
         </div>

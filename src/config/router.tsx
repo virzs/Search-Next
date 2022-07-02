@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-30 15:52:25
+ * @Last Modified time: 2022-06-30 17:29:04
  */
 
 import { lazy } from 'react';
@@ -52,6 +52,7 @@ import Weather from '@/views/setting/features/weather';
 import SearchBar from '@/views/setting/personalise/searchBar';
 import Dependencies from '@/views/setting/about/dependencies';
 import { ChannelType } from '@/data/channel';
+import Error from '@/views/error';
 
 /**
  * 关于 component 额外说明
@@ -250,6 +251,10 @@ const routers: Router[] = [
             component: Dependencies,
           },
         ],
+      },
+      {
+        title: '',
+        path: '*',
       },
     ],
   },

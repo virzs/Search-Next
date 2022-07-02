@@ -2,16 +2,17 @@
  * @Author: Vir
  * @Date: 2021-09-08 14:22:02
  * @Last Modified by: Vir
- * @Last Modified time: 2022-03-02 14:28:05
+ * @Last Modified time: 2022-06-30 18:01:16
  */
 
 import React, { Suspense } from 'react';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import GlobalLoading from './components/global/loading';
 import routers, { Router } from './config/router';
 import RenderContent from './components/global/renderContent';
 import { SnackbarProvider } from 'notistack';
 import ToastContainer from './components/global/feedback/toast/container';
+import Error from './views/error';
 
 // 处理路由数据
 const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {
@@ -41,6 +42,13 @@ const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {
         element={<Element />}
       >
         {i.routes ? Recursive(i.routes, i, pathname) : undefined}
+        {/* 单独为设置页添加异常页面，排除首页及导航页 */}
+        {['setting'].includes(i.path) && (
+          <>
+            <Route path={`error/:status`} element={<Error />}></Route>
+            <Route path="*" element={<Navigate to={`error/404`} replace />} />
+          </>
+        )}
       </Route>
     );
   });
@@ -58,7 +66,12 @@ function App(props: any) {
           }}
         >
           <HashRouter>
-            <Routes>{Recursive(routers)}</Routes>
+            <Routes>
+              {Recursive(routers)}
+              {/* 全局异常页面 */}
+              <Route path={`error/:status`} element={<Error />}></Route>
+              <Route path="*" element={<Navigate to={`error/404`} replace />} />
+            </Routes>
           </HashRouter>
         </SnackbarProvider>
       </Suspense>
