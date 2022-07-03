@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-10-17 21:26:07
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-09 11:37:54
+ * @Last Modified time: 2022-07-03 21:05:06
  */
 
 import { ClockLogoType, LogoType } from '../logo';
@@ -101,7 +101,6 @@ export interface AuthData {
   navigation: Navigation;
   message: Message;
   latestVersion: string;
-  beta?: boolean; // 是否开启beta权限
   sync: {
     setting: boolean; // 设置同步
     website: boolean; // 常用网址同步
