@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2022-05-07 17:31:58
  * @Last Modified by: Vir
- * @Last Modified time: 2022-05-07 17:37:55
+ * @Last Modified time: 2022-07-03 21:33:37
  */
 import { BorderCard } from '@/components/global/card/styleCard';
 import ContentList from '@/pages/setting/components/contentList';
@@ -47,6 +47,8 @@ function Dependencies() {
 
   return (
     <div>
+      <ContentTitle title="说明" />
+      <p>本项目的开发离不开以下开源项目的支持。</p>
       <ContentList>
         <ContentTitle title="项目依赖" />
         {Object.keys(dependencies).map((i, j) => (
