@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-08 14:22:02
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-30 18:01:16
+ * @Last Modified time: 2022-07-03 20:37:50
  */
 
 import React, { Suspense } from 'react';
@@ -12,7 +12,8 @@ import routers, { Router } from './config/router';
 import RenderContent from './components/global/renderContent';
 import { SnackbarProvider } from 'notistack';
 import ToastContainer from './components/global/feedback/toast/container';
-import Error from './views/error';
+import ErrorView from './views/error';
+import Error from './pages/error';
 
 // 处理路由数据
 const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {
@@ -45,7 +46,7 @@ const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {
         {/* 单独为设置页添加异常页面，排除首页及导航页 */}
         {['setting'].includes(i.path) && (
           <>
-            <Route path={`error/:status`} element={<Error />}></Route>
+            <Route path={`error/:status`} element={<ErrorView />}></Route>
             <Route path="*" element={<Navigate to={`error/404`} replace />} />
           </>
         )}
