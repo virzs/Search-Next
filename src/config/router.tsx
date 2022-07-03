@@ -2,7 +2,7 @@
  * @Author: Vir
  * @Date: 2021-09-11 15:26:27
  * @Last Modified by: Vir
- * @Last Modified time: 2022-06-30 17:29:04
+ * @Last Modified time: 2022-07-03 21:25:20
  */
 
 import { lazy } from 'react';
@@ -52,7 +52,6 @@ import Weather from '@/views/setting/features/weather';
 import SearchBar from '@/views/setting/personalise/searchBar';
 import Dependencies from '@/views/setting/about/dependencies';
 import { ChannelType } from '@/data/channel';
-import Error from '@/views/error';
 
 /**
  * 关于 component 额外说明
@@ -195,6 +194,7 @@ const routers: Router[] = [
             icon: <Search />,
             path: 'search-engine',
             component: Engine,
+            channel: 'beta',
             routes: [
               {
                 title: '搜索引擎详情',
