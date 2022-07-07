@@ -39,7 +39,7 @@ const Digit: React.FC<DigitPropsType> = ({ value = 0 }) => {
   }, [value]);
 
   return (
-    <div className="w-14 h-25 mx-1 relative">
+    <div className="w-14 h-25 mx-1 relative transform scale-75 md:scale-100 flex-grow-0 flex-shrink">
       {segmentsOn.map((i, j) => (
         <i
           className={classNames(

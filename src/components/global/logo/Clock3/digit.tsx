@@ -27,7 +27,7 @@ const Digit: React.FC<DigitProps> = ({ number }) => {
   }, [number]);
 
   return (
-    <div className="grid grid-cols-4 gap-1.5">
+    <div className="grid grid-cols-4 gap-1.5 transform scale-75 md:scale-100">
       {matrix.map((i, j) => (
         <i
           key={j}

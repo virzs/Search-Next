@@ -59,7 +59,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
     return (
       <div
         className={classNames(
-          'delay-75 transform duration-300',
+          'delay-75 transform duration-300 max-w-full',
           zoom ? 'scale-50' : 'scale-100',
         )}
       >
@@ -137,7 +137,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
       <div
         ref={logoRef}
         className={classNames(
-          'index-logo-box items-center flex justify-center transition-all duration-300',
+          'index-logo-box items-center flex justify-center transition-all duration-300 max-w-full',
           zoom && logoData.show ? 'grow-0' : 'flex-grow',
           logoData.show ? 'max-h-48 sm:max-h-72' : 'max-h-32',
         )}

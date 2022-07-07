@@ -21,7 +21,7 @@ const Clock1: React.FC = () => {
     <TimeClockContext>
       {(value) => {
         return (
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex justify-center items-center gap-1 md:gap-2 max-w-full px-2 md:px-0">
             <Digit value={mathNum(value?.hour)} />
             <Digit value={mathNum(value?.hour, false)} />
             <Separator number={value?.second || 0} />

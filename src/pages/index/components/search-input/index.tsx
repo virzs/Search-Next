@@ -136,7 +136,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
   return (
     <div
-      className="search-input max-w-2xl w-4/5"
+      className="search-input w-11/12 md:max-w-2xl md:w-4/5"
       onFocus={(e) => {
         setSugOpen(true);
         setEngineSelectOpen(false);

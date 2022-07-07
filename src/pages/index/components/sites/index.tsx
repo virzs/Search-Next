@@ -117,7 +117,7 @@ const Sites: React.FC = (props) => {
 
   return (
     <>
-      <div className="flex justify-center items-end gap-2 h-full py-12">
+      <div className="flex justify-center items-end gap-2 md:h-full py-12 flex-wrap">
         {siteList.map((i) => (
           <SiteCard
             item={i}

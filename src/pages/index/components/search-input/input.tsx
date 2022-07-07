@@ -33,7 +33,7 @@ const Input: FC<InputProps> = (props) => {
         {...rest}
       />
       <Button
-        className="w-16 sm:w-24 rounded-tl-none flex gap-2 items-center justify-center whitespace-nowrap leading-4 sm:leading-7 text-center tracking-widest rounded-bl-none bg-primary text-white"
+        className="w-24 md:w-16 sm:w-24 rounded-tl-none flex gap-2 items-center justify-center whitespace-nowrap leading-4 sm:leading-7 text-center tracking-widest rounded-bl-none bg-primary text-white"
         size="large"
         variant="contained"
         disableElevation
