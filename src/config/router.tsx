@@ -41,7 +41,7 @@ import Logo from '@/views/setting/personalise/logo';
 import Lab from '@/views/setting/lab';
 import Backup from '@/views/setting/data/backup';
 import Features from '@/views/setting/features';
-import Navigation from '@/views/setting/navigation';
+import Navigation from '@/views/setting/features/navigation';
 import OtherApis from '@/views/setting/otherApis';
 import Message from '@/views/setting/features/message';
 import Engine from '@/views/setting/features/engine';

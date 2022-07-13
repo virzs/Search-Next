@@ -15,7 +15,7 @@ import SearchInput from './components/search-input';
 import Sites from './components/sites';
 import { useTranslation } from 'react-i18next';
 import { setTheme } from '@/utils/theme';
-import { AuthLogo, Navigation } from '@/data/account/interface';
+import { AuthLogo } from '@/data/account/interface';
 import { getAuthDataByKey } from '@/apis/auth';
 import { ClockData } from '@/data/logo';
 import NavDrawer from './components/nav-drawer';
@@ -23,11 +23,13 @@ import { useNavigate } from 'react-router-dom';
 import Weather from './components/weather';
 import { SaveWeatherData } from '@/apis/weather/interface';
 import { usePreview } from '@/views/setting/personalise/background/hooks/preview';
+import useNavigation from '@/views/setting/features/navigation/hooks/navigation';
 
 const IndexPage: React.FC<PageProps> = (props) => {
   const history = useNavigate();
   const { t, i18n } = useTranslation();
   const [{ css, isImage, url: bgUrl }] = usePreview();
+  const [{ type: NavType, cols: NavCols }] = useNavigation();
 
   const logoRef = React.useRef<HTMLDivElement>(null);
 
@@ -36,9 +38,6 @@ const IndexPage: React.FC<PageProps> = (props) => {
     type: 'clock',
     show: true,
   } as AuthLogo);
-  const [navigationData, setNavigationData] = React.useState<Navigation>(
-    {} as Navigation,
-  );
   const [navOpen, setNavOpen] = React.useState(false);
   const [weather, setWeather] = useState<SaveWeatherData>(
     {} as SaveWeatherData,
@@ -68,17 +67,8 @@ const IndexPage: React.FC<PageProps> = (props) => {
     );
   };
 
-  // 获取并设置 导航
-  const setNavigationSetting = () => {
-    const id = localStorage.getItem('account');
-    if (!id) return;
-    const navigationData = getAuthDataByKey(id, 'navigation');
-    setNavigationData(navigationData);
-  };
-
   React.useEffect(() => {
     setLogoSetting();
-    setNavigationSetting();
   }, []);
 
   useEffect(() => {
@@ -105,7 +95,7 @@ const IndexPage: React.FC<PageProps> = (props) => {
         <Tooltip title="网址导航">
           <IconButton
             onClick={() => {
-              const type = navigationData.type ?? 'page';
+              const type = NavType ?? 'page';
               switch (type) {
                 case 'drawer':
                   setNavOpen(true);
@@ -161,7 +151,11 @@ const IndexPage: React.FC<PageProps> = (props) => {
       <div className="index-copyright-box flex-grow max-h-8 text-center leading-8">
         <Copyright />
       </div>
-      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} />
+      <NavDrawer
+        open={navOpen}
+        cols={NavCols}
+        onClose={() => setNavOpen(false)}
+      />
     </div>
   );
 };

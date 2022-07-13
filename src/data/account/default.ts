@@ -1,8 +1,8 @@
 /*
- * @Author: Vir
- * @Date: 2021-08-15 00:00:37
- * @Last Modified by: Vir
- * @Last Modified time: 2022-07-03 21:04:57
+ * @Author: vir virs98@outlook.com
+ * @Date: 2021-09-22 14:38:03
+ * @LastEditors: vir virs98@outlook.com
+ * @LastEditTime: 2022-07-13 16:53:18
  */
 
 // ! 账户默认数据
@@ -30,9 +30,6 @@ export const authDefaultData: AuthData = {
         url: '',
       },
     },
-  },
-  navigation: {
-    type: 'page',
   },
   message: {
     update: true,

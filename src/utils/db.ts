@@ -25,6 +25,9 @@ export const SETTING_BACKGROUND = `${DB_USER_SETTING_NAME}_BACKGROUND`;
 // 默认用户设置预览体验渠道表名
 export const SETTING_PREVIEW_CHANNEL = `${DB_USER_SETTING_NAME}_PREVIEW_CHANNEL`;
 
+// 默认用户设置导航页表名
+export const SETTING_NAVIGATION = `${DB_USER_SETTING_NAME}_NAVIGATION`;
+
 export interface DB_BASE_COL {
   createdTime: string;
   updatedTime: string;
@@ -58,3 +61,9 @@ export const SBDB = DB.get(SETTING_BACKGROUND);
  * @desc 存储用户设置的预览通道相关设置
  */
 export const SPCDB = DB.get(SETTING_PREVIEW_CHANNEL);
+
+/**
+ * @name 导航页相关设置数据库
+ * @desc 存储用户设置的导航页相关设置
+ */
+export const SNDB = DB.get(SETTING_NAVIGATION);

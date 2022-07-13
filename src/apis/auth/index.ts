@@ -6,7 +6,7 @@
  */
 
 import { authDefaultData } from '@/data/account/default';
-import { AuthData, AuthLogo, Navigation } from '@/data/account/interface';
+import { AuthData, AuthLogo } from '@/data/account/interface';
 import StorageDB from 'bsdb';
 
 const BaseDB = new StorageDB({
@@ -67,11 +67,6 @@ export const accountsCount = () => {
 // 单独更新 logo 设置数据
 export const updateLogoSetting = (id: string, data: AuthLogo) => {
   return AuthDB.update(id, { logo: data });
-};
-
-// 单独更新 navigation 设置数据
-export const updateNavigationSetting = (id: string, data: Navigation) => {
-  return AuthDB.update(id, { navigation: data });
 };
 
 // 获取账户中指定字段

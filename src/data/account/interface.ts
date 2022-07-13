@@ -45,13 +45,6 @@ export interface AuthLogo {
   config: LogoConfigType;
 }
 
-// 导航显示类型
-export type NavigationType = 'page' | 'drawer';
-// 导航数据
-export interface Navigation {
-  type: NavigationType;
-}
-
 export type AccountUpdateMessageRemind = 'message' | 'notification' | 'popup';
 
 export interface AccountUpdateMessage {
@@ -83,7 +76,6 @@ export interface AuthData {
   updatedTime?: string;
   language: LanguageType; // 账户所选语言
   logo?: AuthLogo;
-  navigation: Navigation;
   message: Message;
   latestVersion: string;
   sync: {
