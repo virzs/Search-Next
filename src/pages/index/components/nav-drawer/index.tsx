@@ -73,13 +73,18 @@ const WebsiteCard: React.FC<WebsiteCardProps> = (props) => {
 const ClassifyEle =
   (dataSource: Classify, parent?: Classify) =>
   ({ cols }: { cols: NavigationData['cols'] }) => {
-    const notClassifiedData =
+    let notClassifiedData =
       dataSource.children &&
       dataSource.children.filter((k) =>
         dataSource.subClassify
           ?.map((l) => l.path)
           .every((n) => !k.classify.includes(n)),
       );
+    if (dataSource.path === 'new' && dataSource?.children) {
+      console.log(dataSource, notClassifiedData);
+      dataSource?.children?.length > 0 &&
+        (notClassifiedData = dataSource.children);
+    }
     return (
       <div
         className={classNames(!parent && 'shadow p-2 mb-2 rounded')}
@@ -109,7 +114,9 @@ const ClassifyEle =
                   margin-top: 16px;
                 `}
               >
-                <div className={classNames('font-semibold mb-3')}>未分类</div>
+                {dataSource.path !== 'new' && (
+                  <div className={classNames('font-semibold mb-3')}>未分类</div>
+                )}
                 <div className={cx('grid gap-2.5 mb-3', `grid-cols-${cols}`)}>
                   {notClassifiedData.map((j) => (
                     <WebsiteCard key={j.id} dataSource={j} />
@@ -153,7 +160,6 @@ const NavDrawer: React.FC<NavDrawerProps> = (props) => {
         return (
           <div key={ii}>
             <div className="text-base font-bold mb-2">{i.name}</div>
-            {i.intro && <div className="mb-2">{i.intro}</div>}
             {ClassifyEle(i)({ cols })}
           </div>
         );
