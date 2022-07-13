@@ -1,3 +1,9 @@
+/*
+ * @Author: vir virs98@outlook.com
+ * @Date: 2021-09-22 16:34:45
+ * @LastEditors: vir virs98@outlook.com
+ * @LastEditTime: 2022-07-13 14:35:57
+ */
 import React from 'react';
 import * as client from 'react-dom/client';
 import './index.css';
@@ -13,6 +19,7 @@ import { auto, disable, enable } from 'darkreader';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import 'virtual:svg-icons-register';
+import { getTheme } from './apis/setting/theme';
 
 const env = import.meta.env;
 
@@ -21,13 +28,15 @@ window.addEventListener('DOMContentLoaded', () => {
   // 初始化时获取用户
   const res = getAccount();
   res && getVersionInfo();
+
   // 设置主题
-  if (res.theme) {
-    res.theme?.type === 'system'
-      ? auto(res.theme?.darkSettings)
-      : res.theme?.type === 'light'
+  const theme = getTheme();
+  if (theme) {
+    theme?.type === 'system'
+      ? auto(theme?.darkSettings)
+      : theme?.type === 'light'
       ? disable()
-      : enable(res.theme?.darkSettings);
+      : enable(theme?.darkSettings);
   }
 });
 

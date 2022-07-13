@@ -74,21 +74,6 @@ export interface Engine {
   selected?: string;
 }
 
-export type ThemeType = 'system' | 'light' | 'dark';
-
-export interface DarkThemeSettings {
-  brightness: number;
-  contrast: number;
-  grayscale: number;
-  sepia: number;
-}
-
-// 主题设置
-export interface Theme {
-  type: ThemeType;
-  darkSettings: DarkThemeSettings;
-}
-
 export interface AuthData {
   _id?: string;
   username: string; // 用户名
@@ -107,7 +92,6 @@ export interface AuthData {
     history: boolean; // 历史记录同步
   }; // 是否同步，默认false
   engine?: Engine;
-  theme?: Theme;
 }
 
 export interface SettingDefaultData {

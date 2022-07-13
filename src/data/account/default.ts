@@ -48,15 +48,6 @@ export const authDefaultData: AuthData = {
     indexCount: 4,
     sortType: 'default',
   },
-  theme: {
-    type: 'light',
-    darkSettings: {
-      brightness: 100,
-      contrast: 100,
-      grayscale: 0,
-      sepia: 0,
-    },
-  },
 };
 
 export const settingDefaultData: SettingDefaultData = {

@@ -1,74 +1,36 @@
 /*
- * @Author: Vir
- * @Date: 2021-09-24 13:49:01
- * @Last Modified by:   Vir
- * @Last Modified time: 2021-09-24 13:49:01
+ * @Author: vir virs98@outlook.com
+ * @Date: 2022-04-06 17:06:36
+ * @LastEditors: vir virs98@outlook.com
+ * @LastEditTime: 2022-07-13 14:25:06
  */
 
-import { getUserThemeSetting, updateUserThemeSetting } from '@/apis/theme';
+import { DarkThemeSettings, ThemeType } from '@/apis/setting/theme';
 import Select from '@/components/md-custom/form/select';
-import { authDefaultData } from '@/data/account/default';
-import {
-  DarkThemeSettings,
-  Theme as ThemeSetting,
-  ThemeType,
-} from '@/data/account/interface';
 import ContentList from '@/pages/setting/components/contentList';
 import ContentTitle from '@/pages/setting/components/contentTitle';
-import ItemAccordion from '@/pages/setting/components/itemAccordion';
 import ItemCard from '@/pages/setting/components/itemCard';
-import { Slider, Switch } from '@mui/material';
-import { auto, disable, enable } from 'darkreader';
-import React, { useEffect, useState } from 'react';
+import { Slider } from '@mui/material';
+import React from 'react';
+import useTheme from './hooks/theme';
 
 const Theme: React.FC = () => {
-  const [theme, setTheme] = React.useState<ThemeSetting>(
-    authDefaultData.theme as ThemeSetting,
-  );
-  const [darkSettings, setDarkSettings] = useState<DarkThemeSettings>(
-    {} as DarkThemeSettings,
-  );
+  const [{ type = 'light', darkSettings }, { setTheme }] = useTheme();
 
   const handleThemeTypeChange = (
-    val: ThemeType,
-    darkSettings: DarkThemeSettings,
+    val?: ThemeType,
+    darkSettings?: DarkThemeSettings,
   ) => {
-    setTheme({ ...theme, darkSettings, type: val });
-    switch (val) {
-      case 'system':
-        auto({});
-        break;
-      case 'light':
-        disable();
-        break;
-      case 'dark':
-        enable(darkSettings);
-        break;
-    }
-    updateUserThemeSetting({
-      ...theme,
-      darkSettings,
-      type: val,
-    });
+    setTheme && setTheme({ darkSettings, type: val });
   };
 
   const handleDarkThemeSettingChange = (name: string, val: number) => {
-    const darkSettings = { ...theme.darkSettings, [name]: val };
-    setTheme({
-      ...theme,
-      darkSettings,
-    });
-    setDarkSettings(darkSettings);
-    handleThemeTypeChange(theme.type, darkSettings);
+    const privData: DarkThemeSettings = {
+      ...darkSettings,
+      [name]: val,
+    } as DarkThemeSettings;
+    handleThemeTypeChange(type, privData);
   };
-
-  useEffect(() => {
-    getUserThemeSetting().then((res) => {
-      setTheme(res);
-      res?.darkSettings && setDarkSettings({ ...res.darkSettings });
-      console.log(res);
-    });
-  }, []);
 
   const renderDarkSliders = () => {
     const {
@@ -160,10 +122,8 @@ const Theme: React.FC = () => {
                   value: 'dark',
                 },
               ]}
-              value={theme.type}
-              onChange={(e) =>
-                handleThemeTypeChange(e.target.value, theme.darkSettings)
-              }
+              value={type}
+              onChange={(e) => handleThemeTypeChange(e.target.value)}
               size="small"
             />
           }
