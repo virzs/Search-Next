@@ -2,7 +2,7 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2022-07-14 11:59:12
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-20 17:11:47
+ * @LastEditTime: 2022-07-20 18:00:35
  */
 
 import { Release } from '@/apis/setting/message';
@@ -21,7 +21,7 @@ const useReleaseMessage = (): [Release, UseReleaseMessageAction] => {
     show: true,
     lastTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     interval: 0,
-    remind: 'message',
+    remind: 'popup',
   });
 
   const setData = (data: Release) => {

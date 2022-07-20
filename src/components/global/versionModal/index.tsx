@@ -78,8 +78,8 @@ const getVersionInfo = () => {
   latest().then((res) => {
     if (res.data) {
       const { tag_name = '' } = res.data;
-      if (latestVersion === tag_name) return;
-      updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
+      // if (latestVersion === tag_name) return;
+      // updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
 
       const {
         show: privUpdate,
