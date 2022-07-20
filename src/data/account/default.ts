@@ -2,7 +2,7 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2021-09-22 14:38:03
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-13 16:53:18
+ * @LastEditTime: 2022-07-20 17:12:45
  */
 
 // ! 账户默认数据
@@ -30,9 +30,6 @@ export const authDefaultData: AuthData = {
         url: '',
       },
     },
-  },
-  message: {
-    update: true,
   },
   latestVersion: '',
   sync: {

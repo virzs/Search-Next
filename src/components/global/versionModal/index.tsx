@@ -12,10 +12,9 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import Markdown from '../markdown';
-import { Message } from '@/data/account/interface';
 import { LoadingButton } from '@mui/lab';
-import { isBoolean } from 'lodash';
 import { toast } from 'react-toastify';
+import { getMessage, Message } from '@/apis/setting/message';
 
 interface VersionData {
   data: Latest;
@@ -73,7 +72,7 @@ const updateModal = (data: Latest, account: string, message: Message) => {
 
 const getVersionInfo = () => {
   const account = localStorage.getItem('account');
-  const message = getAuthDataByKey(account ?? '', 'message');
+  const message: Message = getMessage() ?? {};
   const latestVersion = getAuthDataByKey(account ?? '', 'latestVersion');
 
   latest().then((res) => {
@@ -82,41 +81,37 @@ const getVersionInfo = () => {
       if (latestVersion === tag_name) return;
       updateAuthDataByKey(account ?? '', 'latestVersion', tag_name);
 
-      if (isBoolean(message?.update)) {
-        message?.update && updateModal(res.data, account || '', message);
+      const {
+        show: privUpdate,
+        remind = 'popup',
+        interval = 0,
+        lastTime,
+      } = message?.release || {};
+
+      if (!privUpdate) {
+        return;
+      }
+      let remindUpdate;
+
+      switch (remind) {
+        case 'message':
+          remindUpdate = updateToast;
+          break;
+        case 'notification':
+          remindUpdate = updateNotification;
+          break;
+        case 'popup':
+        default:
+          remindUpdate = updateModal;
+          break;
+      }
+      if (!interval) {
+        remindUpdate(res.data, account || '', message);
       } else {
-        const {
-          update: privUpdate,
-          remind = 'popup',
-          interval = 0,
-          lastTime,
-        } = message?.update || {};
-
-        if (!privUpdate) {
-          return;
-        }
-        let remindUpdate;
-
-        switch (remind) {
-          case 'message':
-            remindUpdate = updateToast;
-            break;
-          case 'notification':
-            remindUpdate = updateNotification;
-            break;
-          case 'popup':
-          default:
-            remindUpdate = updateModal;
-            break;
-        }
-        if (!interval) {
+        const now = dayjs();
+        const last = dayjs(lastTime);
+        if (last.isBefore(now.subtract(interval, 'day'))) {
           remindUpdate(res.data, account || '', message);
-        } else {
-          const now = dayjs();
-          const last = dayjs(lastTime);
-          if (last.isBefore(now.subtract(interval, 'day'))) {
-            remindUpdate(res.data, account || '', message);
-          }
         }
       }
     }

@@ -47,18 +47,6 @@ export interface AuthLogo {
 
 export type AccountUpdateMessageRemind = 'message' | 'notification' | 'popup';
 
-export interface AccountUpdateMessage {
-  update: boolean;
-  remind: AccountUpdateMessageRemind;
-  interval: number;
-  lastTime: string;
-}
-
-// 消息提示
-export interface Message {
-  update: boolean | AccountUpdateMessage; // 版本更新消息提示
-}
-
 // 搜索引擎设置
 export interface Engine {
   mode: 'default' | 'custom';
@@ -76,7 +64,6 @@ export interface AuthData {
   updatedTime?: string;
   language: LanguageType; // 账户所选语言
   logo?: AuthLogo;
-  message: Message;
   latestVersion: string;
   sync: {
     setting: boolean; // 设置同步

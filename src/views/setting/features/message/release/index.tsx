@@ -4,90 +4,50 @@
  * @Last Modified by: Vir
  * @Last Modified time: 2022-03-04 14:03:54
  */
-import { getAuthDataByKey, updateAuthDataByKey } from '@/apis/auth';
+
 import ContentList from '@/pages/setting/components/contentList';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { Alert, AlertTitle, SelectChangeEvent, Switch } from '@mui/material';
-import {
-  AccountUpdateMessage,
-  AccountUpdateMessageRemind,
-  Message as AuthMessage,
-} from '@/data/account/interface';
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import Select from '@/components/md-custom/form/select';
-import { isBoolean } from 'lodash';
-import { ValueOf } from '@/typings/global';
-import dayjs from 'dayjs';
+import useMessage from '../hooks/message';
+import { Release as ReleaseType } from '@/apis/setting/message';
 
 const Release: FC = () => {
-  const [update, setUpdate] = React.useState(false);
-  const [remind, setRemind] =
-    React.useState<AccountUpdateMessageRemind>('popup');
-  const [interval, setInterval] = React.useState(0);
-  const [messageData, setMessageData] = React.useState({} as AuthMessage);
-
-  const init = () => {
-    const account = localStorage.getItem('account');
-    const result = getAuthDataByKey(account ?? '', 'message');
-    if (isBoolean(result?.update)) {
-      setUpdate(result.update);
-      setRemind('popup');
-      setInterval(0);
-    } else {
-      const { update = {} } = result || {};
-      const {
-        update: privUpdate = true,
-        remind = 'popup',
-        interval = 0,
-      } = update;
-      setUpdate(privUpdate);
-      setRemind(remind);
-      setInterval(interval);
-    }
-    setMessageData(result);
-  };
-
-  const handleUpdate = (key: any, val: any) => {
-    const account = localStorage.getItem('account');
-    const updateData: any = {
-      update,
-      interval,
-      remind,
-      lastTime: dayjs(),
-    };
-    updateData[key] = val;
-    const newMessageData = {
-      ...messageData,
-      update: updateData,
-    };
-    setMessageData(newMessageData);
-    updateAuthDataByKey(account ?? '', 'message', newMessageData);
-    init();
-  };
+  const [{ release }, { setData }] = useMessage();
+  const { show, interval, remind } = release;
 
   const onUpdateSwichChange = (
     _: React.ChangeEvent<HTMLInputElement>,
     checked: boolean,
   ) => {
-    setUpdate(checked);
-    handleUpdate('update', checked);
+    setData({
+      release: {
+        ...release,
+        show: checked,
+      },
+    });
   };
 
   const onRemindChange = (e: SelectChangeEvent<any>) => {
-    const value = e.target.value as AccountUpdateMessageRemind;
-    setRemind(value);
-    handleUpdate('remind', value);
+    const value = e.target.value as ReleaseType['remind'];
+    setData({
+      release: {
+        ...release,
+        remind: value,
+      },
+    });
   };
 
   const onIntervalChange = (e: SelectChangeEvent<any>) => {
     const value = e.target.value as number;
-    setInterval(value);
-    handleUpdate('interval', value);
+    setData({
+      release: {
+        ...release,
+        interval: value,
+      },
+    });
   };
-
-  useEffect(() => {
-    init();
-  }, []);
 
   return (
     <div>
@@ -99,7 +59,7 @@ const Release: FC = () => {
         <ItemCard
           title="版本更新提醒"
           desc="设置版本更新时是否提醒"
-          action={<Switch checked={update} onChange={onUpdateSwichChange} />}
+          action={<Switch checked={show} onChange={onUpdateSwichChange} />}
         />
         <ItemCard
           title="提醒方式"

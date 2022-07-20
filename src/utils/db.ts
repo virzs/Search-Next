@@ -1,8 +1,8 @@
 /*
- * @Author: Vir
- * @Date: 2022-05-09 15:51:47
- * @Last Modified by: Vir
- * @Last Modified time: 2022-06-29 17:14:53
+ * @Author: vir virs98@outlook.com
+ * @Date: 2022-07-03 20:39:14
+ * @LastEditors: vir virs98@outlook.com
+ * @LastEditTime: 2022-07-14 11:00:43
  */
 
 import StorageDB from 'bsdb';
@@ -27,6 +27,9 @@ export const SETTING_PREVIEW_CHANNEL = `${DB_USER_SETTING_NAME}_PREVIEW_CHANNEL`
 
 // 默认用户设置导航页表名
 export const SETTING_NAVIGATION = `${DB_USER_SETTING_NAME}_NAVIGATION`;
+
+// 默认用户设置消息表名
+export const SETTING_MESSAGE = `${DB_USER_SETTING_NAME}_MESSAGE`;
 
 export interface DB_BASE_COL {
   createdTime: string;
@@ -67,3 +70,9 @@ export const SPCDB = DB.get(SETTING_PREVIEW_CHANNEL);
  * @desc 存储用户设置的导航页相关设置
  */
 export const SNDB = DB.get(SETTING_NAVIGATION);
+
+/**
+ * @name 消息相关设置数据库
+ * @desc 存储用户设置的消息相关设置
+ */
+export const SMDB = DB.get(SETTING_MESSAGE);
