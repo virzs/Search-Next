@@ -2,9 +2,10 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2022-07-15 16:57:39
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-20 18:00:09
+ * @LastEditTime: 2022-07-21 17:38:12
  */
 
+import message from '@/data/message';
 import { SMDB } from '@/utils/db';
 import dayjs from 'dayjs';
 
@@ -30,14 +31,7 @@ export const getMessage = () => {
   const userId = localStorage.getItem('account');
   const res = SMDB.findOne({ userId });
   if (!res) {
-    setMessage({
-      release: {
-        show: true,
-        lastTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        interval: 0,
-        remind: 'popup',
-      },
-    });
+    setMessage(message);
   }
 
   return SMDB.findOne({ userId });

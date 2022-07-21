@@ -2,10 +2,11 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2022-07-14 11:59:12
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-20 18:00:35
+ * @LastEditTime: 2022-07-21 17:38:43
  */
 
 import { Release } from '@/apis/setting/message';
+import message from '@/data/message';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -17,12 +18,7 @@ export interface UseReleaseMessageAction {
  * @name 版本更新消息通知设置
  */
 const useReleaseMessage = (): [Release, UseReleaseMessageAction] => {
-  const [release, setRelease] = useState<Release>({
-    show: true,
-    lastTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    interval: 0,
-    remind: 'popup',
-  });
+  const [release, setRelease] = useState<Release>(message.release);
 
   const setData = (data: Release) => {
     let newData: Release = { ...release };
