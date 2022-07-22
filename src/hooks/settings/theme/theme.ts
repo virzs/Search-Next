@@ -2,13 +2,13 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2022-07-08 11:36:54
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-13 14:25:01
+ * @LastEditTime: 2022-07-22 13:43:54
  */
 
 import { DarkThemeSettings, getTheme, ThemeType } from '@/apis/setting/theme';
 import { auto, disable, enable } from 'darkreader';
 import { useEffect, useState } from 'react';
-import { setTheme } from '../../../../../apis/setting/theme';
+import { setTheme } from '../../../apis/setting/theme';
 
 export interface UseThemeData {
   type: ThemeType;

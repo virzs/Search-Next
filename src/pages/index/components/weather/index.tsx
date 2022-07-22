@@ -6,7 +6,7 @@
  */
 import Loading from '@/components/global/loading/loading';
 import SvgIcon from '@/components/global/svgIcon';
-import useWeather from '@/views/setting/features/weather/hooks/weather';
+import useWeather from '@/hooks/settings/weather/weather';
 import { cx } from '@emotion/css';
 import { styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 import React, { FC, useEffect, useState } from 'react';

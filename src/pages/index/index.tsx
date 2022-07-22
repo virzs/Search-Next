@@ -22,8 +22,8 @@ import NavDrawer from './components/nav-drawer';
 import { useNavigate } from 'react-router-dom';
 import Weather from './components/weather';
 import { SaveWeatherData } from '@/apis/weather/interface';
-import { usePreview } from '@/views/setting/personalise/background/hooks/preview';
-import useNavigation from '@/views/setting/features/navigation/hooks/navigation';
+import { usePreview } from '@/hooks/settings/background/preview';
+import useNavigation from '@/hooks/settings/navigation/navigation';
 
 const IndexPage: React.FC<PageProps> = (props) => {
   const history = useNavigate();

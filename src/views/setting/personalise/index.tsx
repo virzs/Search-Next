@@ -13,7 +13,7 @@ import { PageProps } from '@/typings';
 import React from 'react';
 import Example from './components/example';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { usePreview } from './background/hooks/preview';
+import { usePreview } from '@/hooks/settings/background/preview';
 
 const Personalise: React.FC<PageProps> = (props) => {
   const { route } = props;
