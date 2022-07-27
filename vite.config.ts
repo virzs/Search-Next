@@ -1,3 +1,9 @@
+/*
+ * @Author: vir virs98@outlook.com
+ * @Date: 2021-09-23 11:14:38
+ * @LastEditors: vir virs98@outlook.com
+ * @LastEditTime: 2022-07-27 13:46:47
+ */
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -17,6 +23,7 @@ export default defineConfig({
     VitePWA({}),
     mdx(),
     // build 分析
+    // @ts-ignore
     visualizer(),
     vitePluginImp({
       libList: [
