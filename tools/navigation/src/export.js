@@ -53,7 +53,7 @@ const formatData = (classify = [], website = [], level = 1) => {
         .filter(
           (j) =>
             j.createTime &&
-            dayjs().subtract(1, 'month').isAfter(dayjs(j.createTime)),
+            dayjs().subtract(1, 'month').isBefore(dayjs(j.createTime)),
         )
         .sort((a, b) => (a.createTime < b.createTime ? 1 : -1));
     }
