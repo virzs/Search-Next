@@ -2,7 +2,7 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2021-09-23 11:14:38
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-27 13:46:47
+ * @LastEditTime: 2022-07-28 09:39:40
  */
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
@@ -52,7 +52,13 @@ export default defineConfig({
     }),
     createSvgIconsPlugin({
       iconDirs: [
+        // 和风天气 icon 图标
         path.resolve(process.cwd(), 'node_modules/qweather-icons/icons'),
+        // icons8 网站下载的 windows 11 Color 风格图标
+        path.resolve(
+          process.cwd(),
+          'src/assets/svg/icons/icons8/windows11Color',
+        ),
       ],
       symbolId: 'icon-[name]',
     }),
