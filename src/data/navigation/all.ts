@@ -1375,6 +1375,38 @@ const allWebsites: Website[] = [
     classify: ['tools', 'software'],
     createTime: '2022-07-25',
   },
+  {
+    id: '1e75bde0e0c74de882bb1cd7c7f108e7',
+    name: '草料二维码',
+    url: 'https://cli.im/',
+    intro:
+      '我们努力把二维码技术变成简单实用的产品，让每个人和组织都能轻松使用。',
+    icon: 'cli',
+    color: '#479f48',
+    classify: ['tools', 'onlineTools'],
+    createTime: '2022-07-29',
+  },
+  {
+    id: '5d2ebb4218bd45ed97274128f04cbb1e',
+    name: 'PNGtoSVG',
+    url: 'https://png2svg.com/',
+    intro:
+      '使用此免费在线PNG 至SVG转换软件允许您将PNG文档转换成SVG文档，轻松且简单，无需安装任何软件。',
+    icon: 'png2svg',
+    color: '#596971',
+    classify: ['tools', 'onlineTools', 'imageProcess'],
+    createTime: '2022-08-09',
+  },
+  {
+    id: 'f96316b1a7834c9bbd106202661a95ef',
+    name: 'OBS Studio',
+    url: 'https://obsproject.com/',
+    intro: '免费开源的录屏软件',
+    icon: 'obs',
+    color: '#2e2e2e',
+    classify: ['tools', 'software'],
+    createTime: '2022-08-09',
+  },
 ];
 
 export default allWebsites;
