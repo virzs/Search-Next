@@ -23,6 +23,7 @@ import {
   ColorLens,
   WbSunny,
   FolderOutlined,
+  AppsOutlined,
 } from '@mui/icons-material';
 import React from 'react';
 import Auth from '@views/setting/auth';
@@ -46,12 +47,12 @@ import OtherApis from '@/views/setting/otherApis';
 import Message from '@/views/setting/features/message';
 import Engine from '@/views/setting/features/engine';
 import Channel from '@/views/setting/about/channel';
-import EngineDetail from '@/views/setting/features/engine/engineDetail';
 import ReleasesView from '@/views/setting/features/message/release';
 import Weather from '@/views/setting/features/weather';
 import SearchBar from '@/views/setting/personalise/searchBar';
 import Dependencies from '@/views/setting/about/dependencies';
 import { ChannelType } from '@/data/channel';
+import Icons from '@/views/setting/about/icons';
 
 /**
  * 关于 component 额外说明
@@ -195,14 +196,6 @@ const routers: Router[] = [
             path: 'search-engine',
             component: Engine,
             channel: 'beta',
-            routes: [
-              {
-                title: '搜索引擎详情',
-                icon: <Search />,
-                path: 'engine-detail/:id',
-                component: EngineDetail,
-              },
-            ],
           },
           {
             title: '天气',
@@ -249,6 +242,12 @@ const routers: Router[] = [
             icon: <FolderOutlined />,
             path: 'dependencies',
             component: Dependencies,
+          },
+          {
+            title: '图标库',
+            icon: <AppsOutlined />,
+            path: 'icons',
+            component: Icons,
           },
         ],
       },
