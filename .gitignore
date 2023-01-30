@@ -10,3 +10,4 @@ dist-ssr
 stats.html
 /report/*
 *.env
+/.vs
