@@ -148,6 +148,22 @@ VS Code 安装i18n Ally插件
 
 -----none------
 
+## 提交
+
+使用 cz 命令替换 git commit
+
+全局安装或项目中安装
+
+``` bash
+npm i -g commitizen cz-conventional-changelog
+# or
+npm i -D commitizen cz-conventional-changelog
+```
+
+``` bash
+cz
+```
+
 ## 版权说明
 
 ### GPL-3.0 License
