@@ -35,8 +35,6 @@
     "@mui/lab": "^5.0.0-alpha.61",
     "@mui/material": "^5.2.5",
     "@mui/x-data-grid": "^5.2.2",
-    "@sentry/react": "^6.19.4",
-    "@sentry/tracing": "^6.19.4",
     "antd": "^4.16.13",
     "axios": "^0.21.4",
     "bowser": "^2.11.0",
@@ -95,7 +93,6 @@
     "vite-plugin-imp": "^2.2.0",
     "vite-plugin-mdx": "^3.5.10",
     "vite-plugin-pwa": "^0.12.3",
-    "vite-plugin-sentry": "^1.1.2",
     "vite-plugin-svg-icons": "^2.0.1",
     "vitest": "^0.19.1"
   },
