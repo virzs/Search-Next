@@ -8,7 +8,7 @@
 import { getScale } from '@/utils/common';
 import { css, cx } from '@emotion/css';
 import React, { useEffect, useState } from 'react';
-import { UsePreviewData } from '../background/hooks/preview';
+import { UsePreviewData } from '@/hooks/settings/background/preview';
 
 export interface ExampleProps {
   data: UsePreviewData;

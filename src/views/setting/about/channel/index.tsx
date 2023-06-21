@@ -15,7 +15,7 @@ import { BugReportOutlined } from '@mui/icons-material';
 import { Alert } from '@mui/material';
 import React from 'react';
 import Docs from './docs.mdx';
-import useChannel from './hooks/channel';
+import useChannel from '@/hooks/settings/channel/channel';
 
 const Channel: React.FC = () => {
   const [{ channel, option }, { updateChannel }] = useChannel();

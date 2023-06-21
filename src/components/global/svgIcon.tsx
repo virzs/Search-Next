@@ -1,13 +1,15 @@
 /*
- * @Author: Vir
+ * @Author: vir virs98@outlook.com
  * @Date: 2022-05-11 10:11:06
- * @Last Modified by: Vir
- * @Last Modified time: 2022-05-11 14:40:47
+ * @LastEditors: vir virs98@outlook.com
+ * @LastEditTime: 2022-07-28 09:38:11
  */
+
 import React, { FC } from 'react';
 
 export interface SvgIconProps {
-  name: any;
+  name?: any;
+  fullName?: string;
   prefix?: string;
   color?: string;
   width?: number;

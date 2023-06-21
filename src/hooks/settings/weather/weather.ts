@@ -19,7 +19,7 @@ import {
   SaveWeatherData,
 } from '@/apis/weather/interface';
 import { useEffect, useState } from 'react';
-import geolocation from '../utils/geolocation';
+import geolocation from '../../../views/setting/features/weather/utils/geolocation';
 
 export interface Location {
   longitude: number;

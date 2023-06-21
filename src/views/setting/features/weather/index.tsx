@@ -14,7 +14,7 @@ import { css } from '@emotion/css';
 import { Alert, AlertTitle, Switch, TextField } from '@mui/material';
 import React, { FC, useEffect } from 'react';
 import WeatherCard from './components/weatherCard';
-import useWeather from './hooks/weather';
+import useWeather from '../../../../hooks/settings/weather/weather';
 
 const Weather: FC = () => {
   const [data, action] = useWeather();
