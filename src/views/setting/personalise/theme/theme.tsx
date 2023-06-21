@@ -2,7 +2,7 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2022-04-06 17:06:36
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-22 13:44:00
+ * @LastEditTime: 2022-07-13 14:25:06
  */
 
 import { DarkThemeSettings, ThemeType } from '@/apis/setting/theme';
@@ -12,7 +12,7 @@ import ContentTitle from '@/pages/setting/components/contentTitle';
 import ItemCard from '@/pages/setting/components/itemCard';
 import { Slider } from '@mui/material';
 import React from 'react';
-import useTheme from '@/hooks/settings/theme/theme';
+import useTheme from './hooks/theme';
 
 const Theme: React.FC = () => {
   const [{ type = 'light', darkSettings }, { setTheme }] = useTheme();

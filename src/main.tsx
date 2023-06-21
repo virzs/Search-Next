@@ -2,7 +2,7 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2021-09-22 16:34:45
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2023-02-03 15:47:39
+ * @LastEditTime: 2022-07-13 14:35:57
  */
 import React from 'react';
 import * as client from 'react-dom/client';
@@ -16,6 +16,8 @@ import getVersionInfo from './components/global/versionModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { auto, disable, enable } from 'darkreader';
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 import 'virtual:svg-icons-register';
 import { getTheme } from './apis/setting/theme';
 
@@ -61,6 +63,14 @@ window.onerror = function (msg, source, lineno, colno, error) {
   toast.error(msg);
   return false;
 };
+
+env?.VITE_SENTRY_URL &&
+  env?.PROD &&
+  Sentry.init({
+    dsn: env?.VITE_SENTRY_URL as string,
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 1.0,
+  });
 
 const rootElement = document.getElementById('root');
 if (rootElement) {

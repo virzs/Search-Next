@@ -49,16 +49,6 @@ QQ群：859791575
 
 实际流程可能会直接跳过 `beta` 分支，例如 bug fix
 
-提交代码
-
-``` powershell
-> cz
-```
-
-## 新手必看
-
-[新手必看](./docs/%E6%96%B0%E6%89%8B%E5%BF%85%E7%9C%8B.md)
-
 ## 启动项目
 
 需要nodejs（版本不限，建议最新）、yarn（npm也可以）
@@ -159,22 +149,6 @@ VS Code 安装i18n Ally插件
 ## 引用资源
 
 -----none------
-
-## 提交
-
-使用 cz 命令替换 git commit
-
-全局安装或项目中安装
-
-``` bash
-npm i -g commitizen cz-conventional-changelog
-# or
-npm i -D commitizen cz-conventional-changelog
-```
-
-``` bash
-cz
-```
 
 ## 版权说明
 
