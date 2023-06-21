@@ -14,7 +14,7 @@ export interface FormItemProps {
   rules: Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
 }
 
-export interface FormProps<T extends FieldValues> {
+export interface FormProps<T> {
   id?: string;
   items?: FormItemProps[];
   form: UseFormReturn<T>;
@@ -22,7 +22,7 @@ export interface FormProps<T extends FieldValues> {
   children: any;
 }
 
-function Form<T extends FieldValues>(props: FormProps<T>) {
+function Form<T>(props: FormProps<T>) {
   const { id, form, size, children } = props;
 
   const [items, setItems] = React.useState<any[]>([]);

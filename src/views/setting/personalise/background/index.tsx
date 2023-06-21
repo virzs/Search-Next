@@ -15,8 +15,8 @@ import Bing from './bgTypes/bing';
 import BingEveryDay from './bgTypes/bingEveryDay';
 import Color from './bgTypes/color';
 import { BackgroundType } from '@/apis/setting/background';
-import useBackground from '@/hooks/settings/background/background';
-import { usePreview } from '@/hooks/settings/background/preview';
+import useBackground from './hooks/background';
+import { usePreview } from './hooks/preview';
 
 export interface BgOptions {
   label: string;

@@ -2,7 +2,7 @@
  * @Author: vir virs98@outlook.com
  * @Date: 2022-03-21 20:36:38
  * @LastEditors: vir virs98@outlook.com
- * @LastEditTime: 2022-07-22 13:41:15
+ * @LastEditTime: 2022-07-13 16:53:33
  */
 import Select from '@/components/md-custom/form/select';
 import ContentList from '@/pages/setting/components/contentList';
@@ -10,7 +10,7 @@ import ItemCard from '@/pages/setting/components/itemCard';
 
 import { PageProps } from '@/typings';
 import React from 'react';
-import useNavigation from '../../../../hooks/settings/navigation/navigation';
+import useNavigation from './hooks/navigation';
 
 const Navigation: React.FC<PageProps> = (props) => {
   const [{ type, cols }, { setNavigation }] = useNavigation();

@@ -10,7 +10,7 @@ import ItemCard from '@/pages/setting/components/itemCard';
 import { Alert, AlertTitle, SelectChangeEvent, Switch } from '@mui/material';
 import React, { FC } from 'react';
 import Select from '@/components/md-custom/form/select';
-import useMessage from '../../../../../hooks/settings/message/message';
+import useMessage from '../hooks/message';
 import { Release as ReleaseType } from '@/apis/setting/message';
 
 const Release: FC = () => {
