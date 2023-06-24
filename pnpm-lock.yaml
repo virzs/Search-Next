@@ -12,6 +12,7 @@ specifiers:
   eslint: ^8.38.0
   eslint-plugin-react-hooks: ^4.6.0
   eslint-plugin-react-refresh: ^0.3.4
+  lodash: ^4.17.21
   postcss: ^8.4.24
   primereact: ^9.5.0
   react: ^18.2.0
@@ -24,6 +25,7 @@ specifiers:
 
 dependencies:
   dayjs: 1.11.8
+  lodash: 4.17.21
   primereact: 9.5.0_b2wlzab4o7ehpxv6mvz3buccci
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -2037,7 +2039,6 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /log-symbols/4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
