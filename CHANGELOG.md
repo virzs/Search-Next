@@ -1,3 +1,68 @@
+### [0.13.6](https://github.com/virzs/Search-Next/compare/v0.13.5...v0.13.6) (2023-07-04)
+
+
+### ♻ Code Refactoring | 代码重构
+
+* **导航页设置:** :recycle: 重写导航页设置，增加设置每行显示个数 ([618a881](https://github.com/lpreterite/datagent/commit/618a88142ade630c0228feaf58af207951245cc4))
+* **默认数据:** :wastebasket: 清理代码 ([9f1428a](https://github.com/lpreterite/datagent/commit/9f1428addbb2e57c6759ece9da89f5d046b26f2f))
+* **设置页:** :necktie: 设置页适配预览渠道 ([27c2e84](https://github.com/lpreterite/datagent/commit/27c2e84974b4a357a7e46859f402ddc2b6ba55a0))
+* **预览渠道:** :recycle: 重写预览渠道相关代码 ([818217c](https://github.com/lpreterite/datagent/commit/818217c50a9d6bee8974fcea65b08d63a7ef206c))
+* **主题设置:** :recycle: 主题设置数据从账户数据分离 ([8c54877](https://github.com/lpreterite/datagent/commit/8c548775d9f429f1dd738607cdda3e513948ea2c))
+* **hooks:** :truck: hooks 位置调整 ([a915a7a](https://github.com/lpreterite/datagent/commit/a915a7aac3c61b5215250c9cda223f332d479c06))
+
+
+### ✨ Features | 新功能
+
+* **错误页面:** :sparkles: 增加 401 404 错误页面 ([2fb7493](https://github.com/lpreterite/datagent/commit/2fb7493605fb080b51d6ec4f8b69938862f29419))
+* **图标库:** :sparkles: 添加 Windows 11 风格图标 ([d2e7290](https://github.com/lpreterite/datagent/commit/d2e7290641f4a1a97b76c7174c67d3a900a85839))
+
+
+### 🔧 Continuous Integration | CI 配置
+
+* **切换为pnpm:** yarn -> pnpm，去掉sentry配置 ([7f22514](https://github.com/lpreterite/datagent/commit/7f2251468b74461cd29bbb5efc836fef1d07fbf3))
+* **依赖:** :arrow_up: 升级 vite ([0dbd655](https://github.com/lpreterite/datagent/commit/0dbd655565716dcc0b4e87efd1b0b10baefff584))
+* **vite:** :arrow_up: vite v2.x -> vite v3.x ([9675ff4](https://github.com/lpreterite/datagent/commit/9675ff40516e4e69de7038b38543d8a0f48f6c60))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **版本更新消息提示设置:** :bug: 修复首次进入版本更新不提示bug ([89d6d47](https://github.com/lpreterite/datagent/commit/89d6d4721ac6559984aa81613daca91cc8874c77))
+* **版本更新消息提醒设置:** :bug: 修复每次进入都会提示的bug ([f7fce5a](https://github.com/lpreterite/datagent/commit/f7fce5a783291ff9de70747e37b0b359eb12642b))
+* **部署:** :bug: 修复部署错误 ([13de34c](https://github.com/lpreterite/datagent/commit/13de34c78b9aebd657ff63891d6a57205c8e260d))
+* **错误页:** :bug: 修复错误页某些情况下显示异常 ([fe59a8c](https://github.com/lpreterite/datagent/commit/fe59a8c7e6a5ff1f6a1e24fd416c925cb402ae0a))
+* **导航抽屉:** :bug: 修复导航抽屉最近新增网站未显示 bug ([fc48c4f](https://github.com/lpreterite/datagent/commit/fc48c4f4dd1230be7b405968eabcd1787f9c5350))
+* **脚本:** :bug: 修复导航数据处理脚本 未正确处理 最近新增 bug ([c093716](https://github.com/lpreterite/datagent/commit/c093716a638143f7027b9395bf2cde596e87af4f))
+* **build:** :bug: 修复build报错 ([60759af](https://github.com/lpreterite/datagent/commit/60759af53c4fca05a3fb2fe3a11896c3427ca86c))
+
+
+### 💄 Styles | 风格
+
+* **样式:** 优化输入框样式 ([6cda361](https://github.com/lpreterite/datagent/commit/6cda361218d386f55ca2722a8ce65a8c0e6c45a6))
+* **主页:** :lipstick: 主页适配移动端 ([7211ddd](https://github.com/lpreterite/datagent/commit/7211ddd841e0e40944a04fdda318ceacb9609c00))
+
+
+### 📝 Documentation | 文档
+
+* **说明:** :memo: 更新项目分支说明 ([ceaf0d0](https://github.com/lpreterite/datagent/commit/ceaf0d0aab6ebce7fe74df04a5106e939700d2fd))
+* **说明:** :memo: 更新在线地址说明 ([f11b0e6](https://github.com/lpreterite/datagent/commit/f11b0e66df389939e7025c165efc83fc42b02d18))
+* **文档:** 增加说明文档 ([87829b7](https://github.com/lpreterite/datagent/commit/87829b7703ea58419b3c601b44dd776576fd454e))
+* **增加提交说明:** 添加针对 commitizen 的说明 ([bb7d81b](https://github.com/lpreterite/datagent/commit/bb7d81b1f7514f11d2941fcf8910462a31d31b7c))
+
+
+### 📦 Chores | 其他更新
+
+* **版本更新消息提醒设置:** :recycle: 重写版本更新消息提示代码 ([ebd94fe](https://github.com/lpreterite/datagent/commit/ebd94fe4f1e488cf0950687b5d7beb8b422205dc))
+* **编译及说明文档:** 修复编译报错，增加文档说明 ([1b31c72](https://github.com/lpreterite/datagent/commit/1b31c7294c7098d92e2a6fe6a0d34ee64e803ee4))
+* **代码:** :fire: 删除无用代码 ([28f18fb](https://github.com/lpreterite/datagent/commit/28f18fb4eaff1c0cf4e97b4b0ffb764794c111eb))
+* **导航数据:** :card_file_box: 更新导航数据 ([68c1368](https://github.com/lpreterite/datagent/commit/68c1368116726c1c234154554b519c4a64e57502))
+* **导航数据:** :card_file_box: 增加导航数据 ([fd864ac](https://github.com/lpreterite/datagent/commit/fd864ac6ab961476bce39a43333e0a0afc1f4b04))
+* **搜索引擎设置:** :necktie: 搜索引擎设置功能修改为 beta 渠道 ([bee1aa2](https://github.com/lpreterite/datagent/commit/bee1aa21ca7806076278c8f6d15953e159223f7e))
+* **图标:** :truck: 图标重命名 ([3fc6598](https://github.com/lpreterite/datagent/commit/3fc659809370c6f96ffa646ca8933223d76ee699))
+* **项目依赖:** :speech_balloon: 为项目依赖添加说明 ([e7f08f6](https://github.com/lpreterite/datagent/commit/e7f08f6e0057391751b8e4c924b3237323b9f7aa))
+* **依赖:** :heavy_plus_sign: 添加recoil :heavy_minus_sign: 删除弃用依赖 ([8f6199e](https://github.com/lpreterite/datagent/commit/8f6199e6778ee5243685055c554e77bfc613f6a8))
+* **组件:** :lipstick: 优化组件样式 ([50f6160](https://github.com/lpreterite/datagent/commit/50f6160a1dff98660b5d0801f57a428e821c600e))
+* **组件:** :necktie: itemAccordion 支持默认展开 ([94462a4](https://github.com/lpreterite/datagent/commit/94462a4aafff9da96890b16cfafde99536a7dc7b))
+
 ### [0.13.5](https://github.com/virzs/Search-Next/compare/v0.13.4...v0.13.5) (2022-06-29)
 
 

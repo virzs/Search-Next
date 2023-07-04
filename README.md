@@ -8,6 +8,13 @@
 
 Search项目的React版本，相较于原项目从原生js更改为React，引入新的设计和交互，原项目已实现或未实现的内容将移植到此项目,并且此项目将加入更多新功能。
 
+##  版本说明
+
+- 1.x 分支 1.x
+- 2.x 分支 2.x
+
+当前 master 分支为 1.x，1.0版本不再继续更新
+
 ## 在线地址
 
 - [master.search.virs.xyz (稳定版)](https://master.search.virs.xyz)

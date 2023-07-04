@@ -97,6 +97,8 @@ const SugPopper: React.FC<SugPopperProps> = ({
       placement="bottom"
       container={anchorEl}
       className="z-10 top-auto left-auto"
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       {({ TransitionProps }) => (
         <Card
