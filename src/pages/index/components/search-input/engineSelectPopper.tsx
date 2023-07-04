@@ -69,7 +69,7 @@ const EngineSelectPopper: FC<EngineSelectPopperProps> = (props) => {
 
   return (
     <div className="mb-1">
-      <Popper open={open} anchorEl={anchorEl} placement="top">
+      <Popper open={open} anchorEl={anchorEl} placement="top" onResize={undefined} onResizeCapture={undefined}>
         {({ TransitionProps }) => (
           <Card
             {...TransitionProps}
