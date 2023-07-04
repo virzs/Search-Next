@@ -12,7 +12,7 @@ import RenderOutlet from "./components/renderOutlet";
 import ErrorView from "./components/error";
 
 function App() {
-  locale("zh-CN");
+  // locale("zh-CN");
 
   // 处理路由数据
   const Recursive = (routes: Router[], parent?: Router, basePath?: string) => {

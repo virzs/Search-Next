@@ -26,6 +26,7 @@ import appConfig from "./widgets/app/config";
 import { ContextMenu } from "primereact/contextmenu";
 import { MenuItem } from "primereact/menuitem";
 import { cx } from "@emotion/css";
+import storeConfig from "./widgets/store/config";
 
 interface GridLayoutProps {
   className?: string;
@@ -33,7 +34,7 @@ interface GridLayoutProps {
 
 interface GridItem extends GridStackWidget {
   id: string;
-  el?: JSX.Element;
+  el?: () => JSX.Element;
 }
 
 interface GridNode extends GridStackNode {
@@ -41,11 +42,11 @@ interface GridNode extends GridStackNode {
 }
 
 const GridLayout: FC<GridLayoutProps> = () => {
-  const [items, setItems] = useState<GridItem[]>([]);
+  const [items, setItems] = useState<GridItem[]>([storeConfig]);
 
   const refs = useRef<{ [x: string]: RefObject<GridStackElement> }>({});
   const gridRef = useRef<GridStack>();
-  const cm = useRef<ContextMenu>();
+  const cm = useRef<ContextMenu>(null);
 
   const [contextMenuItems, setContextMenuItems] = useState<MenuItem[]>([]);
 
@@ -88,9 +89,18 @@ const GridLayout: FC<GridLayoutProps> = () => {
     [items]
   );
 
+  const addItem = (item) => {
+    setItems([...items, item]);
+  };
+
   useEffect(() => {
     gridRef.current = GridStack.init(
-      { float: true, acceptWidgets: true, column: 12 },
+      {
+        float: true,
+        acceptWidgets: true,
+        column: 12,
+        disableOneColumnMode: true,
+      },
       ".grid-layout"
     );
   }, []);
@@ -127,30 +137,28 @@ const GridLayout: FC<GridLayoutProps> = () => {
 
   return (
     <div>
-      <Button
+      {/* <Button
         onClick={() => {
-          setItems([
-            ...items,
-            {
-              ...appConfig,
-              id: `item-${items.length + 1}`,
-              dataSource: {
-                name: "百度",
-                url: "https://www.baidu.com",
-                icon: "https://www.baidu.com/favicon.ico",
-              },
+          addItem({
+            ...appConfig,
+            id: `item-${items.length + 1}`,
+            dataSource: {
+              name: "百度",
+              url: "https://www.baidu.com",
+              icon: "https://www.baidu.com/favicon.ico",
             },
-          ]);
+          });
         }}
       >
         新增 App
-      </Button>
+      </Button> */}
       <GridLayoutContext.Provider
         value={{
           container: gridRef.current,
           items: refs.current,
           cm: cm.current,
           setContextMenuItems,
+          addItem,
         }}
       >
         <div className="grid-stack h-screen grid-layout">
