@@ -4,10 +4,51 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--看板娘CSS-->
+    <link rel="stylesheet" type="text/css" href="https://live2d.fghrsh.net/assets/1.4.2/waifu.min.css"/>
     <title>Search Next</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    
+    <!--看板娘模块-->
+      <div class="waifu">
+        <div class="waifu-tips"></div>
+        <canvas id="live2d" class="live2d"></canvas>
+        <div class="waifu-tool">
+            <span class="fui-home"></span>
+            <span class="fui-chat"></span>
+            <span class="fui-eye"></span>
+            <span class="fui-user"></span>
+            <span class="fui-photo"></span>
+            <span class="fui-info-circle"></span>
+            <span class="fui-cross"></span>
+      </div>
+    </div>
+    <!--自定义waifu-tips.min.js-->
+     <script src="http://xxxxx/waifu-tips.min.js"></script>
+    <!--自定义live2d.min.js-->
+    <script src="https://xxxxx/live2d.min.js"></script>
+    <!--默认不修改-->
+    <script type="text/javascript">
+        /* 可直接修改部分参数 */
+        live2d_settings['modelId'] = 1;                  // 默认模型 ID
+        live2d_settings['modelTexturesId'] = 87;         // 默认材质 ID
+        live2d_settings['modelStorage'] = false;         // 不储存模型 ID
+        live2d_settings['canCloseLive2d'] = false;       // 隐藏 关闭看板娘 按钮
+        live2d_settings['canTurnToHomePage'] = false;    // 隐藏 返回首页 按钮
+        live2d_settings['waifuSize'] = '600x535';        // 看板娘大小
+        live2d_settings['waifuTipsSize'] = '570x150';    // 提示框大小
+        live2d_settings['waifuFontSize'] = '30px';       // 提示框字体
+        live2d_settings['waifuToolFont'] = '36px';       // 工具栏字体
+        live2d_settings['waifuToolLine'] = '50px';       // 工具栏行高
+        live2d_settings['waifuToolTop'] = '-60px';       // 工具栏顶部边距
+        live2d_settings['waifuDraggable'] = 'axis-x';    // 拖拽样式
+        /* 在 initModel 前添加 */
+        /* 自行修改waifu-tips.json路径或者api地址
+        initModel("https://xxxxxx/waifu-tips.json")
+    </script>
   </body>
 </html>
