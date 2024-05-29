@@ -6,6 +6,7 @@ import { css, cx } from "@emotion/css";
 import ContextMenu from "./Item/ContextMenu";
 import SortableGroupItem from "./Item/GroupItem";
 import { SortItem } from "./types";
+import ItemInfoModal from "./Item/Modal/infoModal";
 
 export interface SortableProps {
   list?: SortItem[];
@@ -13,7 +14,13 @@ export interface SortableProps {
 
 const Sortable: FC<SortableProps> = (props) => {
   const { list: propList } = props;
-  const { list, setList, setListStatus } = useSortable();
+  const {
+    list,
+    setList,
+    setListStatus,
+    showInfoItemData,
+    setShowInfoItemData,
+  } = useSortable();
 
   return (
     <>
@@ -38,6 +45,7 @@ const Sortable: FC<SortableProps> = (props) => {
           const draggedData = dragged.dataset;
           const relatedData = related.dataset;
           // 限制只有一层
+          // sortable-group-item 标记为文件夹
           if (
             (Object.keys(relatedData).length === 0 || relatedData.parentIds) &&
             Number(draggedData.childrenLength) > 0 &&
@@ -89,6 +97,14 @@ const Sortable: FC<SortableProps> = (props) => {
         })}
       </ReactSortable>
       <ContextMenu />
+
+      {/* 单个item信息弹窗 */}
+      <ItemInfoModal
+        data={showInfoItemData}
+        onClose={() => {
+          setShowInfoItemData(null);
+        }}
+      />
     </>
   );
 };

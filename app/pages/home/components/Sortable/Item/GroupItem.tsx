@@ -39,7 +39,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
       >
         <ReactSortable
           className={cx(
-            "h-full w-full grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item",
+            "h-full w-full grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item cursor-pointer",
             childrenEmpty ? "" : "p-1.5"
           )}
           group={{ name: "nested", pull: false, put: true }}
@@ -56,10 +56,12 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
         >
           {_children?.map((item) => (
             <motion.div
+              data-parent-ids={parentIds?.join(",")}
+              data-children-length={children?.length}
               className={cx(
-                "bg-green-500 rounded transition-all",
+                "bg-green-500 rounded transition-all cursor-pointer",
                 childrenEmpty
-                  ? "col-span-3 row-span-3"
+                  ? "col-span-3 row-span-3 sortable-group-item"
                   : "col-span-1 row-span-1"
               )}
               key={item.id}

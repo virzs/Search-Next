@@ -9,6 +9,7 @@ import { SortItem } from "./types";
 
 interface ContextMenu {
   rect: DOMRect;
+  data: any;
 }
 
 type ListStatus = "onMove";
@@ -22,6 +23,8 @@ export interface SortableContextProps {
   setListStatus: (e: ListStatus | null) => void;
   contextMenuFuns: (data: any) => any;
   hideContextMenu: () => void;
+  showInfoItemData: SortItem | null;
+  setShowInfoItemData: (e: SortItem | null) => void;
 }
 
 export const SortableContext = createContext<SortableContextProps>({
@@ -33,6 +36,8 @@ export const SortableContext = createContext<SortableContextProps>({
   setListStatus: () => {},
   contextMenuFuns: () => {},
   hideContextMenu: () => {},
+  showInfoItemData: null,
+  setShowInfoItemData: () => {},
 });
 
 interface SortableProviderProps {
@@ -49,15 +54,18 @@ export const SortableProvider = ({
   const [listStatus, setListStatus] = useState<ListStatus | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [list, setList] = useState<any[]>([]);
+  const [showInfoItemData, setShowInfoItemData] = useState<SortItem | null>(
+    null
+  );
 
   const hideContextMenu = () => {
     setContextMenu(null);
     clearTimeout(contextMenuTimer);
   };
 
-  const getItemRectAndSetContextMenu = (e: any) => {
+  const getItemRectAndSetContextMenu = (e: any, data: any) => {
     const rect = (e.target as HTMLElement).getBoundingClientRect();
-    setContextMenu({ ...e, rect });
+    setContextMenu({ ...e, rect, data });
     clearTimeout(contextMenuTimer);
   };
 
@@ -65,7 +73,7 @@ export const SortableProvider = ({
     return {
       onMouseDown: (e: any) => {
         contextMenuTimer = setTimeout(() => {
-          getItemRectAndSetContextMenu(e);
+          getItemRectAndSetContextMenu(e, data);
         }, 800);
       },
       onMouseUp: () => {
@@ -73,7 +81,7 @@ export const SortableProvider = ({
       },
       onContextMenu: (e: any) => {
         e.preventDefault();
-        getItemRectAndSetContextMenu(e);
+        getItemRectAndSetContextMenu(e, data);
       },
     };
   };
@@ -93,6 +101,7 @@ export const SortableProvider = ({
             updateChild(parent.children || []);
           } else if (parent) {
             parent.children = list;
+            console.log("parent", parent);
           } else {
             _list = list;
           }
@@ -133,6 +142,8 @@ export const SortableProvider = ({
         setListStatus,
         contextMenuFuns,
         hideContextMenu,
+        showInfoItemData,
+        setShowInfoItemData,
       }}
     >
       {children}

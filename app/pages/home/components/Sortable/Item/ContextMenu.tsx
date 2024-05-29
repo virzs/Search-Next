@@ -16,16 +16,18 @@ const itemVariants: Variants = {
 interface ContextButtonProps {
   icon: any;
   title: string;
+  onClick?: () => void;
 }
 
 const ContextButton: FC<ContextButtonProps> = (props) => {
-  const { icon, title } = props;
+  const { icon, title, onClick } = props;
 
   return (
     <motion.div
       className="hover:bg-gray-100 dark:text-black text-xs cursor-pointer transition select-none rounded-lg"
       onClick={(e) => {
         e.stopPropagation();
+        onClick?.();
       }}
       variants={itemVariants}
     >
@@ -40,8 +42,13 @@ const ContextButton: FC<ContextButtonProps> = (props) => {
 export interface ContextMenuProps {}
 
 const ContextMenu: FC<ContextMenuProps> = (props) => {
-  const { contextMenu, setContextMenu, listStatus, hideContextMenu } =
-    useSortable();
+  const {
+    contextMenu,
+    setContextMenu,
+    listStatus,
+    hideContextMenu,
+    setShowInfoItemData,
+  } = useSortable();
   const ref = useRef<HTMLDivElement>(null);
 
   const { rect } = contextMenu ?? {};
@@ -85,7 +92,13 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
         >
           <motion.div className="flex">
             <ContextButton icon={<Icons.ShareOne />} title="分享" />
-            <ContextButton icon={<Icons.Info />} title="信息" />
+            <ContextButton
+              icon={<Icons.Info />}
+              title="信息"
+              onClick={() => {
+                setShowInfoItemData(contextMenu.data);
+              }}
+            />
             <ContextButton icon={<Icons.DeleteThree />} title="移除" />
           </motion.div>
         </motion.div>
