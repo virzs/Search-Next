@@ -58,6 +58,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
               ></motion.div>
             ))}
           </motion.div>
+          {/* 需要设置宽高小于父元素，否则在拖拽时会始终响应子列表 */}
           <ReactSortable
             className={cx(
               "absolute left-1.5 top-1.5 grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item cursor-pointer",
