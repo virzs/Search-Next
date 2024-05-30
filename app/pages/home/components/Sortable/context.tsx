@@ -101,7 +101,15 @@ export const SortableProvider = ({
             updateChild(parent.children || []);
           } else if (parent) {
             parent.children = list;
-            console.log("parent", parent);
+            if (listStatus !== null) {
+              const newParent = { ...parent };
+              newParent.children = [];
+              parent.children = [newParent, ...list].filter(
+                (item) => item.type === "app"
+              );
+              parent.data = null;
+              parent.type = "group";
+            }
           } else {
             _list = list;
           }
