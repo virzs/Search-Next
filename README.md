@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Search 导航页 Next 版
 
-## Getting Started
+![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next) ![license](https://img.shields.io/github/license/virzs/Search-Next) [![wakatime](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4.svg)](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4)
 
-First, run the development server:
+2x 正在开发中，暂不提供在线地址预览，查看历史版本请切换至 1x 分支
+
+后端部分暂不开源，待项目稳定后发布
+
+2x 版本将会支持账号
+
+## 版本说明
+
+- 1.x 分支 1.x
+- 2.x 分支 2.x
+
+## 在线地址
+
+待更新
+
+## 在线交流
+
+QQ 群：859791575
+
+欢迎提供意见或建议
+
+## 启动项目
+
+需要 nodejs（版本不限，建议最新）、pnpm（npm 也可以）
+
+安装依赖：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+启动项目：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+编译项目：
 
-## Learn More
+```bash
+pnpm build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Star 趋势
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+[![Stargazers over time](https://starchart.cc/virzs/Search-Next.svg)](https://starchart.cc/virzs/Search-Next)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## 更新路线
 
-## Deploy on Vercel
+![版本更新路线](https://user-images.githubusercontent.com/44538687/173269566-fd3ba5cc-bbb7-45b7-81b8-3dc2fd09512c.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 常见问题说明
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+待更新
+
+## 插件
+
+规划中，预计采用微前端方案
+
+[Search Next Plugins](https://github.com/virzs/Search-Next-Plugins)
+
+## 后端支持
+
+待更新，暂不开源
+
+**多语言：**
+
+VS Code 安装 i18n Ally 插件
+
+## 引用资源
+
+-----none------
+
+## 版权说明
+
+### GPL-3.0 License
+
+由 [Vir](https://github.com/virzs) 维护的 `Search-Next` 仓库及后端 u 你代码仓库默认遵循`GPL-3.0` 协议开源发布
+
+下面简述由 `GPL-3.0` 带来的约束条款( 本处解释若无特别说明无 法律效益, 仅仅帮助了解协议大体内容, `GPL-3.0` 最终解释权应当归属自由软件基金会 )
+
+1、确保软件自始至终都以开放源代码形式发布，保护开发成果不被窃取用作商业发售。任何一套软 件，只要其中使用了受 GPL 协议保护的第三方软件的源程序，并向非开发人员发布时，软件本身也就自动成为受 GPL 保护并且约束的实体。也就是说，此时它必须开放源代码。
+
+2、GPL 大致就是一个左侧版权（Copyleft，或译为“反版权”、“版权属左”、“版权所无”、“版责”等）的体现。你可以去掉所有原作的版权 信息，只要你保持开源，并且随源代码、二进制版附上 GPL 的许可证就行，让后人可以很明确地得知此软件的授权信息。GPL 精髓就是，只要使软件在完整开源 的情况下，尽可能使使用者得到自由发挥的空间，使软件得到更快更好的发展。
+
+3、无论软件以何种形式发布，都必须同时附上源代码。例如在 Web 上提供下载，就必须在二进制版本（如果有的话）下载的同一个页面，清楚地提供源代码下载的链接。如果以光盘形式发布，就必须同时附上源文件的光盘。
+
+4、开发或维护遵循 GPL 协议开发的软件的公司或个人，可以对使用者收取一定的服务费用。但还是一句老话——必须无偿提供软件的完整源代码，不得将源代码与服务做捆绑或任何变相捆绑销售。
+
+### 附加条款
+
+此附加条款符合 `GPL-3.0` 协议并具有法律效益
+
+禁止歪曲或隐藏代码的来源, 对于代码的所有修改, 要以合理形式标示出和原版的区别
+禁止假借原作者名号, 进行包括但不限于宣传 销售的行为
+我页面中必须出现带有完整原版权声明的文字, 并放置在醒目的位置
+除此之外使用本项目造成的各种问题 纠纷, 原作者皆不负责
+只要你遵循上述条款规定，您就可以自由使用并传播本源代码
