@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Sortable from "./components/Sortable";
 import { SortableProvider } from "./components/Sortable/context";
 import { SortItem } from "./components/Sortable/types";
+import Header from "./components/Header";
+import Footer from "@/app/components/Layout/Footer";
 
 const Home = () => {
   const [list, setList] = useState<SortItem[]>([
@@ -66,11 +68,15 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
-      <SortableProvider list={list}>
-        <Sortable />
-      </SortableProvider>
-    </div>
+    <main className="w-screen h-screen flex flex-col items-center justify-center dark:bg-black transition-colors">
+      <Header />
+      <div className="mx-auto max-w-5xl w-full flex-1">
+        <SortableProvider list={list}>
+          <Sortable />
+        </SortableProvider>
+      </div>
+      <Footer />
+    </main>
   );
 };
 

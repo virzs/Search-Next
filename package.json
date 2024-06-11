@@ -9,7 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/cssinjs": "^1.20.0",
+    "@ant-design/nextjs-registry": "^1.0.0",
     "@emotion/css": "^11.11.2",
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-regular-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "antd": "^5.16.2",
     "framer-motion": "^11.0.28",
     "next": "14.2.1",

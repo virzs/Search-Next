@@ -1,7 +1,14 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@ant-design/cssinjs': ^1.20.0
+  '@ant-design/nextjs-registry': ^1.0.0
   '@emotion/css': ^11.11.2
+  '@fortawesome/fontawesome-svg-core': ^6.5.2
+  '@fortawesome/free-brands-svg-icons': ^6.5.2
+  '@fortawesome/free-regular-svg-icons': ^6.5.2
+  '@fortawesome/free-solid-svg-icons': ^6.5.2
+  '@fortawesome/react-fontawesome': ^0.2.2
   '@types/node': ^20
   '@types/react': ^18
   '@types/react-dom': ^18
@@ -21,7 +28,14 @@ specifiers:
   typescript: ^5
 
 dependencies:
+  '@ant-design/cssinjs': 1.20.0_biqbaboplfbrettd7655fr4n2y
+  '@ant-design/nextjs-registry': 1.0.0_6n62kvl4luw3lbg5eetxqtqnd4
   '@emotion/css': 11.11.2
+  '@fortawesome/fontawesome-svg-core': 6.5.2
+  '@fortawesome/free-brands-svg-icons': 6.5.2
+  '@fortawesome/free-regular-svg-icons': 6.5.2
+  '@fortawesome/free-solid-svg-icons': 6.5.2
+  '@fortawesome/react-fontawesome': 0.2.2_eqehtq6deupjpkcqkuzoi3symq
   antd: 5.16.2_biqbaboplfbrettd7655fr4n2y
   framer-motion: 11.0.28_biqbaboplfbrettd7655fr4n2y
   next: 14.2.1_biqbaboplfbrettd7655fr4n2y
@@ -60,8 +74,8 @@ packages:
       '@ctrl/tinycolor': 3.6.1
     dev: false
 
-  /@ant-design/cssinjs/1.19.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-hgQ3wiys3X0sqDKWkqCJ6EYdF79i9JCvtavmIGwuuPUKmoJXV8Ff0sY+yQQSxk2dRmMyam/bYKo/Bwor45hnZw==}
+  /@ant-design/cssinjs/1.20.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-uG3iWzJxgNkADdZmc6W0Ci3iQAUOvLMcM8SnnmWq3r6JeocACft4ChnY/YWvI2Y+rG/68QBla/O+udke1yH3vg==}
     peerDependencies:
       react: '>=16.0.0'
       react-dom: '>=16.0.0'
@@ -93,6 +107,22 @@ packages:
       '@babel/runtime': 7.24.4
       classnames: 2.5.1
       rc-util: 5.39.1_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@ant-design/nextjs-registry/1.0.0_6n62kvl4luw3lbg5eetxqtqnd4:
+    resolution: {integrity: sha512-kU1K1UOhwrF6DPv73MhuL5a6U4e6/TiFapeLUt/c/kch9h5qFwEaJPb4RSJKNw0PRBfqCAPS011wVm4wYcrqbQ==}
+    peerDependencies:
+      '@ant-design/cssinjs': ^1.18.2
+      antd: ^5.0.0
+      next: ^14.0.0
+      react: '>=16.0.0'
+      react-dom: '>=16.0.0'
+    dependencies:
+      '@ant-design/cssinjs': 1.20.0_biqbaboplfbrettd7655fr4n2y
+      antd: 5.16.2_biqbaboplfbrettd7655fr4n2y
+      next: 14.2.1_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
@@ -279,6 +309,55 @@ packages:
     resolution: {integrity: sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@fortawesome/fontawesome-common-types/6.5.2:
+    resolution: {integrity: sha512-gBxPg3aVO6J0kpfHNILc+NMhXnqHumFxOmjYCFfOiLZfwhnnfhtsdA2hfJlDnj+8PjAs6kKQPenOTKj3Rf7zHw==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dev: false
+
+  /@fortawesome/fontawesome-svg-core/6.5.2:
+    resolution: {integrity: sha512-5CdaCBGl8Rh9ohNdxeeTMxIj8oc3KNBgIeLMvJosBMdslK/UnEB8rzyDRrbKdL1kDweqBPo4GT9wvnakHWucZw==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 6.5.2
+    dev: false
+
+  /@fortawesome/free-brands-svg-icons/6.5.2:
+    resolution: {integrity: sha512-zi5FNYdmKLnEc0jc0uuHH17kz/hfYTg4Uei0wMGzcoCL/4d3WM3u1VMc0iGGa31HuhV5i7ZK8ZlTCQrHqRHSGQ==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 6.5.2
+    dev: false
+
+  /@fortawesome/free-regular-svg-icons/6.5.2:
+    resolution: {integrity: sha512-iabw/f5f8Uy2nTRtJ13XZTS1O5+t+anvlamJ3zJGLEVE2pKsAWhPv2lq01uQlfgCX7VaveT3EVs515cCN9jRbw==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 6.5.2
+    dev: false
+
+  /@fortawesome/free-solid-svg-icons/6.5.2:
+    resolution: {integrity: sha512-QWFZYXFE7O1Gr1dTIp+D6UcFUF0qElOnZptpi7PBUMylJh+vFmIedVe1Ir6RM1t2tEQLLSV1k7bR4o92M+uqlw==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 6.5.2
+    dev: false
+
+  /@fortawesome/react-fontawesome/0.2.2_eqehtq6deupjpkcqkuzoi3symq:
+    resolution: {integrity: sha512-EnkrprPNqI6SXJl//m29hpaNzOp1bruISWaOiRtkMi/xSvHJlzc2j2JAYS7egxt/EbjSNV/k6Xy0AQI6vB2+1g==}
+    peerDependencies:
+      '@fortawesome/fontawesome-svg-core': ~1 || ~6
+      react: '>=16.3'
+    dependencies:
+      '@fortawesome/fontawesome-svg-core': 6.5.2
+      prop-types: 15.8.1
+      react: 18.2.0
+    dev: false
 
   /@humanwhocodes/config-array/0.11.14:
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -729,7 +808,7 @@ packages:
       react-dom: '>=16.9.0'
     dependencies:
       '@ant-design/colors': 7.0.2
-      '@ant-design/cssinjs': 1.19.1_biqbaboplfbrettd7655fr4n2y
+      '@ant-design/cssinjs': 1.20.0_biqbaboplfbrettd7655fr4n2y
       '@ant-design/icons': 5.3.6_biqbaboplfbrettd7655fr4n2y
       '@ant-design/react-slick': 1.1.2_react@18.2.0
       '@babel/runtime': 7.24.4
@@ -2781,7 +2860,6 @@ packages:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       react-is: 16.13.1
-    dev: true
 
   /punycode/2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
@@ -3337,7 +3415,6 @@ packages:
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
-    dev: true
 
   /react-is/18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
