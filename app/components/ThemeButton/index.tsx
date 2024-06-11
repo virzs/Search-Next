@@ -1,14 +1,21 @@
 import { motion } from "framer-motion";
 import { FC, useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDisplay, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { cx } from "@emotion/css";
+import {
+  RiComputerFill,
+  RiComputerLine,
+  RiMoonFill,
+  RiMoonLine,
+  RiSunFill,
+  RiSunLine,
+} from "@remixicon/react";
 
 type ThemeType = "system" | "light" | "dark";
 
 interface ThemeOption {
   label: string;
   icon: any;
+  selectedIcon: any;
   value: ThemeType;
 }
 
@@ -21,20 +28,25 @@ const ThemeButton: FC = () => {
     dark: { x: "200%" },
   };
 
+  const iconSize = 18;
+
   const themeOptions: ThemeOption[] = [
     {
       label: "跟随系统",
-      icon: faDisplay,
+      icon: <RiComputerLine size={iconSize} />,
+      selectedIcon: <RiComputerFill size={iconSize} />,
       value: "system",
     },
     {
       label: "浅色",
-      icon: faSun,
+      icon: <RiSunLine size={iconSize} />,
+      selectedIcon: <RiSunFill size={iconSize} />,
       value: "light",
     },
     {
       label: "深色",
-      icon: faMoon,
+      icon: <RiMoonLine size={iconSize} />,
+      selectedIcon: <RiMoonFill size={iconSize} />,
       value: "dark",
     },
   ];
@@ -75,7 +87,7 @@ const ThemeButton: FC = () => {
         animate={themeVariants[theme]}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <motion.div className="bg-project-primary dark:bg-white h-full rounded-md"></motion.div>
+        <motion.div className="bg-project-primary dark:bg-gray-200 h-full rounded"></motion.div>
       </motion.div>
       {themeOptions.map((i) => (
         <motion.div
@@ -89,10 +101,10 @@ const ThemeButton: FC = () => {
           <motion.div
             className={cx(
               "absolute w-8 h-8 flex justify-center items-center transition-all",
-              theme === i.value ? "text-white dark:text-project-primary" : ""
+              theme === i.value ? "text-gray-200 dark:text-project-primary" : ""
             )}
           >
-            <FontAwesomeIcon icon={i.icon} />
+            {theme === i.value ? i.selectedIcon : i.icon}
           </motion.div>
         </motion.div>
       ))}
