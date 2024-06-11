@@ -19,6 +19,8 @@
 
 ## 在线交流
 
+Discord: https://discord.gg/NRMxAmqG
+
 QQ 群：859791575
 
 欢迎提供意见或建议
