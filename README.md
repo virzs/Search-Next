@@ -1,6 +1,6 @@
 # Search 导航页 Next 版
 
-![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next) ![license](https://img.shields.io/github/license/virzs/Search-Next) [![wakatime](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4.svg)](https://wakatime.com/badge/user/3c19ae9b-7437-486b-b4f8-38897d7303d9/project/f80a8218-f773-4a2b-b5fa-afff9d7234b4)
+![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
 
 2x 正在开发中，暂不提供在线地址预览，查看历史版本请切换至 1x 分支
 
@@ -44,14 +44,6 @@ pnpm dev
 ```bash
 pnpm build
 ```
-
-## Star 趋势
-
-[![Stargazers over time](https://starchart.cc/virzs/Search-Next.svg)](https://starchart.cc/virzs/Search-Next)
-
-## 更新路线
-
-![版本更新路线](https://user-images.githubusercontent.com/44538687/173269566-fd3ba5cc-bbb7-45b7-81b8-3dc2fd09512c.png)
 
 ## 常见问题说明
 
