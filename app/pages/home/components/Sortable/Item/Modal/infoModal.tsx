@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { FC } from "react";
 import { Modal } from "antd";
 import ReactJson from "react-json-view";
