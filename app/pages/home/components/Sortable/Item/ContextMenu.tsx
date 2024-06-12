@@ -2,7 +2,11 @@ import { AnimatePresence, Variants, motion } from "framer-motion";
 import { FC, useEffect, useRef } from "react";
 import { useSortable } from "../context";
 import { css, cx } from "@emotion/css";
-import Icons from "@/app/components/Icons";
+import {
+  RiCloseCircleLine,
+  RiInformationLine,
+  RiShareLine,
+} from "@remixicon/react";
 
 const itemVariants: Variants = {
   menuShow: {
@@ -91,15 +95,15 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
           }}
         >
           <motion.div className="flex">
-            <ContextButton icon={<Icons.ShareOne />} title="分享" />
+            <ContextButton icon={<RiShareLine />} title="分享" />
             <ContextButton
-              icon={<Icons.Info />}
+              icon={<RiInformationLine />}
               title="信息"
               onClick={() => {
                 setShowInfoItemData(contextMenu.data);
               }}
             />
-            <ContextButton icon={<Icons.DeleteThree />} title="移除" />
+            <ContextButton icon={<RiCloseCircleLine />} title="移除" />
           </motion.div>
         </motion.div>
       )}
