@@ -23,8 +23,14 @@ export interface SortableContextProps {
   setListStatus: (e: ListStatus | null) => void;
   contextMenuFuns: (data: any) => any;
   hideContextMenu: () => void;
+  /** 点击右键菜单信息数据 */
   showInfoItemData: SortItem | null;
   setShowInfoItemData: (e: SortItem | null) => void;
+  /** group item 点击打开弹窗数据 */
+  openGroupItemData: SortItem | null;
+  setOpenGroupItemData: (e: SortItem | null) => void;
+  /** 长按事件状态 */
+  longPressTriggered: boolean;
 }
 
 export const SortableContext = createContext<SortableContextProps>({
@@ -38,6 +44,9 @@ export const SortableContext = createContext<SortableContextProps>({
   hideContextMenu: () => {},
   showInfoItemData: null,
   setShowInfoItemData: () => {},
+  openGroupItemData: null,
+  setOpenGroupItemData: () => {},
+  longPressTriggered: false,
 });
 
 interface SortableProviderProps {
@@ -46,6 +55,8 @@ interface SortableProviderProps {
 }
 
 let contextMenuTimer: NodeJS.Timeout;
+
+let pressTimer: NodeJS.Timeout;
 
 export const SortableProvider = ({
   children,
@@ -57,6 +68,10 @@ export const SortableProvider = ({
   const [showInfoItemData, setShowInfoItemData] = useState<SortItem | null>(
     null
   );
+  const [openGroupItemData, setOpenGroupItemData] = useState<SortItem | null>(
+    null
+  );
+  const [longPressTriggered, setLongPressTriggered] = useState(false);
 
   const hideContextMenu = () => {
     setContextMenu(null);
@@ -75,9 +90,16 @@ export const SortableProvider = ({
         contextMenuTimer = setTimeout(() => {
           getItemRectAndSetContextMenu(e, data);
         }, 800);
+        setLongPressTriggered(false);
+        pressTimer = setTimeout(() => {
+          console.log("Long press");
+          setLongPressTriggered(true);
+          // 这里处理长按事件
+        }, 800);
       },
       onMouseUp: () => {
         clearTimeout(contextMenuTimer);
+        clearTimeout(pressTimer);
       },
       onContextMenu: (e: any) => {
         e.preventDefault();
@@ -152,6 +174,9 @@ export const SortableProvider = ({
         hideContextMenu,
         showInfoItemData,
         setShowInfoItemData,
+        openGroupItemData,
+        setOpenGroupItemData,
+        longPressTriggered,
       }}
     >
       {children}

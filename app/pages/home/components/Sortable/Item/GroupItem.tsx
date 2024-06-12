@@ -14,7 +14,13 @@ interface SortableGroupItemProps {
 
 const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
   const { data, className, itemIndex, parentIds } = props;
-  const { contextMenuFuns, setList, setListStatus } = useSortable();
+  const {
+    contextMenuFuns,
+    setList,
+    setListStatus,
+    setOpenGroupItemData,
+    longPressTriggered,
+  } = useSortable();
 
   const { children, data: itemData } = data;
 
@@ -35,6 +41,11 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
       <motion.div
         whileTap={{ scale: 0.9 }}
         className="relative rounded-xl h-full bg-orange-400 border-0 overflow-hidden"
+        onClick={() => {
+          if (!childrenEmpty && !longPressTriggered) {
+            setOpenGroupItemData(data);
+          }
+        }}
         {...contextMenuFuns(data)}
       >
         <motion.div className="p-1.5 relative w-full h-full">

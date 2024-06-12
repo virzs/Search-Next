@@ -80,7 +80,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
         <motion.div
           ref={ref}
           className={cx(
-            "bg-white mt-2 rounded-lg fixed -translate-x-1/2 overflow-hidden",
+            "bg-white mt-2 rounded-lg fixed -translate-x-1/2 overflow-hidden z-[1001]",
             css`
               top: ${bottom}px;
               left: ${left + width / 2}px;

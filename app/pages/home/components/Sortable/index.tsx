@@ -6,7 +6,8 @@ import { css, cx } from "@emotion/css";
 import ContextMenu from "./Item/ContextMenu";
 import SortableGroupItem from "./Item/GroupItem";
 import { SortItem } from "./types";
-import ItemInfoModal from "./Item/Modal/infoModal";
+import ItemInfoModal from "./Item/Modal/InfoModal";
+import GroupItemModal from "./Item/Modal/GroupItemModal";
 
 export interface SortableProps {
   list?: SortItem[];
@@ -20,6 +21,8 @@ const Sortable: FC<SortableProps> = (props) => {
     setListStatus,
     showInfoItemData,
     setShowInfoItemData,
+    openGroupItemData,
+    setOpenGroupItemData,
   } = useSortable();
 
   return (
@@ -96,6 +99,8 @@ const Sortable: FC<SortableProps> = (props) => {
           // <div className="p-2 bg-white text-black">{item.title}</div>
         })}
       </ReactSortable>
+
+      {/* 右键菜单 */}
       <ContextMenu />
 
       {/* 单个item信息弹窗 */}
@@ -103,6 +108,14 @@ const Sortable: FC<SortableProps> = (props) => {
         data={showInfoItemData}
         onClose={() => {
           setShowInfoItemData(null);
+        }}
+      />
+
+      {/* GroupModal 点击展开弹窗 */}
+      <GroupItemModal
+        data={openGroupItemData}
+        onClose={() => {
+          setOpenGroupItemData(null);
         }}
       />
     </>

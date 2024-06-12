@@ -18,6 +18,17 @@ const Home = () => {
       config: {
         col: 2,
       },
+      children:
+        // 生成20个子项
+        Array(60)
+          .fill(0)
+          .map((_, index) => ({
+            id: 1 + index,
+            type: "app",
+            data: {
+              title: `one-${index}`,
+            },
+          })),
     },
     {
       id: 2,
