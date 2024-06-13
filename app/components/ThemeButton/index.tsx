@@ -51,34 +51,47 @@ const ThemeButton: FC = () => {
     },
   ];
 
-  useEffect(() => {
+  const setDocumentTheme = (theme: ThemeType) => {
     const document = window.document.documentElement;
     const documentDataSet = document.dataset;
+    documentDataSet.theme = theme;
+  };
 
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
-
+  const onSystemThemeChange = (e: MediaQueryListEvent) => {
     if (theme === "system") {
-      if (systemTheme.matches) {
-        documentDataSet.theme = "dark";
+      if (e.matches) {
+        setDocumentTheme("dark");
       } else {
-        documentDataSet.theme = "light";
-      }
-    } else {
-      if (theme === "dark") {
-        documentDataSet.theme = "dark";
-      } else {
-        documentDataSet.theme = "light";
+        setDocumentTheme("light");
       }
     }
-  }, [theme]);
+  };
 
   useEffect(() => {
-    // 查看当前系统设置的主题
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-      .matches
-      ? "dark"
-      : "light";
-  }, []);
+    const darkModeMediaQuery = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+
+    if (theme !== "system") {
+      if (theme === "dark") {
+        setDocumentTheme("dark");
+      } else {
+        setDocumentTheme("light");
+      }
+    } else {
+      if (darkModeMediaQuery.matches) {
+        setDocumentTheme("dark");
+      } else {
+        setDocumentTheme("light");
+      }
+    }
+
+    darkModeMediaQuery.addEventListener("change", onSystemThemeChange);
+
+    return () => {
+      darkModeMediaQuery.removeEventListener("change", onSystemThemeChange);
+    };
+  }, [theme]);
 
   return (
     <motion.div className="inline-flex justify-between border dark:border-gray-500 relative rounded-md">
