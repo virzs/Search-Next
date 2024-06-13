@@ -7,6 +7,7 @@ import { ReactSortable } from "react-sortablejs";
 import SortableItem from "..";
 import { useSortable } from "../../context";
 import { css, cx } from "@emotion/css";
+import { ghostClass } from "../../style";
 
 interface GroupItemModalProps {
   data: SortItem | null;
@@ -28,28 +29,31 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
       title={data?.data?.name ?? "文件夹"}
       footer={null}
       closable={false}
-      className={css`
-        .ant-modal-content {
-          background-color: transparent;
-          box-shadow: none;
-          padding: 0;
-          .ant-modal-header {
-            text-align: center;
+      className={cx(
+        "group-item-modal",
+        css`
+          .ant-modal-content {
             background-color: transparent;
-            margin-bottom: 16px;
-            .ant-modal-title {
-              color: #fff;
+            box-shadow: none;
+            padding: 0;
+            .ant-modal-header {
+              text-align: center;
+              background-color: transparent;
+              margin-bottom: 16px;
+              .ant-modal-title {
+                color: #fff;
+              }
+            }
+            .ant-modal-body {
+              background-color: rgba(255, 255, 255, 0.8);
+              padding: 20px 28px;
+              border-radius: 10px;
+              max-height: 60vh;
+              overflow-y: auto;
             }
           }
-          .ant-modal-body {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px 28px;
-            border-radius: 10px;
-            max-height: 60vh;
-            overflow-y: auto;
-          }
-        }
-      `}
+        `
+      )}
     >
       <ReactSortable
         className={cx(
@@ -75,19 +79,7 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
         onEnd={(e) => {
           setListStatus(null);
         }}
-        ghostClass={css`
-          padding: 8px;
-          transition: all 0.2s;
-          > div {
-            transition: all 0.2s;
-            border: 2px solid aquamarine;
-            background-color: transparent;
-            > div {
-              opacity: 0;
-              transition: all 0.2s;
-            }
-          }
-        `}
+        ghostClass={ghostClass}
       >
         {_children.map((item, index) => {
           return <SortableItem key={item.id} data={item} itemIndex={index} />;

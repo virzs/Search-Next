@@ -92,7 +92,6 @@ export const SortableProvider = ({
         }, 800);
         setLongPressTriggered(false);
         pressTimer = setTimeout(() => {
-          console.log("Long press");
           setLongPressTriggered(true);
           // 这里处理长按事件
         }, 800);
