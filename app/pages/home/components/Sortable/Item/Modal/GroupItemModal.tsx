@@ -55,36 +55,44 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
         `
       )}
     >
-      <ReactSortable
-        className={cx(
-          "grid gap-4",
-          css`
-            grid-template-columns: repeat(auto-fill, 64px);
-            grid-auto-flow: dense;
-            grid-auto-rows: 64px;
-          `
-        )}
-        group={{ name: "nested", pull: true, put: false }}
-        animation={150}
-        fallbackOnBody
-        list={data?.children ?? []}
-        setList={(x) => setList(x, [data?.id])}
-        onMove={(e) => {
-          setListStatus("onMove");
-          return true;
+      <div
+        onDragLeave={(e) => {
+          setTimeout(() => {
+            onClose();
+          }, 500);
         }}
-        onStart={() => {
-          setListStatus("onMove");
-        }}
-        onEnd={(e) => {
-          setListStatus(null);
-        }}
-        ghostClass={ghostClass}
       >
-        {_children.map((item, index) => {
-          return <SortableItem key={item.id} data={item} itemIndex={index} />;
-        })}
-      </ReactSortable>
+        <ReactSortable
+          className={cx(
+            "grid gap-4",
+            css`
+              grid-template-columns: repeat(auto-fill, 64px);
+              grid-auto-flow: dense;
+              grid-auto-rows: 64px;
+            `
+          )}
+          group={{ name: "nested", pull: true, put: false }}
+          animation={150}
+          fallbackOnBody
+          list={data?.children ?? []}
+          setList={(x) => setList(x, [data?.id])}
+          onMove={(e) => {
+            setListStatus("onMove");
+            return true;
+          }}
+          onStart={() => {
+            setListStatus("onMove");
+          }}
+          onEnd={(e) => {
+            setListStatus(null);
+          }}
+          ghostClass={ghostClass}
+        >
+          {_children.map((item, index) => {
+            return <SortableItem key={item.id} data={item} itemIndex={index} />;
+          })}
+        </ReactSortable>
+      </div>
     </Modal>
   );
 };

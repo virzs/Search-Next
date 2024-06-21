@@ -32,6 +32,8 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
     ? [...(children ?? [])]?.slice(0, 9)
     : [data];
 
+  console.log("children", children, _children.length);
+
   return (
     <motion.div
       className="h-full w-full"
@@ -55,7 +57,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
               childrenEmpty ? "" : "p-1.5"
             )}
           >
-            {_children?.map((item) => (
+            {_children?.map((item, index) => (
               <motion.div
                 data-parent-ids={parentIds?.join(",")}
                 data-children-length={children?.length}
@@ -65,14 +67,14 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
                     ? "col-span-3 row-span-3 sortable-group-item"
                     : "col-span-1 row-span-1"
                 )}
-                key={item.id}
+                key={index}
               ></motion.div>
             ))}
           </motion.div>
           {/* 需要设置宽高小于父元素，否则在拖拽时会始终响应子列表 */}
           <ReactSortable
             className={cx(
-              "absolute left-1.5 top-1.5 grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item cursor-pointer",
+              "absolute left-1.5 top-1.5 sortable-group-item cursor-pointer",
               css`
                 width: calc(100% - 0.75rem);
                 height: calc(100% - 0.75rem);
