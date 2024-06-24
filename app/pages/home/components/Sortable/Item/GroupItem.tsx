@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FC } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useSortable } from "../context";
 import { ReactSortable } from "react-sortablejs";
 import { SortItem } from "../types";
@@ -32,8 +32,6 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
     ? [...(children ?? [])]?.slice(0, 9)
     : [data];
 
-  console.log("children", children, _children.length);
-
   return (
     <motion.div
       className="h-full w-full"
@@ -53,7 +51,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
         <motion.div className="p-1.5 relative w-full h-full">
           <motion.div
             className={cx(
-              "h-full w-full absolute left-0 top-0 grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item cursor-pointer",
+              "h-full w-full absolute left-0 top-0 grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item cursor-pointer transition-all",
               childrenEmpty ? "" : "p-1.5"
             )}
           >
@@ -85,10 +83,6 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
             fallbackOnBody
             list={children ?? []}
             setList={(x) => setList(x, parentIds)}
-            onMove={(e) => {
-              setListStatus("onMove");
-              return true;
-            }}
             // 只能移入，文件夹中的不能响应拖拽事件
             filter={() => true}
           ></ReactSortable>
