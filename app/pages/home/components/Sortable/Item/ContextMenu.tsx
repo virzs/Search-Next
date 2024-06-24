@@ -7,6 +7,7 @@ import {
   RiInformationLine,
   RiShareLine,
 } from "@remixicon/react";
+import { Modal } from "antd";
 
 const itemVariants: Variants = {
   menuShow: {
@@ -52,8 +53,11 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
     listStatus,
     hideContextMenu,
     setShowInfoItemData,
+    removeItem,
   } = useSortable();
   const ref = useRef<HTMLDivElement>(null);
+
+  const [modal, contextHolder] = Modal.useModal();
 
   const { rect } = contextMenu ?? {};
   const { left = 0, bottom = 0, width = 0 } = rect ?? {};
@@ -104,10 +108,25 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
                 hideContextMenu();
               }}
             />
-            <ContextButton icon={<RiCloseCircleLine />} title="移除" />
+            <ContextButton
+              icon={<RiCloseCircleLine />}
+              title="移除"
+              onClick={() => {
+                setContextMenu(null);
+                modal.confirm({
+                  icon: null,
+                  title: "移除",
+                  content: "确认移除此项？",
+                  onOk: () => {
+                    removeItem(contextMenu.data.id);
+                  },
+                });
+              }}
+            />
           </motion.div>
         </motion.div>
       )}
+      {contextHolder}
     </AnimatePresence>
   );
 };

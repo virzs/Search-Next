@@ -31,6 +31,7 @@ export interface SortableContextProps {
   setOpenGroupItemData: (e: SortItem | null) => void;
   /** 长按事件状态 */
   longPressTriggered: boolean;
+  removeItem: (id: string) => void;
 }
 
 export const SortableContext = createContext<SortableContextProps>({
@@ -47,6 +48,7 @@ export const SortableContext = createContext<SortableContextProps>({
   openGroupItemData: null,
   setOpenGroupItemData: () => {},
   longPressTriggered: false,
+  removeItem: () => {},
 });
 
 interface SortableProviderProps {
@@ -148,6 +150,26 @@ export const SortableProvider = ({
     }
   };
 
+  const removeItem = (id: string) => {
+    setList((prevList) => {
+      const _list = [...prevList];
+      const removeItem = (list: SortItem[]) => {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].id === id) {
+            list.splice(i, 1);
+            break;
+          } else if (list[i].children?.length !== undefined) {
+            removeItem(list[i].children!);
+          }
+        }
+      };
+
+      removeItem(_list);
+
+      return _list;
+    });
+  };
+
   useEffect(() => {
     if (propList?.length > 0 && list.length === 0) {
       _setList(propList);
@@ -176,6 +198,7 @@ export const SortableProvider = ({
         openGroupItemData,
         setOpenGroupItemData,
         longPressTriggered,
+        removeItem,
       }}
     >
       {children}
