@@ -101,6 +101,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
               title="信息"
               onClick={() => {
                 setShowInfoItemData(contextMenu.data);
+                hideContextMenu();
               }}
             />
             <ContextButton icon={<RiCloseCircleLine />} title="移除" />
