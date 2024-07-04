@@ -109,7 +109,8 @@ export const SortableProvider = ({
       onMouseUp: () => {
         clearTimeout(pressTimer);
         setPressTimer(undefined);
-        hideContextMenu();
+        clearTimeout(contextMenuTimer);
+        setContextMenuTimer(undefined);
       },
       onContextMenu: (e: any) => {
         e.preventDefault();
