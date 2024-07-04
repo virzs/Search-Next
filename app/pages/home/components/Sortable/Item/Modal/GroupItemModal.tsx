@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "antd";
+import { Input, Modal } from "antd";
 import { FC } from "react";
 import { SortItem } from "../../types";
 import { ReactSortable } from "react-sortablejs";
@@ -26,7 +26,12 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
       onCancel={() => {
         onClose();
       }}
-      title={data?.data?.name ?? "文件夹"}
+      title={
+        <Input
+          className="!bg-transparent !border-none text-center text-white !shadow-none text-xl"
+          value={data?.data?.name ?? "文件夹"}
+        />
+      }
       footer={null}
       closable={false}
       className={cx(
@@ -40,26 +45,33 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
               text-align: center;
               background-color: transparent;
               margin-bottom: 16px;
-              .ant-modal-title {
+              .ant-modal-name {
                 color: #fff;
               }
             }
             .ant-modal-body {
               background-color: rgba(255, 255, 255, 0.8);
-              padding: 20px 28px;
               border-radius: 10px;
-              max-height: 60vh;
-              overflow-y: auto;
+              overflow: hidden;
             }
           }
         `
       )}
     >
       <div
+        className="overflow-y-auto max-h-[60vh] py-5 pl-6 pr-4"
         onDragLeave={(e) => {
-          setTimeout(() => {
-            onClose();
-          }, 500);
+          // 获取鼠标指针进入的元素
+          const relatedTarget = e.relatedTarget;
+          if (!relatedTarget) return;
+
+          if (!e.currentTarget.contains(relatedTarget as any)) {
+            // 鼠标确实离开了当前元素
+            console.log("鼠标真的离开了当前元素");
+            setTimeout(() => {
+              onClose();
+            }, 500);
+          }
         }}
       >
         <ReactSortable

@@ -17,12 +17,17 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
   const {
     contextMenuFuns,
     setList,
-    setListStatus,
+    listStatus,
     setOpenGroupItemData,
     longPressTriggered,
   } = useSortable();
 
   const { children, data: itemData } = data;
+
+  const variants = {
+    visible: { opacity: 1, scale: 1 },
+    hidden: { opacity: 0, scale: 0.95 },
+  };
 
   // 是否为空
   const childrenEmpty = children?.length === 0;
@@ -34,13 +39,12 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
 
   return (
     <motion.div
-      className="h-16 w-16"
       data-parent-ids={parentIds?.join(",")}
       data-children-length={children?.length}
     >
       <motion.div
         whileTap={{ scale: 0.9 }}
-        className="relative rounded-xl h-full bg-orange-400 border-0 overflow-hidden"
+        className="relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16"
         onClick={() => {
           if (!childrenEmpty && !longPressTriggered) {
             setOpenGroupItemData(data);
@@ -88,6 +92,13 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
           ></ReactSortable>
         </motion.div>
       </motion.div>
+      <motion.p
+        className="text-center mt-1"
+        variants={variants}
+        animate={listStatus === "onMove" ? "hidden" : "visible"}
+      >
+        {itemData?.name ?? "文件夹"}
+      </motion.p>
     </motion.div>
   );
 };

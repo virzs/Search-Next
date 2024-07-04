@@ -13,7 +13,7 @@ const Home = () => {
       id: 1,
       type: "app",
       data: {
-        title: "one",
+        name: "one",
       },
       config: {
         col: 2,
@@ -26,7 +26,7 @@ const Home = () => {
             id: 1 + index,
             type: "app",
             data: {
-              title: `one-${index}`,
+              name: `one-${index}`,
             },
           })),
     },
@@ -34,42 +34,42 @@ const Home = () => {
       id: 2,
       type: "app",
       data: {
-        title: "two",
+        name: "two",
       },
     },
     {
       id: 3,
       type: "app",
       data: {
-        title: "three",
+        name: "three",
       },
     },
     {
       id: 4,
       type: "app",
       data: {
-        title: "four",
+        name: "four",
       },
     },
     {
       id: 5,
       type: "app",
       data: {
-        title: "five",
+        name: "five",
       },
     },
     {
       id: 6,
       type: "app",
       data: {
-        title: "six",
+        name: "six",
       },
     },
     {
       id: 7,
       type: "app",
       data: {
-        title: "x",
+        name: "x",
       },
     },
   ]);
