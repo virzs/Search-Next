@@ -56,14 +56,13 @@ interface SortableProviderProps {
   list?: any[];
 }
 
-let contextMenuTimer: NodeJS.Timeout;
-
-let pressTimer: NodeJS.Timeout;
-
 export const SortableProvider = ({
   children,
   list: propList = [],
 }: SortableProviderProps) => {
+  let contextMenuTimer: NodeJS.Timeout;
+  let pressTimer: NodeJS.Timeout;
+
   const [listStatus, setListStatus] = useState<ListStatus | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [list, setList] = useState<any[]>([]);
