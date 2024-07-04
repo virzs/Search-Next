@@ -61,9 +61,8 @@ export const SortableProvider = ({
   children,
   list: propList = [],
 }: SortableProviderProps) => {
-  let contextMenuTimer: NodeJS.Timeout;
-  let pressTimer: NodeJS.Timeout;
-
+  const [contextMenuTimer, setContextMenuTimer] = useState<NodeJS.Timeout>();
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout>();
   const [listStatus, setListStatus] = useState<ListStatus | null>(null);
   const listStatusRef = useRef(listStatus);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
@@ -79,6 +78,8 @@ export const SortableProvider = ({
   const hideContextMenu = () => {
     setContextMenu(null);
     clearTimeout(contextMenuTimer);
+    setContextMenuTimer(undefined);
+    listStatusRef.current = null;
   };
 
   const getItemRectAndSetContextMenu = (e: any, data: any) => {
@@ -90,20 +91,26 @@ export const SortableProvider = ({
   const contextMenuFuns = (data: any) => {
     return {
       onMouseDown: (e: any) => {
-        contextMenuTimer = setTimeout(() => {
-          // 解决闭包导致拖拽时右键菜单不消失的问题
-          if (listStatusRef.current !== null) return;
-          getItemRectAndSetContextMenu(e, data);
-        }, 800);
+        setContextMenuTimer(
+          setTimeout(() => {
+            // 解决闭包导致拖拽时右键菜单不消失的问题
+            if (listStatusRef.current !== null) return;
+            console.log("onMouseDown", data);
+            getItemRectAndSetContextMenu(e, data);
+          }, 800)
+        );
         setLongPressTriggered(false);
-        pressTimer = setTimeout(() => {
-          setLongPressTriggered(true);
-          // 这里处理长按事件
-        }, 800);
+        setPressTimer(
+          setTimeout(() => {
+            setLongPressTriggered(true);
+            // 这里处理长按事件
+          }, 800)
+        );
       },
       onMouseUp: () => {
-        clearTimeout(contextMenuTimer);
         clearTimeout(pressTimer);
+        setPressTimer(undefined);
+        hideContextMenu();
       },
       onContextMenu: (e: any) => {
         e.preventDefault();
