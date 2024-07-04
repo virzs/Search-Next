@@ -95,7 +95,6 @@ export const SortableProvider = ({
           setTimeout(() => {
             // 解决闭包导致拖拽时右键菜单不消失的问题
             if (listStatusRef.current !== null) return;
-            console.log("onMouseDown", data);
             getItemRectAndSetContextMenu(e, data);
           }, 800)
         );
