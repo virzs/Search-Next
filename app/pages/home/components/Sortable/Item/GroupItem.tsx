@@ -34,7 +34,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
 
   return (
     <motion.div
-      className="h-full w-full"
+      className="h-16 w-16"
       data-parent-ids={parentIds?.join(",")}
       data-children-length={children?.length}
     >

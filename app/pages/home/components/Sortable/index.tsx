@@ -6,9 +6,10 @@ import { css, cx } from "@emotion/css";
 import ContextMenu from "./Item/ContextMenu";
 import SortableGroupItem from "./Item/GroupItem";
 import { SortItem } from "./types";
-import ItemInfoModal from "./Item/Modal/InfoModal";
 import GroupItemModal from "./Item/Modal/GroupItemModal";
 import { ghostClass } from "./style";
+import ItemInfoModal from "./Item/Modal/InfoModal";
+import { motion } from "framer-motion";
 
 export interface SortableProps {
   list?: SortItem[];
@@ -30,11 +31,11 @@ const Sortable: FC<SortableProps> = (props) => {
     <>
       <ReactSortable
         className={cx(
-          "grid justify-center gap-8 transition-all",
+          "grid justify-center transition-all place-items-center",
           css`
-            grid-template-columns: repeat(auto-fill, 64px);
+            grid-template-columns: repeat(auto-fill, 128px);
             grid-auto-flow: dense;
-            grid-auto-rows: 64px;
+            grid-auto-rows: 128px;
           `
         )}
         animation={150}
@@ -68,10 +69,12 @@ const Sortable: FC<SortableProps> = (props) => {
         ghostClass={ghostClass}
       >
         {list.map((item, index) => {
+          let el;
+
           switch (item.type) {
             case "group":
             case "app":
-              return (
+              el = (
                 <SortableGroupItem
                   key={item.id}
                   data={item}
@@ -79,12 +82,13 @@ const Sortable: FC<SortableProps> = (props) => {
                   parentIds={[item.id]}
                 />
               );
+              break;
             default:
-              return (
-                <SortableItem key={item.id} data={item} itemIndex={index} />
-              );
+              el = <SortableItem key={item.id} data={item} itemIndex={index} />;
+              break;
           }
-          // <div className="p-2 bg-white text-black">{item.title}</div>
+
+          return el;
         })}
       </ReactSortable>
 
