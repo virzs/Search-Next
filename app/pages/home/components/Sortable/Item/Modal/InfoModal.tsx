@@ -19,6 +19,8 @@ const ItemInfoModal: FC<ItemInfoModalProps> = (props) => {
   // 是否为开发模式
   const isDev = process.env.NODE_ENV === "development";
 
+  if (typeof window === "undefined") return null;
+
   return (
     <Modal
       open={!!data}
