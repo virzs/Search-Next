@@ -6,10 +6,17 @@ import { css, cx } from "@emotion/css";
 import ContextMenu from "./Item/ContextMenu";
 import SortableGroupItem from "./Item/GroupItem";
 import { SortItem } from "./types";
-import GroupItemModal from "./Item/Modal/GroupItemModal";
 import { ghostClass } from "./style";
-import ItemInfoModal from "./Item/Modal/InfoModal";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+
+const ItemInfoModal = dynamic(() => import("./Item/Modal/InfoModal"), {
+  ssr: false,
+});
+
+const GroupItemModal = dynamic(() => import("./Item/Modal/GroupItemModal"), {
+  ssr: false,
+});
 
 export interface SortableProps {
   list?: SortItem[];

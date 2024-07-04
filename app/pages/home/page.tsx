@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Sortable from "./components/Sortable";
 import { SortableProvider } from "./components/Sortable/context";
 import { SortItem } from "./components/Sortable/types";
 import Header from "./components/Header";
 import Footer from "@/app/components/Layout/Footer";
+import dynamic from "next/dynamic";
+import Sortable from "./components/Sortable";
 
 const Home = () => {
   const [list, setList] = useState<SortItem[]>([
