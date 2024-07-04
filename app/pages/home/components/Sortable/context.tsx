@@ -3,6 +3,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { SortItem } from "./types";
@@ -64,6 +65,7 @@ export const SortableProvider = ({
   let pressTimer: NodeJS.Timeout;
 
   const [listStatus, setListStatus] = useState<ListStatus | null>(null);
+  const listStatusRef = useRef(listStatus);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [list, setList] = useState<any[]>([]);
   const [showInfoItemData, setShowInfoItemData] = useState<SortItem | null>(
@@ -89,6 +91,8 @@ export const SortableProvider = ({
     return {
       onMouseDown: (e: any) => {
         contextMenuTimer = setTimeout(() => {
+          // 解决闭包导致拖拽时右键菜单不消失的问题
+          if (listStatusRef.current !== null) return;
           getItemRectAndSetContextMenu(e, data);
         }, 800);
         setLongPressTriggered(false);
@@ -176,6 +180,7 @@ export const SortableProvider = ({
   }, [propList]);
 
   useEffect(() => {
+    listStatusRef.current = listStatus;
     if (listStatus !== null) {
       hideContextMenu();
     }
