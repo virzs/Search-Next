@@ -7,6 +7,8 @@ export const ghostClass = css`
     transition: all 0.2s;
     border: 2px solid aquamarine;
     background-color: transparent;
+    width: 64px;
+    height: 64px;
     > div {
       opacity: 0;
       transition: all 0.2s;
