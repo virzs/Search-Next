@@ -16,7 +16,8 @@ interface GroupItemModalProps {
 
 const GroupItemModal: FC<GroupItemModalProps> = (props) => {
   const { data, onClose } = props;
-  const { setList, setListStatus } = useSortable();
+  const { setList, setListStatus, setMoveItemId, setMoveTargetId } =
+    useSortable();
 
   const _children = [...(data?.children ?? [])];
 
@@ -67,7 +68,6 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
 
           if (!e.currentTarget.contains(relatedTarget as any)) {
             // 鼠标确实离开了当前元素
-            console.log("鼠标真的离开了当前元素");
             setTimeout(() => {
               onClose();
             }, 500);
@@ -89,13 +89,26 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
           list={data?.children ?? []}
           setList={(x) => setList(x, [data?.id])}
           onMove={(e) => {
+            const { related } = e;
+            const relatedData = related.dataset;
+            if (relatedData?.id) {
+              setMoveTargetId(relatedData.id);
+            } else {
+              setMoveTargetId(null);
+            }
             setListStatus("onMove");
             return true;
           }}
-          onStart={() => {
+          onStart={(e) => {
+            const dataset = e.item.dataset;
+            if (dataset?.id) {
+              setMoveItemId(dataset.id);
+            }
             setListStatus("onMove");
           }}
           onEnd={(e) => {
+            setMoveItemId(null);
+            setMoveTargetId(null);
             setListStatus(null);
           }}
           ghostClass={ghostClass}

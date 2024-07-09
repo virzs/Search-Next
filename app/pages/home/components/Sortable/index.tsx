@@ -61,6 +61,8 @@ const Sortable: FC<SortableProps> = (props) => {
           const relatedData = related.dataset;
           if (relatedData?.id) {
             setMoveTargetId(relatedData.id);
+          } else {
+            setMoveTargetId(null);
           }
           // 限制只有一层
           // sortable-group-item 标记为文件夹
