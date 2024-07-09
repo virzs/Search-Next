@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { FC } from "react";
-import { useSortable } from "../context";
 import { cx } from "@emotion/css";
+import { useSortable } from "../hook";
 
 export interface SortableItemProps {
   data: any;
@@ -12,8 +12,6 @@ export interface SortableItemProps {
 
 const SortableItem: FC<SortableItemProps> = (props) => {
   const { data, className, itemIndex, showTitle } = props;
-
-  // console.log("item", props);
 
   const { contextMenuFuns } = useSortable();
 

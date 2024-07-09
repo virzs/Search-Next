@@ -1,6 +1,5 @@
 import { FC } from "react";
 import { ReactSortable } from "react-sortablejs";
-import { useSortable } from "./context";
 import SortableItem from "./Item";
 import { css, cx } from "@emotion/css";
 import ContextMenu from "./Item/ContextMenu";
@@ -9,6 +8,7 @@ import { SortItem } from "./types";
 import { ghostClass } from "./style";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import { useSortable } from "./hook";
 
 const ItemInfoModal = dynamic(() => import("./Item/Modal/InfoModal"), {
   ssr: false,
@@ -32,6 +32,9 @@ const Sortable: FC<SortableProps> = (props) => {
     setShowInfoItemData,
     openGroupItemData,
     setOpenGroupItemData,
+    setMoveItemId,
+    moveTargetId,
+    setMoveTargetId,
   } = useSortable();
 
   return (
@@ -56,6 +59,9 @@ const Sortable: FC<SortableProps> = (props) => {
           const { dragged, related } = e;
           const draggedData = dragged.dataset;
           const relatedData = related.dataset;
+          if (relatedData?.id) {
+            setMoveTargetId(relatedData.id);
+          }
           // 限制只有一层
           // sortable-group-item 标记为文件夹
           if (
@@ -67,10 +73,16 @@ const Sortable: FC<SortableProps> = (props) => {
           }
           return true;
         }}
-        onStart={() => {
+        onStart={(e) => {
+          const dataset = e.item.dataset;
+          if (dataset?.id) {
+            setMoveItemId(dataset.id);
+          }
           setListStatus("onMove");
         }}
         onEnd={(e) => {
+          setMoveItemId(null);
+          setMoveTargetId(null);
           setListStatus(null);
         }}
         ghostClass={ghostClass}

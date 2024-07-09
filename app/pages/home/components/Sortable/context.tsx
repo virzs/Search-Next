@@ -33,6 +33,12 @@ export interface SortableContextProps {
   /** 长按事件状态 */
   longPressTriggered: boolean;
   removeItem: (id: string) => void;
+  /** 当前移动的元素id */
+  moveItemId: string | null;
+  setMoveItemId: (e: string | null) => void;
+  /** 当前元素将要移动到的元素id */
+  moveTargetId: string | null;
+  setMoveTargetId: (e: string | null) => void;
 }
 
 export const SortableContext = createContext<SortableContextProps>({
@@ -50,6 +56,10 @@ export const SortableContext = createContext<SortableContextProps>({
   setOpenGroupItemData: () => {},
   longPressTriggered: false,
   removeItem: () => {},
+  moveItemId: null,
+  setMoveItemId: () => {},
+  moveTargetId: null,
+  setMoveTargetId: () => {},
 });
 
 interface SortableProviderProps {
@@ -74,6 +84,8 @@ export const SortableProvider = ({
     null
   );
   const [longPressTriggered, setLongPressTriggered] = useState(false);
+  const [moveItemId, setMoveItemId] = useState<string | null>(null);
+  const [moveTargetId, setMoveTargetId] = useState<string | null>(null);
 
   const hideContextMenu = () => {
     setContextMenu(null);
@@ -123,7 +135,7 @@ export const SortableProvider = ({
     const _parentIds = [...(parentIds || [])];
 
     if (_parentIds.length > 0) {
-      setList((prevItems) => {
+      setList((prevItems: SortItem[]) => {
         const _items = [...prevItems];
 
         const updateChild = (_list: SortItem[]) => {
@@ -147,10 +159,18 @@ export const SortableProvider = ({
             _list = list;
           }
         };
-
         updateChild(_items);
 
-        return _items;
+        return _items.map((i) => {
+          // ! 只有一个子元素时，将子元素提升到当前层级
+          const onlyOneChild = (i.children?.length ?? 0) === 1;
+          return {
+            ...i,
+            children: onlyOneChild ? [] : i.children,
+            data: onlyOneChild ? i.children![0].data : i.data,
+            type: onlyOneChild ? i.children![0].type : i.type,
+          };
+        });
       });
     } else {
       setList((_list) => {
@@ -210,15 +230,13 @@ export const SortableProvider = ({
         setOpenGroupItemData,
         longPressTriggered,
         removeItem,
+        moveItemId,
+        setMoveItemId,
+        moveTargetId,
+        setMoveTargetId,
       }}
     >
       {children}
     </SortableContext.Provider>
   );
-};
-
-export const useSortable = () => {
-  const state = useContext(SortableContext);
-
-  return state;
 };

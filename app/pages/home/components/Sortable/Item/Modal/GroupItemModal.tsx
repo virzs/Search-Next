@@ -5,9 +5,9 @@ import { FC } from "react";
 import { SortItem } from "../../types";
 import { ReactSortable } from "react-sortablejs";
 import SortableItem from "..";
-import { useSortable } from "../../context";
 import { css, cx } from "@emotion/css";
 import { ghostClass } from "../../style";
+import { useSortable } from "../../hook";
 
 interface GroupItemModalProps {
   data: SortItem | null;

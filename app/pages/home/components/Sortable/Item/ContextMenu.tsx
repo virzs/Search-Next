@@ -1,6 +1,5 @@
 import { AnimatePresence, Variants, motion } from "framer-motion";
 import { FC, useEffect, useRef } from "react";
-import { useSortable } from "../context";
 import { css, cx } from "@emotion/css";
 import {
   RiCloseCircleLine,
@@ -8,6 +7,7 @@ import {
   RiShareLine,
 } from "@remixicon/react";
 import { Modal } from "antd";
+import { useSortable } from "../hook";
 
 const itemVariants: Variants = {
   menuShow: {
@@ -76,7 +76,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
     return () => {
       document.removeEventListener("mousedown", handleDocumentClick);
     };
-  }, []);
+  }, [hideContextMenu]);
 
   return (
     <AnimatePresence>

@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { useSortable } from "../context";
 import { ReactSortable } from "react-sortablejs";
 import { SortItem } from "../types";
 import { css, cx } from "@emotion/css";
+import { useSortable } from "../hook";
 
 interface SortableGroupItemProps {
   data: SortItem;
@@ -20,6 +20,8 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
     listStatus,
     setOpenGroupItemData,
     longPressTriggered,
+    moveItemId,
+    moveTargetId,
   } = useSortable();
 
   const { children, data: itemData } = data;
@@ -30,21 +32,33 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
   };
 
   // 是否为空
-  const childrenEmpty = children?.length === 0;
+  const childrenEmpty = (children?.length ?? 0) === 0;
 
   // 截取前 9 个
   const _children = !childrenEmpty
     ? [...(children ?? [])]?.slice(0, 9)
     : [data];
 
+  const isMove = useMemo(() => {
+    return moveItemId === data.id.toString();
+  }, [data.id, moveItemId]);
+
+  const isMoveTarget = useMemo(() => {
+    return moveTargetId === data.id.toString();
+  }, [data.id, moveTargetId]);
+
   return (
     <motion.div
+      data-id={data.id}
       data-parent-ids={parentIds?.join(",")}
       data-children-length={children?.length}
     >
       <motion.div
         whileTap={{ scale: 0.9 }}
-        className="relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16"
+        className={cx(
+          "relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16 transition-all",
+          isMoveTarget ? "scale-110" : ""
+        )}
         onClick={() => {
           if (!childrenEmpty && !longPressTriggered) {
             setOpenGroupItemData(data);
@@ -95,7 +109,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
       <motion.p
         className="text-center mt-1"
         variants={variants}
-        animate={listStatus === "onMove" ? "hidden" : "visible"}
+        animate={isMove ? "hidden" : "visible"}
       >
         {itemData?.name ?? "文件夹"}
       </motion.p>
