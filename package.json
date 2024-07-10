@@ -13,6 +13,7 @@
     "@ant-design/nextjs-registry": "^1.0.0",
     "@emotion/css": "^11.11.2",
     "@remixicon/react": "^4.2.0",
+    "ahooks": "^3.8.0",
     "antd": "^5.16.2",
     "framer-motion": "^11.0.28",
     "next": "14.2.1",
