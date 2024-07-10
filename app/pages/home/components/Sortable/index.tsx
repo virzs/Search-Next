@@ -59,11 +59,8 @@ const Sortable: FC<SortableProps> = (props) => {
           const { dragged, related } = e;
           const draggedData = dragged.dataset;
           const relatedData = related.dataset;
-          if (relatedData?.id) {
-            setMoveTargetId(relatedData.id);
-          } else {
-            setMoveTargetId(null);
-          }
+          setMoveTargetId(null);
+          console.log("change over");
           // 限制只有一层
           // sortable-group-item 标记为文件夹
           if (

@@ -89,13 +89,7 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
           list={data?.children ?? []}
           setList={(x) => setList(x, [data?.id])}
           onMove={(e) => {
-            const { related } = e;
-            const relatedData = related.dataset;
-            if (relatedData?.id) {
-              setMoveTargetId(relatedData.id);
-            } else {
-              setMoveTargetId(null);
-            }
+            setMoveTargetId(null);
             setListStatus("onMove");
             return true;
           }}

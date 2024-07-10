@@ -22,6 +22,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
     longPressTriggered,
     moveItemId,
     moveTargetId,
+    setMoveTargetId,
   } = useSortable();
 
   const { children, data: itemData } = data;
@@ -44,10 +45,8 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
   }, [data.id, moveItemId]);
 
   const isMoveTarget = useMemo(() => {
-    return moveTargetId === data.id.toString();
+    return moveTargetId === data.id;
   }, [data.id, moveTargetId]);
-
-  isMoveTarget && console.log("isMoveTarget", isMoveTarget, data);
 
   return (
     <motion.div
@@ -59,7 +58,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
         whileTap={{ scale: 0.9 }}
         className={cx(
           "relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16 transition-all",
-          isMoveTarget ? "scale-110" : ""
+          isMoveTarget ? "!scale-110" : ""
         )}
         onClick={() => {
           if (!childrenEmpty && !longPressTriggered) {
@@ -92,11 +91,16 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
           {/* 需要设置宽高小于父元素，否则在拖拽时会始终响应子列表 */}
           <ReactSortable
             className={cx(
-              "absolute left-1.5 top-1.5 sortable-group-item cursor-pointer",
-              css`
-                width: calc(100% - 0.75rem);
-                height: calc(100% - 0.75rem);
-              `
+              "absolute sortable-group-item cursor-pointer",
+              isMoveTarget
+                ? ""
+                : css`
+                    width: calc(100% - 0.75rem);
+                    height: calc(100% - 0.75rem);
+                  `,
+              isMoveTarget
+                ? "left-0 top-0 right-0 bottom-0"
+                : "left-1.5 top-1.5"
             )}
             group={{ name: "nested", pull: false, put: true }}
             animation={150}
@@ -106,6 +110,10 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
             // 只能移入，文件夹中的不能响应拖拽事件
             filter={() => true}
             data-id={data.id}
+            onChange={() => {
+              console.log("change");
+              setMoveTargetId(data.id);
+            }}
           ></ReactSortable>
         </motion.div>
       </motion.div>

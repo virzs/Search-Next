@@ -37,8 +37,8 @@ export interface SortableContextProps {
   moveItemId: string | null;
   setMoveItemId: (e: string | null) => void;
   /** 当前元素将要移动到的元素id */
-  moveTargetId: string | null;
-  setMoveTargetId: (e: string | null) => void;
+  moveTargetId: string | number | null;
+  setMoveTargetId: (e: string | number | null) => void;
 }
 
 export const SortableContext = createContext<SortableContextProps>({
@@ -85,7 +85,9 @@ export const SortableProvider = ({
   );
   const [longPressTriggered, setLongPressTriggered] = useState(false);
   const [moveItemId, setMoveItemId] = useState<string | null>(null);
-  const [moveTargetId, setMoveTargetId] = useState<string | null>(null);
+  const [moveTargetId, setMoveTargetId] = useState<string | number | null>(
+    null
+  );
 
   const hideContextMenu = () => {
     setContextMenu(null);
