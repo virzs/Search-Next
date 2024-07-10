@@ -204,6 +204,7 @@ export const SortableProvider = ({
     if (propList?.length > 0 && list.length === 0) {
       _setList(propList);
     }
+    // eslint-disable-next-line
   }, [propList]);
 
   useEffect(() => {
@@ -211,6 +212,7 @@ export const SortableProvider = ({
     if (listStatus !== null) {
       hideContextMenu();
     }
+    // eslint-disable-next-line
   }, [listStatus]);
 
   return (
