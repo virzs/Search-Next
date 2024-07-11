@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { FC } from "react";
 
 interface HeaderProps {}

@@ -4,6 +4,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
 import { ConfigProvider } from "antd";
 import theme from "./theme/config";
+import { ViewTransitions } from "next-view-transitions";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,12 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ConfigProvider theme={theme}>
-          <AntdRegistry>{children}</AntdRegistry>
-        </ConfigProvider>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="en">
+        <body className={inter.className}>
+          <ConfigProvider theme={theme}>
+            <AntdRegistry>{children}</AntdRegistry>
+          </ConfigProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

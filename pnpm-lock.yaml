@@ -17,6 +17,7 @@ specifiers:
   eslint-plugin-react-refresh: ^0.4.7
   framer-motion: ^11.0.28
   next: 14.2.1
+  next-view-transitions: ^0.2.0
   postcss: ^8
   react: ^18
   react-dom: ^18
@@ -35,6 +36,7 @@ dependencies:
   antd: 5.16.2_biqbaboplfbrettd7655fr4n2y
   framer-motion: 11.0.28_biqbaboplfbrettd7655fr4n2y
   next: 14.2.1_biqbaboplfbrettd7655fr4n2y
+  next-view-transitions: 0.2.0_7zsvwwbp5gyeabk2so4s4qkwvm
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-json-view: 1.21.3_6qcp4jokx32fjqh56b7wyl7qsu
@@ -2629,6 +2631,18 @@ packages:
   /natural-compare/1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
+
+  /next-view-transitions/0.2.0_7zsvwwbp5gyeabk2so4s4qkwvm:
+    resolution: {integrity: sha512-dFxevMIJy8irIstytJivLEtgYT4IJ7Gy7fnDCKHJtNZAsuQgmewYcdA/o/mRkMd1zwxTfyGALiOlZYxvtsn5jg==}
+    peerDependencies:
+      next: ^14.0.0
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      next: 14.2.1_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /next/14.2.1_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-SF3TJnKdH43PMkCcErLPv+x/DY1YCklslk3ZmwaVoyUfDgHKexuKlf9sEfBQ69w+ue8jQ3msLb+hSj1T19hGag==}
