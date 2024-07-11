@@ -111,7 +111,6 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
             filter={() => true}
             data-id={data.id}
             onChange={() => {
-              console.log("change");
               setMoveTargetId(data.id);
             }}
           ></ReactSortable>

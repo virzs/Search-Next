@@ -60,7 +60,6 @@ const Sortable: FC<SortableProps> = (props) => {
           const draggedData = dragged.dataset;
           const relatedData = related.dataset;
           setMoveTargetId(null);
-          console.log("change over");
           // 限制只有一层
           // sortable-group-item 标记为文件夹
           if (
