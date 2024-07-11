@@ -2,7 +2,7 @@
 
 ![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
 
-2x 正在开发中，暂不提供在线地址预览，查看历史版本请切换至 1x 分支
+2x 正在开发中，查看历史版本请切换至 1x 分支
 
 后端部分暂不开源，待项目稳定后发布
 
@@ -15,7 +15,7 @@
 
 ## 在线地址
 
-待更新
+<https://search-next-fqpz3y9kt-virzs-projects.vercel.app>
 
 ## 在线交流
 
