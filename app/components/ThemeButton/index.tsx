@@ -68,6 +68,10 @@ const ThemeButton: FC = () => {
   };
 
   useEffect(() => {
+    const localTheme = localStorage.getItem("theme") as ThemeType;
+    if (localTheme) {
+      setTheme(localTheme);
+    }
     const darkModeMediaQuery = window.matchMedia(
       "(prefers-color-scheme: dark)"
     );
@@ -86,11 +90,14 @@ const ThemeButton: FC = () => {
       }
     }
 
-    darkModeMediaQuery.addEventListener("change", onSystemThemeChange);
+    if (localTheme === "system") {
+      darkModeMediaQuery.addEventListener("change", onSystemThemeChange);
 
-    return () => {
-      darkModeMediaQuery.removeEventListener("change", onSystemThemeChange);
-    };
+      return () => {
+        darkModeMediaQuery.removeEventListener("change", onSystemThemeChange);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 
   return (
@@ -109,6 +116,7 @@ const ThemeButton: FC = () => {
           key={i.value}
           onClick={() => {
             setTheme(i.value);
+            localStorage.setItem("theme", i.value);
           }}
         >
           <motion.div
