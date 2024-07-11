@@ -117,7 +117,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
         </motion.div>
       </motion.div>
       <motion.p
-        className="text-center mt-1"
+        className="text-center mt-1 text-black dark:text-white"
         variants={variants}
         animate={isMove ? "hidden" : "visible"}
       >
