@@ -91,16 +91,14 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
           {/* 需要设置宽高小于父元素，否则在拖拽时会始终响应子列表 */}
           <ReactSortable
             className={cx(
-              "absolute sortable-group-item cursor-pointer",
-              isMoveTarget
-                ? ""
-                : css`
-                    width: calc(100% - 0.75rem);
-                    height: calc(100% - 0.75rem);
-                  `,
-              isMoveTarget
-                ? "left-0 top-0 right-0 bottom-0"
-                : "left-1.5 top-1.5"
+              "absolute sortable-group-item cursor-pointer left-1.5 top-1.5",
+              css`
+                width: calc(100% - 0.75rem);
+                height: calc(100% - 0.75rem);
+                > * {
+                  opacity: 0;
+                }
+              `
             )}
             group={{ name: "nested", pull: false, put: true }}
             animation={150}
