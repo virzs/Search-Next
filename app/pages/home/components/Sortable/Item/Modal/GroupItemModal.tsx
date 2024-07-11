@@ -58,6 +58,7 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
           }
         `
       )}
+      width={600}
     >
       <div
         className="overflow-y-auto max-h-[60vh] py-5 pl-6 pr-4"
@@ -76,11 +77,11 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
       >
         <ReactSortable
           className={cx(
-            "grid gap-4",
+            "grid gap-4 place-items-center",
             css`
-              grid-template-columns: repeat(auto-fill, 64px);
+              grid-template-columns: repeat(auto-fill, 96px);
               grid-auto-flow: dense;
-              grid-auto-rows: 64px;
+              grid-auto-rows: 96px;
             `
           )}
           group={{ name: "nested", pull: true, put: false }}

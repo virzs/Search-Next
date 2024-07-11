@@ -11,7 +11,7 @@ export interface SortableItemProps {
 }
 
 const SortableItem: FC<SortableItemProps> = (props) => {
-  const { data, className, itemIndex, showTitle } = props;
+  const { data, className, itemIndex, showTitle = true } = props;
 
   const { contextMenuFuns } = useSortable();
 
