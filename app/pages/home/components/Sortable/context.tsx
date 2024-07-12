@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { SortItem } from "./types";
+import { v4 as uuidv4 } from "uuid";
 
 interface ContextMenu {
   rect: DOMRect;
@@ -136,6 +137,8 @@ export const SortableProvider = ({
   const _setList = (list: SortItem[], parentIds?: string[]) => {
     const _parentIds = [...(parentIds || [])];
 
+    parentIds && console.log("before change", list, parentIds);
+
     if (_parentIds.length > 0) {
       setList((prevItems: SortItem[]) => {
         const _items = [...prevItems];
@@ -144,37 +147,46 @@ export const SortableProvider = ({
           const parentId = _parentIds.shift();
           const parent = _list.find((item) => item.id === parentId);
 
+          console.log("parent", parent, _parentIds, list);
+
           if (_parentIds.length && parent) {
             updateChild(parent.children || []);
           } else if (parent) {
-            parent.children = list;
-            if (listStatus !== null) {
-              const newParent = { ...parent };
-              newParent.children = [];
-              parent.children = [newParent, ...list].filter(
-                (item) => item.type === "app"
-              );
+            let newChildren: SortItem[] = [];
+
+            if (!parent.children?.length && list.length) {
+              console.log("no children", list);
+              newChildren = [{ ...parent }];
               parent.data = null;
               parent.type = "group";
+              parent.children = [...newChildren, ...list];
+              parent.id = uuidv4();
+              return;
             }
+
+            if (list.length === 1) {
+              console.log("only one", list);
+              const _i = list[0];
+              parent.data = _i.data;
+              parent.type = _i.type;
+              parent.children = [];
+              parent.config = _i.config;
+              parent.id = _i.id;
+              return;
+            }
+
+            // ! 当前已经是 group 时，直接将 children 更改为最新的 list
+            parent.children = [...list];
           } else {
             _list = list;
           }
         };
         updateChild(_items);
 
-        return _items.map((i) => {
-          // ! 只有一个子元素时，将子元素提升到当前层级
-          const onlyOneChild = (i.children?.length ?? 0) === 1;
-          return {
-            ...i,
-            children: onlyOneChild ? [] : i.children,
-            data: onlyOneChild ? i.children![0].data : i.data,
-            type: onlyOneChild ? i.children![0].type : i.type,
-          };
-        });
+        return _items;
       });
     } else {
+      // ! 直接排序
       setList((_list) => {
         _list = list;
         return [..._list];

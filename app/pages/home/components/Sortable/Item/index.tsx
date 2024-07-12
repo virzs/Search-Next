@@ -31,7 +31,7 @@ const SortableItem: FC<SortableItemProps> = (props) => {
       <motion.p
         className={cx("text-center mt-1", showTitle ? "" : "text-transparent")}
       >
-        ghost
+        {data?.data?.name}
       </motion.p>
     </motion.div>
   );
