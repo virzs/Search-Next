@@ -104,7 +104,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
             animation={150}
             fallbackOnBody
             list={children ?? []}
-            setList={(x) => setList(x, parentIds)}
+            setList={(x) => setList(x, parentIds, "groupItem")}
             // 只能移入，文件夹中的不能响应拖拽事件
             filter={() => true}
             data-id={data.id}

@@ -16,7 +16,7 @@ interface GroupItemModalProps {
 
 const GroupItemModal: FC<GroupItemModalProps> = (props) => {
   const { data, onClose } = props;
-  const { setList, setListStatus, setMoveItemId, setMoveTargetId } =
+  const { list, setList, setListStatus, setMoveItemId, setMoveTargetId } =
     useSortable();
 
   const _children = [...(data?.children ?? [])];
@@ -59,6 +59,7 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
         `
       )}
       width={600}
+      destroyOnClose
     >
       <div
         className="overflow-y-auto max-h-[60vh] py-5 pl-6 pr-4"
@@ -88,7 +89,26 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
           animation={150}
           fallbackOnBody
           list={data?.children ?? []}
-          setList={(x) => setList(x, [data?.id])}
+          setList={(x) => {
+            const xIds = x.map((item) => item.id);
+            const parentChildrenIds = list
+              .find((item) => item.id === data?.id)
+              ?.children?.map((item) => item.id);
+            // ! 如果ids个数相同，顺序相同 return，优化性能
+            if (
+              xIds.length === parentChildrenIds?.length &&
+              xIds.every((id, index) => id === parentChildrenIds[index])
+            ) {
+              return;
+            }
+
+            // ! 解决文件夹中移出再移入会触发setList导致元素丢失bug
+            if (xIds.length < (parentChildrenIds?.length ?? 0)) {
+              return;
+            }
+
+            setList(x, [data?.id], "modal");
+          }}
           onMove={(e) => {
             setMoveTargetId(null);
             setListStatus("onMove");

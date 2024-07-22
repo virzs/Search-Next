@@ -8,6 +8,7 @@ import {
 } from "react";
 import { SortItem } from "./types";
 import { v4 as uuidv4 } from "uuid";
+import SortableUtils from "./utils";
 
 interface ContextMenu {
   rect: DOMRect;
@@ -134,39 +135,37 @@ export const SortableProvider = ({
     };
   };
 
-  const _setList = (list: SortItem[], parentIds?: string[]) => {
+  const _setList = (
+    newList: SortItem[],
+    parentIds?: string[],
+    from?: string
+  ) => {
     const _parentIds = [...(parentIds || [])];
 
-    parentIds && console.log("before change", list, parentIds);
-
     if (_parentIds.length > 0) {
-      setList((prevItems: SortItem[]) => {
-        const _items = [...prevItems];
+      setList((oldList: SortItem[]) => {
+        const _items = [...oldList];
 
         const updateChild = (_list: SortItem[]) => {
           const parentId = _parentIds.shift();
           const parent = _list.find((item) => item.id === parentId);
-
-          console.log("parent", parent, _parentIds, list);
 
           if (_parentIds.length && parent) {
             updateChild(parent.children || []);
           } else if (parent) {
             let newChildren: SortItem[] = [];
 
-            if (!parent.children?.length && list.length) {
-              console.log("no children", list);
+            if (!parent.children?.length && newList.length) {
               newChildren = [{ ...parent }];
               parent.data = null;
               parent.type = "group";
-              parent.children = [...newChildren, ...list];
+              parent.children = [...newChildren, ...newList];
               parent.id = uuidv4();
               return;
             }
 
-            if (list.length === 1) {
-              console.log("only one", list);
-              const _i = list[0];
+            if (newList.length === 1) {
+              const _i = newList[0];
               parent.data = _i.data;
               parent.type = _i.type;
               parent.children = [];
@@ -176,9 +175,9 @@ export const SortableProvider = ({
             }
 
             // ! 当前已经是 group 时，直接将 children 更改为最新的 list
-            parent.children = [...list];
+            parent.children = [...SortableUtils.uniqueArray(newList)];
           } else {
-            _list = list;
+            _list = SortableUtils.uniqueArray(newList);
           }
         };
         updateChild(_items);
@@ -188,7 +187,7 @@ export const SortableProvider = ({
     } else {
       // ! 直接排序
       setList((_list) => {
-        _list = list;
+        _list = newList;
         return [..._list];
       });
     }
