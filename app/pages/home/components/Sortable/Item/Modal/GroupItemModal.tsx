@@ -1,7 +1,7 @@
 "use client";
 
 import { Input, Modal } from "antd";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { SortItem } from "../../types";
 import { ReactSortable } from "react-sortablejs";
 import SortableItem from "..";
@@ -16,12 +16,24 @@ interface GroupItemModalProps {
 
 const GroupItemModal: FC<GroupItemModalProps> = (props) => {
   const { data, onClose } = props;
-  const { list, setList, setListStatus, setMoveItemId, setMoveTargetId } =
-    useSortable();
+  const {
+    list,
+    setList,
+    setListStatus,
+    setMoveItemId,
+    setMoveTargetId,
+    updateItem,
+  } = useSortable();
 
-  const [name, setName] = useState(data?.data?.name ?? "文件夹");
+  const [name, setName] = useState("文件夹");
 
   const _children = [...(data?.children ?? [])];
+
+  useEffect(() => {
+    if (!data) return;
+    console.log(data);
+    setName(data.data?.name);
+  }, [data]);
 
   return (
     <Modal
@@ -37,20 +49,11 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
             setName(e.target.value);
           }}
           onBlur={() => {
-            setList(
-              list.map((item) => {
-                if (item.id === data?.id) {
-                  return {
-                    ...item,
-                    data: {
-                      ...item.data,
-                      name,
-                    },
-                  };
-                }
-                return item;
-              })
-            );
+            if (!data) return;
+            updateItem(data.id!, {
+              ...data.data,
+              name,
+            });
           }}
         />
       }

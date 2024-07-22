@@ -34,6 +34,7 @@ export interface SortableContextProps {
   setOpenGroupItemData: (e: SortItem | null) => void;
   /** 长按事件状态 */
   longPressTriggered: boolean;
+  updateItem: (id: string | number, data: any) => void;
   removeItem: (id: string) => void;
   /** 当前移动的元素id */
   moveItemId: string | null;
@@ -57,6 +58,7 @@ export const SortableContext = createContext<SortableContextProps>({
   openGroupItemData: null,
   setOpenGroupItemData: () => {},
   longPressTriggered: false,
+  updateItem: () => {},
   removeItem: () => {},
   moveItemId: null,
   setMoveItemId: () => {},
@@ -153,7 +155,7 @@ export const SortableProvider = ({
 
             if (!parent.children?.length && newList.length) {
               newChildren = [{ ...parent }];
-              parent.data = null;
+              parent.data = { name: "文件夹" };
               parent.type = "group";
               parent.children = [...newChildren, ...newList];
               parent.id = uuidv4();
@@ -187,6 +189,26 @@ export const SortableProvider = ({
         return [..._list];
       });
     }
+  };
+
+  const updateItem = (id: string | number, data: any) => {
+    setList((prevList) => {
+      const _list = [...prevList];
+      const updateItem = (list: SortItem[]) => {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].id === id) {
+            list[i].data = data;
+            break;
+          } else if (list[i].children?.length !== undefined) {
+            updateItem(list[i].children!);
+          }
+        }
+      };
+
+      updateItem(_list);
+
+      return _list;
+    });
   };
 
   const removeItem = (id: string) => {
@@ -240,6 +262,7 @@ export const SortableProvider = ({
         openGroupItemData,
         setOpenGroupItemData,
         longPressTriggered,
+        updateItem,
         removeItem,
         moveItemId,
         setMoveItemId,
