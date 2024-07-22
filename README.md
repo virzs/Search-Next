@@ -15,7 +15,7 @@
 
 ## 在线地址
 
-<https://search-next-fqpz3y9kt-virzs-projects.vercel.app>
+<https://search-next-git-2x-virzs-projects.vercel.app/home>
 
 ## 在线交流
 
@@ -68,4 +68,3 @@ VS Code 安装 i18n Ally 插件
 ## 引用资源
 
 -----none------
-
