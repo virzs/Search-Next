@@ -135,11 +135,7 @@ export const SortableProvider = ({
     };
   };
 
-  const _setList = (
-    newList: SortItem[],
-    parentIds?: string[],
-    from?: string
-  ) => {
+  const _setList = (newList: SortItem[], parentIds?: string[]) => {
     const _parentIds = [...(parentIds || [])];
 
     if (_parentIds.length > 0) {

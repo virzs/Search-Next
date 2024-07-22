@@ -107,7 +107,7 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
               return;
             }
 
-            setList(x, [data?.id], "modal");
+            setList(x, [data?.id]);
           }}
           onMove={(e) => {
             setMoveTargetId(null);
