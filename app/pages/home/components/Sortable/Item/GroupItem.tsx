@@ -57,7 +57,7 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
       <motion.div
         whileTap={{ scale: 0.9 }}
         className={cx(
-          "relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16 transition-all",
+          "relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16 transition-all mx-auto",
           isMoveTarget ? "!scale-110" : ""
         )}
         onClick={() => {
