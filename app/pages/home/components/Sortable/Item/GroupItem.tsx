@@ -25,7 +25,9 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
     setMoveTargetId,
   } = useSortable();
 
-  const { children, data: itemData } = data;
+  const { children, data: itemData, config: itemConfig } = data;
+
+  const { row = 1, col = 1 } = itemConfig ?? {};
 
   const variants = {
     visible: { opacity: 1, scale: 1 },
@@ -53,12 +55,20 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
       data-id={data.id}
       data-parent-ids={parentIds?.join(",")}
       data-children-length={children?.length}
+      className={css`
+        grid-row: span ${row};
+        grid-column: span ${col};
+      `}
     >
       <motion.div
         whileTap={{ scale: 0.9 }}
         className={cx(
-          "relative rounded-xl bg-orange-400 border-0 overflow-hidden h-16 w-16 transition-all mx-auto",
-          isMoveTarget ? "!scale-110" : ""
+          "relative rounded-xl bg-orange-400 border-0 overflow-hidden transition-all mx-auto",
+          isMoveTarget ? "!scale-110" : "",
+          css`
+            width: ${col * 64 + 32 * (col - 1)}px;
+            height: ${row * 64 + 32 * (row - 1)}px;
+          `
         )}
         onClick={() => {
           if (!childrenEmpty && !longPressTriggered) {
@@ -70,8 +80,12 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
         <motion.div className="p-1.5 relative w-full h-full">
           <motion.div
             className={cx(
-              "h-full w-full absolute left-0 top-0 grid grid-cols-3 grid-rows-3 gap-1 sortable-group-item cursor-pointer transition-all",
-              childrenEmpty ? "" : "p-1.5"
+              "h-full w-full absolute left-0 top-0 grid gap-1 sortable-group-item cursor-pointer transition-all",
+              childrenEmpty ? "" : "p-1.5",
+              ((col === 1 && row === 1) || (col === 2 && row === 2)) &&
+                "grid-cols-3 grid-rows-3",
+              col === 1 && row === 2 && "grid-cols-2 grid-rows-6",
+              col === 2 && row === 1 && "grid-cols-6 grid-rows-2"
             )}
           >
             {_children?.map((item, index) => (
@@ -80,9 +94,40 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
                 data-children-length={children?.length}
                 className={cx(
                   "bg-green-500 rounded transition-all cursor-pointer",
-                  childrenEmpty
-                    ? "col-span-3 row-span-3 sortable-group-item"
-                    : "col-span-1 row-span-1"
+                  childrenEmpty && "sortable-group-item",
+                  (() => {
+                    if (childrenEmpty) {
+                      if (col === 1 && row === 1) {
+                        return "col-span-3 row-span-3";
+                      }
+                      if (col === 2 && row === 1) {
+                        return "col-span-6 row-span-2";
+                      }
+                      if (col === 1 && row === 2) {
+                        return "col-span-3 row-span-2";
+                      }
+                      return "col-span-3 row-span-3";
+                    } else {
+                      if (col === 1 && row === 1) {
+                        return "col-span-1 row-span-1";
+                      }
+                      if (col === 2 && row === 1) {
+                        if (index < 2) {
+                          return "col-span-2 row-span-2";
+                        } else {
+                          return "col-span-1 row-span-1";
+                        }
+                      }
+                      if (col === 1 && row === 2) {
+                        if (index < 2) {
+                          return "col-span-2 row-span-2";
+                        } else {
+                          return "col-span-1 row-span-1";
+                        }
+                      }
+                      return "col-span-1 row-span-1";
+                    }
+                  })()
                 )}
                 key={index}
               ></motion.div>

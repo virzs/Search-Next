@@ -9,6 +9,7 @@ import {
 } from "@remixicon/react";
 import { Menu, Modal } from "antd";
 import { useSortable } from "../hook";
+import { configMap, SortableItemBaseConfig } from "../config";
 
 const itemVariants: Variants = {
   menuShow: {
@@ -55,6 +56,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
     hideContextMenu,
     setShowInfoItemData,
     removeItem,
+    updateItemConfig,
   } = useSortable();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -78,6 +80,18 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
       document.removeEventListener("mousedown", handleDocumentClick);
     };
   }, [hideContextMenu]);
+
+  const getAllSizes = () => {
+    const config: SortableItemBaseConfig =
+      contextMenu?.data?.config ?? configMap[contextMenu?.data?.type];
+    const dimensions = [];
+    for (let row = 1; row <= config.maxRow; row++) {
+      for (let col = 1; col <= config.maxCol; col++) {
+        dimensions.push(`${row}x${col}`);
+      }
+    }
+    return dimensions;
+  };
 
   return (
     <AnimatePresence>
@@ -115,29 +129,17 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
                   label: "修改大小",
                   key: "resize",
                   icon: <RiPencilRuler2Line size={14} />,
-                  children: [
-                    {
-                      label: "1x1",
-                      key: "small",
-                      onClick: () => {
-                        console.log("small");
-                      },
+                  children: getAllSizes().map((size) => ({
+                    label: size,
+                    key: size,
+                    onClick: () => {
+                      const [row, col] = size.split("x").map(Number);
+                      updateItemConfig(contextMenu.data.id, {
+                        row,
+                        col,
+                      });
                     },
-                    {
-                      label: "2x1",
-                      key: "medium",
-                      onClick: () => {
-                        console.log("medium");
-                      },
-                    },
-                    {
-                      label: "1x2",
-                      key: "large",
-                      onClick: () => {
-                        console.log("large");
-                      },
-                    },
-                  ],
+                  })),
                 },
               ]}
             ></Menu>

@@ -35,6 +35,7 @@ export interface SortableContextProps {
   /** 长按事件状态 */
   longPressTriggered: boolean;
   updateItem: (id: string | number, data: any) => void;
+  updateItemConfig: (id: string | number, config: any) => void;
   removeItem: (id: string) => void;
   /** 当前移动的元素id */
   moveItemId: string | null;
@@ -59,6 +60,7 @@ export const SortableContext = createContext<SortableContextProps>({
   setOpenGroupItemData: () => {},
   longPressTriggered: false,
   updateItem: () => {},
+  updateItemConfig: () => {},
   removeItem: () => {},
   moveItemId: null,
   setMoveItemId: () => {},
@@ -198,6 +200,26 @@ export const SortableProvider = ({
     }
   };
 
+  const updateItemConfig = (id: string | number, config: any) => {
+    setList((prevList) => {
+      const _list = [...prevList];
+      const updateItem = (list: SortItem[]) => {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].id === id) {
+            list[i].config = config;
+            break;
+          } else if (list[i].children?.length !== undefined) {
+            updateItem(list[i].children!);
+          }
+        }
+      };
+
+      updateItem(_list);
+
+      return _list;
+    });
+  };
+
   const updateItem = (id: string | number, data: any) => {
     setList((prevList) => {
       const _list = [...prevList];
@@ -269,6 +291,7 @@ export const SortableProvider = ({
         openGroupItemData,
         setOpenGroupItemData,
         longPressTriggered,
+        updateItemConfig,
         updateItem,
         removeItem,
         moveItemId,

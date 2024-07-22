@@ -43,9 +43,9 @@ const Sortable: FC<SortableProps> = (props) => {
         className={cx(
           "grid justify-center transition-all place-items-center",
           css`
-            grid-template-columns: repeat(auto-fill, 128px);
+            grid-template-columns: repeat(auto-fill, 96px);
             grid-auto-flow: dense;
-            grid-auto-rows: 128px;
+            grid-auto-rows: 96px;
           `
         )}
         animation={150}
