@@ -12,7 +12,7 @@ const Home = () => {
   const [list, setList] = useState<SortItem[]>([
     {
       id: 1,
-      type: "app",
+      type: "group",
       data: {
         name: "one",
       },

@@ -31,7 +31,6 @@ const GroupItemModal: FC<GroupItemModalProps> = (props) => {
 
   useEffect(() => {
     if (!data) return;
-    console.log(data);
     setName(data.data?.name);
   }, [data]);
 

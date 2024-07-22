@@ -162,16 +162,6 @@ export const SortableProvider = ({
               return;
             }
 
-            if (newList.length === 1) {
-              const _i = newList[0];
-              parent.data = _i.data;
-              parent.type = _i.type;
-              parent.children = [];
-              parent.config = _i.config;
-              parent.id = _i.id;
-              return;
-            }
-
             // ! 当前已经是 group 时，直接将 children 更改为最新的 list
             parent.children = [...SortableUtils.uniqueArray(newList)];
           } else {
@@ -183,10 +173,27 @@ export const SortableProvider = ({
         return _items;
       });
     } else {
-      // ! 直接排序
+      // ! 根节点直接排序
       setList((_list) => {
         _list = newList;
-        return [..._list];
+        const ids = _list.map((item) => item.id);
+
+        // ! model 中的 children 可能会存在重复的 id，需要去重
+        // ! 从 model 向根节点移动时会出现重复的 id
+        const result = [..._list].map((i) => {
+          if (i.children?.length) {
+            i.children = i.children.filter(
+              (item: any) => !ids.includes(item.id)
+            );
+          }
+          if (i.children?.length === 1) {
+            const _i = { ...i.children[0] };
+            return _i;
+          }
+          return i;
+        });
+
+        return result;
       });
     }
   };

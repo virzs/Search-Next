@@ -4,9 +4,10 @@ import { css, cx } from "@emotion/css";
 import {
   RiCloseCircleLine,
   RiInformationLine,
+  RiPencilRuler2Line,
   RiShareLine,
 } from "@remixicon/react";
-import { Modal } from "antd";
+import { Menu, Modal } from "antd";
 import { useSortable } from "../hook";
 
 const itemVariants: Variants = {
@@ -36,7 +37,7 @@ const ContextButton: FC<ContextButtonProps> = (props) => {
       }}
       variants={itemVariants}
     >
-      <motion.div className="py-2 px-4 rounded-lg" whileTap={{ scale: 0.9 }}>
+      <motion.div className="py-1.5 px-3 rounded-lg" whileTap={{ scale: 0.9 }}>
         <motion.div className="mb-1.5 flex justify-center">{icon}</motion.div>
         <motion.div>{title}</motion.div>
       </motion.div>
@@ -84,7 +85,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
         <motion.div
           ref={ref}
           className={cx(
-            "bg-white mt-2 rounded-lg fixed -translate-x-1/2 overflow-hidden z-[1001]",
+            "fixed -translate-x-1/2 z-[1001]",
             css`
               top: ${bottom}px;
               left: ${left + width / 2}px;
@@ -98,10 +99,53 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
             e.preventDefault();
           }}
         >
-          <motion.div className="flex">
-            <ContextButton icon={<RiShareLine />} title="分享" />
+          <motion.div
+            className={cx(
+              "shadow rounded-lg overflow-hidden",
+              css`
+                .ant-menu {
+                  border-inline-end: none !important;
+                }
+              `
+            )}
+          >
+            <Menu
+              items={[
+                {
+                  label: "修改大小",
+                  key: "resize",
+                  icon: <RiPencilRuler2Line size={14} />,
+                  children: [
+                    {
+                      label: "1x1",
+                      key: "small",
+                      onClick: () => {
+                        console.log("small");
+                      },
+                    },
+                    {
+                      label: "2x1",
+                      key: "medium",
+                      onClick: () => {
+                        console.log("medium");
+                      },
+                    },
+                    {
+                      label: "1x2",
+                      key: "large",
+                      onClick: () => {
+                        console.log("large");
+                      },
+                    },
+                  ],
+                },
+              ]}
+            ></Menu>
+          </motion.div>
+          <motion.div className="flex shadow bg-white mt-2 rounded-lg overflow-hidden p-1">
+            <ContextButton icon={<RiShareLine size={20} />} title="分享" />
             <ContextButton
-              icon={<RiInformationLine />}
+              icon={<RiInformationLine size={20} />}
               title="信息"
               onClick={() => {
                 setShowInfoItemData(contextMenu.data);
@@ -109,7 +153,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
               }}
             />
             <ContextButton
-              icon={<RiCloseCircleLine />}
+              icon={<RiCloseCircleLine size={20} />}
               title="移除"
               onClick={() => {
                 setContextMenu(null);
@@ -120,6 +164,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
                   onOk: () => {
                     removeItem(contextMenu.data.id);
                   },
+                  onCancel: () => {},
                 });
               }}
             />
