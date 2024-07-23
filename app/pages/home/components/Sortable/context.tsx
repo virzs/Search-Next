@@ -9,6 +9,7 @@ import {
 import { SortItem } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import SortableUtils from "./utils";
+import { useDebounceEffect, useLocalStorageState } from "ahooks";
 
 interface ContextMenu {
   rect: DOMRect;
@@ -93,6 +94,15 @@ export const SortableProvider = ({
   const [moveItemId, setMoveItemId] = useState<string | null>(null);
   const [moveTargetId, setMoveTargetId] = useState<string | number | null>(
     null
+  );
+
+  const [init, setInit] = useState(false);
+  const [localList, setLocalList] = useLocalStorageState<any[]>(
+    "SEARCH_NEXT_SORTABLE_CONFIG",
+    {
+      defaultValue: [],
+      listenStorageChange: true,
+    }
   );
 
   const hideContextMenu = () => {
@@ -274,6 +284,23 @@ export const SortableProvider = ({
     }
     // eslint-disable-next-line
   }, [listStatus]);
+
+  useEffect(() => {
+    if (localList && !init) {
+      _setList(localList as any);
+      setInit(true);
+    }
+  }, [localList, init]);
+
+  useDebounceEffect(
+    () => {
+      setLocalList(list);
+    },
+    [list],
+    {
+      wait: 1000,
+    }
+  );
 
   return (
     <SortableContext.Provider
