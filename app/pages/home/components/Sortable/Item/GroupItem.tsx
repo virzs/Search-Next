@@ -50,6 +50,56 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
     return moveTargetId === data.id;
   }, [data.id, moveTargetId]);
 
+  const sizedContent = () => {
+    /** type app */
+    if (childrenEmpty) {
+      return (
+        <motion.div className="w-full h-full bg-green-500 absolute left-0 top-0 sortable-group-item"></motion.div>
+      );
+    }
+    if ((row === 1 && col === 1) || (row === 2 && col === 2)) {
+      return (
+        <motion.div className="grid grid-cols-3 grid-rows-3 w-full h-full p-1 gap-2">
+          {_children?.slice(0, 9).map((i) => (
+            <motion.div className="bg-green-500 rounded-lg"></motion.div>
+          ))}
+        </motion.div>
+      );
+    }
+    if (row === 1 && col === 2) {
+      return (
+        <motion.div className="grid grid-cols-10 grid-rows-4 gap-x-2 gap-y-1 w-[144px] h-[52px]">
+          {_children?.slice(0, 4).map((i, j) => (
+            <motion.div
+              className={cx(
+                "bg-green-500",
+                j < 2
+                  ? "w-[52px] h-[52px] rounded-lg col-span-4 row-span-4"
+                  : "w-6 h-6 rounded-md col-span-2 row-span-2"
+              )}
+            ></motion.div>
+          ))}
+        </motion.div>
+      );
+    }
+    if (row === 2 && col === 1) {
+      return (
+        <motion.div className="grid grid-cols-4 grid-rows-10 gap-x-1 gap-y-2 w-[52px] h-[144px]">
+          {_children?.slice(0, 4).map((i, j) => (
+            <motion.div
+              className={cx(
+                "bg-green-500",
+                j < 2
+                  ? "w-[52px] h-[52px] rounded-lg col-span-4 row-span-4"
+                  : "w-6 h-6 rounded-md col-span-2 row-span-2"
+              )}
+            ></motion.div>
+          ))}
+        </motion.div>
+      );
+    }
+  };
+
   return (
     <motion.div
       data-id={data.id}
@@ -77,62 +127,8 @@ const SortableGroupItem: FC<SortableGroupItemProps> = (props) => {
         }}
         {...contextMenuFuns(data)}
       >
-        <motion.div className="p-1.5 relative w-full h-full">
-          <motion.div
-            className={cx(
-              "h-full w-full absolute left-0 top-0 grid gap-1 sortable-group-item cursor-pointer transition-all",
-              childrenEmpty ? "" : "p-1.5",
-              ((col === 1 && row === 1) || (col === 2 && row === 2)) &&
-                "grid-cols-3 grid-rows-3",
-              col === 1 && row === 2 && "grid-cols-2 grid-rows-6",
-              col === 2 && row === 1 && "grid-cols-6 grid-rows-2"
-            )}
-          >
-            {_children?.map((item, index) => (
-              <motion.div
-                data-parent-ids={parentIds?.join(",")}
-                data-children-length={children?.length}
-                className={cx(
-                  "bg-green-500 rounded transition-all cursor-pointer",
-                  childrenEmpty && "sortable-group-item",
-                  (() => {
-                    if (childrenEmpty) {
-                      if (col === 1 && row === 1) {
-                        return "col-span-3 row-span-3";
-                      }
-                      if (col === 2 && row === 1) {
-                        return "col-span-6 row-span-2";
-                      }
-                      if (col === 1 && row === 2) {
-                        return "col-span-3 row-span-2";
-                      }
-                      return "col-span-3 row-span-3";
-                    } else {
-                      if (col === 1 && row === 1) {
-                        return "col-span-1 row-span-1";
-                      }
-                      if (col === 2 && row === 1) {
-                        if (index < 2) {
-                          return "col-span-2 row-span-2";
-                        } else {
-                          return "col-span-1 row-span-1";
-                        }
-                      }
-                      if (col === 1 && row === 2) {
-                        if (index < 2) {
-                          return "col-span-2 row-span-2";
-                        } else {
-                          return "col-span-1 row-span-1";
-                        }
-                      }
-                      return "col-span-1 row-span-1";
-                    }
-                  })()
-                )}
-                key={index}
-              ></motion.div>
-            ))}
-          </motion.div>
+        <motion.div className="p-1.5 relative w-full h-full flex justify-center items-center">
+          {sizedContent()}
           {/* 需要设置宽高小于父元素，否则在拖拽时会始终响应子列表 */}
           <ReactSortable
             className={cx(
