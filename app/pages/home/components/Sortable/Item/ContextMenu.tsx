@@ -7,7 +7,7 @@ import {
   RiPencilRuler2Line,
   RiShareLine,
 } from "@remixicon/react";
-import { Menu, Modal } from "antd";
+import { Modal } from "antd";
 import { useSortable } from "../hook";
 import { configMap, SortableItemBaseConfig } from "../config";
 
@@ -62,8 +62,9 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
 
   const [modal, contextHolder] = Modal.useModal();
 
-  const { rect } = contextMenu ?? {};
+  const { rect, data } = contextMenu ?? {};
   const { left = 0, bottom = 0, width = 0 } = rect ?? {};
+  const { config } = data ?? {};
 
   // 点击空白处关闭
   useEffect(() => {
@@ -82,8 +83,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
   }, [hideContextMenu]);
 
   const getAllSizes = () => {
-    const config: SortableItemBaseConfig =
-      contextMenu?.data?.config ?? configMap[contextMenu?.data?.type];
+    const config: SortableItemBaseConfig = configMap[contextMenu?.data?.type];
     const dimensions = [];
     for (let row = 1; row <= config.maxRow; row++) {
       for (let col = 1; col <= config.maxCol; col++) {
@@ -123,13 +123,13 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
               `
             )}
           >
-            <Menu
-              items={[
+            <motion.ul className="bg-white p-1">
+              {[
                 {
                   label: "修改大小",
-                  key: "resize",
+                  key: "size",
                   icon: <RiPencilRuler2Line size={14} />,
-                  children: getAllSizes().map((size) => ({
+                  items: getAllSizes().map((size) => ({
                     label: size,
                     key: size,
                     onClick: () => {
@@ -141,8 +141,29 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
                     },
                   })),
                 },
-              ]}
-            ></Menu>
+              ].map((i) => (
+                <motion.li className="py-2 px-3" key={i.key}>
+                  <motion.p className="flex items-center text-sm gap-2 pb-2">
+                    {i.icon} {i.label}
+                  </motion.p>
+                  <motion.div className="grid grid-cols-2 gap-1">
+                    {i.items.map((it) => (
+                      <motion.div
+                        className={cx(
+                          "py-1 px-2 hover:bg-gray-100 rounded transition-all cursor-pointer text-center text-sm",
+                          `${config.row}x${config.col}` === it.key &&
+                            "bg-gray-100"
+                        )}
+                        key={it.key}
+                        onClick={it.onClick}
+                      >
+                        {it.label}
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </motion.li>
+              ))}
+            </motion.ul>
           </motion.div>
           <motion.div className="flex shadow bg-white mt-2 rounded-lg overflow-hidden p-1">
             <ContextButton icon={<RiShareLine size={20} />} title="分享" />
