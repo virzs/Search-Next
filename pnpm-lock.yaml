@@ -20,7 +20,7 @@ specifiers:
   next: 14.2.1
   next-view-transitions: ^0.2.0
   postcss: ^8
-  primereact: ^9.5.0
+  primereact: ^10.7.0
   react: ^18
   react-dom: ^18
   react-json-view: ^1.21.3
@@ -40,7 +40,7 @@ dependencies:
   framer-motion: 11.0.28_biqbaboplfbrettd7655fr4n2y
   next: 14.2.1_biqbaboplfbrettd7655fr4n2y
   next-view-transitions: 0.2.0_7zsvwwbp5gyeabk2so4s4qkwvm
-  primereact: 9.5.0_6qcp4jokx32fjqh56b7wyl7qsu
+  primereact: 10.7.0_6qcp4jokx32fjqh56b7wyl7qsu
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-json-view: 1.21.3_6qcp4jokx32fjqh56b7wyl7qsu
@@ -2985,12 +2985,13 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /primereact/9.5.0_6qcp4jokx32fjqh56b7wyl7qsu:
-    resolution: {integrity: sha512-ZykUr4MtEsVLECiTCk58oexYqYwtfa1/eg9T+0u6IaxQczEo/4UfljWCg/KLrs2KCgH6OKGScxvlUePiVMsBrw==}
+  /primereact/10.7.0_6qcp4jokx32fjqh56b7wyl7qsu:
+    resolution: {integrity: sha512-Rx0JaNF7WM+vcSy4sUeLA9nnEAxm5N1P2RhRXEwFpoo9527429kvwZcNanlcJiqY8JCwCaiSnGGPYgVKtGcZCw==}
+    engines: {node: '>=14.0.0'}
     peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
-      react-dom: ^17.0.0 || ^18.0.0
+      '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
