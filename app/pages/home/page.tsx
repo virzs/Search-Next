@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import Footer from "@/app/components/Layout/Footer";
 import dynamic from "next/dynamic";
 import Sortable from "./components/Sortable";
+import StoreModal from "./components/Store/Modal";
 
 const Home = () => {
   const [list, setList] = useState<SortItem[]>([
@@ -85,6 +86,7 @@ const Home = () => {
       <div className="mx-auto max-w-5xl w-full flex-1">
         <SortableProvider list={list}>
           <Sortable />
+          <StoreModal />
         </SortableProvider>
       </div>
       <Footer />
