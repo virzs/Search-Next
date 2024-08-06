@@ -4,6 +4,7 @@ specifiers:
   '@ant-design/cssinjs': ^1.20.0
   '@ant-design/nextjs-registry': ^1.0.0
   '@emotion/css': ^11.11.2
+  '@micro-zoe/micro-app': 1.0.0-rc.6
   '@remixicon/react': ^4.2.0
   '@types/node': ^20
   '@types/react': ^18
@@ -34,6 +35,7 @@ dependencies:
   '@ant-design/cssinjs': 1.20.0_biqbaboplfbrettd7655fr4n2y
   '@ant-design/nextjs-registry': 1.0.0_6n62kvl4luw3lbg5eetxqtqnd4
   '@emotion/css': 11.11.2
+  '@micro-zoe/micro-app': 1.0.0-rc.6
   '@remixicon/react': 4.2.0_react@18.2.0
   ahooks: 3.8.0_react@18.2.0
   antd: 5.16.2_biqbaboplfbrettd7655fr4n2y
@@ -377,6 +379,10 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@micro-zoe/micro-app/1.0.0-rc.6:
+    resolution: {integrity: sha512-5HrbNXBciPbSifZthFdIjOpeZZ0SD8zvvY7+0VRxbA9RDL9JJo81PsoYxoDKh895fsGd8ZFHiaSc0X5cuQHPhg==}
+    dev: false
 
   /@next/env/14.2.1:
     resolution: {integrity: sha512-qsHJle3GU3CmVx7pUoXcghX4sRN+vINkbLdH611T8ZlsP//grzqVW87BSUgOZeSAD4q7ZdZicdwNe/20U2janA==}

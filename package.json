@@ -12,6 +12,7 @@
     "@ant-design/cssinjs": "^1.20.0",
     "@ant-design/nextjs-registry": "^1.0.0",
     "@emotion/css": "^11.11.2",
+    "@micro-zoe/micro-app": "1.0.0-rc.6",
     "@remixicon/react": "^4.2.0",
     "ahooks": "^3.8.0",
     "antd": "^5.16.2",
