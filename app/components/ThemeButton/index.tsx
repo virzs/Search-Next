@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { FC, useEffect, useState } from "react";
 import { cx } from "@emotion/css";
