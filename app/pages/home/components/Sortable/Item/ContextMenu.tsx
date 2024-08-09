@@ -1,3 +1,5 @@
+"use client";
+
 import { AnimatePresence, Variants, motion } from "framer-motion";
 import { FC, useEffect, useRef } from "react";
 import { css, cx } from "@emotion/css";
@@ -64,7 +66,7 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
 
   const { rect, data } = contextMenu ?? {};
   const { left = 0, bottom = 0, width = 0 } = rect ?? {};
-  const { config } = data ?? {};
+  const { config = {} } = data ?? {};
 
   // 点击空白处关闭
   useEffect(() => {
@@ -123,47 +125,49 @@ const ContextMenu: FC<ContextMenuProps> = (props) => {
               `
             )}
           >
-            <motion.ul className="bg-white p-1">
-              {[
-                {
-                  label: "修改大小",
-                  key: "size",
-                  icon: <RiPencilRuler2Line size={14} />,
-                  items: getAllSizes().map((size) => ({
-                    label: size,
-                    key: size,
-                    onClick: () => {
-                      const [row, col] = size.split("x").map(Number);
-                      updateItemConfig(contextMenu.data.id, {
-                        row,
-                        col,
-                      });
-                    },
-                  })),
-                },
-              ].map((i) => (
-                <motion.li className="py-2 px-3" key={i.key}>
-                  <motion.p className="flex items-center text-sm gap-2 pb-2">
-                    {i.icon} {i.label}
-                  </motion.p>
-                  <motion.div className="grid grid-cols-2 gap-1">
-                    {i.items.map((it) => (
-                      <motion.div
-                        className={cx(
-                          "py-1 px-2 hover:bg-gray-100 rounded transition-all cursor-pointer text-center text-sm",
-                          `${config.row}x${config.col}` === it.key &&
-                            "bg-gray-100"
-                        )}
-                        key={it.key}
-                        onClick={it.onClick}
-                      >
-                        {it.label}
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </motion.li>
-              ))}
-            </motion.ul>
+            {config.allowResize !== false && (
+              <motion.ul className="bg-white p-1">
+                {[
+                  {
+                    label: "修改大小",
+                    key: "size",
+                    icon: <RiPencilRuler2Line size={14} />,
+                    items: getAllSizes().map((size) => ({
+                      label: size,
+                      key: size,
+                      onClick: () => {
+                        const [row, col] = size.split("x").map(Number);
+                        updateItemConfig(contextMenu.data.id, {
+                          row,
+                          col,
+                        });
+                      },
+                    })),
+                  },
+                ].map((i) => (
+                  <motion.li className="py-2 px-3" key={i.key}>
+                    <motion.p className="flex items-center text-sm gap-2 pb-2">
+                      {i.icon} {i.label}
+                    </motion.p>
+                    <motion.div className="grid grid-cols-2 gap-1">
+                      {i.items.map((it) => (
+                        <motion.div
+                          className={cx(
+                            "py-1 px-2 hover:bg-gray-100 rounded transition-all cursor-pointer text-center text-sm",
+                            `${config.row}x${config.col}` === it.key &&
+                              "bg-gray-100"
+                          )}
+                          key={it.key}
+                          onClick={it.onClick}
+                        >
+                          {it.label}
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            )}
           </motion.div>
           <motion.div className="flex shadow bg-white mt-2 rounded-lg overflow-hidden p-1">
             <ContextButton icon={<RiShareLine size={20} />} title="分享" />

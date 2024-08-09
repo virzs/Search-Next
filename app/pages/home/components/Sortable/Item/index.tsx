@@ -8,15 +8,29 @@ export interface SortableItemProps {
   className?: string;
   itemIndex: number;
   showTitle?: boolean;
+  onClick?: () => void;
+  disabledDrag?: boolean;
 }
 
 const SortableItem: FC<SortableItemProps> = (props) => {
-  const { data, className, itemIndex, showTitle = true } = props;
+  const {
+    data,
+    className,
+    itemIndex,
+    showTitle = true,
+    onClick,
+    disabledDrag = false,
+  } = props;
 
   const { contextMenuFuns } = useSortable();
 
   return (
-    <motion.div data-id={data.id} data-index={itemIndex}>
+    <motion.div
+      data-id={data.id}
+      data-index={itemIndex}
+      onClick={onClick}
+      className={cx(disabledDrag && "drag-disabled")}
+    >
       <motion.div
         className="bg-white dark:bg-white dark:text-black rounded-xl shadow-2xl cursor-pointer border-0 relative w-16 h-16"
         whileTap={{ scale: 0.9 }}

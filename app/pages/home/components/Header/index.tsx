@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "antd";
 import { motion } from "framer-motion";
 import { Link } from "next-view-transitions";

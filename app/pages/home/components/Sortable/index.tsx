@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 import SortableItem from "./Item";
 import { css, cx } from "@emotion/css";
@@ -6,9 +6,9 @@ import ContextMenu from "./Item/ContextMenu";
 import SortableGroupItem from "./Item/GroupItem";
 import { SortItem } from "./types";
 import { ghostClass } from "./style";
-import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSortable } from "./hook";
+import StoreModal from "../Store/Modal";
 
 const ItemInfoModal = dynamic(() => import("./Item/Modal/InfoModal"), {
   ssr: false,
@@ -37,6 +37,8 @@ const Sortable: FC<SortableProps> = (props) => {
     setMoveTargetId,
   } = useSortable();
 
+  const [storeOpen, setStoreOpen] = useState(false);
+
   return (
     <>
       <ReactSortable
@@ -54,6 +56,7 @@ const Sortable: FC<SortableProps> = (props) => {
         group="nested"
         list={list}
         setList={(e) => setList(e)}
+        filter=".drag-disabled"
         onMove={(e) => {
           setListStatus("onMove");
           const { dragged, related } = e;
@@ -107,6 +110,22 @@ const Sortable: FC<SortableProps> = (props) => {
 
           return el;
         })}
+        <SortableItem
+          key="store"
+          disabledDrag
+          data={{
+            data: {
+              name: "应用商店",
+            },
+            config: {
+              allowResize: false,
+            },
+          }}
+          onClick={() => {
+            setStoreOpen(true);
+          }}
+          itemIndex={-1}
+        />
       </ReactSortable>
 
       {/* 右键菜单 */}
@@ -125,6 +144,13 @@ const Sortable: FC<SortableProps> = (props) => {
         data={openGroupItemData}
         onClose={() => {
           setOpenGroupItemData(null);
+        }}
+      />
+
+      <StoreModal
+        open={storeOpen}
+        onClose={() => {
+          setStoreOpen(false);
         }}
       />
     </>

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ReactNode,
   createContext,
@@ -119,6 +121,11 @@ export const SortableProvider = ({
   };
 
   const contextMenuFuns = (data: any) => {
+    const { config = {} } = data;
+
+    if (config.allowContextMenu === false) {
+      return {};
+    }
     return {
       onMouseDown: (e: any) => {
         setContextMenuTimer(

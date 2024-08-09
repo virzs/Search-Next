@@ -1,10 +1,10 @@
 import { RiAppsLine, RiLinksLine } from "@remixicon/react";
 import { configResponsive, useResponsive } from "ahooks";
-import { Drawer, Input, Menu, Modal, Tabs } from "antd";
+import { Drawer, Menu, Modal } from "antd";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import WebsiteView from "./wiews/Website";
-import WidgetView from "./wiews/Widget";
+import { FC, Suspense, useState } from "react";
+import WebsiteView from "./views/Website";
+import WidgetView from "./views/Widget";
 /**
  * 配置响应式断点 hooks
  * 和 tailwindcss 的断点对应
@@ -17,7 +17,14 @@ configResponsive({
   xxl: 1536,
 });
 
-const StoreModal = () => {
+interface StoreModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const StoreModal: FC<StoreModalProps> = (props) => {
+  const { open, onClose } = props;
+
   const responsive = useResponsive();
 
   const { lg, xl, xxl } = responsive ?? {};
@@ -29,8 +36,8 @@ const StoreModal = () => {
       <div className="w-32 shrink-0">
         <Menu
           mode="inline"
-          selectedKeys={[activeMenu]}
-          onClick={({ key }) => setActiveMenu(key)}
+          // selectedKeys={[activeMenu]}
+          // onClick={({ key }) => setActiveMenu(key)}
           items={[
             {
               icon: <RiLinksLine />,
@@ -47,13 +54,15 @@ const StoreModal = () => {
       </div>
       <div className="grow w-0">
         <motion.div
-          key={activeMenu}
+          // key={activeMenu}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {activeMenu === "website" && <WebsiteView />}
-          {activeMenu === "widget" && <WidgetView />}
+          <Suspense fallback={<div>Loading...</div>}>
+            {activeMenu === "website" && <WebsiteView />}
+            {activeMenu === "widget" && <WidgetView />}
+          </Suspense>
         </motion.div>
       </div>
     </div>
@@ -61,8 +70,9 @@ const StoreModal = () => {
 
   const containerProps = {
     title: "应用商店",
-    open: true,
+    open,
     footer: null,
+    onCancel: onClose,
   };
 
   const drawer = (

@@ -3,6 +3,10 @@ export interface SortableItemBaseConfig {
   maxRow: number;
   /** 最大列数 */
   maxCol: number;
+  /** 允许设置大小 */
+  allowResize?: boolean;
+  /** 允许打开右键菜单 */
+  allowContextMenu?: boolean;
 }
 
 // app 类型 config
