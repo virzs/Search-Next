@@ -4,7 +4,7 @@ export const getApiPrefix = (
   path: string,
   extra?: number | string | Array<number | string>
 ) => {
-  const prefix = process.env.API_URL;
+  const prefix = "/api";
 
   const mergedExtra = Array.isArray(extra)
     ? extra
