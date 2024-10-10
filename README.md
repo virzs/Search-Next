@@ -1,5 +1,7 @@
 # Search 导航页 Next 版
 
+# 由于服务器到期，部分功能无法访问
+
 ![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
 
 2x 正在开发中，查看历史版本请切换至 1x 分支
