@@ -1,5 +1,21 @@
 # Search 导航页 Next 版
 
+```
+公共组件库 🚧    公共后端接口 🚧    公共后台 🚧
+      |                  |                  |
+      |                  |                  |
+      +------------------+------------------+
+                         |
+                         |
+                         v
+                    本项目 ⏳
+```
+
+> 状态说明：
+> - 🚧 开发中
+> - ⏳ 等待中
+> - 🎉 已完成
+
 # 由于服务器到期，部分功能无法访问
 
 ![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
