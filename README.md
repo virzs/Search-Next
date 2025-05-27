@@ -1,90 +1,54 @@
-# Search 导航页 Next 版
+# React + TypeScript + Vite
 
-```
-公共组件库 🚧    公共后端接口 🚧    公共后台 🚧
-      |                  |                  |
-      |                  |                  |
-      +------------------+------------------+
-                         |
-                         |
-                         v
-                    本项目 ⏳
-```
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-> 状态说明：
-> - 🚧 开发中
-> - ⏳ 等待中
-> - 🎉 已完成
->
-> 公共组件库地址：https://zs-library.virs.xyz/
+Currently, two official plugins are available:
 
-# 由于服务器到期，部分功能无法访问
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
+## Expanding the ESLint configuration
 
-2x 正在开发中，查看历史版本请切换至 1x 分支
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-后端部分暂不开源，待项目稳定后发布
-
-2x 版本将会支持账号
-
-## 版本说明
-
-- 1.x 分支 1.x
-- 2.x 分支 2.x
-
-## 在线地址
-
-<https://search-next-git-2x-virzs-projects.vercel.app/home>
-
-## 在线交流
-
-Discord: https://discord.gg/NRMxAmqG
-
-QQ 群：859791575
-
-欢迎提供意见或建议
-
-## 启动项目
-
-需要 nodejs（版本不限，建议最新）、pnpm（npm 也可以）
-
-安装依赖：
-
-```bash
-pnpm
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
 
-启动项目：
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```bash
-pnpm dev
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
 ```
-
-编译项目：
-
-```bash
-pnpm build
-```
-
-## 常见问题说明
-
-待更新
-
-## 插件
-
-规划中，预计采用微前端方案
-
-[Search Next Plugins](https://github.com/virzs/Search-Next-Plugins)
-
-## 后端支持
-
-待更新，暂不开源
-
-**多语言：**
-
-VS Code 安装 i18n Ally 插件
-
-## 引用资源
-
------none------
