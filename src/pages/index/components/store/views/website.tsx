@@ -43,10 +43,13 @@ const WebsiteView = () => {
                         </div>
                         <div className="relative flex flex-wrap gap-2">
                           {k.websites?.map((x, q) => (
-                            <DesktopGroupItem
+                            <DesktopAppItem
                               data={{
                                 id: x._id,
-                                data: x,
+                                data: {
+                                  name: x.name,
+                                  icon: x.icon?.url,
+                                },
                                 config: {
                                   allowResize: false,
                                   allowContextMenu: false,

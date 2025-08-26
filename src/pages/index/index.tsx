@@ -10,18 +10,18 @@ import {
 } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean } from "ahooks";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo, useCallback } from "react";
 import HandleRootGroupModal from "./components/root-group/handle-modal";
 import { ContextMenu } from "@radix-ui/themes";
 import { message, Modal } from "antd";
 import Header from "./components/header";
-import { RiStore2Fill } from "@remixicon/react";
+import { RiStore2Fill, RiApps2Line } from "@remixicon/react";
 import StoreModal from "./components/store/modal";
-
-interface DesktopItemData {
-  name: string;
-  icon?: string | { iconName: string; iconType: string };
-}
+import WidgetWindow from "../../components/window";
+import WidgetIcon from "../../components/micro-frontend/widget-icon";
+import InternalWidget from "../../components/micro-frontend/internal-widget";
+import { WIDGET_CONFIGS, MicroAppConfig } from "../../services/micro-frontend";
+import type { DesktopItemData } from "../../types";
 
 function Index() {
   const [modal, contextHolder] = Modal.useModal();
@@ -30,20 +30,14 @@ function Index() {
 
   const [modalOpen, { toggle: toggleModal }] = useBoolean(false);
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
-  const [currentEditItem, setCurrentEditItem] = useState<
-    DesktopSortItem<DesktopItemData> | undefined
-  >(undefined);
+  const [currentEditItem, setCurrentEditItem] = useState<DesktopSortItem<DesktopItemData> | undefined>(undefined);
+  // 小组件窗口管理
+  const [openWidgets, setOpenWidgets] = useState<Set<string>>(new Set());
 
-  const [desktopList, setDesktopList] = useState<
-    DesktopSortItem<DesktopItemData>[]
-  >([
+  const [desktopList, setDesktopList] = useState<DesktopSortItem<DesktopItemData>[]>([
     {
       id: "123",
       type: "group",
-      data: {
-        name: "常用",
-        icon: "ri-star-line",
-      },
       children: [
         {
           id: 1,
@@ -71,6 +65,38 @@ function Index() {
           type: "app",
           data: {
             name: "two",
+          },
+        }, // 添加一个小组件示例
+        {
+          id: "widget-demo-clock",
+          type: "app",
+          data: {
+            name: "时钟小组件",
+            widgetConfig: {
+              id: "clock",
+              name: "时钟",
+              entry: "//localhost:3002",
+              props: {
+                title: "时钟小组件",
+              },
+            },
+          },
+        },
+        // 添加测试小组件示例
+        {
+          id: "widget-demo-test",
+          type: "app",
+          data: {
+            name: "测试小组件",
+            widgetConfig: {
+              id: "test",
+              name: "测试小组件",
+              entry: "internal",
+              props: {
+                title: "测试小组件",
+                supportIconMode: true,
+              },
+            },
           },
         },
         {
@@ -113,10 +139,6 @@ function Index() {
     {
       id: "12313eqw",
       type: "group",
-      data: {
-        name: "开发",
-        icon: "ri-terminal-line",
-      },
       children: [
         {
           id: 90,
@@ -130,10 +152,6 @@ function Index() {
     {
       id: "12313eqw1",
       type: "group",
-      data: {
-        name: "社交",
-        icon: "ri-chat-1-line",
-      },
       children: [
         {
           id: 902,
@@ -146,29 +164,19 @@ function Index() {
     },
     {
       id: "12313eqws",
-      type: "group",
-      data: {
-        name: "AI",
-        icon: "ri-ai-generate-2",
-      },
+      type: "dock",
       children: [
         {
           id: 903,
           type: "app",
           data: {
             name: "x90",
+            icon: "https://placehold.co/100x100/FC3D39/FFFFFF?text=Calendar",
           },
         },
       ],
     },
   ]);
-
-  const mouseX = useDockDesktopMouseX(Infinity);
-
-  const handleOpenModal = (editItem?: DesktopSortItem<DesktopItemData>) => {
-    setCurrentEditItem(editItem);
-    toggleModal();
-  };
 
   const handleCloseModal = () => {
     setCurrentEditItem(undefined);
@@ -195,21 +203,101 @@ function Index() {
     handleCloseModal();
   };
 
-  const handleDeleteGroup = (id: string | number) => {
-    modal.confirm({
-      title: "删除分类",
-      content: "确定要删除该分类吗？此操作不可撤销。",
-      onOk: () => {
-        desktopRef.current?.state.removeRootItem(id);
-        message.success("删除成功");
-      },
+  // 小组件窗口管理函数
+  const handleOpenWidget = (widgetId: string) => {
+    setOpenWidgets((prev) => new Set([...prev, widgetId]));
+  };
+
+  const handleCloseWidget = (widgetId: string) => {
+    setOpenWidgets((prev) => {
+      const next = new Set(prev);
+      next.delete(widgetId);
+      return next;
     });
   };
+
+  // 处理应用项双击事件
+  const handleItemDoubleClick = (item: DesktopSortItem<DesktopItemData>) => {
+    // 如果是小组件类型
+    if (item.data?.widgetConfig) {
+      handleOpenWidget(item.data.widgetConfig.id);
+    }
+    // 如果是普通应用且有URL
+    else if (item.type === "app" && item.data?.url) {
+      window.open(item.data.url, "_blank");
+    }
+  };
+
+  // 添加小组件到桌面
+  const handleAddWidgetToDesktop = (widgetId: string) => {
+    const widgetConfig = WIDGET_CONFIGS[widgetId];
+    if (!widgetConfig) return;
+
+    // 找到第一个分组添加小组件
+    const firstGroup = desktopList[0];
+    if (firstGroup?.type === "group") {
+      const newWidget = {
+        id: `widget-${widgetId}-${Date.now()}`,
+        type: "app" as const, // 由于类型限制，我们使用 app 类型，但通过 data.widgetConfig 来标识为小组件
+        data: {
+          name: (widgetConfig.props?.title as string) || widgetConfig.name,
+          widgetConfig: {
+            id: widgetId,
+            name: widgetConfig.name,
+            entry: widgetConfig.entry,
+            props: widgetConfig.props,
+          },
+        },
+      };
+
+      desktopRef.current?.state.updateRootItem(firstGroup.id, {
+        ...firstGroup,
+        children: [...(firstGroup.children || []), newWidget],
+      });
+
+      message.success(`${widgetConfig.name} 已添加到桌面`);
+    }
+  };
+
+  // 预计算所有小组件配置，避免在渲染过程中修改缓存
+  const precomputedConfigs = useMemo(() => {
+    const configs = new Map<string, MicroAppConfig>();
+
+    const computeConfigs = (items: DesktopSortItem<DesktopItemData>[]) => {
+      items.forEach((item) => {
+        if (item.type === "group" && item.children) {
+          computeConfigs(item.children);
+        } else if (item.data?.widgetConfig) {
+          const cacheKey = `${item.id}-${item.data.widgetConfig.id}`;
+          const widgetConfig = WIDGET_CONFIGS[item.data.widgetConfig.id];
+          if (widgetConfig) {
+            const fullConfig = {
+              ...widgetConfig,
+              container: `#widget-icon-${item.id}`,
+            };
+            configs.set(cacheKey, fullConfig);
+          }
+        }
+      });
+    };
+
+    computeConfigs(desktopList);
+    return configs;
+  }, [desktopList]);
+
+  // 获取缓存的小组件配置
+  const getCachedWidgetConfig = useCallback(
+    (item: DesktopSortItem<DesktopItemData>) => {
+      const cacheKey = `${item.id}-${item.data?.widgetConfig?.id}`;
+      return precomputedConfigs.get(cacheKey) || null;
+    },
+    [precomputedConfigs]
+  );
 
   return (
     <div className="w-screen h-screen flex flex-col">
       <Header />
-      <div className="py-24 h-full">
+      <div className="h-full">
         <Desktop<DesktopItemData>
           ref={desktopRef}
           className={cx(
@@ -241,27 +329,44 @@ function Index() {
           list={desktopList}
           onChange={setDesktopList}
           theme={desktopThemeLight}
-          extraItems={() => {
-            return (
-              <DesktopAppItem
-                key="store"
-                disabledDrag
-                data={{
-                  id: "*:store",
-                  type: "app",
-                  data: {
-                    name: "应用商店",
-                  },
-                  config: {
-                    allowResize: false,
-                  },
-                }}
-                onClick={() => {
-                  toggleStore();
-                }}
-                itemIndex={-1}
-              ></DesktopAppItem>
-            );
+          dock={{
+            enabled: true,
+            fixedItems: [
+              {
+                id: "*:store",
+                data: {
+                  name: "应用商店",
+                },
+              },
+            ],
+            fixedItemBuilder: (i) => {
+              switch (i.id) {
+                case "*:store":
+                  return (
+                    <DesktopAppItem
+                      key="store"
+                      disabledDrag
+                      data={{
+                        id: "*:store",
+                        type: "app",
+                        data: {
+                          name: "应用商店",
+                        },
+                        config: {
+                          allowResize: false,
+                        },
+                      }}
+                      onClick={() => {
+                        toggleStore();
+                      }}
+                      itemIndex={-1}
+                      noLetters
+                    ></DesktopAppItem>
+                  );
+                default:
+                  return null;
+              }
+            },
           }}
           itemIconBuilder={(item) => {
             if (item.id === "*:store") {
@@ -270,12 +375,7 @@ function Index() {
                   className={cx(
                     "flex items-center justify-center w-full h-full rounded-lg",
                     css`
-                      background: linear-gradient(
-                        135deg,
-                        #0066ff 0%,
-                        #3399ff 50%,
-                        #66b3ff 100%
-                      );
+                      background: linear-gradient(135deg, #0066ff 0%, #3399ff 50%, #66b3ff 100%);
                       color: #fff;
                     `
                   )}
@@ -283,80 +383,49 @@ function Index() {
                   <RiStore2Fill className="text-xl" />
                 </div>
               );
-            }
-            return null;
-          }}
-          pagingDotBuilder={(dot, _, isActive) => {
-            if (!dot) return <></>;
-            return (
-              <DockDesktopItem
-                mouseX={mouseX}
-                title={dot.data?.name}
-                onDoubleClick={() => {
-                  if (dot.type === "group") {
-                    handleOpenModal(dot);
-                  }
-                }}
-              >
-                <ContextMenu.Root>
-                  <ContextMenu.Trigger>
-                    <div>
-                      {dot.data?.icon ? (
-                        dot.data?.icon instanceof Object ? (
-                          <i
-                            className={`ri-${dot.data?.icon?.iconName}-${
-                              isActive ? "fill" : "line"
-                            }`}
-                          />
-                        ) : (
-                          <i className={dot.data?.icon} />
-                        )
-                      ) : (
-                        dot.data?.name
-                      )}
+            } // 处理小组件类型 - 通过 data.widgetConfig 来判断
+            if (item.data?.widgetConfig) {
+              const widgetConfig = WIDGET_CONFIGS[item.data.widgetConfig.id];
+              if (widgetConfig) {
+                // 如果是内部组件
+                if (widgetConfig.entry === "internal") {
+                  return (
+                    <div className="w-full h-full cursor-pointer" onDoubleClick={() => handleItemDoubleClick(item)}>
+                      <InternalWidget widgetId={item.data.widgetConfig.id} mode="icon" className="w-full h-full" />
                     </div>
-                  </ContextMenu.Trigger>
-                  <ContextMenu.Content>
-                    <ContextMenu.Item
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenModal(dot);
-                      }}
-                    >
-                      <i className="ri-edit-line"></i> 编辑
-                    </ContextMenu.Item>
-                    {desktopList.length > 1 && (
-                      <ContextMenu.Item
-                        color="red"
-                        className="cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteGroup(dot.id);
-                        }}
-                      >
-                        <i className="ri-delete-bin-line"></i> 删除
-                      </ContextMenu.Item>
+                  );
+                }
+                // 如果支持图标模式，使用 WidgetIcon 和缓存的配置
+                if (widgetConfig.props?.supportIconMode) {
+                  const cachedConfig = getCachedWidgetConfig(item);
+
+                  if (cachedConfig) {
+                    return (
+                      <WidgetIcon
+                        config={cachedConfig}
+                        className="w-full h-full cursor-pointer"
+                        onDoubleClick={() => handleItemDoubleClick(item)}
+                        fallbackIcon={<RiApps2Line className="text-xl" />}
+                      />
+                    );
+                  }
+                }
+
+                // 默认显示固定图标
+                return (
+                  <div
+                    className={cx(
+                      "flex items-center justify-center w-full h-full rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-sm cursor-pointer"
                     )}
-                  </ContextMenu.Content>
-                </ContextMenu.Root>
-              </DockDesktopItem>
-            );
-          }}
-          pagingDotsBuilder={(dots) => {
-            return (
-              <DockDesktop mouseX={mouseX} as="ul">
-                {dots}
-                <DockDesktopItem
-                  mouseX={mouseX}
-                  title="新建分类"
-                  componentClassName="cursor-pointer bg-gray-200 rounded-full"
-                  onClick={() => handleOpenModal()}
-                >
-                  <i className="ri-add-line" />
-                </DockDesktopItem>
-              </DockDesktop>
-            );
+                    onDoubleClick={() => handleItemDoubleClick(item)}
+                  >
+                    <RiApps2Line className="text-xl" />
+                  </div>
+                );
+              }
+            }
+
+            return null;
           }}
           enableCaching={false}
         />
@@ -372,8 +441,28 @@ function Index() {
         onClose={() => {
           toggleStore();
         }}
+        onAddWidget={handleAddWidgetToDesktop}
       />
       {contextHolder}
+      {/* 渲染小组件窗口 */}
+      {[...openWidgets].map((widgetId) => {
+        const widgetConfig = WIDGET_CONFIGS[widgetId];
+        if (!widgetConfig) return null;
+
+        const fullConfig = {
+          ...widgetConfig,
+          container: `#widget-${widgetId}`, // 添加默认容器
+        };
+        return (
+          <WidgetWindow
+            key={widgetId}
+            visible={true}
+            config={fullConfig}
+            widgetId={widgetId}
+            onClose={() => handleCloseWidget(widgetId)}
+          />
+        );
+      })}
     </div>
   );
 }

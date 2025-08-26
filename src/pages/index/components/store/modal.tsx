@@ -20,10 +20,11 @@ configResponsive({
 interface StoreModalProps {
   open: boolean;
   onClose: () => void;
+  onAddWidget?: (widgetId: string) => void;
 }
 
 const StoreModal: FC<StoreModalProps> = (props) => {
-  const { open, onClose } = props;
+  const { open, onClose, onAddWidget } = props;
 
   const responsive = useResponsive();
 
@@ -36,8 +37,8 @@ const StoreModal: FC<StoreModalProps> = (props) => {
       <div className="w-32 shrink-0">
         <Menu
           mode="inline"
-          // selectedKeys={[activeMenu]}
-          // onClick={({ key }) => setActiveMenu(key)}
+          selectedKeys={[activeMenu]}
+          onClick={({ key }) => setActiveMenu(key)}
           items={[
             {
               icon: <RiLinksLine />,
@@ -54,14 +55,16 @@ const StoreModal: FC<StoreModalProps> = (props) => {
       </div>
       <div className="grow w-0">
         <motion.div
-          // key={activeMenu}
+          key={activeMenu}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <Suspense fallback={<div>Loading...</div>}>
             {activeMenu === "website" && <WebsiteView />}
-            {activeMenu === "widget" && <WidgetView />}
+            {activeMenu === "widget" && (
+              <WidgetView onAddWidget={onAddWidget} />
+            )}
           </Suspense>
         </motion.div>
       </div>
