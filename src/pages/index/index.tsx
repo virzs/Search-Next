@@ -9,7 +9,7 @@ import {
 import { css, cx } from "@emotion/css";
 import { useBoolean } from "ahooks";
 import { useRef, useState, useMemo, useCallback } from "react";
-import { message, Modal } from "antd";
+import { message } from "antd";
 import {
   RiStore2Fill,
   RiApps2Line,
@@ -27,8 +27,6 @@ import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
 
 function Index() {
-  const [modal, contextHolder] = Modal.useModal();
-
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
 
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
@@ -478,7 +476,6 @@ function Index() {
         onAddWidget={handleAddWidgetToDesktop}
       />
       <Settings open={settingsOpen} onClose={toggleSettings} />
-      {contextHolder}
       {/* 渲染小组件窗口 */}
       {[...openWidgets].map((widgetId) => {
         const widgetConfig = WIDGET_CONFIGS[widgetId];
