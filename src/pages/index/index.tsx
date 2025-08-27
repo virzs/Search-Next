@@ -1,36 +1,31 @@
-import {
-  Desktop,
-  DesktopSortItem,
-  desktopThemeLight,
-  DockDesktop,
-  DockDesktopItem,
-  useDockDesktopMouseX,
-  DesktopHandle,
-  DesktopAppItem,
-} from "zs_library";
+import { Desktop, DesktopSortItem, desktopThemeLight, DesktopHandle, DesktopAppItem } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean } from "ahooks";
 import { useRef, useState, useMemo, useCallback } from "react";
-import HandleRootGroupModal from "./components/root-group/handle-modal";
-import { ContextMenu } from "@radix-ui/themes";
 import { message, Modal } from "antd";
-import Header from "./components/header";
-import { RiStore2Fill, RiApps2Line } from "@remixicon/react";
-import StoreModal from "./components/store/modal";
+import {
+  RiStore2Fill,
+  RiApps2Line,
+  RiSettingsFill,
+  RiBrush2Fill,
+  RemixiconComponentType,
+  RiUserFill,
+} from "@remixicon/react";
+import StoreModal from "./components/default-apps/store";
 import WidgetWindow from "../../components/window";
 import WidgetIcon from "../../components/micro-frontend/widget-icon";
 import InternalWidget from "../../components/micro-frontend/internal-widget";
 import { WIDGET_CONFIGS, MicroAppConfig } from "../../services/micro-frontend";
 import type { DesktopItemData } from "../../types";
+import Settings from "./components/default-apps/settings";
 
 function Index() {
   const [modal, contextHolder] = Modal.useModal();
 
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
 
-  const [modalOpen, { toggle: toggleModal }] = useBoolean(false);
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
-  const [currentEditItem, setCurrentEditItem] = useState<DesktopSortItem<DesktopItemData> | undefined>(undefined);
+  const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
   // 小组件窗口管理
   const [openWidgets, setOpenWidgets] = useState<Set<string>>(new Set());
 
@@ -178,31 +173,6 @@ function Index() {
     },
   ]);
 
-  const handleCloseModal = () => {
-    setCurrentEditItem(undefined);
-    toggleModal();
-  };
-
-  const handleSubmitModal = (values: { name: string; icon: string }) => {
-    if (currentEditItem) {
-      desktopRef.current?.state.updateRootItem(currentEditItem.id, {
-        ...currentEditItem,
-        data: {
-          ...currentEditItem.data,
-          ...values,
-        },
-      });
-    } else {
-      desktopRef.current?.state.addRootItem({
-        id: "new-item-" + Date.now(),
-        type: "group",
-        data: values,
-        children: [],
-      });
-    }
-    handleCloseModal();
-  };
-
   // 小组件窗口管理函数
   const handleOpenWidget = (widgetId: string) => {
     setOpenWidgets((prev) => new Set([...prev, widgetId]));
@@ -294,9 +264,94 @@ function Index() {
     [precomputedConfigs]
   );
 
+  // 封装固定项构建器
+  const createFixedItemBuilder = (i: DesktopSortItem) => {
+    // 封装通用的固定项组件
+    const createFixedItem = ({
+      key,
+      name,
+      IconComponent,
+      backgroundStyle,
+      iconSize,
+      onClick,
+    }: {
+      key: string;
+      name: string;
+      IconComponent: RemixiconComponentType;
+      backgroundStyle: string;
+      iconSize?: number;
+      onClick?: () => void;
+    }) => (
+      <DesktopAppItem
+        key={key}
+        disabledDrag
+        iconSize={56}
+        data={{
+          id: i.id,
+          type: "app",
+          data: { name },
+        }}
+        onClick={onClick}
+        itemIndex={-1}
+        noLetters
+        contextMenuProps={false}
+        icon={
+          <div
+            className={cx(
+              "flex items-center justify-center w-full h-full rounded-lg",
+              css`
+                ${backgroundStyle}
+                color: #fff;
+              `
+            )}
+          >
+            <IconComponent size={iconSize} />
+          </div>
+        }
+      />
+    );
+
+    switch (i.id) {
+      case "*:my":
+        return createFixedItem({
+          key: "my",
+          name: "账号",
+          IconComponent: RiUserFill,
+          backgroundStyle: "background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);",
+        });
+      case "*:theme":
+        return createFixedItem({
+          key: "theme",
+          name: "主题",
+          IconComponent: RiBrush2Fill,
+          backgroundStyle: `background: conic-gradient(from 0deg at center,
+            #ff0000 0deg, #ff8000 60deg, #ffff00 120deg,
+            #80ff00 180deg, #00ff80 240deg, #0080ff 300deg, #ff0000 360deg);`,
+          iconSize: 28,
+        });
+      case "*:store":
+        return createFixedItem({
+          key: "store",
+          name: "应用商店",
+          IconComponent: RiStore2Fill,
+          backgroundStyle: "background: linear-gradient(135deg, #0066ff 0%, #3399ff 50%, #66b3ff 100%);",
+          onClick: () => toggleStore(),
+        });
+      case "*:settings":
+        return createFixedItem({
+          key: "settings",
+          name: "设置",
+          IconComponent: RiSettingsFill,
+          backgroundStyle: "background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);",
+          onClick: () => toggleSettings(),
+        });
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="w-screen h-screen flex flex-col">
-      <Header />
       <div className="h-full">
         <Desktop<DesktopItemData>
           ref={desktopRef}
@@ -333,57 +388,38 @@ function Index() {
             enabled: true,
             fixedItems: [
               {
+                id: "*:my",
+                type: "app",
+                data: {
+                  name: "账号",
+                },
+              },
+              {
+                id: "*:theme",
+                type: "app",
+                data: {
+                  name: "主题",
+                },
+              },
+              {
                 id: "*:store",
+                type: "app",
                 data: {
                   name: "应用商店",
                 },
               },
+              {
+                id: "*:settings",
+                type: "app",
+                data: {
+                  name: "设置",
+                },
+              },
             ],
-            fixedItemBuilder: (i) => {
-              switch (i.id) {
-                case "*:store":
-                  return (
-                    <DesktopAppItem
-                      key="store"
-                      disabledDrag
-                      data={{
-                        id: "*:store",
-                        type: "app",
-                        data: {
-                          name: "应用商店",
-                        },
-                        config: {
-                          allowResize: false,
-                        },
-                      }}
-                      onClick={() => {
-                        toggleStore();
-                      }}
-                      itemIndex={-1}
-                      noLetters
-                    ></DesktopAppItem>
-                  );
-                default:
-                  return null;
-              }
-            },
+            fixedItemBuilder: createFixedItemBuilder,
           }}
           itemIconBuilder={(item) => {
-            if (item.id === "*:store") {
-              return (
-                <div
-                  className={cx(
-                    "flex items-center justify-center w-full h-full rounded-lg",
-                    css`
-                      background: linear-gradient(135deg, #0066ff 0%, #3399ff 50%, #66b3ff 100%);
-                      color: #fff;
-                    `
-                  )}
-                >
-                  <RiStore2Fill className="text-xl" />
-                </div>
-              );
-            } // 处理小组件类型 - 通过 data.widgetConfig 来判断
+            // 处理小组件类型 - 通过 data.widgetConfig 来判断
             if (item.data?.widgetConfig) {
               const widgetConfig = WIDGET_CONFIGS[item.data.widgetConfig.id];
               if (widgetConfig) {
@@ -430,12 +466,6 @@ function Index() {
           enableCaching={false}
         />
       </div>
-      <HandleRootGroupModal
-        open={modalOpen}
-        onCancel={handleCloseModal}
-        onOk={handleSubmitModal}
-        editItem={currentEditItem}
-      />
       <StoreModal
         open={storeOpen}
         onClose={() => {
@@ -443,6 +473,7 @@ function Index() {
         }}
         onAddWidget={handleAddWidgetToDesktop}
       />
+      <Settings open={settingsOpen} onClose={toggleSettings} />
       {contextHolder}
       {/* 渲染小组件窗口 */}
       {[...openWidgets].map((widgetId) => {

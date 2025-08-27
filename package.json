@@ -26,7 +26,7 @@
     "react-router": "^7.5.3",
     "remixicon": "^4.6.0",
     "tailwindcss": "^4.1.4",
-    "zs_library": "^0.6.4"
+    "zs_library": "^0.6.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

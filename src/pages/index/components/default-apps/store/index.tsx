@@ -1,10 +1,11 @@
 import { RiAppsLine, RiLinksLine } from "@remixicon/react";
 import { configResponsive, useResponsive } from "ahooks";
-import { Drawer, Menu, Modal } from "antd";
+import { Drawer, Menu } from "antd";
 import { motion } from "framer-motion";
 import { FC, Suspense, useState } from "react";
 import WebsiteView from "./views/website";
 import WidgetView from "./views/widget";
+import { DesktopBaseModal } from "zs_library";
 /**
  * 配置响应式断点 hooks
  * 和 tailwindcss 的断点对应
@@ -54,17 +55,10 @@ const StoreModal: FC<StoreModalProps> = (props) => {
         />
       </div>
       <div className="grow w-0">
-        <motion.div
-          key={activeMenu}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
+        <motion.div key={activeMenu} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Suspense fallback={<div>Loading...</div>}>
             {activeMenu === "website" && <WebsiteView />}
-            {activeMenu === "widget" && (
-              <WidgetView onAddWidget={onAddWidget} />
-            )}
+            {activeMenu === "widget" && <WidgetView onAddWidget={onAddWidget} />}
           </Suspense>
         </motion.div>
       </div>
@@ -85,12 +79,9 @@ const StoreModal: FC<StoreModalProps> = (props) => {
   );
 
   const modal = (
-    <Modal
-      className="lg:!w-[80vw] xl:!w-[70vw] 2xl:!w-[60vw]"
-      {...containerProps}
-    >
+    <DesktopBaseModal visible={open} onClose={onClose}>
       {body}
-    </Modal>
+    </DesktopBaseModal>
   );
 
   return <>{lg || xl || xxl ? modal : drawer}</>;

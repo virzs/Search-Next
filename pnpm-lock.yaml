@@ -57,8 +57,8 @@ importers:
         specifier: ^4.1.4
         version: 4.1.4
       zs_library:
-        specifier: ^0.6.4
-        version: 0.6.4(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.1.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(jquery@3.7.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3)
+        specifier: ^0.6.6
+        version: 0.6.6(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.1.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(jquery@3.7.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.22.0
@@ -5144,8 +5144,8 @@ packages:
   zrender@5.6.1:
     resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
-  zs_library@0.6.4:
-    resolution: {integrity: sha512-jcZYnHh05l1magAFQHmsDDdB8eHBhM30K4LNya+PXin2Cs7sOKSeeM7EIKeor0HG+GiJCqv40kxf0QRFwhWC/Q==}
+  zs_library@0.6.6:
+    resolution: {integrity: sha512-d9pFruDXcQn7gmp+42KVdwswNQUQjbykm9XPfSn/qgN2fGrNIWSLpnwx5JMFCR9FA1F03lO9kZ2AEUKDwfy+yw==}
     peerDependencies:
       react: '>=18.0.0 <19.0.0'
       react-dom: '>=18.0.0 <19.0.0'
@@ -11194,7 +11194,7 @@ snapshots:
     dependencies:
       tslib: 2.3.0
 
-  zs_library@0.6.4(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.1.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(jquery@3.7.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3):
+  zs_library@0.6.6(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.1.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(jquery@3.7.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3):
     dependencies:
       '@ai-sdk/react': 1.2.9(react@19.1.0)(zod@3.24.3)
       '@emotion/css': 11.13.5
