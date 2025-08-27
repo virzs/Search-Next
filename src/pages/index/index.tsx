@@ -1,4 +1,11 @@
-import { Desktop, DesktopSortItem, desktopThemeLight, DesktopHandle, DesktopAppItem } from "zs_library";
+import {
+  Desktop,
+  DesktopSortItem,
+  DesktopListItem,
+  desktopThemeLight,
+  DesktopHandle,
+  DesktopAppItem,
+} from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean } from "ahooks";
 import { useRef, useState, useMemo, useCallback } from "react";
@@ -29,7 +36,7 @@ function Index() {
   // 小组件窗口管理
   const [openWidgets, setOpenWidgets] = useState<Set<string>>(new Set());
 
-  const [desktopList, setDesktopList] = useState<DesktopSortItem<DesktopItemData>[]>([
+  const [desktopList, setDesktopList] = useState<DesktopListItem<DesktopItemData>[]>([
     {
       id: "123",
       type: "group",
@@ -39,9 +46,6 @@ function Index() {
           type: "group",
           data: {
             name: "one",
-          },
-          config: {
-            col: 2,
           },
           children:
             // 生成20个子项
