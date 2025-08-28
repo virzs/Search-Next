@@ -25,6 +25,7 @@ import InternalWidget from "../../components/micro-frontend/internal-widget";
 import { WIDGET_CONFIGS, MicroAppConfig } from "../../services/micro-frontend";
 import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
+import AISearchComponent from "../../components/ai-search";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -353,7 +354,17 @@ function Index() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col">
+    <div
+      className={cx(
+        "w-screen h-screen flex flex-col",
+        css`
+          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        `
+      )}
+    >
+      <div className="pt-30 pb-20">
+        <AISearchComponent />
+      </div>
       <div className="h-full">
         <Desktop<DesktopItemData>
           ref={desktopRef}
