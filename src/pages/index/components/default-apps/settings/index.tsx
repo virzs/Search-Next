@@ -5,8 +5,9 @@ import { DesktopBaseModal } from "zs_library";
 import AccountView from "./views/account";
 import BackupView from "./views/backup";
 import AboutView from "./views/about";
+import ThirdPartyView from "./views/third-party";
 import { AnimatePresence } from "framer-motion";
-import { RiInbox2Fill, RiInformationFill, RiUserFill } from "@remixicon/react";
+import { RiInbox2Fill, RiInformationFill, RiUserFill, RiKeyFill } from "@remixicon/react";
 
 interface SettingsProps {
   open: boolean;
@@ -39,6 +40,11 @@ const Settings: FC<SettingsProps> = (props) => {
               icon: <RiUserFill size={16} />,
             },
             {
+              label: "第三方服务",
+              key: "third-party",
+              icon: <RiKeyFill size={16} />,
+            },
+            {
               label: "备份与恢复",
               key: "backup",
               icon: <RiInbox2Fill size={16} />,
@@ -54,6 +60,7 @@ const Settings: FC<SettingsProps> = (props) => {
         <div className="grow-1 pr-2">
           <AnimatePresence mode="wait">
             {currentMenu === "account" && <AccountView key="account" />}
+            {currentMenu === "third-party" && <ThirdPartyView key="third-party" />}
             {currentMenu === "backup" && <BackupView key="backup" />}
             {currentMenu === "about" && <AboutView key="about" />}
           </AnimatePresence>

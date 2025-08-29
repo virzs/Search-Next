@@ -32,10 +32,7 @@ axiosInstance.interceptors.response.use(
         description: errMsg,
       });
     }
-    if (
-      error.response.status === 500 &&
-      error.config.url.includes("/auth/refresh-token")
-    ) {
+    if (error.response.status === 500 && error.config.url.includes("/auth/refresh-token")) {
       // history.replace("/login");
       window.location.reload();
     }
@@ -140,11 +137,7 @@ export const basePostRequest =
 
 export const basePutRequest =
   <T = any>(url: string, options?: AxiosRequestConfig) =>
-  async (
-    id: number | string | Array<number | string>,
-    data: object,
-    params: object = {}
-  ) =>
+  async (id: number | string | Array<number | string>, data: object, params: object = {}) =>
     axiosInstance<T, T>(getApiPrefix(url, id), {
       ...options,
       method: "PUT",
@@ -179,5 +172,49 @@ export const baseDeleteRequest =
         ...params,
       },
     });
+
+// 扩展axios实例，添加jsonp方法
+(axiosInstance as any).jsonp = (url: string, data?: any) => {
+  if (!url) throw new Error("url is necessary");
+  const callback = "CALLBACK" + Math.random().toString().substr(9, 18);
+  const JSONP = document.createElement("script");
+  JSONP.setAttribute("type", "text/javascript");
+
+  const headEle = document.getElementsByTagName("head")[0];
+
+  let ret = "";
+  if (data) {
+    if (typeof data === "string") ret = "&" + data;
+    else if (typeof data === "object") {
+      for (let key in data) ret += "&" + key + "=" + encodeURIComponent(data[key]);
+    }
+    ret += "&_time=" + Date.now();
+  }
+  JSONP.src = `${url}?callback=${callback}${ret}`;
+  const w = window as any;
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      headEle.removeChild(JSONP);
+      delete w[callback];
+      reject(new Error("JSONP request timeout"));
+    }, 5000);
+
+    w[callback] = (r: any) => {
+      clearTimeout(timeoutId);
+      resolve(r);
+      headEle.removeChild(JSONP);
+      delete w[callback];
+    };
+
+    JSONP.onerror = () => {
+      clearTimeout(timeoutId);
+      headEle.removeChild(JSONP);
+      delete w[callback];
+      reject(new Error("JSONP script load error"));
+    };
+
+    headEle.appendChild(JSONP);
+  });
+};
 
 export default axiosInstance;

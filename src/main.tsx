@@ -7,6 +7,7 @@ import Index from "./pages/index";
 import { ConfigProvider } from "antd";
 import theme from "./theme/config";
 import LoginPage from "./pages/login";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <Theme>
     <ConfigProvider theme={theme}>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </ConfigProvider>
   </Theme>
 );

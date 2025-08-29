@@ -25,7 +25,7 @@ import InternalWidget from "../../components/micro-frontend/internal-widget";
 import { WIDGET_CONFIGS, MicroAppConfig } from "../../services/micro-frontend";
 import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
-import AISearchComponent from "../../components/ai-search";
+import SearchWithAI from "../../components/ai-search";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -363,7 +363,7 @@ function Index() {
       )}
     >
       <div className="pt-30 pb-20">
-        <AISearchComponent />
+        <SearchWithAI />
       </div>
       <div className="h-full">
         <Desktop<DesktopItemData>
