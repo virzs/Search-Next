@@ -6,8 +6,9 @@ import AccountView from "./views/account";
 import BackupView from "./views/backup";
 import AboutView from "./views/about";
 import ThirdPartyView from "./views/third-party";
+import LanguageView from "./views/language";
 import { AnimatePresence } from "framer-motion";
-import { RiInbox2Fill, RiInformationFill, RiUserFill, RiKeyFill } from "@remixicon/react";
+import { RiInbox2Fill, RiInformationFill, RiUserFill, RiKeyFill, RiGlobalLine } from "@remixicon/react";
 
 interface SettingsProps {
   open: boolean;
@@ -45,6 +46,11 @@ const Settings: FC<SettingsProps> = (props) => {
               icon: <RiKeyFill size={16} />,
             },
             {
+              label: "语言",
+              key: "language",
+              icon: <RiGlobalLine size={16} />,
+            },
+            {
               label: "备份与恢复",
               key: "backup",
               icon: <RiInbox2Fill size={16} />,
@@ -61,6 +67,7 @@ const Settings: FC<SettingsProps> = (props) => {
           <AnimatePresence mode="wait">
             {currentMenu === "account" && <AccountView key="account" />}
             {currentMenu === "third-party" && <ThirdPartyView key="third-party" />}
+            {currentMenu === "language" && <LanguageView key="language" />}
             {currentMenu === "backup" && <BackupView key="backup" />}
             {currentMenu === "about" && <AboutView key="about" />}
           </AnimatePresence>
