@@ -2,7 +2,7 @@ import type { ThemeConfig } from "antd";
 
 const theme: ThemeConfig = {
   token: {
-    colorPrimary: "#171717",
+    colorPrimary: "rgb(250, 84, 28)",
   },
   components: {
     Button: {
