@@ -2,18 +2,11 @@ import { Desktop, DesktopSortItem, desktopThemeLight, DesktopHandle, DesktopAppI
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect } from "react";
-import {
-  RiStore2Fill,
-  RiApps2Line,
-  RiSettingsFill,
-  RiBrush2Fill,
-  RemixiconComponentType,
-  RiUserFill,
-} from "@remixicon/react";
+import { RiStore2Fill, RiSettingsFill, RiBrush2Fill, RemixiconComponentType, RiUserFill } from "@remixicon/react";
 import StoreModal from "./components/default-apps/store";
 import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
-import SearchWithAI from "../../components/ai-search";
+// import SearchWithAI from "../../components/ai-search";
 import { Spin } from "antd";
 import { getDefaultUserConfig } from "@/services/desktop";
 import { DESKTOP_LIST_MODIFIED_STORAGE_KEY, DESKTOP_LIST_STORAGE_KEY } from "@/utils/storage";
@@ -31,22 +24,14 @@ function Index() {
       const {
         config: { list = [] },
       } = res;
-      // 从本地存储中获取用户是否修改过桌面配置
+
       const isModified = localStorage.getItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY) === "true";
       if (!isModified) {
-        // 如果用户未修改过配置，直接设置桌面列表
         desktopRef.current?.state.setList(list);
       }
-      toggleInit();
+      if (init) toggleInit();
     },
   });
-
-  // 处理应用项双击事件
-  const handleItemDoubleClick = (item: DesktopSortItem<DesktopItemData>) => {
-    if (item.type === "app" && item.data?.url) {
-      window.open(item.data.url, "_blank");
-    }
-  };
 
   // 封装固定项构建器
   const createFixedItemBuilder = (i: DesktopSortItem) => {
@@ -136,6 +121,7 @@ function Index() {
 
   useEffect(() => {
     runDefaultDesktop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -147,9 +133,9 @@ function Index() {
         `
       )}
     >
-      <div className="pt-30 pb-10">
+      {/* <div className="pt-30 pb-10">
         <SearchWithAI />
-      </div>
+      </div> */}
       <div className="h-full">
         <Desktop<DesktopItemData>
           ref={desktopRef}
@@ -214,23 +200,16 @@ function Index() {
             ],
             fixedItemBuilder: createFixedItemBuilder,
           }}
-          itemIconBuilder={(item) => {
-            // 默认显示固定图标
-            return (
-              <div
-                className={cx(
-                  "flex items-center justify-center w-full h-full rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-sm cursor-pointer"
-                )}
-                onDoubleClick={() => handleItemDoubleClick(item)}
-              >
-                <RiApps2Line className="text-xl" />
-              </div>
-            );
-          }}
           storageKey={DESKTOP_LIST_STORAGE_KEY}
-          onChange={() => {
-            // 当用户修改桌面配置时，设置本地存储标志为 true
+          onChange={(list) => {
+            if (!list.length) return;
             localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
+          }}
+          onItemClick={(item) => {
+            if (item.type === "app" && item.data?.url) {
+              // 点击应用时，打开应用链接
+              window.open(item.data.url, "_blank");
+            }
           }}
         />
       </div>
