@@ -1,11 +1,11 @@
-import { Avatar, Button, Form, Input, Space, Typography, Card } from "antd";
+import { Avatar, Button, Form, Input, Space, Typography } from "antd";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { css } from "@emotion/css";
 import { RiEditFill, RiUserFill } from "@remixicon/react";
 import { useAuth } from "@/contexts/AuthContext";
 import UnloggedView from "@/components/auth/UnloggedView";
 import AccountInfo from "@/components/auth/AccountInfo";
+import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
 
 const { Title, Text } = Typography;
 const { Item } = Form;
@@ -44,33 +44,38 @@ const AccountView = () => {
     if (!user) return null;
 
     return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-        <div className="text-center mb-8">
-          <div className="relative inline-block">
-            <Avatar size={100} src={user.avatar} icon={<RiUserFill />} className="!mb-4" />
-            <Button
-              type="primary"
-              shape="circle"
-              size="small"
-              icon={<RiEditFill size={14} />}
-              onClick={handleAvatarChange}
-              className={css`
-                position: absolute;
-                bottom: 16px;
-                right: -8px;
-              `}
-            />
-          </div>
-          <Title level={3} className="mb-2">
-            {user.username}
-          </Title>
-          <Text type="secondary">{user.email}</Text>
-        </div>
+      <SettingsViewContainer>
+        <SettingsViewHeader
+          title="账号设置"
+          description="管理您的个人信息和账号设置"
+          icon={<RiUserFill />}
+          centered
+          extra={
+            <div className="text-center">
+              <div className="relative inline-block mb-4">
+                <Avatar size={100} src={user.avatar} icon={<RiUserFill />} />
+                <Button
+                  type="primary"
+                  shape="circle"
+                  size="small"
+                  icon={<RiEditFill size={14} />}
+                  onClick={handleAvatarChange}
+                  className={css`
+                    position: absolute;
+                    bottom: 0;
+                    right: -8px;
+                  `}
+                />
+              </div>
+              <Title level={3} className="mb-2">
+                {user.username}
+              </Title>
+              <Text type="secondary">{user.email}</Text>
+            </div>
+          }
+        />
 
-        <Card className="!mb-6">
-          <Title level={4} className="mb-4">
-            个人信息
-          </Title>
+        <SettingsCard title="个人信息">
           {isEditing ? (
             <Form
               layout="vertical"
@@ -101,12 +106,21 @@ const AccountView = () => {
                 <Input placeholder="请输入邮箱" />
               </Item>
               <Item>
-                <Space>
-                  <Button type="primary" htmlType="submit">
-                    保存
-                  </Button>
-                  <Button onClick={() => setIsEditing(false)}>取消</Button>
-                </Space>
+                <SettingsActions
+                  actions={[
+                    {
+                      key: "save",
+                      label: "保存",
+                      type: "primary",
+                      onClick: () => {},
+                    },
+                    {
+                      key: "cancel",
+                      label: "取消",
+                      onClick: () => setIsEditing(false),
+                    },
+                  ]}
+                />
               </Item>
             </Form>
           ) : (
@@ -123,19 +137,36 @@ const AccountView = () => {
                 <Text strong>注册时间：</Text>
                 <Text>{new Date(user.createdAt).toLocaleDateString()}</Text>
               </div>
-              <Button type="primary" icon={<RiEditFill />} onClick={() => setIsEditing(true)}>
-                编辑资料
-              </Button>
+              <SettingsActions
+                actions={[
+                  {
+                    key: "edit",
+                    label: "编辑资料",
+                    type: "primary",
+                    icon: <RiEditFill />,
+                    onClick: () => setIsEditing(true),
+                  },
+                ]}
+              />
             </div>
           )}
-        </Card>
+        </SettingsCard>
 
         <AccountInfo user={user} showActions={false} onEditProfile={() => setIsEditing(true)} />
-      </motion.div>
+      </SettingsViewContainer>
     );
   };
 
-  return <div className="flex-1 overflow-auto">{isAuthenticated ? renderLoggedView() : renderUnloggedView()}</div>;
+  return isAuthenticated ? renderLoggedView() : (
+    <SettingsViewContainer>
+      <SettingsViewHeader
+        title="账号设置"
+        description="登录后可以管理您的个人信息和账号设置"
+        icon={<RiUserFill />}
+      />
+      {renderUnloggedView()}
+    </SettingsViewContainer>
+  );
 };
 
 export default AccountView;

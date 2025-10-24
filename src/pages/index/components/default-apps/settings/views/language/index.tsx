@@ -1,7 +1,7 @@
-import { Card, Typography, Radio, Space, Button, Divider, List } from "antd";
+import { Typography, Radio, Space, Button, Divider, List } from "antd";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { RiGlobalLine, RiCheckLine } from "@remixicon/react";
+import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -113,51 +113,51 @@ const LanguageView = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      {/* 当前语言状态 */}
-      <Card className="!mb-6">
-        <div className="text-center mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-            <RiGlobalLine className="text-white text-2xl" />
-          </div>
-          <Title level={3} className="mb-2">
-            语言设置
-          </Title>
-          <Text type="secondary">选择您偏好的界面语言</Text>
-        </div>
-
-        {getCurrentLanguage() && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-4">
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-2xl">{getCurrentLanguage()?.flag}</span>
-              <div className="text-center">
-                <div className="font-semibold text-lg">{getCurrentLanguage()?.nativeName}</div>
-                <Text type="secondary">{getCurrentLanguage()?.description}</Text>
+    <SettingsViewContainer>
+      <SettingsViewHeader
+        title="语言设置"
+        description="选择您偏好的界面语言"
+        icon={<RiGlobalLine />}
+        centered
+        extra={
+          getCurrentLanguage() && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-2xl">{getCurrentLanguage()?.flag}</span>
+                <div className="text-center">
+                  <div className="font-semibold text-lg">{getCurrentLanguage()?.nativeName}</div>
+                  <Text type="secondary">{getCurrentLanguage()?.description}</Text>
+                </div>
+                <RiCheckLine className="text-green-500 text-xl" />
               </div>
-              <RiCheckLine className="text-green-500 text-xl" />
             </div>
-          </div>
-        )}
-
-        {isChanged && (
-          <div className="text-center">
-            <Space>
-              <Button type="primary" onClick={handleSaveLanguage}>
-                保存设置
-              </Button>
-              <Button onClick={handleResetLanguage}>
-                重置
-              </Button>
-            </Space>
-          </div>
-        )}
-      </Card>
+          )
+        }
+      />
+      
+      {isChanged && (
+        <SettingsCard>
+          <SettingsActions
+            align="center"
+            actions={[
+              {
+                key: "save",
+                label: "保存设置",
+                type: "primary",
+                onClick: handleSaveLanguage,
+              },
+              {
+                key: "reset",
+                label: "重置",
+                onClick: handleResetLanguage,
+              },
+            ]}
+          />
+        </SettingsCard>
+      )}
 
       {/* 语言选择列表 */}
-      <Card>
-        <Title level={4} className="mb-4">
-          选择语言
-        </Title>
+      <SettingsCard title="选择语言">
         <Paragraph type="secondary" className="mb-4">
           选择您希望使用的界面语言。更改语言后，界面将立即切换到所选语言。
         </Paragraph>
@@ -202,8 +202,8 @@ const LanguageView = () => {
             <li>• 如果遇到显示问题，可以尝试重置为默认语言</li>
           </ul>
         </div>
-      </Card>
-    </motion.div>
+      </SettingsCard>
+    </SettingsViewContainer>
   );
 };
 

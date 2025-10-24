@@ -1,4 +1,4 @@
-import { Card, Button, Space, Typography, Progress, Alert, Divider, Switch, List } from "antd";
+import { Button, Space, Typography, Progress, Alert, Divider, Switch, List } from "antd";
 import {
   RiCloudLine,
   RiDownloadLine,
@@ -7,9 +7,10 @@ import {
   RiErrorWarningLine,
   RiDownloadFill,
   RiUploadFill,
+  RiInbox2Fill,
 } from "@remixicon/react";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -69,7 +70,13 @@ const BackupView = () => {
 
   // 未登录视图
   const renderUnloggedView = () => (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+    <SettingsViewContainer>
+      <SettingsViewHeader
+        title="备份与恢复"
+        description="管理您的数据备份和恢复设置"
+        icon={<RiInbox2Fill />}
+      />
+      
       <Alert
         message="需要登录账号"
         description="登录后可以使用云端同步功能，确保您的数据安全备份。"
@@ -78,42 +85,54 @@ const BackupView = () => {
         className="mb-6"
       />
 
-      <Card>
-        <Title level={4} className="mb-4">
-          本地备份
-        </Title>
+      <SettingsCard title="本地备份">
         <Paragraph type="secondary" className="mb-4">
           即使未登录，您也可以导出和导入本地数据。
         </Paragraph>
 
-        <Space direction="vertical" className="w-full" size="middle">
-          <Button type="primary" icon={<RiDownloadLine />} block onClick={handleExportData}>
-            导出数据
-          </Button>
-          <Button icon={<RiUploadLine />} block onClick={handleImportData}>
-            导入数据
-          </Button>
-        </Space>
-      </Card>
-    </motion.div>
+        <SettingsActions
+          layout="vertical"
+          actions={[
+            {
+              key: "export",
+              label: "导出数据",
+              type: "primary",
+              icon: <RiDownloadLine />,
+              onClick: handleExportData,
+            },
+            {
+              key: "import",
+              label: "导入数据",
+              icon: <RiUploadLine />,
+              onClick: handleImportData,
+            },
+          ]}
+        />
+      </SettingsCard>
+    </SettingsViewContainer>
   );
 
   // 已登录视图
   const renderLoggedView = () => (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+    <SettingsViewContainer>
+      <SettingsViewHeader
+        title="备份与恢复"
+        description="管理您的数据备份和恢复设置"
+        icon={<RiInbox2Fill />}
+      />
+      
       {/* 云端同步 */}
-      <Card className="!mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <Title level={4} className="mb-0">
-            云端同步
-          </Title>
+      <SettingsCard
+        title="云端同步"
+        extra={
           <Switch
             checked={syncStatus.isEnabled}
             onChange={handleToggleSync}
             checkedChildren="开启"
             unCheckedChildren="关闭"
           />
-        </div>
+        }
+      >
 
         {syncStatus.isEnabled ? (
           <div>
@@ -133,15 +152,19 @@ const BackupView = () => {
               </div>
             )}
 
-            <Button
-              type="primary"
-              icon={<RiCloudLine />}
-              onClick={handleManualSync}
-              disabled={syncStatus.isSyncing}
-              block
-            >
-              {syncStatus.isSyncing ? "同步中..." : "立即同步"}
-            </Button>
+            <SettingsActions
+              actions={[
+                {
+                  key: "sync",
+                  label: syncStatus.isSyncing ? "同步中..." : "立即同步",
+                  type: "primary",
+                  icon: <RiCloudLine />,
+                  onClick: handleManualSync,
+                  disabled: syncStatus.isSyncing,
+                  loading: syncStatus.isSyncing,
+                },
+              ]}
+            />
           </div>
         ) : (
           <Alert
@@ -151,13 +174,10 @@ const BackupView = () => {
             showIcon
           />
         )}
-      </Card>
+      </SettingsCard>
 
       {/* 备份历史 */}
-      <Card className="!mb-6">
-        <Title level={4} className="mb-4">
-          备份历史
-        </Title>
+      <SettingsCard title="备份历史">
         <List
           size="small"
           dataSource={[
@@ -184,37 +204,43 @@ const BackupView = () => {
             </List.Item>
           )}
         />
-      </Card>
+      </SettingsCard>
 
       {/* 本地备份 */}
-      <Card>
-        <Title level={4} className="mb-4">
-          本地备份
-        </Title>
+      <SettingsCard title="本地备份">
         <Paragraph type="secondary" className="mb-4">
           除了云端同步，您还可以手动导出和导入数据文件。
         </Paragraph>
 
-        <Space direction="vertical" className="w-full" size="middle">
-          <Button icon={<RiDownloadFill />} block onClick={handleExportData}>
-            导出数据
-          </Button>
-          <Button icon={<RiUploadFill />} block onClick={handleImportData}>
-            导入数据
-          </Button>
+        <SettingsActions
+          layout="vertical"
+          actions={[
+            {
+              key: "export",
+              label: "导出数据",
+              icon: <RiDownloadFill />,
+              onClick: handleExportData,
+            },
+            {
+              key: "import",
+              label: "导入数据",
+              icon: <RiUploadFill />,
+              onClick: handleImportData,
+            },
+          ]}
+        />
 
-          <Divider />
+        <Divider />
 
-          <Alert
-            message="注意"
-            description="导入数据将覆盖当前所有设置，请谨慎操作。建议先导出当前数据作为备份。"
-            type="warning"
-            showIcon
-            icon={<RiErrorWarningLine />}
-          />
-        </Space>
-      </Card>
-    </motion.div>
+        <Alert
+          message="注意"
+          description="导入数据将覆盖当前所有设置，请谨慎操作。建议先导出当前数据作为备份。"
+          type="warning"
+          showIcon
+          icon={<RiErrorWarningLine />}
+        />
+      </SettingsCard>
+    </SettingsViewContainer>
   );
 
   return <div className="flex-1 overflow-auto">{isLoggedIn ? renderLoggedView() : renderUnloggedView()}</div>;

@@ -1,6 +1,6 @@
-import { Card, Typography, Space, Button, Tag, List, Avatar } from "antd";
-import { RiGithubLine, RiGlobalLine, RiMailLine, RiHeartLine, RiBugLine, RiQuestionLine } from "@remixicon/react";
-import { motion } from "framer-motion";
+import { Typography, Space, Button, Tag, List, Avatar } from "antd";
+import { RiGithubLine, RiGlobalLine, RiMailLine, RiHeartLine, RiBugLine, RiQuestionLine, RiInformationFill } from "@remixicon/react";
+import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
 
 const { Title, Text, Paragraph, Link } = Typography;
 
@@ -59,9 +59,15 @@ const AboutView = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+    <SettingsViewContainer>
+      <SettingsViewHeader
+        title="关于"
+        description="了解应用信息、开发团队和技术栈"
+        icon={<RiInformationFill />}
+      />
+      
       {/* 应用信息 */}
-      <Card className="!mb-6">
+      <SettingsCard>
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
             <Text className="text-white text-2xl font-bold">S</Text>
@@ -96,26 +102,33 @@ const AboutView = () => {
           </div>
         </div>
 
-        <Space direction="vertical" className="w-full" size="middle">
-          <Button type="primary" block onClick={handleCheckUpdate}>
-            检查更新
-          </Button>
-          <Space className="w-full">
-            <Button icon={<RiGithubLine />} onClick={handleOpenGithub} className="flex-1">
-              GitHub
-            </Button>
-            <Button icon={<RiBugLine />} onClick={handleReportBug} className="flex-1">
-              反馈问题
-            </Button>
-          </Space>
-        </Space>
-      </Card>
+        <SettingsActions
+          layout="vertical"
+          actions={[
+            {
+              key: "update",
+              label: "检查更新",
+              type: "primary",
+              onClick: handleCheckUpdate,
+            },
+            {
+              key: "github",
+              label: "GitHub",
+              icon: <RiGithubLine />,
+              onClick: handleOpenGithub,
+            },
+            {
+              key: "bug",
+              label: "反馈问题",
+              icon: <RiBugLine />,
+              onClick: handleReportBug,
+            },
+          ]}
+        />
+      </SettingsCard>
 
       {/* 开发团队 */}
-      <Card className="!mb-6">
-        <Title level={4} className="mb-4">
-          开发团队
-        </Title>
+      <SettingsCard title="开发团队">
         <List
           dataSource={teamMembers}
           renderItem={(member) => (
@@ -137,13 +150,10 @@ const AboutView = () => {
             </List.Item>
           )}
         />
-      </Card>
+      </SettingsCard>
 
       {/* 技术栈 */}
-      <Card className="!mb-6">
-        <Title level={4} className="mb-4">
-          技术栈
-        </Title>
+      <SettingsCard title="技术栈">
         <List
           size="small"
           dataSource={dependencies}
@@ -161,13 +171,10 @@ const AboutView = () => {
             </List.Item>
           )}
         />
-      </Card>
+      </SettingsCard>
 
       {/* 联系方式 */}
-      <Card className="!mb-6">
-        <Title level={4} className="mb-4">
-          联系我们
-        </Title>
+      <SettingsCard title="联系我们">
         <Space direction="vertical" className="w-full">
           <div className="flex items-center gap-3">
             <RiMailLine className="text-gray-500" />
@@ -186,10 +193,10 @@ const AboutView = () => {
             </Link>
           </div>
         </Space>
-      </Card>
+      </SettingsCard>
 
       {/* 致谢 */}
-      <Card>
+      <SettingsCard>
         <div className="text-center">
           <RiHeartLine className="text-red-500 text-2xl mb-3" />
           <Title level={4} className="mb-2">
@@ -202,8 +209,8 @@ const AboutView = () => {
             © 2024 Search Next. All rights reserved.
           </Text>
         </div>
-      </Card>
-    </motion.div>
+      </SettingsCard>
+    </SettingsViewContainer>
   );
 };
 

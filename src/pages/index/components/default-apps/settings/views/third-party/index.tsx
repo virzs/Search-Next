@@ -1,7 +1,7 @@
-import { Card, Form, Input, Button, Switch, Space, Typography, Divider, message } from "antd";
+import { Form, Input, Button, Switch, Space, Typography, Divider, message } from "antd";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { RiKeyFill, RiCloudLine, RiSaveFill, RiRefreshLine, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
+import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
 import { ThirdPartyConfig, SyncSettings } from "@/types/api-config";
 import {
   getLocalApiConfig,
@@ -128,25 +128,16 @@ const ThirdPartyView = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="flex-1 overflow-auto"
-    >
-      <div className="mb-6">
-        <Title level={2} className="!mb-2">
-          <RiKeyFill className="inline mr-2" size={24} />
-          第三方服务设置
-        </Title>
-        <Paragraph type="secondary">
-          配置第三方服务的API密钥，用于增强搜索和AI功能。所有密钥都会安全存储在本地。
-        </Paragraph>
-      </div>
+    <SettingsViewContainer>
+      <SettingsViewHeader
+        title="第三方服务设置"
+        description="配置第三方服务的API密钥，用于增强搜索和AI功能。所有密钥都会安全存储在本地。"
+        icon={<RiKeyFill />}
+      />
 
       {/* 同步设置 */}
       {isLoggedIn && (
-        <Card className="!mb-6" title="同步设置">
+        <SettingsCard title="同步设置">
           <div className="flex items-center justify-between mb-4">
             <div>
               <Text strong>服务器同步</Text>
@@ -173,11 +164,11 @@ const ThirdPartyView = () => {
               </Button>
             </div>
           )}
-        </Card>
+        </SettingsCard>
       )}
 
       {/* API配置表单 */}
-      <Card title="API密钥配置">
+      <SettingsCard title="API密钥配置">
         <Form
           form={form}
           layout="vertical"
@@ -270,7 +261,7 @@ const ThirdPartyView = () => {
 
           {/* 保存按钮 */}
           <Item>
-            <Space>
+            <SettingsActions actions={[]}>
               <Button type="primary" htmlType="submit" icon={<RiSaveFill />} loading={isSaving} size="large">
                 保存配置
               </Button>
@@ -281,13 +272,13 @@ const ThirdPartyView = () => {
                   <span>将同步到服务器</span>
                 </div>
               )}
-            </Space>
+            </SettingsActions>
           </Item>
         </Form>
-      </Card>
+      </SettingsCard>
 
       {/* 使用说明 */}
-      <Card title="使用说明" className="!mt-6">
+      <SettingsCard title="使用说明">
         <div className="space-y-3">
           <div>
             <Text strong>• 安全性：</Text>
@@ -308,8 +299,8 @@ const ThirdPartyView = () => {
             </Text>
           </div>
         </div>
-      </Card>
-    </motion.div>
+      </SettingsCard>
+    </SettingsViewContainer>
   );
 };
 

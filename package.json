@@ -20,14 +20,14 @@
     "axios": "^1.9.0",
     "framer-motion": "^12.12.1",
     "qiankun": "^2.10.16",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-draggable": "^4.4.6",
     "react-infinite-scroll-component": "^6.1.0",
-    "react-router": "^7.5.3",
+    "react-router": "^7.9.4",
     "remixicon": "^4.6.0",
     "tailwindcss": "^4.1.4",
-    "zs_library": "^0.6.7"
+    "zs_library": "^0.6.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -40,6 +40,6 @@
     "globals": "^16.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.3.1"
+    "vite": "^7.1.12"
   }
 }
