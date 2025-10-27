@@ -60,8 +60,8 @@ importers:
         specifier: ^4.1.4
         version: 4.1.4
       zs_library:
-        specifier: ^0.6.13
-        version: 0.6.13(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3)
+        specifier: ^0.6.14
+        version: 0.6.14(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.22.0
@@ -3165,14 +3165,6 @@ packages:
   fbjs@3.0.5:
     resolution: {integrity: sha512-ztsSx77JBtkuMrEypfhgc3cI0+0h+svqeie7xHbh1k/IKdcydnvadp/mUaGgjAOXQmQSxsqgaRhS3q9fy+1kxg==}
 
-  fdir@6.4.4:
-    resolution: {integrity: sha512-1NZP+GK4GfuAv3PqKvxQRDMjdSRZjnkq7KfhlNrCNNlZ0ygQFpebfrnfnq/W7fpUnAv9aGWmY1zKx7FYL3gwhg==}
-    peerDependencies:
-      picomatch: ^3 || ^4
-    peerDependenciesMeta:
-      picomatch:
-        optional: true
-
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
     engines: {node: '>=12.0.0'}
@@ -4391,6 +4383,12 @@ packages:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
 
+  rc-dialog@10.0.0:
+    resolution: {integrity: sha512-KdQjqNknesFtIdz5dGcVpqWqqMg6PeWq6Jodv9gVPXtQ3Kr8Ik7RSWauhlMbidNiwSSvTUvkDQmdawhypob1JQ==}
+    peerDependencies:
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
   rc-dialog@9.6.0:
     resolution: {integrity: sha512-ApoVi9Z8PaCQg6FsUzS8yvBEQy0ZL2PkuvAgrmohPkN3okps5WZ5WQWPc1RNuiOKaAYv8B97ACdsFU5LizzCqg==}
     peerDependencies:
@@ -4399,6 +4397,12 @@ packages:
 
   rc-drawer@7.2.0:
     resolution: {integrity: sha512-9lOQ7kBekEJRdEpScHvtmEtXnAsy+NGDXiRWc2ZVC7QXAazNVbeT4EraQKYwCME8BJLa8Bxqxvs5swwyOepRwg==}
+    peerDependencies:
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+
+  rc-drawer@7.3.0:
+    resolution: {integrity: sha512-DX6CIgiBWNpJIMGFO8BAISFkxiuKitoizooj4BDyee8/SnBn0zwO2FHrNDpqqepj0E/TFTDpmEBCyFuTgC7MOg==}
     peerDependencies:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
@@ -5101,10 +5105,6 @@ packages:
   tinyexec@1.0.1:
     resolution: {integrity: sha512-5uC6DDlmeqiOwCPmK9jMSdOuZTh8bU39Ys6yidB+UTt5hfZUPGAypSgFRiEp+jbi9qH40BLDvy85jIU88wKSqw==}
 
-  tinyglobby@0.2.14:
-    resolution: {integrity: sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==}
-    engines: {node: '>=12.0.0'}
-
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
@@ -5442,8 +5442,8 @@ packages:
   zrender@5.6.1:
     resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
-  zs_library@0.6.13:
-    resolution: {integrity: sha512-x5QrckTWZhEXGWBFfQYqGWkVoYSa2lvX68zdefQA1V/UZDiI2CZd8P0HOpQYwbg2SGF1LAt2WEsPomSecjwebw==}
+  zs_library@0.6.14:
+    resolution: {integrity: sha512-bwIUQtYDwOIiQvCfZZGIAXFOHAHpYvv/8wCBMctYIkwpwAVtAUlu5KTVf/GboH45LOn1ohWaZ0Tr5ml/aJxYeA==}
     peerDependencies:
       react: '>=18.0.0 <19.0.0'
       react-dom: '>=18.0.0 <19.0.0'
@@ -8099,7 +8099,7 @@ snapshots:
 
   '@types/estree-jsx@1.0.5':
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
 
   '@types/estree@1.0.7': {}
 
@@ -8536,7 +8536,7 @@ snapshots:
       package-manager-detector: 1.3.0
       semver: 7.7.2
       tinyexec: 1.0.1
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.15
       yaml: 2.8.0
     transitivePeerDependencies:
       - magicast
@@ -9070,10 +9070,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  fdir@6.4.4(picomatch@4.0.2):
-    optionalDependencies:
-      picomatch: 4.0.2
-
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:
       picomatch: 4.0.3
@@ -9279,7 +9275,7 @@ snapshots:
 
   hast-util-to-jsx-runtime@2.3.6:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       '@types/hast': 3.0.4
       '@types/unist': 3.0.3
       comma-separated-tokens: 2.0.3
@@ -9999,7 +9995,7 @@ snapshots:
 
   micromark-extension-mdx-expression@3.0.1:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       devlop: 1.1.0
       micromark-factory-mdx-expression: 2.0.3
       micromark-factory-space: 2.0.1
@@ -10010,7 +10006,7 @@ snapshots:
 
   micromark-extension-mdx-jsx@3.0.2:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       devlop: 1.1.0
       estree-util-is-identifier-name: 3.0.0
       micromark-factory-mdx-expression: 2.0.3
@@ -10027,7 +10023,7 @@ snapshots:
 
   micromark-extension-mdxjs-esm@3.0.0:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.3
       micromark-util-character: 2.1.1
@@ -10063,7 +10059,7 @@ snapshots:
 
   micromark-factory-mdx-expression@2.0.3:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       devlop: 1.1.0
       micromark-factory-space: 2.0.1
       micromark-util-character: 2.1.1
@@ -10127,7 +10123,7 @@ snapshots:
 
   micromark-util-events-to-acorn@2.0.3:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       '@types/unist': 3.0.3
       devlop: 1.1.0
       estree-util-visit: 2.0.0
@@ -10695,6 +10691,16 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
+  rc-dialog@10.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+    dependencies:
+      '@babel/runtime': 7.27.0
+      '@rc-component/portal': 1.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      classnames: 2.5.1
+      rc-motion: 2.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      rc-util: 5.44.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+
   rc-dialog@9.6.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@babel/runtime': 7.27.0
@@ -10706,6 +10712,16 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
 
   rc-drawer@7.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+    dependencies:
+      '@babel/runtime': 7.27.0
+      '@rc-component/portal': 1.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      classnames: 2.5.1
+      rc-motion: 2.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      rc-util: 5.44.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+
+  rc-drawer@7.3.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@babel/runtime': 7.27.0
       '@rc-component/portal': 1.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -11542,11 +11558,6 @@ snapshots:
 
   tinyexec@1.0.1: {}
 
-  tinyglobby@0.2.14:
-    dependencies:
-      fdir: 6.4.4(picomatch@4.0.2)
-      picomatch: 4.0.2
-
   tinyglobby@0.2.15:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
@@ -11849,7 +11860,7 @@ snapshots:
     dependencies:
       tslib: 2.3.0
 
-  zs_library@0.6.13(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3):
+  zs_library@0.6.14(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3):
     dependencies:
       '@ai-sdk/react': 1.2.9(react@19.2.0)(zod@3.24.3)
       '@emotion/css': 11.13.5
@@ -11886,7 +11897,8 @@ snapshots:
       motion: 12.23.11(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next-themes: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       novel: 1.0.2(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      rc-dialog: 9.6.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      rc-dialog: 10.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      rc-drawer: 7.3.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       rc-dropdown: 4.2.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       rc-image: 7.12.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       rc-menu: 9.16.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
