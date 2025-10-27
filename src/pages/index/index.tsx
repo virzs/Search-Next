@@ -136,7 +136,7 @@ function Index() {
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}
-      <div className="h-full">
+      <div className="h-full pb-8">
         <Desktop<DesktopItemData>
           ref={desktopRef}
           className={cx(
