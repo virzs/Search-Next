@@ -14,22 +14,22 @@ const SettingsViewContainer = ({ children, className = "" }: SettingsViewContain
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`flex-1 overflow-auto ${className}`}
+      className={`${className}`}
     >
       <div
         className={css`
           padding: 0;
           max-width: 100%;
-          
+
           /* iPadOS风格的间距 */
           & > * + * {
             margin-top: 24px;
           }
-          
+
           /* 响应式设计 */
           @media (max-width: 768px) {
             padding: 0 16px;
-            
+
             & > * + * {
               margin-top: 16px;
             }

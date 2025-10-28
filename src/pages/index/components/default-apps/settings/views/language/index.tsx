@@ -23,71 +23,71 @@ const LanguageView = () => {
       name: "简体中文",
       nativeName: "简体中文",
       flag: "🇨🇳",
-      description: "中国大陆地区使用的简体中文"
+      description: "中国大陆地区使用的简体中文",
     },
     {
       code: "zh-TW",
       name: "繁体中文",
       nativeName: "繁體中文",
       flag: "🇹🇼",
-      description: "台湾地区使用的繁体中文"
+      description: "台湾地区使用的繁体中文",
     },
     {
       code: "en-US",
       name: "English (US)",
       nativeName: "English (United States)",
       flag: "🇺🇸",
-      description: "美式英语"
+      description: "美式英语",
     },
     {
       code: "en-GB",
       name: "English (UK)",
       nativeName: "English (United Kingdom)",
       flag: "🇬🇧",
-      description: "英式英语"
+      description: "英式英语",
     },
     {
       code: "ja-JP",
       name: "日本語",
       nativeName: "日本語",
       flag: "🇯🇵",
-      description: "日语"
+      description: "日语",
     },
     {
       code: "ko-KR",
       name: "한국어",
       nativeName: "한국어",
       flag: "🇰🇷",
-      description: "韩语"
+      description: "韩语",
     },
     {
       code: "fr-FR",
       name: "Français",
       nativeName: "Français",
       flag: "🇫🇷",
-      description: "法语"
+      description: "法语",
     },
     {
       code: "de-DE",
       name: "Deutsch",
       nativeName: "Deutsch",
       flag: "🇩🇪",
-      description: "德语"
+      description: "德语",
     },
     {
       code: "es-ES",
       name: "Español",
       nativeName: "Español",
       flag: "🇪🇸",
-      description: "西班牙语"
+      description: "西班牙语",
     },
     {
       code: "ru-RU",
       name: "Русский",
       nativeName: "Русский",
       flag: "🇷🇺",
-      description: "俄语"
-    }
+      description: "俄语",
+    },
   ];
 
   const handleLanguageChange = (languageCode: string) => {
@@ -109,32 +109,11 @@ const LanguageView = () => {
   };
 
   const getCurrentLanguage = () => {
-    return languages.find(lang => lang.code === selectedLanguage);
+    return languages.find((lang) => lang.code === selectedLanguage);
   };
 
   return (
     <SettingsViewContainer>
-      <SettingsViewHeader
-        title="语言设置"
-        description="选择您偏好的界面语言"
-        icon={<RiGlobalLine />}
-        centered
-        extra={
-          getCurrentLanguage() && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-2xl">{getCurrentLanguage()?.flag}</span>
-                <div className="text-center">
-                  <div className="font-semibold text-lg">{getCurrentLanguage()?.nativeName}</div>
-                  <Text type="secondary">{getCurrentLanguage()?.description}</Text>
-                </div>
-                <RiCheckLine className="text-green-500 text-xl" />
-              </div>
-            </div>
-          )
-        }
-      />
-      
       {isChanged && (
         <SettingsCard>
           <SettingsActions
@@ -162,11 +141,7 @@ const LanguageView = () => {
           选择您希望使用的界面语言。更改语言后，界面将立即切换到所选语言。
         </Paragraph>
 
-        <Radio.Group 
-          value={selectedLanguage} 
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          className="w-full"
-        >
+        <Radio.Group value={selectedLanguage} onChange={(e) => handleLanguageChange(e.target.value)} className="w-full">
           <List
             dataSource={languages}
             renderItem={(language) => (
@@ -180,9 +155,7 @@ const LanguageView = () => {
                         {language.description}
                       </Text>
                     </div>
-                    {selectedLanguage === language.code && (
-                      <RiCheckLine className="text-green-500" />
-                    )}
+                    {selectedLanguage === language.code && <RiCheckLine className="text-green-500" />}
                   </div>
                 </Radio>
               </List.Item>
@@ -191,7 +164,7 @@ const LanguageView = () => {
         </Radio.Group>
 
         <Divider />
-        
+
         <div className="bg-blue-50 rounded-lg p-4">
           <Title level={5} className="mb-2 text-blue-700">
             💡 提示

@@ -6,20 +6,16 @@ interface RefreshTokenRequestData {
 }
 
 // auth/refresh-token post
-export const postRefreshToken = (data: RefreshTokenRequestData) =>
-  basePostRequest("/auth/refresh-token")(data);
+export const postRefreshToken = (data: RefreshTokenRequestData) => basePostRequest("/auth/refresh-token")(data);
 
 // /auth/login post
-export const postLogin = (data: LoginRequest): Promise<LoginResponse> =>
-  basePostRequest("/auth/login")(data);
+export const postLogin = (data: LoginRequest): Promise<LoginResponse> => basePostRequest("/auth/login")(data);
 
 // /auth/register post
-export const postRegister = (data: RegisterRequest): Promise<LoginResponse> =>
-  basePostRequest("/auth/register")(data);
+export const postRegister = (data: RegisterRequest): Promise<LoginResponse> => basePostRequest("/auth/register")(data);
 
 // /system/email/register/captcha
-export const getEmailCaptcha = (email: string) =>
-  basePostRequest("/auth/register/captcha")({ email });
+export const getEmailCaptcha = (email: string) => basePostRequest("/auth/register/captcha")({ email });
 
 // /auth/logout post
-export const postLogout = (data: any) => basePostRequest("/auth/logout")(data);
+export const postLogout = (data: Record<string, never>) => basePostRequest("/auth/logout")(data);

@@ -71,12 +71,6 @@ const BackupView = () => {
   // 未登录视图
   const renderUnloggedView = () => (
     <SettingsViewContainer>
-      <SettingsViewHeader
-        title="备份与恢复"
-        description="管理您的数据备份和恢复设置"
-        icon={<RiInbox2Fill />}
-      />
-      
       <Alert
         message="需要登录账号"
         description="登录后可以使用云端同步功能，确保您的数据安全备份。"
@@ -115,12 +109,6 @@ const BackupView = () => {
   // 已登录视图
   const renderLoggedView = () => (
     <SettingsViewContainer>
-      <SettingsViewHeader
-        title="备份与恢复"
-        description="管理您的数据备份和恢复设置"
-        icon={<RiInbox2Fill />}
-      />
-      
       {/* 云端同步 */}
       <SettingsCard
         title="云端同步"
@@ -133,7 +121,6 @@ const BackupView = () => {
           />
         }
       >
-
         {syncStatus.isEnabled ? (
           <div>
             <div className="flex justify-between items-center mb-3">

@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { UserInfo, AuthContextValue, LoginResponse } from "../types/auth";
+import { useRequest } from "ahooks";
+import { UserInfo, AuthContextValue, LoginResponse, LoginFormData, RegisterFormData } from "../types/auth";
+import { postLogin, postRegister, postLogout } from "../services/auth";
+import { getToken, setToken, setRefreshToken } from "../utils/token";
+import { notification } from "../utils/globalNotification";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -24,8 +28,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem("auth_token");
-        const userStr = localStorage.getItem("user_info");
+        const token = getToken();
+        const userStr = localStorage.getItem("user_info") || sessionStorage.getItem("user_info");
 
         if (token && userStr) {
           const userData = JSON.parse(userStr);
@@ -45,117 +49,113 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  // 登录
-  const login = async (email: string, password: string, remember?: boolean): Promise<LoginResponse> => {
+  // 使用 useRequest 封装登录
+  const { loading: loginLoading, runAsync: runLogin } = useRequest(
+    async (data: LoginFormData) => {
+      return await postLogin({ email: data.email, password: data.password });
+    },
+    { manual: true }
+  );
+
+  const login = async (data: LoginFormData): Promise<LoginResponse> => {
     try {
-      // 这里应该调用实际的登录API
-      // 模拟API调用
-      const response = await new Promise<LoginResponse>((resolve) => {
-        setTimeout(() => {
-          // 模拟登录成功
-          const mockUser: UserInfo = {
-            _id: Date.now().toString(),
-            username: email.split("@")[0],
-            email: email,
-            createdAt: new Date(),
-          };
+      const res = await runLogin(data);
 
-          resolve({
-            success: true,
-            message: "登录成功",
-            user: mockUser,
-            token: `mock-token-${Date.now()}`,
-          });
-        }, 1000);
-      });
-
-      if (response.success && response.user && response.token) {
-        setUser(response.user);
-        setIsAuthenticated(true);
-
-        // 保存到本地存储
-        if (remember) {
-          localStorage.setItem("auth_token", response.token);
-          localStorage.setItem("user_info", JSON.stringify(response.user));
-        } else {
-          sessionStorage.setItem("auth_token", response.token);
-          sessionStorage.setItem("user_info", JSON.stringify(response.user));
-        }
-      }
-
-      return response;
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "登录失败",
+      const userPayload: UserInfo = {
+        _id: res._id,
+        username: res.username,
+        email: data.email,
+        createdAt: res.createdAt,
       };
-    }
-  };
 
-  // 注册
-  const register = async (
-    username: string,
-    email: string,
-    password: string,
-    captcha?: string
-  ): Promise<LoginResponse> => {
-    try {
-      // 这里应该调用实际的注册API
-      // 模拟API调用
-      const response = await new Promise<LoginResponse>((resolve) => {
-        setTimeout(() => {
-          // 模拟注册成功
-          const mockUser: UserInfo = {
-            _id: Date.now().toString(),
-            username: username,
-            email: email,
-            createdAt: new Date(),
-          };
-
-          resolve({
-            success: true,
-            message: "注册成功",
-            user: mockUser,
-            token: `mock-token-${Date.now()}`,
-          });
-        }, 1000);
-      });
+      const response: LoginResponse = {
+        success: true,
+        message: "登录成功",
+        user: userPayload,
+        token: res.access_token,
+        refreshToken: res.refresh_token,
+      };
 
       if (response.success && response.user && response.token) {
         setUser(response.user);
         setIsAuthenticated(true);
-
-        // 注册成功后自动保存到本地存储
-        localStorage.setItem("auth_token", response.token);
+        setToken(response.token);
+        if (response.refreshToken) setRefreshToken(response.refreshToken);
         localStorage.setItem("user_info", JSON.stringify(response.user));
       }
 
       return response;
     } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "注册失败",
+      return { success: false, message: error.message || "登录失败" };
+    }
+  };
+
+  // 使用 useRequest 封装注册
+  const { loading: registerLoading, runAsync: runRegister } = useRequest(
+    async (data: RegisterFormData) => {
+      return await postRegister({
+        email: data.email,
+        password: data.password,
+        captcha: Number(data.captcha) || undefined,
+        invitationCode: "",
+      });
+    },
+    { manual: true }
+  );
+
+  const register = async (data: RegisterFormData): Promise<LoginResponse> => {
+    try {
+      const res = await runRegister(data);
+
+      const userPayload: UserInfo = {
+        _id: String(res._id ?? Date.now()),
+        username: data.username,
+        email: data.email,
+        createdAt: new Date(),
       };
+
+      const response: LoginResponse = {
+        success: true,
+        message: "注册成功",
+        user: userPayload,
+        token: res.access_token,
+        refreshToken: res.refresh_token,
+      };
+
+      if (response.success && response.user && response.token) {
+        setUser(response.user);
+        setIsAuthenticated(true);
+        setToken(response.token);
+        if (response.refreshToken) setRefreshToken(response.refreshToken);
+        localStorage.setItem("user_info", JSON.stringify(response.user));
+      }
+
+      return response;
+    } catch (error: any) {
+      return { success: false, message: error.message || "注册失败" };
     }
   };
 
   // 登出
   const logout = async () => {
     try {
-      // 这里可以调用登出API
+      await postLogout({});
 
       // 清除状态
       setUser(null);
       setIsAuthenticated(false);
 
       // 清除本地存储
-      localStorage.removeItem("auth_token");
       localStorage.removeItem("user_info");
-      sessionStorage.removeItem("auth_token");
       sessionStorage.removeItem("user_info");
+
+      // 通过全局通知抛出登出成功事件
+      notification?.success({ message: "已成功登出" });
 
       return { success: true, message: "登出成功" };
     } catch (error: any) {
+      // 通过全局通知抛出登出失败事件
+      notification?.error({ message: error?.message || "登出失败" });
       return { success: false, message: error.message || "登出失败" };
     }
   };
@@ -186,6 +186,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updateUser,
+    loginLoading,
+    registerLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

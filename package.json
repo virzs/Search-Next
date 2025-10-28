@@ -18,6 +18,7 @@
     "ahooks": "^3.8.4",
     "antd": "^5.24.9",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.12.1",
     "qiankun": "^2.10.16",
     "react": "^19.2.0",
@@ -25,9 +26,10 @@
     "react-draggable": "^4.4.6",
     "react-infinite-scroll-component": "^6.1.0",
     "react-router": "^7.9.4",
+    "react-sticky-box": "^2.0.5",
     "remixicon": "^4.6.0",
     "tailwindcss": "^4.1.4",
-    "zs_library": "^0.6.14"
+    "zs_library": "^0.6.15"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

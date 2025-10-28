@@ -75,9 +75,6 @@ export interface UnloggedViewProps {
   // 自定义描述
   description?: string;
 
-  // 是否显示头像
-  showAvatar?: boolean;
-
   // 自定义样式类名
   className?: string;
 
@@ -143,16 +140,13 @@ export interface RegisterFormProps {
 // 认证状态
 export interface AuthState {
   // 是否已登录
-  isLoggedIn: boolean;
+  isAuthenticated: boolean;
 
   // 用户信息
   user: UserInfo | null;
 
   // 是否正在加载
   loading: boolean;
-
-  // 错误信息
-  error: string | null;
 }
 
 // 认证上下文
@@ -164,11 +158,12 @@ export interface AuthContextValue extends AuthState {
   register: (data: RegisterFormData) => Promise<LoginResponse>;
 
   // 登出方法
-  logout: () => void;
-
-  // 刷新用户信息
-  refreshUser: () => Promise<void>;
+  logout: () => Promise<{ success: boolean; message: string }>;
 
   // 更新用户信息
   updateUser: (user: Partial<UserInfo>) => void;
+
+  // 操作加载状态（由 AuthContext 管理）
+  loginLoading: boolean;
+  registerLoading: boolean;
 }

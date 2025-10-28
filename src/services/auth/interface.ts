@@ -16,6 +16,6 @@ export interface LoginResponse {
 export interface RegisterRequest {
   email: string;
   password: string;
-  captcha: number;
+  captcha: number | undefined;
   invitationCode: string;
 }

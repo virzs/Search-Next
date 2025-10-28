@@ -2,7 +2,8 @@ import { Form, Input, Button, Typography, message } from "antd";
 import { useState } from "react";
 import { RiUserFill, RiMailFill, RiLockFill, RiEyeFill, RiEyeOffFill, RiShieldCheckFill } from "@remixicon/react";
 import { RegisterFormProps, RegisterFormData, LoginResponse } from "../../types/auth";
-import { postRegister, getEmailCaptcha } from "../../services/auth";
+import { getEmailCaptcha } from "../../services/auth";
+import { useAuth } from "../../contexts/AuthContext";
 
 const { Text } = Typography;
 const { Item } = Form;
@@ -16,34 +17,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   initialValues = {},
 }) => {
   const [form] = Form.useForm<RegisterFormData>();
-  const [internalLoading, setInternalLoading] = useState(false);
+  const { register, registerLoading: contextRegisterLoading } = useAuth();
   const [captchaLoading, setCaptchaLoading] = useState(false);
   const [captchaSent, setCaptchaSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const isLoading = externalLoading || internalLoading;
+  const isLoading = externalLoading || contextRegisterLoading;
 
   // 默认注册处理
   const defaultRegister = async (data: RegisterFormData): Promise<LoginResponse> => {
-    try {
-      const response = await postRegister({
-        username: data.username,
-        email: data.email,
-        password: data.password,
-      });
-      return {
-        success: true,
-        message: "注册成功",
-        ...response,
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "注册失败，请稍后重试",
-      };
-    }
+    return await register(data);
   };
 
   // 默认获取验证码处理
@@ -98,7 +83,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   // 表单提交处理
   const handleSubmit = async (values: RegisterFormData) => {
-    setInternalLoading(true);
     try {
       const submitHandler = onSubmit || defaultRegister;
       const result = await submitHandler(values);
@@ -118,8 +102,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         success: false,
         message: errorMessage,
       };
-    } finally {
-      setInternalLoading(false);
     }
   };
 

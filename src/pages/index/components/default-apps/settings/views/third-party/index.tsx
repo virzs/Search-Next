@@ -129,12 +129,6 @@ const ThirdPartyView = () => {
 
   return (
     <SettingsViewContainer>
-      <SettingsViewHeader
-        title="第三方服务设置"
-        description="配置第三方服务的API密钥，用于增强搜索和AI功能。所有密钥都会安全存储在本地。"
-        icon={<RiKeyFill />}
-      />
-
       {/* 同步设置 */}
       {isLoggedIn && (
         <SettingsCard title="同步设置">

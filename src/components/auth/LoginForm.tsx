@@ -2,7 +2,7 @@ import { Form, Input, Button, Checkbox, Typography, message } from "antd";
 import { useState } from "react";
 import { RiMailFill, RiLockFill, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
 import { LoginFormProps, LoginFormData, LoginResponse } from "../../types/auth";
-import { postLogin } from "../../services/auth";
+import { useAuth } from "../../contexts/AuthContext";
 
 const { Link } = Typography;
 const { Item } = Form;
@@ -16,41 +16,24 @@ const LoginForm: React.FC<LoginFormProps> = ({
   initialValues = {},
 }) => {
   const [form] = Form.useForm<LoginFormData>();
-  const [internalLoading, setInternalLoading] = useState(false);
+  const { login, loginLoading: contextLoginLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const isLoading = externalLoading || internalLoading;
+  const isLoading = externalLoading || contextLoginLoading;
 
   // 默认登录处理
   const defaultLogin = async (data: LoginFormData): Promise<LoginResponse> => {
-    try {
-      const response = await postLogin({
-        email: data.email,
-        password: data.password,
-      });
-      return {
-        success: true,
-        message: "登录成功",
-        ...response,
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "登录失败，请检查邮箱和密码",
-      };
-    }
+    return await login(data);
   };
 
   // 表单提交处理
   const handleSubmit = async (values: LoginFormData) => {
-    setInternalLoading(true);
     try {
       const submitHandler = onSubmit || defaultLogin;
       const result = await submitHandler(values);
 
       if (result.success) {
         message.success(result.message || "登录成功");
-        // 这里可以触发全局状态更新或其他成功后的操作
       } else {
         message.error(result.message || "登录失败");
       }
@@ -63,8 +46,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
         success: false,
         message: errorMessage,
       };
-    } finally {
-      setInternalLoading(false);
     }
   };
 

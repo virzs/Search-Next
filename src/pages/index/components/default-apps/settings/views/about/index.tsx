@@ -1,6 +1,6 @@
-import { Typography, Space, Button, Tag, List, Avatar } from "antd";
-import { RiGithubLine, RiGlobalLine, RiMailLine, RiHeartLine, RiBugLine, RiQuestionLine, RiInformationFill } from "@remixicon/react";
-import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
+import { Typography, Space, Tag, List, Avatar } from "antd";
+import { RiGithubLine, RiGlobalLine, RiMailLine, RiHeartLine, RiBugLine, RiQuestionLine } from "@remixicon/react";
+import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
 
 const { Title, Text, Paragraph, Link } = Typography;
 
@@ -60,12 +60,6 @@ const AboutView = () => {
 
   return (
     <SettingsViewContainer>
-      <SettingsViewHeader
-        title="关于"
-        description="了解应用信息、开发团队和技术栈"
-        icon={<RiInformationFill />}
-      />
-      
       {/* 应用信息 */}
       <SettingsCard>
         <div className="text-center mb-6">

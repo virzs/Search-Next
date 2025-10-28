@@ -1,78 +1,109 @@
-import { css, cx } from "@emotion/css";
-import { Menu } from "antd";
+import { Tabs } from "antd";
 import { FC, useState } from "react";
-import { DesktopBaseModal } from "zs_library";
+import { DesktopBaseModal, DesktopBaseDrawer } from "zs_library";
 import AccountView from "./views/account";
 import BackupView from "./views/backup";
-import AboutView from "./views/about";
-import ThirdPartyView from "./views/third-party";
-import LanguageView from "./views/language";
-import { AnimatePresence } from "framer-motion";
-import { RiInbox2Fill, RiInformationFill, RiUserFill, RiKeyFill, RiGlobalLine } from "@remixicon/react";
+import { RiInbox2Fill, RiUserFill } from "@remixicon/react";
+import { isMobileDevice } from "@/utils/utils";
+import { css, cx } from "@emotion/css";
 
 interface SettingsProps {
   open: boolean;
   onClose: () => void;
 }
 
+const SettingsView = () => {
+  const [currentMenu, setCurrentMenu] = useState("account");
+
+  const tabItems = [
+    {
+      label: (
+        <span className="inline-flex items-center gap-1">
+          <RiUserFill size={16} />
+          账号
+        </span>
+      ),
+      key: "account",
+      children: <AccountView />,
+    },
+    // {
+    //   label: (
+    //     <span className="inline-flex items-center gap-1">
+    //       <RiKeyFill size={16} />
+    //       第三方服务
+    //     </span>
+    //   ),
+    //   key: "third-party",
+    //   children: <ThirdPartyView />,
+    // },
+    // {
+    //   label: (
+    //     <span className="inline-flex items-center gap-1">
+    //       <RiGlobalLine size={16} />
+    //       语言
+    //     </span>
+    //   ),
+    //   key: "language",
+    //   children: <LanguageView />,
+    // },
+    {
+      label: (
+        <span className="inline-flex items-center gap-1">
+          <RiInbox2Fill size={16} />
+          备份与恢复
+        </span>
+      ),
+      key: "backup",
+      children: <BackupView />,
+    },
+    // {
+    //   label: (
+    //     <span className="inline-flex items-center gap-1">
+    //       <RiInformationFill size={16} />
+    //       关于
+    //     </span>
+    //   ),
+    //   key: "about",
+    //   children: <AboutView />,
+    // },
+  ];
+
+  return (
+    <Tabs
+      className={cx(
+        "h-[60vh]",
+        css`
+          .ant-tabs-content-holder {
+            overflow-y: auto;
+            .ant-tabs-content,
+            .ant-tabs-tabpane {
+              height: 100%;
+            }
+          }
+        `
+      )}
+      activeKey={currentMenu}
+      onChange={(key) => setCurrentMenu(key)}
+      tabPosition="left"
+      size="small"
+      destroyInactiveTabPane
+      items={tabItems}
+    />
+  );
+};
+
 const Settings: FC<SettingsProps> = (props) => {
   const { open, onClose } = props;
 
-  const [currentMenu, setCurrentMenu] = useState("account");
+  const isMobile = isMobileDevice();
 
-  return (
-    <DesktopBaseModal visible={open} onClose={onClose} width={1000}>
-      <div className="flex min-h-[60vh] gap-5">
-        <Menu
-          selectedKeys={[currentMenu]}
-          onSelect={({ key }) => {
-            setCurrentMenu(key);
-          }}
-          className={cx(
-            "shrink-0 w-44 !bg-inherit rounded-2xl !shadow-2xl fixed bottom-5 top-5 !px-2 !py-3",
-            css`
-              border-inline-end: none !important;
-            `
-          )}
-          items={[
-            {
-              label: "账号",
-              key: "account",
-              icon: <RiUserFill size={16} />,
-            },
-            {
-              label: "第三方服务",
-              key: "third-party",
-              icon: <RiKeyFill size={16} />,
-            },
-            {
-              label: "语言",
-              key: "language",
-              icon: <RiGlobalLine size={16} />,
-            },
-            {
-              label: "备份与恢复",
-              key: "backup",
-              icon: <RiInbox2Fill size={16} />,
-            },
-            {
-              label: "关于",
-              key: "about",
-              icon: <RiInformationFill size={16} />,
-            },
-          ]}
-        />
-        <div className="w-44"></div>
-        <div className="grow-1 pr-2">
-          <AnimatePresence mode="wait">
-            {currentMenu === "account" && <AccountView key="account" />}
-            {currentMenu === "third-party" && <ThirdPartyView key="third-party" />}
-            {currentMenu === "language" && <LanguageView key="language" />}
-            {currentMenu === "backup" && <BackupView key="backup" />}
-            {currentMenu === "about" && <AboutView key="about" />}
-          </AnimatePresence>
-        </div>
-      </div>
+  return isMobile ? (
+    <DesktopBaseDrawer width="100vw" height="100vh" open={open} onClose={onClose}>
+      <SettingsView />
+    </DesktopBaseDrawer>
+  ) : (
+    <DesktopBaseModal visible={open} onClose={onClose} width={1000} contentClassName="!overflow-hidden">
+      <SettingsView />
     </DesktopBaseModal>
   );
 };
