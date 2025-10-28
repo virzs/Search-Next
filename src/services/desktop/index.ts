@@ -14,3 +14,10 @@ export interface DefaultUserConfig {
 export const getDefaultUserConfig = () => {
   return baseGetRequest<DefaultUserConfig>("/tabs/desktop/config/user/default")();
 };
+
+/**
+ * 获取当前用户配置限制
+ */
+export const getUserLimit = () => {
+  return baseGetRequest("/tabs/desktop/user-limit/public")();
+};

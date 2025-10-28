@@ -1,13 +1,10 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Avatar, Button, Card, Typography, Space } from "antd";
 import { motion } from "framer-motion";
 import { RiLogoutBoxRLine, RiShieldCheckLine } from "@remixicon/react";
 import { useAuth } from "../../contexts/AuthContext";
 import { UserInfo } from "../../types/auth";
 import { format } from "date-fns";
-import { emailToGradient } from "@/utils/emailGradient";
-import { createAvatar } from "@dicebear/core";
-import { thumbs } from "@dicebear/collection";
 
 const { Title, Text } = Typography;
 
@@ -18,18 +15,14 @@ interface AccountInfoProps {
 }
 
 const AccountInfo: React.FC<AccountInfoProps> = ({ user: propUser, showActions = true, className = "" }) => {
-  const { user: contextUser, logout } = useAuth();
+  const { user: contextUser, logout, avatarSrc, coverGradientCss } = useAuth();
   const user = propUser || contextUser;
 
   const handleLogout = () => {
     logout();
   };
 
-  const coverGradient = emailToGradient(user?.email || "unknown");
-  const avatarSrc = useMemo(() => {
-    const seed = (user?.email || "unknown").trim().toLowerCase();
-    return createAvatar(thumbs, { seed, size: 80 }).toDataUri();
-  }, [user?.email]);
+  // 头像与封面由 AuthContext 生成；未登录时为 null
 
   return (
     <motion.div
@@ -39,14 +32,15 @@ const AccountInfo: React.FC<AccountInfoProps> = ({ user: propUser, showActions =
     >
       <Card className="overflow-hidden grow" bodyStyle={{ padding: 0 }} variant="borderless">
         {/* 背景封面 */}
-        <div className="h-32 relative" style={{ backgroundImage: coverGradient.css }}>
+        <div className="h-32 relative" style={{ backgroundImage: coverGradientCss || undefined }}>
           {/* 头像 */}
           <div className="absolute -bottom-8 left-6">
             <Avatar
               size={80}
-              src={avatarSrc}
+              src={avatarSrc ?? undefined}
               style={{
                 border: "4px solid white",
+                backgroundImage: coverGradientCss || undefined,
               }}
             />
           </div>

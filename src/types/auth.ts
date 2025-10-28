@@ -166,4 +166,10 @@ export interface AuthContextValue extends AuthState {
   // 操作加载状态（由 AuthContext 管理）
   loginLoading: boolean;
   registerLoading: boolean;
+
+  // 基于固定文本（邮箱）生成的头像 Data URI，未登录为 null
+  avatarSrc: string | null;
+
+  // 基于固定文本（邮箱）生成的封面 CSS（backgroundImage），未登录为 null
+  coverGradientCss: string | null;
 }

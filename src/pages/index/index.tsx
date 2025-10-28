@@ -8,15 +8,25 @@ import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
 // import SearchWithAI from "../../components/ai-search";
 import { Spin } from "antd";
-import { getDefaultUserConfig } from "@/services/desktop";
+import { getDefaultUserConfig, getUserLimit } from "@/services/desktop";
 import { DESKTOP_LIST_MODIFIED_STORAGE_KEY, DESKTOP_LIST_STORAGE_KEY } from "@/utils/storage";
+import { useAuth } from "@/contexts/AuthContext";
+import AccountModal from "./components/default-apps/account";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
 
+  const { isAuthenticated, avatarSrc, coverGradientCss } = useAuth();
+
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
   const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
+  const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
+
+  const { data: userLimit } = useRequest(getUserLimit, {
+    refreshDeps: [isAuthenticated],
+  });
+  console.log("🚀 ~ Index ~ userLimit:", userLimit);
 
   const { run: runDefaultDesktop } = useRequest(getDefaultUserConfig, {
     manual: true,
@@ -85,8 +95,13 @@ function Index() {
         return createFixedItem({
           key: "my",
           name: "账号",
-          IconComponent: RiUserFill,
-          backgroundStyle: "background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);",
+          IconComponent: avatarSrc
+            ? () => <img src={avatarSrc} alt="avatar" className="w-full h-full pointer-events-none" />
+            : RiUserFill,
+          backgroundStyle: coverGradientCss
+            ? `background: ${coverGradientCss};`
+            : "background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);",
+          onClick: () => toggleAccountInfo(),
         });
       case "*:theme":
         return createFixedItem({
@@ -220,6 +235,7 @@ function Index() {
         }}
       />
       <Settings open={settingsOpen} onClose={toggleSettings} />
+      <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />
 
       {init && (
         <div className={cx("fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center")}>
