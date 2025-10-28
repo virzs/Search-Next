@@ -23,6 +23,8 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      // 允许在项目中使用显式 any（配合 tsconfig 控制 implicit any）
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 )
