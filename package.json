@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/x": "^1.6.0",
+    "@dicebear/collection": "^9.2.4",
+    "@dicebear/core": "^9.2.4",
     "@emotion/css": "^11.13.5",
     "@radix-ui/themes": "^3.2.1",
     "@remixicon/react": "^4.6.0",
