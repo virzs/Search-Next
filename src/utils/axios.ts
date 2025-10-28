@@ -1,10 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosRequestConfig } from "axios";
-import { notification } from "antd";
 import { getApiPrefix } from "./utils";
-import { getRefreshToken, getToken, setRefreshToken, setToken } from "./token";
 import { postRefreshToken } from "../services/auth";
+import { notification } from "./globalNotification";
+import { getRefreshToken, getToken, setRefreshToken, setToken } from "./token";
 
 const axiosInstance = axios.create({});
+
+// Token刷新队列管理
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -33,41 +53,61 @@ axiosInstance.interceptors.response.use(
       });
     }
     if (error.response.status === 500 && error.config.url.includes("/auth/refresh-token")) {
-      // history.replace("/login");
-      window.location.reload();
+      // TODO: 处理刷新token失败的情况
     }
-    console.log(originalRequest._retry);
-    if (
-      error.response.status === 401 &&
-      !error.config.url.includes("/auth/refresh-token") &&
-      originalRequest._retry === undefined
-    ) {
-      originalRequest._retry = true;
+    if (error.response.status === 401 && !error.config.url.includes("/auth/refresh-token")) {
       const refreshToken = getRefreshToken();
       if ([null, undefined, ""].includes(refreshToken)) {
-        // history.replace("/login");
-        window.location.reload();
-        return;
+        // TODO: 处理刷新token为空的情况
+        return Promise.reject(error);
       }
-      return postRefreshToken({
-        refreshToken: refreshToken as string,
-      })
-        .then((res) => {
-          if (res.access_token) {
-            setToken(res.access_token);
-            console.log("Access token refreshed!");
-            if (res.refresh_token) {
-              console.log("Access token refreshed!");
-              setRefreshToken(res.refresh_token);
-            }
-            return axiosInstance(originalRequest);
-          }
+
+      if (isRefreshing) {
+        // 如果正在刷新token，将请求加入队列
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
         })
-        .catch(() => {
-          // history.replace("/login");
-          window.location.reload();
-          return;
-        });
+          .then(() => {
+            // 刷新成功后重试原请求
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      return new Promise((resolve, reject) => {
+        postRefreshToken({
+          refreshToken: refreshToken as string,
+        })
+          .then((res) => {
+            if (res.access_token) {
+              setToken(res.access_token);
+              console.log("Access token refreshed!");
+              if (res.refresh_token) {
+                console.log("Refresh token updated!");
+                setRefreshToken(res.refresh_token);
+              }
+              // 处理队列中的请求
+              processQueue(null, res.access_token);
+              resolve(axiosInstance(originalRequest));
+            } else {
+              processQueue(new Error("Token refresh failed"), null);
+              reject(error);
+            }
+          })
+          .catch((err) => {
+            processQueue(err, null);
+            // TODO: 处理刷新token失败的情况
+            reject(err);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      });
     }
     if (error.response.status === 429) {
       notification.error({
@@ -78,7 +118,7 @@ axiosInstance.interceptors.response.use(
     if (error.response.status === 500) {
       notification.error({
         message: 500,
-        description: error.response.data.message,
+        description: error.response.data.message ?? "无法访问服务器，请稍后再试",
       });
     }
     return Promise.reject(error);
@@ -137,7 +177,7 @@ export const basePostRequest =
 
 export const basePutRequest =
   <T = any>(url: string, options?: AxiosRequestConfig) =>
-  async (id: number | string | Array<number | string>, data: object, params: object = {}) =>
+  async (id: number | string | Array<number | string>, data?: object, params: object = {}) =>
     axiosInstance<T, T>(getApiPrefix(url, id), {
       ...options,
       method: "PUT",
@@ -172,49 +212,5 @@ export const baseDeleteRequest =
         ...params,
       },
     });
-
-// 扩展axios实例，添加jsonp方法
-(axiosInstance as any).jsonp = (url: string, data?: any) => {
-  if (!url) throw new Error("url is necessary");
-  const callback = "CALLBACK" + Math.random().toString().substr(9, 18);
-  const JSONP = document.createElement("script");
-  JSONP.setAttribute("type", "text/javascript");
-
-  const headEle = document.getElementsByTagName("head")[0];
-
-  let ret = "";
-  if (data) {
-    if (typeof data === "string") ret = "&" + data;
-    else if (typeof data === "object") {
-      for (let key in data) ret += "&" + key + "=" + encodeURIComponent(data[key]);
-    }
-    ret += "&_time=" + Date.now();
-  }
-  JSONP.src = `${url}?callback=${callback}${ret}`;
-  const w = window as any;
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      headEle.removeChild(JSONP);
-      delete w[callback];
-      reject(new Error("JSONP request timeout"));
-    }, 5000);
-
-    w[callback] = (r: any) => {
-      clearTimeout(timeoutId);
-      resolve(r);
-      headEle.removeChild(JSONP);
-      delete w[callback];
-    };
-
-    JSONP.onerror = () => {
-      clearTimeout(timeoutId);
-      headEle.removeChild(JSONP);
-      delete w[callback];
-      reject(new Error("JSONP script load error"));
-    };
-
-    headEle.appendChild(JSONP);
-  });
-};
 
 export default axiosInstance;

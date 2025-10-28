@@ -4,10 +4,11 @@ import { Theme } from "@radix-ui/themes";
 
 import "./index.css";
 import Index from "./pages/index";
-import { ConfigProvider } from "antd";
+import { App, ConfigProvider } from "antd";
 import theme from "./theme/config";
 import LoginPage from "./pages/login";
 import { AuthProvider } from "./contexts/AuthContext";
+import { GlobalNotificationProvider } from "./utils/globalNotification";
 
 const router = createBrowserRouter([
   {
@@ -22,10 +23,13 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <Theme>
-    <ConfigProvider theme={theme}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </ConfigProvider>
+    <App>
+      <GlobalNotificationProvider />
+      <ConfigProvider theme={theme}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </ConfigProvider>
+    </App>
   </Theme>
 );
