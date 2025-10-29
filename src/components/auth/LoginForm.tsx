@@ -2,7 +2,7 @@ import { Form, Input, Button, Checkbox, Typography, message } from "antd";
 import { useState } from "react";
 import { RiMailFill, RiLockFill, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
 import { LoginFormProps, LoginFormData, LoginResponse } from "../../types/auth";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const { Link } = Typography;
 const { Item } = Form;

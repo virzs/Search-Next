@@ -1,4 +1,4 @@
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import UnloggedView from "@/components/auth/UnloggedView";
 import AccountInfo from "@/components/auth/AccountInfo";
 import { SettingsViewContainer } from "@/components/settings";

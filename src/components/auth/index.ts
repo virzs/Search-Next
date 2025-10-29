@@ -4,8 +4,9 @@ export { default as LoginForm } from './LoginForm';
 export { default as RegisterForm } from './RegisterForm';
 export { default as AccountInfo } from './AccountInfo';
 
-// 认证上下文导出
-export { AuthProvider, useAuth } from '../../contexts/AuthContext';
+// 认证上下文与 hooks 导出
+export { AuthProvider } from '../../contexts/AuthContext';
+export { useAuth } from '../../hooks/useAuth';
 
 // 类型定义导出
 export type {

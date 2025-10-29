@@ -8,6 +8,7 @@ import { App, ConfigProvider } from "antd";
 import theme from "./theme/config";
 import LoginPage from "./pages/login";
 import { AuthProvider } from "./contexts/AuthContext";
+import { AppConfigProvider } from "./contexts/ConfigContext";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 
 const router = createBrowserRouter([
@@ -27,7 +28,9 @@ createRoot(document.getElementById("root")!).render(
       <GlobalNotificationProvider />
       <ConfigProvider theme={theme}>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <AppConfigProvider>
+            <RouterProvider router={router} />
+          </AppConfigProvider>
         </AuthProvider>
       </ConfigProvider>
     </App>

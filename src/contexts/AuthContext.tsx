@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { useRequest } from "ahooks";
 import { UserInfo, AuthContextValue, LoginResponse, LoginFormData, RegisterFormData } from "../types/auth";
 import { postLogin, postRegister, postLogout } from "../services/auth";
@@ -9,14 +9,6 @@ import { createAvatar } from "@dicebear/core";
 import { thumbs } from "@dicebear/collection";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
 
 interface AuthProviderProps {
   children: ReactNode;

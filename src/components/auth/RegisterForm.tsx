@@ -3,7 +3,7 @@ import { useState } from "react";
 import { RiUserFill, RiMailFill, RiLockFill, RiEyeFill, RiEyeOffFill, RiShieldCheckFill } from "@remixicon/react";
 import { RegisterFormProps, RegisterFormData, LoginResponse } from "../../types/auth";
 import { getEmailCaptcha } from "../../services/auth";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const { Text } = Typography;
 const { Item } = Form;

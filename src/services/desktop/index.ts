@@ -15,9 +15,15 @@ export const getDefaultUserConfig = () => {
   return baseGetRequest<DefaultUserConfig>("/tabs/desktop/config/user/default")();
 };
 
+export interface UserLimit {
+  maxConfigs: number;
+  maxPages: number;
+  source: string;
+}
+
 /**
  * 获取当前用户配置限制
  */
 export const getUserLimit = () => {
-  return baseGetRequest("/tabs/desktop/user-limit/public")();
+  return baseGetRequest<UserLimit>("/tabs/desktop/user-limit/public")();
 };

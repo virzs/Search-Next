@@ -2,7 +2,7 @@ import React from "react";
 import { Avatar, Button, Card, Typography, Space } from "antd";
 import { motion } from "framer-motion";
 import { RiLogoutBoxRLine, RiShieldCheckLine } from "@remixicon/react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { UserInfo } from "../../types/auth";
 import { format } from "date-fns";
 

@@ -8,25 +8,24 @@ import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
 // import SearchWithAI from "../../components/ai-search";
 import { Spin } from "antd";
-import { getDefaultUserConfig, getUserLimit } from "@/services/desktop";
+import { getDefaultUserConfig } from "@/services/desktop";
 import { DESKTOP_LIST_MODIFIED_STORAGE_KEY, DESKTOP_LIST_STORAGE_KEY } from "@/utils/storage";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useConfig } from "@/hooks/useConfig";
 import AccountModal from "./components/default-apps/account";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
 
-  const { isAuthenticated, avatarSrc, coverGradientCss } = useAuth();
+  const { avatarSrc, coverGradientCss } = useAuth();
+  const { userLimit } = useConfig();
 
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
   const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
 
-  const { data: userLimit } = useRequest(getUserLimit, {
-    refreshDeps: [isAuthenticated],
-  });
-  console.log("🚀 ~ Index ~ userLimit:", userLimit);
+  // userLimit 由 ConfigContext 提供
 
   const { run: runDefaultDesktop } = useRequest(getDefaultUserConfig, {
     manual: true,
@@ -151,11 +150,11 @@ function Index() {
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}
-      <div className="h-full pb-8">
+      <div className="h-full pb-8 max-w-7xl mx-auto">
         <Desktop<DesktopItemData>
           ref={desktopRef}
           className={cx(
-            "h-full max-w-5xl mx-auto",
+            "h-full",
             css`
               .slick-list,
               .slick-track {
@@ -180,6 +179,7 @@ function Index() {
               }
             `
           )}
+          maxSlides={userLimit?.maxPages || 5}
           theme={desktopThemeLight}
           dock={{
             enabled: true,

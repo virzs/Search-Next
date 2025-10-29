@@ -8,7 +8,7 @@ import {
   LoginFormData,
   RegisterFormData,
 } from "../../types/auth";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
