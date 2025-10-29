@@ -150,7 +150,7 @@ function Index() {
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}
-      <div className="h-full pb-8 max-w-7xl mx-auto">
+      <div className="h-full pb-8 w-full max-w-7xl mx-auto">
         <Desktop<DesktopItemData>
           ref={desktopRef}
           maxSlides={userLimit?.maxPages || 5}
