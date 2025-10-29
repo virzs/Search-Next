@@ -153,32 +153,6 @@ function Index() {
       <div className="h-full pb-8 max-w-7xl mx-auto">
         <Desktop<DesktopItemData>
           ref={desktopRef}
-          className={cx(
-            "h-full",
-            css`
-              .slick-list,
-              .slick-track {
-                height: 100%;
-              }
-              .slick-dots {
-                max-width: var(--container-5xl);
-                display: flex;
-                justify-content: center;
-                align-items: flex-end;
-                background-color: transparent;
-                li {
-                  width: auto;
-                  height: auto;
-                  display: block;
-                }
-                .slick-active > div {
-                  transition: all 0.2s ease;
-                  background-color: #294167;
-                  color: white;
-                }
-              }
-            `
-          )}
           maxSlides={userLimit?.maxPages || 5}
           theme={desktopThemeLight}
           dock={{
