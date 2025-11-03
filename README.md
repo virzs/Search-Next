@@ -37,7 +37,7 @@
 
 ## 在线地址
 
-<https://search-next-git-2x-virzs-projects.vercel.app/home>
+<https://search_next.virs.xyz/>
 
 ## 在线交流
 
