@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Button, Typography, Tabs, message } from "antd";
+import { Button, Typography, Tabs, message, Alert } from "antd";
 import {
   UnloggedViewProps,
   AuthAction,
@@ -9,6 +9,7 @@ import {
   RegisterFormData,
 } from "../../types/auth";
 import { useAuth } from "@/hooks/useAuth";
+import useConfig from "@/hooks/useConfig";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
@@ -28,6 +29,10 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   const [currentAction, setCurrentAction] = useState<AuthAction>(defaultAction);
   // 使用 AuthContext 提供的登录/注册与加载状态
   const { login, register, loginLoading, registerLoading } = useAuth();
+  // 使用 ConfigContext 提供的项目公共信息（用于控制注册提示）
+  const { projectInfo } = useConfig();
+  const allowRegister = projectInfo?.register?.allowRegister ?? true;
+  const registerDisabledTip = projectInfo?.register?.registerDisabledTip || "当前项目暂不开放注册";
 
   // 处理登录成功
   const handleLoginSuccess = useCallback(
@@ -161,15 +166,21 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
             <LoginForm onSubmit={handleLogin} loading={loginLoading} showRemember={true} showForgotPassword={true} />
           </TabPane>
           <TabPane tab="注册" key="register">
-            <RegisterForm onSubmit={handleRegister} loading={registerLoading} requireCaptcha={false} />
+            {allowRegister ? (
+              <RegisterForm onSubmit={handleRegister} loading={registerLoading} />
+            ) : (
+              <Alert description={registerDisabledTip} type="warning" showIcon />
+            )}
           </TabPane>
         </Tabs>
       ) : (
         <div>
           {currentAction === "login" ? (
             <LoginForm onSubmit={handleLogin} loading={loginLoading} showRemember={true} showForgotPassword={true} />
+          ) : allowRegister ? (
+            <RegisterForm onSubmit={handleRegister} loading={registerLoading} />
           ) : (
-            <RegisterForm onSubmit={handleRegister} loading={registerLoading} requireCaptcha={false} />
+            <Alert description={registerDisabledTip} type="warning" showIcon />
           )}
         </div>
       )}

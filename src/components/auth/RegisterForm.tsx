@@ -11,7 +11,7 @@ const { Item } = Form;
 const RegisterForm: React.FC<RegisterFormProps> = ({
   onSubmit,
   loading: externalLoading = false,
-  requireCaptcha = false,
+  requireCaptcha = true,
   onGetCaptcha,
   className = "",
   initialValues = {},
