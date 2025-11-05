@@ -1,7 +1,7 @@
 import { Desktop, DesktopSortItem, desktopThemeLight, DesktopHandle, DesktopAppItem } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { RiStore2Fill, RiSettingsFill, RiBrush2Fill, RemixiconComponentType, RiUserFill } from "@remixicon/react";
 import StoreModal from "./components/default-apps/store";
 import type { DesktopItemData } from "../../types";
@@ -13,6 +13,8 @@ import { DESKTOP_LIST_MODIFIED_STORAGE_KEY, DESKTOP_LIST_STORAGE_KEY } from "@/u
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
 import AccountModal from "./components/default-apps/account";
+import PureWidget from "@/components/micro-frontend/pure-widget";
+import PureWidgetWindow from "@/components/window/pure-widget-window";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -24,6 +26,7 @@ function Index() {
   const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
+  const [fullWidget, setFullWidget] = useState<{ entry: string; props?: any; title?: string } | null>(null);
 
   // userLimit 由 ConfigContext 提供
 
@@ -138,6 +141,46 @@ function Index() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 本地默认：注入一个时钟小组件，便于验证方案
+  useEffect(() => {
+    const defaultClockItem = {
+      id: "widget:clock",
+      type: "widget:clock" as const,
+      data: {
+        name: "时钟",
+        widgetConfig: {
+          id: "clock",
+          name: "时钟",
+          entry: "/widgets/clock/index.js",
+          props: { title: "时钟小组件" },
+        },
+      },
+    };
+
+    try {
+      const raw = localStorage.getItem(DESKTOP_LIST_STORAGE_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      const hasClock =
+        Array.isArray(list) &&
+        list.length > 0 &&
+        Array.isArray(list[0]?.children) &&
+        list[0].children.some(
+          (child: any) =>
+            child?.id === defaultClockItem.id ||
+            child?.type === "widget:clock" ||
+            child?.data?.widgetConfig?.id === "clock"
+        );
+
+      if (!hasClock) {
+        // 通过 desktopRef 的 addItem 注入，默认放入第一页根
+        desktopRef.current?.state.addItem(defaultClockItem as any, []);
+      }
+    } catch {
+      // 若解析失败，仍尝试通过 addItem 注入，默认放入第一页根
+      desktopRef.current?.state.addItem(defaultClockItem as any, []);
+    }
+  }, []);
+
   return (
     <div
       className={cx(
@@ -155,6 +198,47 @@ function Index() {
           ref={desktopRef}
           maxSlides={userLimit?.maxPages || 5}
           theme={desktopThemeLight}
+          typeConfigMap={{
+            "widget:clock": {
+              sizeConfigs: [
+                { row: 1, col: 2, name: "2x1", id: "2x1" },
+                { row: 2, col: 2, name: "2x2", id: "2x2" },
+              ],
+              defaultSizeId: "2x1",
+              allowShare: false,
+              allowInfo: false,
+              allowContextMenu: true,
+              allowDelete: true,
+              allowResize: true,
+            },
+          }}
+          itemIconBuilderAllowNull={(item) => {
+            // 纯JS外部小组件渲染（icon模式）
+            if (item.type === "widget:clock" && item.data?.widgetConfig?.entry) {
+              return (
+                <PureWidget
+                  config={{
+                    entry: item.data.widgetConfig.entry,
+                    props: item.data.widgetConfig.props,
+                    mode: "icon",
+                  }}
+                  className={css`
+                    width: 100%;
+                    height: 100%;
+                  `}
+                  onClick={() =>
+                    setFullWidget({
+                      entry: item.data!.widgetConfig!.entry,
+                      props: item.data!.widgetConfig!.props,
+                      title: item.data?.name || "小组件",
+                    })
+                  }
+                />
+              );
+            }
+
+            return null;
+          }}
           dock={{
             enabled: true,
             fixedItems: [
@@ -210,6 +294,16 @@ function Index() {
       />
       <Settings open={settingsOpen} onClose={toggleSettings} />
       <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />
+      {fullWidget && (
+        <PureWidgetWindow
+          visible={true}
+          onClose={() => setFullWidget(null)}
+          config={{ entry: fullWidget.entry, props: fullWidget.props }}
+          title={fullWidget.title}
+          width={600}
+          height={400}
+        />
+      )}
 
       {init && (
         <div className={cx("fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center")}>

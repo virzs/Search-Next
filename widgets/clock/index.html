@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clock Widget Dev</title>
+    <style>
+      :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; }
+      body { margin: 0; padding: 16px; background: #f7f7fb; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .card { background: #fff; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 12px; }
+      .title { font-weight: 600; font-size: 14px; color: #374151; margin-bottom: 8px; }
+      .box { border: 1px dashed #d1d5db; border-radius: 12px; height: 180px; }
+      .full { height: 360px; }
+    </style>
+  </head>
+  <body>
+    <h1 style="font-size: 16px;">Clock Widget 开发页面</h1>
+    <p style="color:#6b7280;">此页面用于独立开发与调试小组件，使用本地依赖注入 React/ReactDOM。</p>
+    <div class="grid">
+      <div class="card">
+        <div class="title">图标模式（icon）</div>
+        <div id="icon" class="box"></div>
+      </div>
+      <div class="card">
+        <div class="title">完整模式（full）</div>
+        <div id="full" class="box full"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      // 使用本地依赖引入 React 与 ReactDOM，并暴露到全局，模拟宿主行为
+      import React from 'react';
+      import * as ReactDOMClient from 'react-dom/client';
+      window.React = React;
+      window.ReactDOM = ReactDOMClient;
+
+      const mod = await import('./src/index.jsx');
+      const unmountIcon = mod.mount(document.getElementById('icon'), { mode: 'icon', title: '时钟 Dev' });
+      const unmountFull = mod.mount(document.getElementById('full'), { mode: 'full', title: '时钟 Dev' });
+
+      // 简单的 HMR 处理：在模块热替换时卸载旧挂载
+      if (import.meta.hot) {
+        import.meta.hot.dispose(() => {
+          try { typeof unmountIcon === 'function' && unmountIcon(); } catch {}
+          try { typeof unmountFull === 'function' && unmountFull(); } catch {}
+        });
+      }
+    </script>
+  </body>
+  </html>

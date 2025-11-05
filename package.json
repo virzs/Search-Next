@@ -37,18 +37,18 @@
     "react-sticky-box": "^2.0.5",
     "remixicon": "^4.6.0",
     "tailwindcss": "^4.1.4",
-    "zs_library": "^0.6.18"
+    "zs_library": "^0.6.21"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.0",
+    "dotenv-cli": "^7.4.3",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "dotenv-cli": "^7.4.3",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^7.1.12"
