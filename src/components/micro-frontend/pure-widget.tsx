@@ -25,7 +25,9 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
         // 某些打包后的库可能引用 Node 的 process 变量，运行时为其提供最小 polyfill
         try {
           (globalThis as any).process = (globalThis as any).process || { env: {} };
-        } catch {}
+        } catch {
+          /* empty */
+        }
         // 构建绝对 URL，确保在 dev 模式下从 public 正确加载
         const toAbsUrl = (entry: string) => {
           if (!entry) return entry;
@@ -37,14 +39,37 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
 
         const abs = toAbsUrl(String(config.entry));
 
+        // 为跨源小组件注入对应 Vite HMR 客户端，让 import.meta.hot 正常工作
+        try {
+          const u = new URL(abs);
+          const clientUrl = `${u.protocol}//${u.host}/@vite/client`;
+          try {
+            await import(/* @vite-ignore */ clientUrl);
+          } catch {
+            /* empty */
+          }
+          try {
+            await new Function("u", "return import(u)")(clientUrl);
+          } catch {
+            /* empty */
+          }
+        } catch {
+          /* empty */
+        }
+
         // 动态导入外部 ESM（来自 public），避免 Vite 静态分析和路径重写
         let mod: any;
         try {
           mod = await import(/* @vite-ignore */ abs);
-        } catch (err) {
-          // 某些构建链路可能移除了 vite-ignore 注释，尝试运行时动态导入回退
-          mod = await new Function("u", "return import(u)")(abs);
+        } catch {
+          /* empty */
         }
+        try {
+          mod = await new Function("u", "return import(u)")(abs);
+        } catch {
+          /* empty */
+        }
+
         const mount = (mod?.mount || mod?.default) as (
           el: HTMLElement,
           props?: Record<string, unknown>
@@ -69,9 +94,11 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
     return () => {
       try {
         cleanup?.();
-      } catch {}
+      } catch {
+        /* empty */
+      }
     };
-  }, [config.entry]);
+  }, [config.entry, config.mode, config.props]);
 
   if (error) {
     return (
