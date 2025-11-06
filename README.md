@@ -3,7 +3,7 @@
 ![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
 
 ```
-公共组件库 🎉    公共后端接口 🚧    公共后台 🚧    第三方组件库 ⏳
+公共组件库 🎉    公共后端接口 🎉    公共后台 🎉    第三方组件库 ⏳
       |                  |                  |                  |
       |                  |                  |                  |
       +------------------+------------------+------------------+
