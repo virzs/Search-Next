@@ -151,7 +151,8 @@ function Index() {
         widgetConfig: {
           id: "clock",
           name: "时钟",
-          entry: "/widgets/clock/index.js",
+          // entry:  "/widgets/clock/index.js",
+          entry: "http://localhost:3002/src/index.jsx",
           props: { title: "时钟小组件" },
         },
       },
@@ -207,7 +208,6 @@ function Index() {
               defaultSizeId: "2x1",
               allowShare: false,
               allowInfo: false,
-              allowContextMenu: true,
               allowDelete: true,
               allowResize: true,
             },
