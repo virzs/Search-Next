@@ -21,7 +21,7 @@
     "@dicebear/core": "^9.2.4",
     "@emotion/css": "^11.13.5",
     "@radix-ui/themes": "^3.2.1",
-    "@remixicon/react": "^4.6.0",
+    "@remixicon/react": "^4.7.0",
     "@tailwindcss/vite": "^4.1.4",
     "ahooks": "^3.8.4",
     "antd": "^5.24.9",
@@ -35,8 +35,8 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-router": "^7.9.4",
     "react-sticky-box": "^2.0.5",
-    "remixicon": "^4.6.0",
-    "tailwindcss": "^4.1.4",
+    "remixicon": "^4.7.0",
+    "tailwindcss": "^4.1.17",
     "zs_library": "^0.6.22"
   },
   "devDependencies": {

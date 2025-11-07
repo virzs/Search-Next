@@ -24,8 +24,8 @@ importers:
         specifier: ^3.2.1
         version: 3.2.1(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@remixicon/react':
-        specifier: ^4.6.0
-        version: 4.6.0(react@19.2.0)
+        specifier: ^4.7.0
+        version: 4.7.0(react@19.2.0)
       '@tailwindcss/vite':
         specifier: ^4.1.4
         version: 4.1.4(vite@7.1.12(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)(yaml@2.8.0))
@@ -66,14 +66,14 @@ importers:
         specifier: ^2.0.5
         version: 2.0.5(react@19.2.0)
       remixicon:
-        specifier: ^4.6.0
-        version: 4.6.0
+        specifier: ^4.7.0
+        version: 4.7.0
       tailwindcss:
-        specifier: ^4.1.4
-        version: 4.1.4
+        specifier: ^4.1.17
+        version: 4.1.17
       zs_library:
         specifier: ^0.6.22
-        version: 0.6.22(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3)
+        version: 0.6.22(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.22.0
@@ -1996,8 +1996,8 @@ packages:
   '@remirror/core-constants@3.0.0':
     resolution: {integrity: sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==}
 
-  '@remixicon/react@4.6.0':
-    resolution: {integrity: sha512-bY56maEgT5IYUSRotqy9h03IAKJC85vlKtWFg2FKzfs8JPrkdBAYSa9dxoUSKFwGzup8Ux6vjShs9Aec3jvr2w==}
+  '@remixicon/react@4.7.0':
+    resolution: {integrity: sha512-ODBQjdbOjnFguCqctYkpDjERXOInNaBnRPDKfZOBvbzExBAwr2BaH/6AHFTg/UAFzBDkwtylfMT8iKPAkLwPLQ==}
     peerDependencies:
       react: '>=18.2.0'
 
@@ -5051,8 +5051,8 @@ packages:
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
 
-  remixicon@4.6.0:
-    resolution: {integrity: sha512-bKM5odjqE1yzVxEZGJE7F79WHhNrJFIKHXR+GG+P1IWXn8AnJZhl8SbIRDJsNAvIqx4VPkNwjuHfc42tutMDpQ==}
+  remixicon@4.7.0:
+    resolution: {integrity: sha512-g2pHOofQWARWpxdbrQu5+K3C8ZbqguQFzE54HIMWFCpFa63pumaAltIgZmFMRQpKKBScRWQASQfWxS9asNCcHQ==}
 
   require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
@@ -5294,6 +5294,9 @@ packages:
     resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
+
+  tailwindcss@4.1.17:
+    resolution: {integrity: sha512-j9Ee2YjuQqYT9bbRTfTZht9W/ytp5H+jJpZKiYdP/bpnXARAuELt9ofP0lPnmHjbga7SNQIxdTAXCmtKVYjN+Q==}
 
   tailwindcss@4.1.4:
     resolution: {integrity: sha512-1ZIUqtPITFbv/DxRmDr5/agPqJwF69d24m9qmM1939TJehgY539CtzeZRjbLt5G6fSy/7YqqYsfvoTEw9xUI2A==}
@@ -7992,7 +7995,7 @@ snapshots:
 
   '@remirror/core-constants@3.0.0': {}
 
-  '@remixicon/react@4.6.0(react@19.2.0)':
+  '@remixicon/react@4.7.0(react@19.2.0)':
     dependencies:
       react: 19.2.0
 
@@ -8236,13 +8239,13 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.4
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.4
 
-  '@tailwindcss/typography@0.5.16(tailwindcss@4.1.4)':
+  '@tailwindcss/typography@0.5.16(tailwindcss@4.1.17)':
     dependencies:
       lodash.castarray: 4.4.0
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 4.1.4
+      tailwindcss: 4.1.17
 
   '@tailwindcss/vite@4.1.4(vite@7.1.12(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)(yaml@2.8.0))':
     dependencies:
@@ -11680,7 +11683,7 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
 
-  remixicon@4.6.0: {}
+  remixicon@4.7.0: {}
 
   require-from-string@2.0.2: {}
 
@@ -11919,9 +11922,11 @@ snapshots:
 
   tailwind-merge@2.6.0: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@4.1.4):
+  tailwindcss-animate@1.0.7(tailwindcss@4.1.17):
     dependencies:
-      tailwindcss: 4.1.4
+      tailwindcss: 4.1.17
+
+  tailwindcss@4.1.17: {}
 
   tailwindcss@4.1.4: {}
 
@@ -12255,7 +12260,7 @@ snapshots:
     dependencies:
       tslib: 2.3.0
 
-  zs_library@0.6.22(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.4)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3):
+  zs_library@0.6.22(@codemirror/language@6.11.0)(@lezer/highlight@1.2.1)(@mantine/hooks@7.17.5(react@19.2.0))(@tiptap/extension-code-block@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(@types/sortablejs@1.15.8)(framer-motion@12.12.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)(typescript@5.7.3)(yjs@13.6.26)(zod@3.24.3):
     dependencies:
       '@ai-sdk/react': 1.2.9(react@19.2.0)(zod@3.24.3)
       '@emotion/css': 11.13.5
@@ -12270,8 +12275,8 @@ snapshots:
       '@radix-ui/react-separator': 1.1.6(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@radix-ui/react-slot': 1.2.3(@types/react@19.1.2)(react@19.2.0)
       '@radix-ui/react-tooltip': 1.2.6(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      '@remixicon/react': 4.6.0(react@19.2.0)
-      '@tailwindcss/typography': 0.5.16(tailwindcss@4.1.4)
+      '@remixicon/react': 4.7.0(react@19.2.0)
+      '@tailwindcss/typography': 0.5.16(tailwindcss@4.1.17)
       '@tiptap/core': 2.11.7(@tiptap/pm@2.11.7)
       '@tiptap/html': 2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7)
       '@tiptap/pm': 2.11.7
@@ -12312,12 +12317,12 @@ snapshots:
       rehype-raw: 7.0.0
       remark-emoji: 5.0.1
       remark-gfm: 4.0.1
-      remixicon: 4.6.0
+      remixicon: 4.7.0
       slick-carousel: 1.8.1(jquery@3.7.1)
       sonner: 1.7.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       sortablejs: 1.15.6
       tailwind-merge: 2.6.0
-      tailwindcss-animate: 1.0.7(tailwindcss@4.1.4)
+      tailwindcss-animate: 1.0.7(tailwindcss@4.1.17)
       tiptap-markdown: 0.8.10(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))
       use-debounce: 10.0.4(react@19.2.0)
       uuid: 11.1.0
