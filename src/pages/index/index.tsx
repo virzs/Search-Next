@@ -7,7 +7,7 @@ import StoreModal from "./components/default-apps/store";
 import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
 // import SearchWithAI from "../../components/ai-search";
-import { Spin } from "antd";
+import { App, Spin } from "antd";
 import { getDefaultUserConfig } from "@/services/desktop";
 import { DESKTOP_LIST_MODIFIED_STORAGE_KEY, DESKTOP_LIST_STORAGE_KEY } from "@/utils/storage";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,10 +15,12 @@ import { useConfig } from "@/hooks/useConfig";
 import AccountModal from "./components/default-apps/account";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
+import { v4 as uuidv4 } from "uuid";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
 
+  const { message } = App.useApp();
   const { avatarSrc, coverGradientCss } = useAuth();
   const { userLimit } = useConfig();
 
@@ -182,6 +184,25 @@ function Index() {
     }
   }, []);
 
+  const handleAddWebsite = (site: any) => {
+    const name = site?.name;
+    const url = site?.url;
+    const icon = site?.icon?.url;
+    if (!url) return;
+    const appItem = {
+      id: uuidv4(),
+      type: "app",
+      data: {
+        name,
+        icon,
+        url,
+      },
+    };
+    const currentPage = desktopRef.current?.state?.currentSliderPage;
+    desktopRef.current?.state.addItem(appItem as any, currentPage ? [currentPage?.id] : []);
+    message.success("添加成功");
+  };
+
   return (
     <div
       className={cx(
@@ -291,6 +312,7 @@ function Index() {
         onClose={() => {
           toggleStore();
         }}
+        onAddWebsite={handleAddWebsite}
       />
       <Settings open={settingsOpen} onClose={toggleSettings} />
       <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />

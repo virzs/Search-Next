@@ -22,10 +22,11 @@ interface StoreModalProps {
   open: boolean;
   onClose: () => void;
   onAddWidget?: (widgetId: string) => void;
+  onAddWebsite?: (site: any) => void;
 }
 
 const StoreModal: FC<StoreModalProps> = (props) => {
-  const { open, onClose, onAddWidget } = props;
+  const { open, onClose, onAddWidget, onAddWebsite } = props;
 
   const responsive = useResponsive();
 
@@ -34,8 +35,8 @@ const StoreModal: FC<StoreModalProps> = (props) => {
   const [activeMenu, setActiveMenu] = useState("website");
 
   const body = (
-    <div className="flex gap-2 w-full overflow-hidden">
-      <div className="w-32 shrink-0">
+    <div className="flex gap-2 w-full h-full max-h-[60vh] overflow-hidden">
+      <div className="w-48 shrink-0">
         <Menu
           mode="inline"
           selectedKeys={[activeMenu]}
@@ -54,10 +55,16 @@ const StoreModal: FC<StoreModalProps> = (props) => {
           ]}
         />
       </div>
-      <div className="grow w-0">
-        <motion.div key={activeMenu} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="grow w-0 h-full max-h-[60vh]">
+        <motion.div
+          className="h-full max-h-[60vh]"
+          key={activeMenu}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
           <Suspense fallback={<div>Loading...</div>}>
-            {activeMenu === "website" && <WebsiteView />}
+            {activeMenu === "website" && <WebsiteView onAddWebsite={onAddWebsite} />}
             {activeMenu === "widget" && <WidgetView onAddWidget={onAddWidget} />}
           </Suspense>
         </motion.div>
@@ -79,7 +86,7 @@ const StoreModal: FC<StoreModalProps> = (props) => {
   );
 
   const modal = (
-    <DesktopBaseModal visible={open} onClose={onClose}>
+    <DesktopBaseModal visible={open} width={1000} onClose={onClose}>
       {body}
     </DesktopBaseModal>
   );

@@ -37,6 +37,7 @@
     "react-sticky-box": "^2.0.5",
     "remixicon": "^4.7.0",
     "tailwindcss": "^4.1.17",
+    "uuid": "^13.0.0",
     "zs_library": "^0.6.22"
   },
   "devDependencies": {

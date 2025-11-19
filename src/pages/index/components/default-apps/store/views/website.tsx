@@ -1,71 +1,63 @@
 import { useRequest } from "ahooks";
-import { Button, Input, Tabs } from "antd";
-import { getTabsWebsiteClassify } from "@/services/website";
-import { DesktopAppItem, DesktopGroupItem } from "zs_library";
-import { RiArrowDropRightLine } from "@remixicon/react";
+import { useState, useMemo } from "react";
+import { Card, Empty, Image, Pagination } from "antd";
+import { getTabsWebsitePublic } from "@/services/website";
 
-const WebsiteView = () => {
-  const { data } = useRequest(getTabsWebsiteClassify);
+interface WebsiteViewProps {
+  onAddWebsite?: (site: any) => void;
+}
+
+const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite }) => {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  const { data, loading, run } = useRequest(getTabsWebsitePublic, {
+    defaultParams: [
+      {
+        page,
+        pageSize,
+      },
+    ],
+  });
+
+  const items = useMemo(() => (data?.data as any[]) || [], [data]);
+  const total = useMemo(() => (data as any)?.total ?? (data as any)?.count ?? 0, [data]);
 
   return (
-    <div className="overflow-y-auto">
-      <Tabs
-        size="small"
-        type="card"
-        tabBarExtraContent={{
-          right: <Input.Search placeholder="搜索" allowClear />,
-        }}
-        defaultActiveKey="1"
-        style={{ height: 220 }}
-        items={(data ?? [])
-          .filter((i) => i.children?.length > 0)
-          .map((_, i) => {
-            const id = String(i);
-            return {
-              label: _.name,
-              key: _._id,
-              children: (
-                <div>
-                  {_.children
-                    ?.filter((i) => i.websites?.length > 0)
-                    .map((k) => (
-                      <div key={k._id}>
-                        <div className="mb-4 text-lg flex items-center justify-between">
-                          {k.name}
-                          <Button
-                            icon={<RiArrowDropRightLine size={16} />}
-                            iconPosition="end"
-                            type="dashed"
-                            size="small"
-                          >
-                            更多
-                          </Button>
-                        </div>
-                        <div className="relative flex flex-wrap gap-2">
-                          {k.websites?.map((x, q) => (
-                            <DesktopAppItem
-                              data={{
-                                id: x._id,
-                                data: {
-                                  name: x.name,
-                                  icon: x.icon?.url,
-                                },
-                                config: {
-                                  allowResize: false,
-                                  allowContextMenu: false,
-                                },
-                              }}
-                              itemIndex={q}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ),
-            };
-          })}
-      />
+    <div className="h-full max-h-[60vh] flex flex-col">
+      <div className="grid gap-3 grid-cols-3 overflow-y-auto flex-1">
+        {items.map((item: any) => (
+          <Card key={item._id ?? item.id ?? item.name} hoverable onClick={() => onAddWebsite?.(item)}>
+            <div className="flex items-center gap-2">
+              <div className="shrink-0">
+                <Image className="w-10! h-10!" src={item.icon?.url} preview={false} />
+              </div>
+              <span className="line-clamp-1">{item.name}</span>
+            </div>
+          </Card>
+        ))}
+        {items.length === 0 && <Empty description="暂无数据" />}
+      </div>
+
+      <div className="flex items-center justify-end py-4 shrink-0">
+        <Pagination
+          size="small"
+          current={page}
+          pageSize={pageSize}
+          total={total}
+          showSizeChanger
+          pageSizeOptions={[10, 20, 40, 80]}
+          onChange={(p, ps) => {
+            setPage(p);
+            if (ps !== pageSize) setPageSize(ps);
+            run({
+              page: p,
+              pageSize: ps,
+            });
+          }}
+          disabled={loading}
+        />
+      </div>
     </div>
   );
 };
