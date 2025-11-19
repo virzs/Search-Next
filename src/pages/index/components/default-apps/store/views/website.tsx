@@ -1,6 +1,6 @@
 import { useRequest } from "ahooks";
 import { useState, useMemo } from "react";
-import { Card, Empty, Image, Pagination } from "antd";
+import { Card, Empty, Image, Pagination, Button, Modal, Form, Input } from "antd";
 import { getTabsWebsitePublic } from "@/services/website";
 
 interface WebsiteViewProps {
@@ -10,6 +10,8 @@ interface WebsiteViewProps {
 const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [addVisible, setAddVisible] = useState(false);
+  const [form] = Form.useForm();
 
   const { data, loading, run } = useRequest(getTabsWebsitePublic, {
     defaultParams: [
@@ -25,6 +27,11 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite }) => {
 
   return (
     <div className="h-full max-h-[60vh] flex flex-col">
+      <div className="flex items-center justify-end py-2 shrink-0">
+        <Button type="primary" onClick={() => setAddVisible(true)}>
+          新增网站
+        </Button>
+      </div>
       <div className="grid gap-3 grid-cols-3 overflow-y-auto flex-1">
         {items.map((item: any) => (
           <Card key={item._id ?? item.id ?? item.name} hoverable onClick={() => onAddWebsite?.(item)}>
@@ -58,6 +65,39 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite }) => {
           disabled={loading}
         />
       </div>
+      <Modal zIndex={2001}
+        open={addVisible}
+        title="新增网站"
+        onCancel={() => setAddVisible(false)}
+        onOk={() => form.submit()}
+        okText="添加"
+        destroyOnClose
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={(values) => {
+            const site = {
+              name: values.name,
+              url: values.url,
+              icon: values.iconUrl ? { url: values.iconUrl } : undefined,
+            };
+            onAddWebsite?.(site);
+            setAddVisible(false);
+            form.resetFields();
+          }}
+        >
+          <Form.Item name="name" label="名称" rules={[{ required: true }]}>
+            <Input placeholder="例如：我的常用站点" />
+          </Form.Item>
+          <Form.Item name="url" label="网址" rules={[{ required: true, type: "url" }]}>
+            <Input placeholder="例如：https://example.com" />
+          </Form.Item>
+          <Form.Item name="iconUrl" label="图标URL" rules={[{ type: "url" }]}>
+            <Input placeholder="例如：https://example.com/icon.png" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
