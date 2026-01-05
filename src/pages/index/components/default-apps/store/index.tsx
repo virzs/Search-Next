@@ -123,28 +123,6 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
       color: var(--store-primary-text) !important;
     }
 
-    .ant-segmented {
-      background: var(--store-bg-card) !important;
-      border: 1px solid var(--store-border) !important;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 9999px !important;
-      padding: 4px !important;
-    }
-    .ant-segmented-item {
-      border-radius: 9999px !important;
-    }
-    .ant-segmented-item-label {
-      color: var(--store-text-secondary) !important;
-      font-size: 13px !important;
-    }
-    .ant-segmented-item-selected {
-      background: rgba(0, 0, 0, 0.06) !important;
-    }
-    .ant-segmented-item-selected .ant-segmented-item-label {
-      color: var(--store-text-primary) !important;
-    }
-
     .ant-drawer-content {
       background: var(--store-bg-glass) !important;
       backdrop-filter: blur(24px);

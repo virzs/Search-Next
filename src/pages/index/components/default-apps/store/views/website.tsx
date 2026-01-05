@@ -1,12 +1,13 @@
 import { useRequest } from "ahooks";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Empty, Form, Modal, Pagination, Segmented, Input } from "antd";
+import { Button, Empty, Form, Modal, Pagination, Input } from "antd";
 import { getTabsWebsitePublic } from "@/services/website";
 import { RiArrowLeftLine } from "@remixicon/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildCategoriesFromItems, fallbackCategories, getWebsiteId } from "../utils";
 import StoreHeroCard from "../components/StoreHeroCard";
 import WebsiteCard from "../components/WebsiteCard";
+import StoreSegmented from "../components/StoreSegmented";
 import WebsiteDetailView from "./WebsiteDetailView";
 
 interface WebsiteViewProps {
@@ -188,11 +189,11 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
         }`}
       >
         <div className="shrink-0 flex items-center justify-between gap-3 px-1">
-          <Segmented
+          <StoreSegmented
             options={viewOptions}
             value={activeView}
             onChange={handleViewChange}
-            className="max-w-full overflow-auto bg-(--store-border)!"
+            className="max-w-full overflow-auto"
           />
           <Button
             type="primary"
