@@ -2,15 +2,18 @@ import { RiAppsLine, RiAppsFill, RiLinksLine, RiLinksFill, RiSearchLine } from "
 import { Input, Menu } from "antd";
 import { FC } from "react";
 import { css } from "@emotion/css";
+import { useStoreNavigate, useStoreLocation } from "../context/router";
 
 interface SidebarProps {
-  activeMenu: string;
-  setActiveMenu: (key: string) => void;
   query: string;
   setQuery: (query: string) => void;
 }
 
-const Sidebar: FC<SidebarProps> = ({ activeMenu, setActiveMenu, query, setQuery }) => {
+const Sidebar: FC<SidebarProps> = ({ query, setQuery }) => {
+  const navigate = useStoreNavigate();
+  const location = useStoreLocation();
+  const activeMenu = location.pathname.startsWith("/widget") ? "widget" : "website";
+
   const menuClassName = css`
     &.ant-menu {
       background: transparent !important;
@@ -82,7 +85,7 @@ const Sidebar: FC<SidebarProps> = ({ activeMenu, setActiveMenu, query, setQuery 
         <Menu
           mode="inline"
           selectedKeys={[activeMenu]}
-          onClick={({ key }) => setActiveMenu(key)}
+          onClick={({ key }) => navigate(`/${key}`)}
           className={menuClassName}
           items={[
             {

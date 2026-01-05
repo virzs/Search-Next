@@ -13,9 +13,10 @@ interface WebsiteViewProps {
   onAddWebsite?: (site: any) => void;
   query?: string;
   antdScopeClassName?: string;
+  active?: boolean;
 }
 
-const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScopeClassName }) => {
+const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScopeClassName, active = true }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
@@ -50,6 +51,11 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
       setFeaturedRoute({ type: "home" });
     }
   }, [query]);
+
+  useEffect(() => {
+    if (active) return;
+    setDetailItem(null);
+  }, [active]);
 
   const featuredItems = useMemo(() => (featuredData?.data as any[]) || [], [featuredData]);
   const listItems = useMemo(() => (listData?.data as any[]) || [], [listData]);
@@ -101,6 +107,7 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
     const v = String(value);
     setActiveView(v);
     setPage(1);
+    setDetailItem(null);
     if (v !== "featured") setFeaturedRoute({ type: "home" });
   };
 

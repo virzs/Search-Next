@@ -2,11 +2,12 @@ import { configResponsive, useResponsive } from "ahooks";
 import { Drawer } from "antd";
 import { css, cx } from "@emotion/css";
 import { motion } from "framer-motion";
-import { FC, Suspense, useState } from "react";
+import { FC, Suspense, useState, ReactNode } from "react";
 import WebsiteView from "./views/website";
 import WidgetView from "./views/widget";
 import Sidebar from "./components/Sidebar";
 import { DesktopBaseModal } from "zs_library";
+import { StoreMemoryRouter, useStoreLocation } from "./context/router";
 
 /**
  * 配置响应式断点 hooks
@@ -27,16 +28,40 @@ interface StoreModalProps {
   onAddWebsite?: (site: any) => void;
 }
 
-const StoreModal: FC<StoreModalProps> = (props) => {
-  const { open, onClose, onAddWidget, onAddWebsite } = props;
+const CachedRoutes: FC<{
+  children: ReactNode;
+}> = ({ children }) => {
+  return <>{children}</>;
+};
 
+const CachedRoute: FC<{
+  path: string;
+  children: ReactNode;
+}> = ({ path, children }) => {
+  const location = useStoreLocation();
+  const isActive = location.pathname.startsWith(path);
+
+  return (
+    <div
+      style={{
+        display: isActive ? "block" : "none",
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const StoreModalContent: FC<StoreModalProps> = (props) => {
+  const { onAddWidget, onAddWebsite } = props;
   const responsive = useResponsive();
-
   const { lg, xl, xxl } = responsive ?? {};
   const isDesktop = !!(lg || xl || xxl);
-
-  const [activeMenu, setActiveMenu] = useState("website");
   const [query, setQuery] = useState("");
+  const location = useStoreLocation();
+  const isWebsiteActive = location.pathname.startsWith("/website");
 
   const antdScopeClassName = css`
     --store-bg-glass: rgba(255, 255, 255, 0.72);
@@ -138,7 +163,7 @@ const StoreModal: FC<StoreModalProps> = (props) => {
     }
   `;
 
-  const body = (
+  return (
     <div
       className={cx(
         antdScopeClassName,
@@ -146,23 +171,31 @@ const StoreModal: FC<StoreModalProps> = (props) => {
       )}
     >
       <div className="flex h-full w-full overflow-hidden backdrop-blur-3xl">
-        <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} query={query} setQuery={setQuery} />
+        <Sidebar query={query} setQuery={setQuery} />
 
         <main className="flex h-full w-0 grow flex-col gap-5 overflow-hidden">
           <div className="h-full w-full overflow-hidden">
             <motion.div
               className="h-full w-full"
-              key={activeMenu}
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
               <Suspense fallback={<div className="p-6 text-sm text-gray-500">Loading...</div>}>
-                {activeMenu === "website" && (
-                  <WebsiteView query={query} onAddWebsite={onAddWebsite} antdScopeClassName={antdScopeClassName} />
-                )}
-                {activeMenu === "widget" && <WidgetView query={query} onAddWidget={onAddWidget} />}
+                <CachedRoutes>
+                  <CachedRoute path="/website">
+                    <WebsiteView
+                      active={isWebsiteActive}
+                      query={query}
+                      onAddWebsite={onAddWebsite}
+                      antdScopeClassName={antdScopeClassName}
+                    />
+                  </CachedRoute>
+                  <CachedRoute path="/widget">
+                    <WidgetView query={query} onAddWidget={onAddWidget} />
+                  </CachedRoute>
+                </CachedRoutes>
               </Suspense>
             </motion.div>
           </div>
@@ -170,6 +203,13 @@ const StoreModal: FC<StoreModalProps> = (props) => {
       </div>
     </div>
   );
+};
+
+const StoreModal: FC<StoreModalProps> = (props) => {
+  const { open, onClose } = props;
+  const responsive = useResponsive();
+  const { lg, xl, xxl } = responsive ?? {};
+  const isDesktop = !!(lg || xl || xxl);
 
   const containerProps = {
     title: "应用商店",
@@ -178,14 +218,14 @@ const StoreModal: FC<StoreModalProps> = (props) => {
     onCancel: onClose,
   };
 
+  const body = (
+    <StoreMemoryRouter initialEntries={["/website"]}>
+      <StoreModalContent {...props} />
+    </StoreMemoryRouter>
+  );
+
   const drawer = (
-    <Drawer
-      placement="bottom"
-      height="100vh"
-      {...containerProps}
-      rootClassName={antdScopeClassName}
-      styles={{ body: { padding: 0 } }}
-    >
+    <Drawer placement="bottom" height="100vh" {...containerProps} styles={{ body: { padding: 0 } }}>
       {body}
     </Drawer>
   );
