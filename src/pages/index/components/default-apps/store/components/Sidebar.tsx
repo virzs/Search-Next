@@ -32,7 +32,7 @@ const Sidebar: FC<SidebarProps> = ({ query, setQuery }) => {
 
       &:hover {
         background-color: var(--store-border) !important;
-        color: var(--store-text-primary) !important;
+        /* color: var(--store-text-primary) !important; */
       }
 
       &:active {
@@ -40,9 +40,9 @@ const Sidebar: FC<SidebarProps> = ({ query, setQuery }) => {
       }
 
       &.ant-menu-item-selected {
-        background-color: rgba(0, 0, 0, 0.06) !important;
-        color: var(--store-primary) !important;
-        font-weight: 600;
+        /* background-color: rgba(0, 0, 0, 0.06) !important; */
+        /* color: var(--store-primary) !important; */
+        /* font-weight: 600; */
       }
 
       .ant-menu-item-icon {
@@ -58,7 +58,7 @@ const Sidebar: FC<SidebarProps> = ({ query, setQuery }) => {
       }
 
       &.ant-menu-item-selected .ant-menu-item-icon {
-        color: var(--store-primary);
+        /* color: var(--store-primary); */
       }
     }
   `;
