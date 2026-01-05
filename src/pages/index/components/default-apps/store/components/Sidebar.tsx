@@ -1,6 +1,7 @@
-import { RiAppsLine, RiLinksLine, RiSearchLine } from "@remixicon/react";
-import { Input } from "antd";
+import { RiAppsLine, RiAppsFill, RiLinksLine, RiLinksFill, RiSearchLine } from "@remixicon/react";
+import { Input, Menu } from "antd";
 import { FC } from "react";
+import { css } from "@emotion/css";
 
 interface SidebarProps {
   activeMenu: string;
@@ -10,6 +11,55 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ activeMenu, setActiveMenu, query, setQuery }) => {
+  const menuClassName = css`
+    &.ant-menu {
+      background: transparent !important;
+      border-inline-end: 0 !important;
+    }
+
+    .ant-menu-item {
+      margin-inline: 0 !important;
+      margin-bottom: 2px !important;
+      border-radius: 0.75rem !important; /* rounded-xl */
+      height: 44px !important;
+      line-height: 44px !important;
+      padding-inline: 12px !important;
+      color: var(--store-text-secondary) !important;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+
+      &:hover {
+        background-color: var(--store-border) !important;
+        color: var(--store-text-primary) !important;
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+
+      &.ant-menu-item-selected {
+        background-color: rgba(0, 0, 0, 0.06) !important;
+        color: var(--store-primary) !important;
+        font-weight: 600;
+      }
+
+      .ant-menu-item-icon {
+        font-size: 20px !important;
+        min-width: 20px !important;
+        margin-inline-end: 12px !important;
+        color: var(--store-text-tertiary);
+        transition: color 0.2s;
+      }
+
+      &:hover .ant-menu-item-icon {
+        color: var(--store-text-secondary);
+      }
+
+      &.ant-menu-item-selected .ant-menu-item-icon {
+        color: var(--store-primary);
+      }
+    }
+  `;
+
   return (
     <aside className="w-64 shrink-0 border-r border-(--store-border) pr-4 backdrop-blur-xl flex flex-col h-full">
       <div className="px-2 pt-1 pb-4">
@@ -29,36 +79,24 @@ const Sidebar: FC<SidebarProps> = ({ activeMenu, setActiveMenu, query, setQuery 
       </div>
 
       <div className="flex-1 overflow-y-auto px-2">
-        <div className="space-y-1">
-          <button
-            onClick={() => setActiveMenu("website")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-              activeMenu === "website"
-                ? "bg-(--store-primary-bg) text-(--store-primary)"
-                : "text-(--store-text-secondary) hover:bg-(--store-border)"
-            }`}
-          >
-            <RiLinksLine
-              size={20}
-              className={activeMenu === "website" ? "text-(--store-primary)" : "text-(--store-text-tertiary)"}
-            />
-            <span>网站</span>
-          </button>
-          <button
-            onClick={() => setActiveMenu("widget")}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-              activeMenu === "widget"
-                ? "bg-(--store-primary-bg) text-(--store-primary)"
-                : "text-(--store-text-secondary) hover:bg-(--store-border)"
-            }`}
-          >
-            <RiAppsLine
-              size={20}
-              className={activeMenu === "widget" ? "text-(--store-primary)" : "text-(--store-text-tertiary)"}
-            />
-            <span>小组件</span>
-          </button>
-        </div>
+        <Menu
+          mode="inline"
+          selectedKeys={[activeMenu]}
+          onClick={({ key }) => setActiveMenu(key)}
+          className={menuClassName}
+          items={[
+            {
+              key: "website",
+              icon: activeMenu === "website" ? <RiLinksFill size={20} /> : <RiLinksLine size={20} />,
+              label: "网站",
+            },
+            {
+              key: "widget",
+              icon: activeMenu === "widget" ? <RiAppsFill size={20} /> : <RiAppsLine size={20} />,
+              label: "小组件",
+            },
+          ]}
+        />
       </div>
 
       <div className="mt-auto px-4 py-4 text-xs text-(--store-text-tertiary) text-center">
