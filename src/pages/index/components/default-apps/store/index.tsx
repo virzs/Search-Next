@@ -73,9 +73,6 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
     --store-text-primary: #111827;
     --store-text-secondary: #6b7280;
     --store-text-tertiary: #9ca3af;
-    --store-primary: #3b82f6;
-    --store-primary-bg: #eff6ff;
-    --store-primary-text: #2563eb;
 
     .ant-input-affix-wrapper {
       background: var(--store-bg-card) !important;
@@ -88,7 +85,6 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
     }
     .ant-input-affix-wrapper:focus,
     .ant-input-affix-wrapper-focused {
-      border-color: var(--store-primary) !important;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
     }
     .ant-input {
@@ -113,14 +109,11 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
       -webkit-backdrop-filter: blur(14px);
     }
     .ant-pagination-item-active {
-      background: var(--store-primary-bg) !important;
-      border-color: var(--store-primary) !important;
     }
     .ant-pagination-item a {
       color: var(--store-text-primary) !important;
     }
     .ant-pagination-item-active a {
-      color: var(--store-primary-text) !important;
     }
 
     .ant-drawer-content {
