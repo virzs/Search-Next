@@ -5,7 +5,7 @@ import BackupView from "./views/backup";
 import { RiInbox2Fill, RiUserFill } from "@remixicon/react";
 // import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { isMobileDevice } from "@/utils/utils";
-import AppSidebar from "../../../../../components/app/sidebar";
+import { AppSidebar } from "@/components";
 // import AboutView from "./views/about";
 // import LanguageView from "./views/language";
 // import ThirdPartyView from "./views/third-party";

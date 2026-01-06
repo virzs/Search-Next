@@ -8,7 +8,7 @@ import WebsiteView from "./views/website";
 import WidgetView from "./views/widget";
 import { DesktopBaseModal } from "zs_library";
 import { StoreMemoryRouter, useStoreLocation, useStoreNavigate } from "./context/router";
-import AppSidebar from "../../../../../components/app/sidebar";
+import { AppSidebar } from "@/components";
 
 /**
  * 配置响应式断点 hooks
