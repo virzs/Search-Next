@@ -1,11 +1,14 @@
-import { Tabs } from "antd";
 import { FC, useState } from "react";
 import { DesktopBaseModal, DesktopBaseDrawer } from "zs_library";
 import AccountView from "./views/account";
 import BackupView from "./views/backup";
 import { RiInbox2Fill, RiUserFill } from "@remixicon/react";
+// import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { isMobileDevice } from "@/utils/utils";
-import { css, cx } from "@emotion/css";
+import AppSidebar from "../../../../../components/app/sidebar";
+// import AboutView from "./views/about";
+// import LanguageView from "./views/language";
+// import ThirdPartyView from "./views/third-party";
 
 interface SettingsProps {
   open: boolean;
@@ -15,80 +18,56 @@ interface SettingsProps {
 const SettingsView = () => {
   const [currentMenu, setCurrentMenu] = useState("account");
 
-  const tabItems = [
-    {
-      label: (
-        <span className="inline-flex items-center gap-1">
-          <RiUserFill size={16} />
-          账号
-        </span>
-      ),
-      key: "account",
-      children: <AccountView />,
-    },
-    // {
-    //   label: (
-    //     <span className="inline-flex items-center gap-1">
-    //       <RiKeyFill size={16} />
-    //       第三方服务
-    //     </span>
-    //   ),
-    //   key: "third-party",
-    //   children: <ThirdPartyView />,
-    // },
-    // {
-    //   label: (
-    //     <span className="inline-flex items-center gap-1">
-    //       <RiGlobalLine size={16} />
-    //       语言
-    //     </span>
-    //   ),
-    //   key: "language",
-    //   children: <LanguageView />,
-    // },
-    {
-      label: (
-        <span className="inline-flex items-center gap-1">
-          <RiInbox2Fill size={16} />
-          备份与恢复
-        </span>
-      ),
-      key: "backup",
-      children: <BackupView />,
-    },
-    // {
-    //   label: (
-    //     <span className="inline-flex items-center gap-1">
-    //       <RiInformationFill size={16} />
-    //       关于
-    //     </span>
-    //   ),
-    //   key: "about",
-    //   children: <AboutView />,
-    // },
-  ];
-
   return (
-    <Tabs
-      className={cx(
-        "h-[60vh]",
-        css`
-          .ant-tabs-content-holder {
-            overflow-y: auto;
-            .ant-tabs-content,
-            .ant-tabs-tabpane {
-              height: 100%;
-            }
-          }
-        `
-      )}
-      activeKey={currentMenu}
-      onChange={(key) => setCurrentMenu(key)}
-      tabPosition="left"
-      size="small"
-      destroyInactiveTabPane
-      items={tabItems}
-    />
+    <div className="h-[60vh] overflow-hidden flex">
+      <AppSidebar
+        header={
+          <>
+            <div className="text-xs font-medium tracking-wide mb-2">设置</div>
+            <div className="text-2xl font-bold tracking-tight">偏好</div>
+          </>
+        }
+        menuItems={[
+          {
+            key: "account",
+            label: "账号",
+            icon: <RiUserFill size={16} />,
+          },
+          // {
+          //   key: "third-party",
+          //   label: "第三方服务",
+          //   icon: <RiKeyFill size={16} />,
+          // },
+          // {
+          //   key: "language",
+          //   label: "语言",
+          //   icon: <RiGlobalLine size={16} />,
+          // },
+          {
+            key: "backup",
+            label: "备份与恢复",
+            icon: <RiInbox2Fill size={16} />,
+          },
+          // {
+          //   key: "about",
+          //   label: "关于",
+          //   icon: <RiInformationFill size={16} />,
+          // },
+        ]}
+        activeMenuKey={currentMenu}
+        onMenuSelect={setCurrentMenu}
+      />
+
+      <div className="h-full w-0 grow overflow-hidden">
+        <div className="h-full w-full overflow-y-auto">
+          {currentMenu === "account" ? <AccountView /> : null}
+          {/* {currentMenu === "third-party" ? <ThirdPartyView /> : null} */}
+          {/* {currentMenu === "language" ? <LanguageView /> : null} */}
+          {currentMenu === "backup" ? <BackupView /> : null}
+          {/* {currentMenu === "about" ? <AboutView /> : null} */}
+        </div>
+      </div>
+    </div>
   );
 };
 

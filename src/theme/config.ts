@@ -14,6 +14,10 @@ const theme: ThemeConfig = {
       activeBarBorderWidth: 0,
       itemMarginInline: 0,
       itemHeight: 36,
+      itemBorderRadius: 12,
+    },
+    Input: {
+      borderRadius: 12,
     },
     Segmented: {
     }
