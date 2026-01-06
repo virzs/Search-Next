@@ -1,26 +1,12 @@
-import { configResponsive, useResponsive } from "ahooks";
-import { Drawer } from "antd";
+import { useResponsive } from "ahooks";
 import { cx } from "@emotion/css";
 import { motion } from "framer-motion";
 import { FC, Suspense, useState, ReactNode } from "react";
 import { RiAppsFill, RiAppsLine, RiLinksFill, RiLinksLine, RiSearchLine } from "@remixicon/react";
 import WebsiteView from "./views/website";
 import WidgetView from "./views/widget";
-import { DesktopBaseModal } from "zs_library";
 import { StoreMemoryRouter, useStoreLocation, useStoreNavigate } from "./context/router";
-import { AppSidebar } from "@/components";
-
-/**
- * 配置响应式断点 hooks
- * 和 tailwindcss 的断点对应
- */
-configResponsive({
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-  xxl: 1536,
-});
+import { AppResponsiveOverlay, AppSidebar } from "@/components";
 
 interface StoreModalProps {
   open: boolean;
@@ -139,36 +125,19 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
 
 const StoreModal: FC<StoreModalProps> = (props) => {
   const { open, onClose } = props;
-  const responsive = useResponsive();
-  const { lg, xl, xxl } = responsive ?? {};
-  const isDesktop = !!(lg || xl || xxl);
 
-  const containerProps = {
-    title: "应用商店",
-    open,
-    footer: null,
-    onCancel: onClose,
-  };
-
-  const body = (
-    <StoreMemoryRouter initialEntries={["/website"]}>
-      <StoreModalContent {...props} />
-    </StoreMemoryRouter>
+  return (
+    <AppResponsiveOverlay
+      open={open}
+      onClose={onClose}
+      title="应用商店"
+      modalProps={{ width: 1180 }}
+    >
+      <StoreMemoryRouter initialEntries={["/website"]}>
+        <StoreModalContent {...props} />
+      </StoreMemoryRouter>
+    </AppResponsiveOverlay>
   );
-
-  const drawer = (
-    <Drawer placement="bottom" height="100vh" {...containerProps} styles={{ body: { padding: 0 } }}>
-      {body}
-    </Drawer>
-  );
-
-  const modal = (
-    <DesktopBaseModal visible={open} width={1180} onClose={onClose}>
-      {body}
-    </DesktopBaseModal>
-  );
-
-  return <>{isDesktop ? modal : drawer}</>;
 };
 
 export default StoreModal;
