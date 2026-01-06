@@ -7,7 +7,10 @@ interface SettingsViewContainerProps {
   className?: string;
 }
 
-const SettingsViewContainer = ({ children, className = "" }: SettingsViewContainerProps) => {
+const SettingsViewContainer = ({
+  children,
+  className = "",
+}: SettingsViewContainerProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -20,6 +23,7 @@ const SettingsViewContainer = ({ children, className = "" }: SettingsViewContain
         className={css`
           padding: 0;
           max-width: 100%;
+          height: 100%;
 
           /* iPadOS风格的间距 */
           & > * + * {

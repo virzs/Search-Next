@@ -8,14 +8,18 @@ const AccountView = () => {
 
   // 未登录视图
   const renderUnloggedView = () => (
-    <UnloggedView
-      mode="inline"
-      title="欢迎使用"
-      description="登录后可以同步您的数据和设置"
-      onLoginSuccess="show-account"
-      onRegisterSuccess="show-account"
-      showToggle={true}
-    />
+    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white/70 shadow-sm backdrop-blur-xl">
+      <div className="w-full max-w-[520px] py-10">
+        <UnloggedView
+          mode="inline"
+          title="欢迎使用"
+          description="登录后可以同步您的数据和设置"
+          onLoginSuccess="show-account"
+          onRegisterSuccess="show-account"
+          showToggle={true}
+        />
+      </div>
+    </div>
   );
 
   // 已登录视图
@@ -25,7 +29,7 @@ const AccountView = () => {
     return <AccountInfo user={user} showActions />;
   };
 
-  return isAuthenticated ? renderLoggedView() : <SettingsViewContainer>{renderUnloggedView()}</SettingsViewContainer>;
+  return isAuthenticated ? renderLoggedView() : <SettingsViewContainer className="h-full w-full">{renderUnloggedView()}</SettingsViewContainer>;
 };
 
 export default AccountView;
