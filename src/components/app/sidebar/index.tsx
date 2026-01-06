@@ -50,7 +50,7 @@ const AppSidebar: FC<AppSidebarProps> = ({
   return (
     <aside
       className={[
-        "w-64 shrink-0 border-r pr-4 backdrop-blur-xl flex flex-col h-full",
+        "w-56 shrink-0 border-r pr-4 backdrop-blur-xl flex flex-col h-full",
         className,
       ]
         .filter(Boolean)
