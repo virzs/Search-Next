@@ -11,6 +11,7 @@ import theme from "./theme/config";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppConfigProvider } from "./contexts/ConfigContext";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
+import { DesktopThemeProvider } from "./contexts/DesktopThemeContext";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,9 @@ createRoot(document.getElementById("root")!).render(
       <ConfigProvider theme={theme}>
         <AuthProvider>
           <AppConfigProvider>
-            <RouterProvider router={router} />
+            <DesktopThemeProvider>
+              <RouterProvider router={router} />
+            </DesktopThemeProvider>
           </AppConfigProvider>
         </AuthProvider>
       </ConfigProvider>

@@ -1,8 +1,8 @@
-import { Desktop, DesktopSortItem, desktopThemeLight, DesktopHandle, DesktopAppItem } from "zs_library";
+import { Desktop, DesktopSortItem, DesktopHandle, DesktopAppItem } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useState } from "react";
-import { RiStore2Fill, RiSettingsFill, RiBrush2Fill, RemixiconComponentType, RiUserFill } from "@remixicon/react";
+import { RiStore2Line, RiSettingsLine, RiBrushLine, RemixiconComponentType, RiUserLine } from "@remixicon/react";
 import StoreModal from "./components/default-apps/store";
 import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
@@ -16,6 +16,8 @@ import AccountModal from "./components/default-apps/account";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
 import { v4 as uuidv4 } from "uuid";
+import ThemeModal from "./components/default-apps/theme";
+import useDesktopTheme from "@/hooks/useDesktopTheme";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -23,10 +25,12 @@ function Index() {
   const { message } = App.useApp();
   const { avatarSrc, coverGradientCss } = useAuth();
   const { userLimit } = useConfig();
+  const { activeTheme } = useDesktopTheme();
 
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
   const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
+  const [themeOpen, { toggle: toggleTheme }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
   const [fullWidget, setFullWidget] = useState<{ entry: string; props?: any; title?: string } | null>(null);
 
@@ -54,15 +58,17 @@ function Index() {
       key,
       name,
       IconComponent,
-      backgroundStyle,
+      tintStyle,
       iconSize,
+      iconColor,
       onClick,
     }: {
       key: string;
       name: string;
       IconComponent: RemixiconComponentType;
-      backgroundStyle: string;
+      tintStyle?: string;
       iconSize?: number;
+      iconColor?: string;
       onClick?: () => void;
     }) => (
       <DesktopAppItem
@@ -81,14 +87,50 @@ function Index() {
         icon={
           <div
             className={cx(
-              "flex items-center justify-center w-full h-full rounded-lg",
+              "flex items-center justify-center w-full h-full rounded-[16px] overflow-hidden",
               css`
-                ${backgroundStyle}
-                color: #fff;
+                position: relative;
+                color: ${iconColor ?? "#fff"};
+                background: rgba(255, 255, 255, 0.16);
+                background-image: ${tintStyle ?? "none"};
+                background-size: cover;
+                background-position: center;
+                -webkit-backdrop-filter: blur(22px) saturate(1.25);
+                backdrop-filter: blur(22px) saturate(1.25);
+                border: 1px solid rgba(255, 255, 255, 0.28);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+                &::before {
+                  content: "";
+                  position: absolute;
+                  inset: 0;
+                  background: radial-gradient(
+                    120% 90% at 30% 18%,
+                    rgba(255, 255, 255, 0.38) 0%,
+                    rgba(255, 255, 255, 0) 62%
+                  );
+                  pointer-events: none;
+                }
+
+                &::after {
+                  content: "";
+                  position: absolute;
+                  inset: 0;
+                  background: radial-gradient(
+                    120% 120% at 60% 86%,
+                    rgba(0, 0, 0, 0.14) 0%,
+                    rgba(0, 0, 0, 0) 56%
+                  );
+                  pointer-events: none;
+                }
               `
             )}
           >
-            <IconComponent size={iconSize} />
+            <div className="w-full h-full flex items-center justify-center relative" style={{ zIndex: 1 }}>
+              <div style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}>
+                <IconComponent size={iconSize ?? 30} />
+              </div>
+            </div>
           </div>
         }
       />
@@ -100,37 +142,37 @@ function Index() {
           key: "my",
           name: "账号",
           IconComponent: avatarSrc
-            ? () => <img src={avatarSrc} alt="avatar" className="w-full h-full pointer-events-none" />
-            : RiUserFill,
-          backgroundStyle: coverGradientCss
-            ? `background: ${coverGradientCss};`
-            : "background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);",
+            ? () => <img src={avatarSrc} alt="avatar" className="w-full h-full object-cover pointer-events-none" />
+            : RiUserLine,
+          tintStyle: coverGradientCss ?? "linear-gradient(135deg, rgba(255, 59, 48, 0.92) 0%, rgba(175, 82, 222, 0.9) 100%)",
           onClick: () => toggleAccountInfo(),
         });
       case "*:theme":
         return createFixedItem({
           key: "theme",
-          name: "主题",
-          IconComponent: RiBrush2Fill,
-          backgroundStyle: `background: conic-gradient(from 0deg at center,
-            #ff0000 0deg, #ff8000 60deg, #ffff00 120deg,
-            #80ff00 180deg, #00ff80 240deg, #0080ff 300deg, #ff0000 360deg);`,
-          iconSize: 28,
+          name: "个性化",
+          IconComponent: RiBrushLine,
+          tintStyle: "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
+          iconSize: 30,
+          onClick: () => toggleTheme(),
         });
       case "*:store":
         return createFixedItem({
           key: "store",
           name: "应用商店",
-          IconComponent: RiStore2Fill,
-          backgroundStyle: "background: linear-gradient(135deg, #0066ff 0%, #3399ff 50%, #66b3ff 100%);",
+          IconComponent: RiStore2Line,
+          tintStyle: "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
+          iconSize: 30,
           onClick: () => toggleStore(),
         });
       case "*:settings":
         return createFixedItem({
           key: "settings",
           name: "设置",
-          IconComponent: RiSettingsFill,
-          backgroundStyle: "background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);",
+          IconComponent: RiSettingsLine,
+          tintStyle: "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
+          iconSize: 30,
+          iconColor: "#1c1c1e",
           onClick: () => toggleSettings(),
         });
       default:
@@ -219,7 +261,7 @@ function Index() {
         <Desktop<DesktopItemData>
           ref={desktopRef}
           maxSlides={userLimit?.maxPages || 5}
-          theme={desktopThemeLight}
+          theme={activeTheme.theme}
           typeConfigMap={{
             "widget:clock": {
               sizeConfigs: [
@@ -274,7 +316,7 @@ function Index() {
                 id: "*:theme",
                 type: "app",
                 data: {
-                  name: "主题",
+                  name: "个性化",
                 },
               },
               {
@@ -314,6 +356,7 @@ function Index() {
         }}
         onAddWebsite={handleAddWebsite}
       />
+      <ThemeModal open={themeOpen} onClose={toggleTheme} />
       <Settings open={settingsOpen} onClose={toggleSettings} />
       <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />
       {fullWidget && (
