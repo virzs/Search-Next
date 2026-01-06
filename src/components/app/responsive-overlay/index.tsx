@@ -1,7 +1,7 @@
 import { Drawer } from "antd";
 import type { DrawerProps } from "antd";
 import { configResponsive, useResponsive } from "ahooks";
-import { FC, ReactNode } from "react";
+import { CSSProperties, FC, ReactNode } from "react";
 import { DesktopBaseModal } from "zs_library";
 
 export interface AppResponsiveOverlayProps {
@@ -11,6 +11,11 @@ export interface AppResponsiveOverlayProps {
   isDesktop?: boolean;
   drawerProps?: Partial<DrawerProps>;
   modalProps?: Partial<React.ComponentProps<typeof DesktopBaseModal>>;
+  wrapContent?: boolean;
+  contentClassName?: string;
+  desktopContentClassName?: string;
+  mobileContentClassName?: string;
+  contentStyle?: CSSProperties;
   children: ReactNode;
 }
 
@@ -22,11 +27,39 @@ configResponsive({
   xxl: 1536,
 });
 
-const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({ open, onClose, title, isDesktop, drawerProps, modalProps, children }) => {
+const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({
+  open,
+  onClose,
+  title,
+  isDesktop,
+  drawerProps,
+  modalProps,
+  wrapContent,
+  contentClassName,
+  desktopContentClassName,
+  mobileContentClassName,
+  contentStyle,
+  children,
+}) => {
   const responsive = useResponsive();
   const { lg, xl, xxl } = responsive ?? {};
   const computedIsDesktop = !!(lg || xl || xxl);
   const resolvedIsDesktop = isDesktop ?? computedIsDesktop;
+
+  const resolvedWrapContent =
+    wrapContent ?? !!(contentClassName || desktopContentClassName || mobileContentClassName || contentStyle);
+  const defaultContentClassName = "w-full overflow-hidden";
+  const defaultDesktopContentClassName = "h-[72vh] min-h-full max-h-[780px]";
+  const defaultMobileContentClassName = "h-full";
+  const resolvedContentClassName = [
+    defaultContentClassName,
+    resolvedIsDesktop
+      ? desktopContentClassName ?? defaultDesktopContentClassName
+      : mobileContentClassName ?? defaultMobileContentClassName,
+    contentClassName,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const defaultDrawerStyles = { body: { padding: 0 } } as DrawerProps["styles"];
   const mergedDrawerStyles = {
@@ -38,6 +71,14 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({ open, onClose, ti
     },
   } as DrawerProps["styles"];
 
+  const contentNode = resolvedWrapContent ? (
+    <div className={resolvedContentClassName} style={contentStyle}>
+      {children}
+    </div>
+  ) : (
+    children
+  );
+
   if (resolvedIsDesktop) {
     return (
       <DesktopBaseModal
@@ -46,7 +87,7 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({ open, onClose, ti
         onClose={modalProps?.onClose ?? onClose}
         width={modalProps?.width ?? 1180}
       >
-        {children}
+        {contentNode}
       </DesktopBaseModal>
     );
   }
@@ -62,7 +103,7 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({ open, onClose, ti
       height={drawerProps?.height ?? "100vh"}
       styles={mergedDrawerStyles}
     >
-      {children}
+      {contentNode}
     </Drawer>
   );
 };

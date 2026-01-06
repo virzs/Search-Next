@@ -5,7 +5,7 @@ import BackupView from "./views/backup";
 import { RiInbox2Fill, RiUserFill } from "@remixicon/react";
 // import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { isMobileDevice } from "@/utils/utils";
-import { AppSidebar } from "@/components";
+import { AppResponsiveOverlay, AppSidebar } from "@/components";
 // import AboutView from "./views/about";
 // import LanguageView from "./views/language";
 // import ThirdPartyView from "./views/third-party";
@@ -72,18 +72,10 @@ const SettingsView = () => {
 };
 
 const Settings: FC<SettingsProps> = (props) => {
-  const { open, onClose } = props;
-
-  const isMobile = isMobileDevice();
-
-  return isMobile ? (
-    <DesktopBaseDrawer width="100vw" height="100vh" open={open} onClose={onClose}>
+  return (
+    <AppResponsiveOverlay wrapContent {...props}>
       <SettingsView />
-    </DesktopBaseDrawer>
-  ) : (
-    <DesktopBaseModal visible={open} onClose={onClose} width={1000} contentClassName="!overflow-hidden">
-      <SettingsView />
-    </DesktopBaseModal>
+    </AppResponsiveOverlay>
   );
 };
 
