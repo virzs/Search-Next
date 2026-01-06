@@ -13,11 +13,10 @@ import WebsiteDetailView from "./WebsiteDetailView";
 interface WebsiteViewProps {
   onAddWebsite?: (site: any) => void;
   query?: string;
-  antdScopeClassName?: string;
   active?: boolean;
 }
 
-const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScopeClassName, active = true }) => {
+const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, active = true }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
@@ -184,9 +183,8 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
     <div className="h-full relative overflow-hidden">
       {/* Main Content */}
       <div
-        className={`h-full flex flex-col overflow-hidden transition-opacity duration-300 ${
-          detailItem ? "opacity-0 pointer-events-none absolute inset-0" : "opacity-100"
-        }`}
+        className={`h-full flex flex-col overflow-hidden transition-opacity duration-300 ${detailItem ? "opacity-0 pointer-events-none absolute inset-0" : "opacity-100"
+          }`}
       >
         <div className="shrink-0 flex items-center justify-between gap-3 px-1">
           <StoreSegmented
@@ -197,7 +195,6 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
           />
           <Button
             type="primary"
-            className="rounded-full! shrink-0 shadow-lg shadow-blue-500/20 bg-(--store-primary)!"
             onClick={() => setAddVisible(true)}
           >
             自定义
@@ -211,14 +208,14 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
                 <div className="flex items-center gap-2 min-w-0">
                   <Button
                     type="text"
-                    className="rounded-full! text-(--store-text-secondary)! hover:bg-(--store-border)!"
+                    className="rounded-full! ! "
                     icon={<RiArrowLeftLine size={18} />}
                     onClick={backToFeaturedHome}
                   >
                     返回
                   </Button>
                   <div className="min-w-0">
-                    <div className="text-lg font-bold text-(--store-text-primary) line-clamp-1">
+                    <div className="text-lg font-bold  line-clamp-1">
                       {activeCollection.title}
                     </div>
                   </div>
@@ -227,7 +224,7 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
 
               <div className="mt-4 flex-1 overflow-y-auto pr-2 pl-1 pb-4">
                 {featuredLoading ? (
-                  <div className="mt-2 text-sm text-(--store-text-secondary)">Loading...</div>
+                  <div className="mt-2 text-sm ">Loading...</div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -261,19 +258,19 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
               {/* Category Browsing removed from featured view as requested, but keeping category tags section below */}
 
               {featuredLoading ? (
-                <div className="mt-6 text-sm text-(--store-text-secondary)">Loading...</div>
+                <div className="mt-6 text-sm ">Loading...</div>
               ) : (
                 <>
                   {featuredSections.map((section) => (
                     <div key={section.key} className="mt-2">
                       <div className="flex items-end justify-between gap-3 mb-4 px-1">
                         <div>
-                          <div className="text-lg font-bold text-(--store-text-primary)">{section.title}</div>
-                          <div className="text-sm text-(--store-text-secondary) mt-0.5">{section.subtitle}</div>
+                          <div className="text-lg font-bold ">{section.title}</div>
+                          <div className="text-sm  mt-0.5">{section.subtitle}</div>
                         </div>
                         <Button
                           type="link"
-                          className="px-0! text-(--store-text-secondary)! hover:text-(--store-primary)!"
+                          className="px-0! ! hover:text-(--store-primary)!"
                           onClick={() => openCollection(section.key)}
                         >
                           查看更多
@@ -304,7 +301,7 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
         ) : (
           <>
             <div className="mt-5 flex items-center justify-between shrink-0 px-1">
-              <div className="text-lg font-bold text-(--store-text-primary)">
+              <div className="text-lg font-bold ">
                 {activeCategory ? activeCategory.label : "全部网站"}
               </div>
             </div>
@@ -360,12 +357,10 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, antdScop
       <Modal
         zIndex={2001}
         open={addVisible}
-        rootClassName={antdScopeClassName}
         title="新增网站"
         onCancel={() => setAddVisible(false)}
         onOk={() => form.submit()}
         okText="添加"
-        destroyOnClose
         centered
       >
         <Form

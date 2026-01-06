@@ -63,82 +63,10 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
   const location = useStoreLocation();
   const isWebsiteActive = location.pathname.startsWith("/website");
 
-  const antdScopeClassName = css`
-    --store-bg-glass: rgba(255, 255, 255, 0.72);
-    --store-bg-sidebar: rgba(249, 250, 251, 0.8);
-    --store-bg-content: rgba(249, 250, 251, 0.5);
-    --store-bg-card: rgba(255, 255, 255, 0.6);
-    --store-bg-card-hover: rgba(255, 255, 255, 0.9);
-    --store-border: rgba(0, 0, 0, 0.06);
-    --store-text-primary: #111827;
-    --store-text-secondary: #6b7280;
-    --store-text-tertiary: #9ca3af;
-
-    .ant-input-affix-wrapper {
-      background: var(--store-bg-card) !important;
-      border-color: var(--store-border) !important;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
-    .ant-input-affix-wrapper:hover {
-      border-color: rgba(0, 0, 0, 0.14) !important;
-    }
-    .ant-input-affix-wrapper:focus,
-    .ant-input-affix-wrapper-focused {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
-    }
-    .ant-input {
-      background: transparent !important;
-      color: var(--store-text-primary) !important;
-    }
-
-    .ant-card {
-      background: var(--store-bg-card) !important;
-      border-color: var(--store-border) !important;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
-    .ant-card:hover {
-      border-color: rgba(0, 0, 0, 0.12) !important;
-    }
-
-    .ant-pagination-item {
-      background: var(--store-bg-card) !important;
-      border-color: var(--store-border) !important;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-    .ant-pagination-item-active {
-    }
-    .ant-pagination-item a {
-      color: var(--store-text-primary) !important;
-    }
-    .ant-pagination-item-active a {
-    }
-
-    .ant-drawer-content {
-      background: var(--store-bg-glass) !important;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-    }
-    .ant-drawer-header {
-      background: transparent !important;
-      border-bottom: 1px solid var(--store-border) !important;
-      color: var(--store-text-primary) !important;
-    }
-    .ant-drawer-title {
-      color: var(--store-text-primary) !important;
-    }
-    .ant-drawer-close {
-      color: var(--store-text-secondary) !important;
-    }
-  `;
-
   return (
     <div
       className={cx(
-        antdScopeClassName,
-        ["w-full overflow-hidden", isDesktop ? "h-[72vh] min-h-[560px] max-h-[780px]" : "h-full"].join(" ")
+        ["w-full overflow-hidden", isDesktop ? "h-[72vh] min-h-full max-h-[780px]" : "h-full"].join(" ")
       )}
     >
       <div className="flex h-full w-full overflow-hidden backdrop-blur-3xl">
@@ -160,7 +88,6 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
                       active={isWebsiteActive}
                       query={query}
                       onAddWebsite={onAddWebsite}
-                      antdScopeClassName={antdScopeClassName}
                     />
                   </CachedRoute>
                   <CachedRoute path="/widget">

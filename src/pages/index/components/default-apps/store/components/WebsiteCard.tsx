@@ -19,7 +19,7 @@ const WebsiteCard: FC<WebsiteCardProps> = ({ item, onAdd, onClick, layout = "gri
 
   return (
     <div
-      className={`group relative flex items-center gap-3 rounded-2xl bg-(--store-bg-card) border border-(--store-border) hover:bg-(--store-bg-card-hover) hover:border-(--store-border) transition-all duration-200 cursor-pointer ${
+      className={`group relative flex items-center gap-3 rounded-2xl  border   hover: transition-all duration-200 cursor-pointer ${
         layout === "grid" ? (isSmall ? "flex-row items-center! p-3 gap-3" : "flex-col items-start! p-4 gap-4") : "p-3"
       }`}
       onClick={() => onClick(item)}
@@ -41,13 +41,13 @@ const WebsiteCard: FC<WebsiteCardProps> = ({ item, onAdd, onClick, layout = "gri
 
       <div className="flex-1 min-w-0 text-left w-full">
         <div
-          className={`font-semibold text-(--store-text-primary) truncate ${
+          className={`font-semibold  truncate ${
             layout === "grid" ? (isSmall ? "text-sm" : "text-base") : "text-sm"
           }`}
         >
           {name}
         </div>
-        <div className="text-xs text-(--store-text-secondary) truncate mt-0.5">{url || "无描述"}</div>
+        <div className="text-xs  truncate mt-0.5">{url || "无描述"}</div>
       </div>
 
       <div
@@ -58,9 +58,7 @@ const WebsiteCard: FC<WebsiteCardProps> = ({ item, onAdd, onClick, layout = "gri
         <Button
           type="primary"
           size={isSmall ? "small" : layout === "grid" ? "middle" : "small"}
-          className={`rounded-full! font-medium bg-(--store-primary-bg)! text-(--store-primary-text)! hover:bg-(--store-primary)! hover:text-white! border-none shadow-none ${
-            layout === "grid" && !isSmall ? "w-full" : "px-4"
-          }`}
+          block={layout === "grid" && !isSmall}
           onClick={(e) => {
             e.stopPropagation();
             onAdd(item);

@@ -19,7 +19,7 @@ const StoreHeroCard: FC<StoreHeroCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border border-(--store-border) ${gradient} px-6 py-6 text-white shadow-sm ${className}`}
+      className={`relative overflow-hidden rounded-3xl border  ${gradient} px-6 py-6 text-white shadow-sm ${className}`}
     >
       {circlePosition === "left" && (
         <div className="absolute -left-14 -top-14 h-40 w-40 rounded-full bg-white/20 blur-2xl" />

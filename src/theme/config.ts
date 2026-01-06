@@ -9,6 +9,14 @@ const theme: ThemeConfig = {
       defaultShadow: "none",
       primaryShadow: "none",
     },
+    Menu: {
+      itemBg: 'transparent',
+      activeBarBorderWidth: 0,
+      itemMarginInline: 0,
+      itemHeight: 36,
+    },
+    Segmented: {
+    }
   },
 };
 

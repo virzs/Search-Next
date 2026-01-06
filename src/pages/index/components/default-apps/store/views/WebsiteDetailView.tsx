@@ -22,7 +22,7 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
       <div className="shrink-0 flex items-center gap-2 p-4 pb-2">
         <Button
           type="text"
-          className="rounded-full! text-(--store-text-secondary)! hover:bg-(--store-border)! hover:text-(--store-text-primary)!"
+          className="rounded-full! !  hover:!"
           icon={<RiArrowLeftLine size={20} />}
           onClick={onBack}
         >
@@ -48,8 +48,8 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
               )}
             </div>
 
-            <h1 className="text-3xl font-bold text-(--store-text-primary) mb-2">{name}</h1>
-            <p className="text-(--store-text-secondary) text-sm mb-6 max-w-md break-all">{url}</p>
+            <h1 className="text-3xl font-bold  mb-2">{name}</h1>
+            <p className=" text-sm mb-6 max-w-md break-all">{url}</p>
 
             <div className="flex gap-4 w-full max-w-xs">
               <Button
@@ -62,17 +62,17 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
               </Button>
               <Button
                 size="large"
-                className="rounded-full! w-12! h-12! flex items-center justify-center border-(--store-border)! text-(--store-text-primary)! hover:bg-(--store-bg-card)!"
+                className="rounded-full! w-12! h-12! flex items-center justify-center ! ! hover:!"
                 icon={<RiExternalLinkLine size={20} />}
                 onClick={() => window.open(url, "_blank")}
               />
             </div>
           </div>
 
-          <div className="border-t border-(--store-border) pt-8">
-            <h3 className="text-lg font-bold text-(--store-text-primary) mb-4">关于此应用</h3>
-            <div className="bg-(--store-bg-card) rounded-2xl p-6 border border-(--store-border)">
-              <p className="text-(--store-text-secondary) leading-relaxed">
+          <div className="border-t  pt-8">
+            <h3 className="text-lg font-bold  mb-4">关于此应用</h3>
+            <div className=" rounded-2xl p-6 border ">
+              <p className=" leading-relaxed">
                 这是一个简单快捷的网站快捷方式。添加到桌面后，您可以快速访问此网站。我们致力于为您提供最优质的网页应用体验。
               </p>
 
@@ -80,7 +80,7 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
                 {item?.tags?.map((tag: any) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 rounded-full bg-(--store-border) text-(--store-text-secondary) text-xs"
+                    className="px-3 py-1 rounded-full bg-(--store-border)  text-xs"
                   >
                     {typeof tag === "string" ? tag : tag.name || tag.label}
                   </span>
@@ -91,12 +91,12 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
 
           {/* Preview Images Placeholder (Optional) */}
           <div className="mt-8">
-            <h3 className="text-lg font-bold text-(--store-text-primary) mb-4">预览</h3>
+            <h3 className="text-lg font-bold  mb-4">预览</h3>
             <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-64 h-40 shrink-0 rounded-2xl bg-(--store-bg-card) border border-(--store-border) flex items-center justify-center text-(--store-text-tertiary)"
+                  className="w-64 h-40 shrink-0 rounded-2xl  border  flex items-center justify-center "
                 >
                   预览图 {i}
                 </div>
