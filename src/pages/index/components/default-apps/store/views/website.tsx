@@ -2,7 +2,7 @@ import { useRequest } from "ahooks";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Empty, Form, Modal, Pagination, Input } from "antd";
 import { getTabsWebsitePublic } from "@/services/website";
-import { RiArrowLeftLine } from "@remixicon/react";
+import { RiAddLine, RiArrowLeftLine } from "@remixicon/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildCategoriesFromItems, fallbackCategories, getWebsiteId } from "../utils";
 import StoreHeroCard from "../components/StoreHeroCard";
@@ -196,6 +196,7 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({ onAddWebsite, query, active =
           <Button
             type="primary"
             onClick={() => setAddVisible(true)}
+            icon={<RiAddLine size={16} />}
           >
             自定义
           </Button>
