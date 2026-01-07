@@ -1,7 +1,7 @@
 import { Desktop, DesktopSortItem, DesktopHandle, DesktopAppItem } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { RiStore2Line, RiSettingsLine, RiBrushLine, RemixiconComponentType, RiUserLine } from "@remixicon/react";
 import StoreModal from "./components/default-apps/store";
 import type { DesktopItemData } from "../../types";
@@ -25,7 +25,22 @@ function Index() {
   const { message } = App.useApp();
   const { avatarSrc, coverGradientCss } = useAuth();
   const { userLimit } = useConfig();
-  const { activeTheme } = useDesktopTheme();
+  const { activeTheme, personalization } = useDesktopTheme();
+
+  const desktopBackgroundCss = useMemo(() => {
+    const wallpaper = personalization.wallpaper;
+
+    if (wallpaper.type === "gradient") {
+      return `background: ${wallpaper.css};`;
+    }
+
+    if (wallpaper.type === "image") {
+      const safeUrl = (wallpaper.url || "").replace(/"/g, '\\"');
+      return `background-color: #000; background-image: url("${safeUrl}"); background-size: cover; background-position: center; background-repeat: no-repeat;`;
+    }
+
+    return "background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);";
+  }, [personalization.wallpaper]);
 
   const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
   const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
@@ -250,7 +265,7 @@ function Index() {
       className={cx(
         "w-screen h-screen flex flex-col",
         css`
-          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+          ${desktopBackgroundCss}
         `
       )}
     >
