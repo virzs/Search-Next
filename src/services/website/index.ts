@@ -16,3 +16,26 @@ export interface WebsitePublicParams extends BasePageParams {
 export const getTabsWebsitePublic = (params = {}) => {
   return baseGetRequest("/tabs/website/public")(params);
 };
+
+export interface WebsiteCollectionPublicItem {
+  _id: string;
+  title: string;
+  description?: string;
+  enable: boolean;
+  effectiveStart?: string | null;
+  effectiveEnd?: string | null;
+  sort?: number;
+  websites?: any[];
+}
+
+// /tabs/website_collection/public/list get
+export const getTabsWebsiteCollectionPublicList = (params = {}) => {
+  return baseGetRequest<WebsiteCollectionPublicItem[]>("/tabs/website_collection/public/list")(params);
+};
+
+export interface WebsiteCollectionWebsitesPageParams extends BasePageParams {}
+
+// /tabs/website_collection/public/:id/websites get
+export const getTabsWebsiteCollectionPublicWebsitesPage = (id: string, params = {}) => {
+  return baseGetRequest(`/tabs/website_collection/public/${id}/websites`)(params);
+};
