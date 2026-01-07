@@ -1,5 +1,12 @@
 import { AppResponsiveOverlay, AppSidebar } from "@/components";
-import { FC, ReactNode, createContext, useContext, useMemo, useState } from "react";
+import {
+  FC,
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import ThemeView from "./views/theme";
 import WallpaperView from "./views/wallpaper";
 
@@ -17,12 +24,16 @@ interface RouterContextType {
   navigate: (path: string) => void;
 }
 
-const PersonalizationRouterContext = createContext<RouterContextType | null>(null);
+const PersonalizationRouterContext = createContext<RouterContextType | null>(
+  null,
+);
 
 const usePersonalizationLocation = () => {
   const context = useContext(PersonalizationRouterContext);
   if (!context) {
-    throw new Error("usePersonalizationLocation must be used within a PersonalizationMemoryRouter");
+    throw new Error(
+      "usePersonalizationLocation must be used within a PersonalizationMemoryRouter",
+    );
   }
   return context.location;
 };
@@ -30,15 +41,17 @@ const usePersonalizationLocation = () => {
 const usePersonalizationNavigate = () => {
   const context = useContext(PersonalizationRouterContext);
   if (!context) {
-    throw new Error("usePersonalizationNavigate must be used within a PersonalizationMemoryRouter");
+    throw new Error(
+      "usePersonalizationNavigate must be used within a PersonalizationMemoryRouter",
+    );
   }
   return context.navigate;
 };
 
-const PersonalizationMemoryRouter: FC<{ initialEntries?: string[]; children: ReactNode }> = ({
-  initialEntries = ["/"],
-  children,
-}) => {
+const PersonalizationMemoryRouter: FC<{
+  initialEntries?: string[];
+  children: ReactNode;
+}> = ({ initialEntries = ["/"], children }) => {
   const [pathname, setPathname] = useState(initialEntries[0]);
 
   const value = useMemo(
@@ -46,17 +59,24 @@ const PersonalizationMemoryRouter: FC<{ initialEntries?: string[]; children: Rea
       location: { pathname },
       navigate: (path: string) => setPathname(path),
     }),
-    [pathname]
+    [pathname],
   );
 
-  return <PersonalizationRouterContext.Provider value={value}>{children}</PersonalizationRouterContext.Provider>;
+  return (
+    <PersonalizationRouterContext.Provider value={value}>
+      {children}
+    </PersonalizationRouterContext.Provider>
+  );
 };
 
 const CachedRoutes: FC<{ children: ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
-const CachedRoute: FC<{ path: string; children: ReactNode }> = ({ path, children }) => {
+const CachedRoute: FC<{ path: string; children: ReactNode }> = ({
+  path,
+  children,
+}) => {
   const location = usePersonalizationLocation();
   const isActive = location.pathname.startsWith(path);
 
@@ -76,17 +96,14 @@ const CachedRoute: FC<{ path: string; children: ReactNode }> = ({ path, children
 const PersonalizationModalContent: FC = () => {
   const navigate = usePersonalizationNavigate();
   const location = usePersonalizationLocation();
-  const activeMenuKey = location.pathname.startsWith("/wallpaper") ? "wallpaper" : "theme";
+  const activeMenuKey = location.pathname.startsWith("/wallpaper")
+    ? "wallpaper"
+    : "theme";
 
   return (
     <div className="flex h-full w-full overflow-hidden backdrop-blur-3xl">
       <AppSidebar
-        header={
-          <>
-            <div className="text-xs font-medium tracking-wide mb-2">个性化</div>
-            <div className="text-2xl font-bold tracking-tight">外观</div>
-          </>
-        }
+        header={<div className="text-2xl font-bold tracking-tight">个性化</div>}
         menuItems={[
           {
             key: "theme",
@@ -117,7 +134,12 @@ const PersonalizationModalContent: FC = () => {
 
 const ThemeModal = ({ open, onClose }: ThemeModalProps) => {
   return (
-    <AppResponsiveOverlay open={open} onClose={onClose} title="个性化" wrapContent>
+    <AppResponsiveOverlay
+      open={open}
+      onClose={onClose}
+      title="个性化"
+      wrapContent
+    >
       <PersonalizationMemoryRouter initialEntries={["/theme"]}>
         <PersonalizationModalContent />
       </PersonalizationMemoryRouter>
