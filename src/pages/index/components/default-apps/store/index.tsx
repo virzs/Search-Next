@@ -1,9 +1,19 @@
 import { motion } from "framer-motion";
 import { FC, Suspense, useState, ReactNode } from "react";
-import { RiAppsFill, RiAppsLine, RiLinksFill, RiLinksLine, RiSearchLine } from "@remixicon/react";
+import {
+  RiAppsFill,
+  RiAppsLine,
+  RiLinksFill,
+  RiLinksLine,
+  RiSearchLine,
+} from "@remixicon/react";
 import WebsiteView from "./views/website";
 import WidgetView from "./views/widget";
-import { StoreMemoryRouter, useStoreLocation, useStoreNavigate } from "./context/router";
+import {
+  StoreMemoryRouter,
+  useStoreLocation,
+  useStoreNavigate,
+} from "./context/router";
 import { AppResponsiveOverlay, AppSidebar } from "@/components";
 
 interface StoreModalProps {
@@ -45,16 +55,15 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
   const navigate = useStoreNavigate();
   const location = useStoreLocation();
   const isWebsiteActive = location.pathname.startsWith("/website");
-  const activeMenuKey = location.pathname.startsWith("/widget") ? "widget" : "website";
+  const activeMenuKey = location.pathname.startsWith("/widget")
+    ? "widget"
+    : "website";
 
   return (
     <div className="flex h-full w-full overflow-hidden backdrop-blur-3xl">
       <AppSidebar
         header={
-          <>
-            <div className="text-xs font-medium tracking-wide mb-2">应用商店</div>
-            <div className="text-2xl font-bold tracking-tight">探索</div>
-          </>
+          <div className="text-2xl font-bold tracking-tight">应用商店</div>
         }
         search={{
           value: query,
@@ -91,10 +100,18 @@ const StoreModalContent: FC<StoreModalProps> = (props) => {
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            <Suspense fallback={<div className="p-6 text-sm text-gray-500">Loading...</div>}>
+            <Suspense
+              fallback={
+                <div className="p-6 text-sm text-gray-500">Loading...</div>
+              }
+            >
               <CachedRoutes>
                 <CachedRoute path="/website">
-                  <WebsiteView active={isWebsiteActive} query={query} onAddWebsite={onAddWebsite} />
+                  <WebsiteView
+                    active={isWebsiteActive}
+                    query={query}
+                    onAddWebsite={onAddWebsite}
+                  />
                 </CachedRoute>
                 <CachedRoute path="/widget">
                   <WidgetView query={query} onAddWidget={onAddWidget} />
