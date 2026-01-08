@@ -33,7 +33,7 @@ const AppContentContainer: FC<AppContentContainerProps> = ({
   return (
     <div
       className={[
-        "flex flex-col bg-(--store-bg-content) overflow-hidden",
+        "flex flex-col overflow-hidden",
         animate
           ? "animate-in fade-in slide-in-from-right-4 duration-300"
           : null,
