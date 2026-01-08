@@ -1,28 +1,16 @@
-import { Button, Empty, Pagination, Skeleton } from "antd";
+import { Button, Empty, Skeleton } from "antd";
 import type React from "react";
 import StoreHeroCard from "../components/StoreHeroCard";
 import WebsiteCard from "../components/WebsiteCard";
 import { getWebsiteId } from "../utils";
-import { AppContentContainer } from "@/components";
-
-export type FeaturedRoute = { type: "home" } | { type: "collection"; id: string };
 
 export interface FeaturedViewProps {
-  featuredRoute: FeaturedRoute;
   featuredHomeScrollRef: React.MutableRefObject<HTMLDivElement | null>;
   collectionItems: any[];
   collectionListLoading: boolean;
-  openCollection: (collectionId: string) => void;
-  backToFeaturedHome: () => void;
-  activeCollection: any | null;
-  activeCollectionWebsites: any[];
-  collectionWebsitesLoading: boolean;
-  collectionPage: number;
-  collectionPageSize: number;
-  activeCollectionTotal: number;
-  onChangeCollectionPage: (page: number, pageSize: number) => void;
+  onOpenCollection: (collectionId: string) => void;
   onAddFromCard: (item: any) => void;
-  onClickWebsite: (item: any) => void;
+  onOpenWebsiteDetail: (item: any) => void;
 }
 
 const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
@@ -44,97 +32,14 @@ const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
   );
 };
 
-const SkeletonWebsiteGrid: React.FC<{ count: number }> = ({ count }) => {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className="rounded-2xl overflow-hidden">
-          <Skeleton.Image active style={{ width: "100%", height: 140 }} />
-          <div className="mt-2 px-2">
-            <Skeleton
-              active
-              title={false}
-              paragraph={{ rows: 2, width: ["85%", "65%"] }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const FeaturedView: React.FC<FeaturedViewProps> = ({
-  featuredRoute,
   featuredHomeScrollRef,
   collectionItems,
   collectionListLoading,
-  openCollection,
-  backToFeaturedHome,
-  activeCollection,
-  activeCollectionWebsites,
-  collectionWebsitesLoading,
-  collectionPage,
-  collectionPageSize,
-  activeCollectionTotal,
-  onChangeCollectionPage,
+  onOpenCollection,
   onAddFromCard,
-  onClickWebsite,
+  onOpenWebsiteDetail,
 }) => {
-  if (featuredRoute.type === "collection") {
-    const titleNode = activeCollection?.title ? (
-      <div className="text-lg font-bold  line-clamp-1">
-        {activeCollection.title}
-      </div>
-    ) : (
-      <Skeleton.Input active size="small" style={{ width: 180 }} />
-    );
-
-    return (
-      <AppContentContainer
-        className="h-full"
-        animate
-        onBack={backToFeaturedHome}
-        title={titleNode}
-      >
-        <div className="p-6 pt-0">
-          {collectionWebsitesLoading ? (
-            <SkeletonWebsiteGrid count={Math.min(6, collectionPageSize)} />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {activeCollectionWebsites.map((item: any) => (
-                  <WebsiteCard
-                    key={getWebsiteId(item)}
-                    item={item}
-                    layout="grid"
-                    variant="normal"
-                    onAdd={onAddFromCard}
-                    onClick={onClickWebsite}
-                  />
-                ))}
-              </div>
-              {activeCollectionWebsites.length === 0 && (
-                <Empty className="mt-8" description="暂无数据" />
-              )}
-              <div className="flex items-center justify-end pt-4">
-                <Pagination
-                  size="small"
-                  current={collectionPage}
-                  pageSize={collectionPageSize}
-                  total={activeCollectionTotal}
-                  showSizeChanger
-                  pageSizeOptions={[12, 24, 48, 96]}
-                  onChange={onChangeCollectionPage}
-                  disabled={collectionWebsitesLoading}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </AppContentContainer>
-    );
-  }
-
   return (
     <div
       ref={featuredHomeScrollRef}
@@ -185,8 +90,8 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                       </div>
                       <Button
                         type="link"
-                        className="px-0! ! hover:text-(--store-primary)!"
-                        onClick={() => openCollection(c._id)}
+                        className="px-0! ! hover:text-[rgb(250,84,28)]!"
+                        onClick={() => onOpenCollection(c._id)}
                       >
                         查看更多
                       </Button>
@@ -199,7 +104,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                             layout="grid"
                             variant="small"
                             onAdd={onAddFromCard}
-                            onClick={onClickWebsite}
+                            onClick={onOpenWebsiteDetail}
                           />
                         </div>
                       ))}

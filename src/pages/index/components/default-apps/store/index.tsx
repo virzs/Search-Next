@@ -1,5 +1,4 @@
-import { motion } from "framer-motion";
-import { FC, Suspense, useState, ReactNode } from "react";
+import { FC } from "react";
 import {
   RiAppsFill,
   RiAppsLine,
@@ -7,139 +6,70 @@ import {
   RiLinksLine,
   RiSearchLine,
 } from "@remixicon/react";
-import WebsiteView from "./views/website";
-import WidgetView from "./views/widget";
 import {
-  StoreMemoryRouter,
-  useStoreLocation,
-  useStoreNavigate,
-} from "./context/router";
-import { AppResponsiveOverlay, AppSidebar } from "@/components";
+  AppRouteModal,
+} from "@/components";
 
-interface StoreModalProps {
-  open: boolean;
-  onClose: () => void;
+export type DesktopOutletContext = {
   onAddWidget?: (widgetId: string) => void;
   onAddWebsite?: (site: any) => void;
-}
-
-const CachedRoutes: FC<{
-  children: ReactNode;
-}> = ({ children }) => {
-  return <>{children}</>;
 };
 
-const CachedRoute: FC<{
-  path: string;
-  children: ReactNode;
-}> = ({ path, children }) => {
-  const location = useStoreLocation();
-  const isActive = location.pathname.startsWith(path);
-
-  return (
-    <div
-      style={{
-        display: isActive ? "block" : "none",
-        height: "100%",
-        width: "100%",
-      }}
-    >
-      {children}
-    </div>
-  );
+export type StoreOutletContext = {
+  query: string;
+  setQuery: (value: string) => void;
+  onAddWidget?: (widgetId: string) => void;
+  onAddWebsite?: (site: any) => void;
 };
 
-const StoreModalContent: FC<StoreModalProps> = (props) => {
-  const { onAddWidget, onAddWebsite } = props;
-  const [query, setQuery] = useState("");
-  const navigate = useStoreNavigate();
-  const location = useStoreLocation();
-  const isWebsiteActive = location.pathname.startsWith("/website");
-  const activeMenuKey = location.pathname.startsWith("/widget")
-    ? "widget"
-    : "website";
+const buildStoreRouteContext = ({
+  parentContext,
+  search,
+}: {
+  parentContext: DesktopOutletContext;
+  search: { value: string; setValue: (value: string) => void };
+}): StoreOutletContext => ({
+  query: search.value,
+  setQuery: search.setValue,
+  onAddWebsite: parentContext?.onAddWebsite,
+  onAddWidget: parentContext?.onAddWidget,
+});
 
+const StoreModalRoute: FC = () => {
   return (
-    <div className="flex h-full w-full overflow-hidden backdrop-blur-3xl">
-      <AppSidebar
-        header={
-          <div className="text-2xl font-bold tracking-tight">应用商店</div>
-        }
-        search={{
-          value: query,
-          onChange: setQuery,
+    <AppRouteModal<DesktopOutletContext, StoreOutletContext>
+      closeTo="/"
+      title="应用商店"
+      wrapContent
+      sidebarProps={{
+        header: <div className="text-2xl font-bold tracking-tight">应用商店</div>,
+        search: {
           placeholder: "搜索应用与组件",
           prefix: <RiSearchLine size={16} className="" />,
           inputClassName: "border-transparent! transition-all h-10",
-        }}
-        menuItems={[
+        },
+        menuItems: [
           {
             key: "website",
             label: "网站",
+            path: "/store/website",
             icon: <RiLinksLine size={16} />,
             activeIcon: <RiLinksFill size={16} />,
           },
           {
             key: "widget",
             label: "小组件",
+            path: "/store/widget",
             icon: <RiAppsLine size={16} />,
             activeIcon: <RiAppsFill size={16} />,
           },
-        ]}
-        activeMenuKey={activeMenuKey}
-        onMenuSelect={(key) => navigate(`/${key}`)}
-        footer="点击卡片查看详情，点击获取按钮添加到桌面"
-      />
-
-      <main className="flex h-full w-0 grow flex-col gap-5 overflow-hidden">
-        <div className="h-full w-full overflow-hidden">
-          <motion.div
-            className="h-full w-full"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            <Suspense
-              fallback={
-                <div className="p-6 text-sm text-gray-500">Loading...</div>
-              }
-            >
-              <CachedRoutes>
-                <CachedRoute path="/website">
-                  <WebsiteView
-                    active={isWebsiteActive}
-                    query={query}
-                    onAddWebsite={onAddWebsite}
-                  />
-                </CachedRoute>
-                <CachedRoute path="/widget">
-                  <WidgetView query={query} onAddWidget={onAddWidget} />
-                </CachedRoute>
-              </CachedRoutes>
-            </Suspense>
-          </motion.div>
-        </div>
-      </main>
-    </div>
+        ],
+        footer: "点击卡片查看详情，点击获取按钮添加到桌面",
+      }}
+      keepAlive={{ enabled: true }}
+      getRouteContext={buildStoreRouteContext}
+    />
   );
 };
 
-const StoreModal: FC<StoreModalProps> = (props) => {
-  const { open, onClose } = props;
-
-  return (
-    <AppResponsiveOverlay
-      open={open}
-      onClose={onClose}
-      title="应用商店"
-      wrapContent
-    >
-      <StoreMemoryRouter initialEntries={["/website"]}>
-        <StoreModalContent {...props} />
-      </StoreMemoryRouter>
-    </AppResponsiveOverlay>
-  );
-};
-
-export default StoreModal;
+export default StoreModalRoute;

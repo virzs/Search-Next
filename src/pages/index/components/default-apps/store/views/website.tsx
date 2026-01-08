@@ -3,11 +3,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Empty, Form, Modal, Pagination, Input } from "antd";
 import {
   getTabsWebsiteCollectionPublicList,
-  getTabsWebsiteCollectionPublicWebsitesPage,
   getTabsWebsitePublic,
 } from "@/services/website";
 import { RiAddLine } from "@remixicon/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useLocation, useNavigate } from "react-router";
 import {
   buildCategoriesFromItems,
   fallbackCategories,
@@ -15,35 +14,30 @@ import {
 } from "../utils";
 import WebsiteCard from "../components/WebsiteCard";
 import StoreSegmented from "../components/StoreSegmented";
-import WebsiteDetailView from "./WebsiteDetailView";
-import FeaturedView, { FeaturedRoute } from "./FeaturedView";
+import FeaturedView from "./FeaturedView";
 
 interface WebsiteViewProps {
   onAddWebsite?: (site: any) => void;
   query?: string;
-  active?: boolean;
 }
 
 const WebsiteView: React.FC<WebsiteViewProps> = ({
   onAddWebsite,
   query,
-  active = true,
 }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
-  const [detailItem, setDetailItem] = useState<any>(null);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [activeView, setActiveView] = useState<string>("featured");
-  const [featuredRoute, setFeaturedRoute] = useState<FeaturedRoute>({
-    type: "home",
-  });
   const featuredHomeScrollRef = useRef<HTMLDivElement | null>(null);
-  const featuredHomeScrollTopRef = useRef(0);
   const featuredRequestedSizeRef = useRef(60);
-  const [collectionPage, setCollectionPage] = useState(1);
-  const [collectionPageSize, setCollectionPageSize] = useState(24);
+  const overlayOpen =
+    location.pathname.startsWith("/store/website/") &&
+    location.pathname !== "/store/website";
 
   const {
     data: listData,
@@ -61,13 +55,6 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
     loading: collectionListLoading,
     run: runCollectionList,
   } = useRequest(getTabsWebsiteCollectionPublicList, { manual: true });
-  const {
-    data: collectionWebsitesData,
-    loading: collectionWebsitesLoading,
-    run: runCollectionWebsites,
-  } = useRequest(getTabsWebsiteCollectionPublicWebsitesPage as any, {
-    manual: true,
-  });
 
   const prevQueryRef = useRef(query);
 
@@ -77,14 +64,9 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
       prevQueryRef.current = query;
       setPage(1);
       featuredRequestedSizeRef.current = 60;
-      setFeaturedRoute({ type: "home" });
+      if (overlayOpen) navigate("/store/website", { replace: true });
     }
-  }, [query]);
-
-  useEffect(() => {
-    if (active) return;
-    setDetailItem(null);
-  }, [active]);
+  }, [query, overlayOpen, navigate]);
 
   const featuredItems = useMemo(
     () => (featuredData?.data as any[]) || [],
@@ -165,69 +147,27 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
     const v = String(value);
     setActiveView(v);
     setPage(1);
-    setDetailItem(null);
-    if (v !== "featured") setFeaturedRoute({ type: "home" });
   };
 
   const handleAddFromCard = (item: any) => {
     onAddWebsite?.(item);
   };
 
-  const activeCollection = useMemo(() => {
-    if (featuredRoute.type !== "collection") return null;
-    return (
-      collectionItems.find((c: any) => c?._id === featuredRoute.id) || null
-    );
-  }, [collectionItems, featuredRoute]);
-
-  const activeCollectionWebsites = useMemo(
-    () => ((collectionWebsitesData as any)?.data as any[]) || [],
-    [collectionWebsitesData],
-  );
-  const activeCollectionTotal = useMemo(
-    () => (collectionWebsitesData as any)?.total ?? 0,
-    [collectionWebsitesData],
-  );
-
-  const openCollection = async (collectionId: string) => {
-    featuredHomeScrollTopRef.current =
-      featuredHomeScrollRef.current?.scrollTop ?? 0;
-    setCollectionPage(1);
-    await runCollectionWebsites(collectionId, {
-      page: 1,
-      pageSize: collectionPageSize,
-    });
-    setFeaturedRoute({ type: "collection", id: collectionId });
+  const openCollection = (collectionId: string) => {
+    navigate(`/store/website/collection/${encodeURIComponent(collectionId)}`);
   };
 
-  const backToFeaturedHome = () => {
-    setFeaturedRoute({ type: "home" });
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        featuredHomeScrollRef.current?.scrollTo({
-          top: featuredHomeScrollTopRef.current,
-        });
-      });
-    });
+  const openWebsiteDetail = (item: any) => {
+    const id = getWebsiteId(item);
+    navigate(`/store/website/detail/${encodeURIComponent(id)}`, { state: { item } });
   };
-
-  const handleChangeCollectionPage = async (p: number, ps: number) => {
-    setCollectionPage(p);
-    if (ps !== collectionPageSize) setCollectionPageSize(ps);
-    if (featuredRoute.type !== "collection") return;
-    await runCollectionWebsites(featuredRoute.id, { page: p, pageSize: ps });
-  };
-
-  const showFeaturedCollectionOverlay =
-    activeView === "featured" && featuredRoute.type === "collection";
 
   return (
     <div className="h-full relative overflow-hidden">
-      {/* Main Content */}
       <div
         className={`h-full flex flex-col overflow-hidden transition-opacity duration-300 ${
-          detailItem || showFeaturedCollectionOverlay
-            ? "opacity-0 pointer-events-none absolute inset-0"
+          overlayOpen
+            ? "opacity-0 pointer-events-none"
             : "opacity-100"
         }`}
       >
@@ -249,23 +189,12 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
 
         {activeView === "featured" ? (
           <FeaturedView
-            featuredRoute={
-              showFeaturedCollectionOverlay ? { type: "home" } : featuredRoute
-            }
             featuredHomeScrollRef={featuredHomeScrollRef}
             collectionItems={collectionItems}
             collectionListLoading={collectionListLoading}
-            openCollection={openCollection}
-            backToFeaturedHome={backToFeaturedHome}
-            activeCollection={activeCollection}
-            activeCollectionWebsites={activeCollectionWebsites}
-            collectionWebsitesLoading={collectionWebsitesLoading}
-            collectionPage={collectionPage}
-            collectionPageSize={collectionPageSize}
-            activeCollectionTotal={activeCollectionTotal}
-            onChangeCollectionPage={handleChangeCollectionPage}
+            onOpenCollection={openCollection}
             onAddFromCard={handleAddFromCard}
-            onClickWebsite={setDetailItem}
+            onOpenWebsiteDetail={openWebsiteDetail}
           />
         ) : (
           <>
@@ -283,7 +212,7 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
                   layout="grid"
                   variant="normal"
                   onAdd={handleAddFromCard}
-                  onClick={setDetailItem}
+                  onClick={openWebsiteDetail}
                 />
               ))}
               {!listLoading && listItems.length === 0 && (
@@ -309,55 +238,6 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
           </>
         )}
       </div>
-
-      <AnimatePresence>
-        {showFeaturedCollectionOverlay && (
-          <motion.div
-            className="absolute inset-0 z-10 bg-(--store-bg-content)"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <FeaturedView
-              featuredRoute={featuredRoute}
-              featuredHomeScrollRef={featuredHomeScrollRef}
-              collectionItems={collectionItems}
-              collectionListLoading={collectionListLoading}
-              openCollection={openCollection}
-              backToFeaturedHome={backToFeaturedHome}
-              activeCollection={activeCollection}
-              activeCollectionWebsites={activeCollectionWebsites}
-              collectionWebsitesLoading={collectionWebsitesLoading}
-              collectionPage={collectionPage}
-              collectionPageSize={collectionPageSize}
-              activeCollectionTotal={activeCollectionTotal}
-              onChangeCollectionPage={handleChangeCollectionPage}
-              onAddFromCard={handleAddFromCard}
-              onClickWebsite={setDetailItem}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Detail View Overlay */}
-      <AnimatePresence>
-        {detailItem && (
-          <motion.div
-            className="absolute inset-0 z-20 bg-(--store-bg-content)"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <WebsiteDetailView
-              item={detailItem}
-              onBack={() => setDetailItem(null)}
-              onAdd={handleAddFromCard}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <Modal
         zIndex={2001}

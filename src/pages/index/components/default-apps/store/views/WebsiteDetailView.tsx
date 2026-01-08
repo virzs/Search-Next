@@ -24,12 +24,12 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
           <div className="relative mb-6">
             {iconUrl ? (
               <Image
-                className="w-32! h-32! rounded-3xl shadow-xl border-4 border-(--store-bg-card) bg-white"
+                className="w-32! h-32! rounded-3xl shadow-xl border-4 border-black/10 bg-white dark:border-white/10 dark:bg-white/10"
                 src={iconUrl}
                 preview={false}
               />
             ) : (
-              <div className="w-32 h-32 rounded-3xl shadow-xl border-4 border-(--store-bg-card) bg-gray-100 flex items-center justify-center text-5xl font-bold text-gray-400">
+              <div className="w-32 h-32 rounded-3xl shadow-xl border-4 border-black/10 bg-gray-100 flex items-center justify-center text-5xl font-bold text-gray-400 dark:border-white/10 dark:bg-white/10 dark:text-white/60">
                 {name?.[0]?.toUpperCase()}
               </div>
             )}
@@ -42,7 +42,7 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
             <Button
               type="primary"
               size="large"
-              className="flex-1 rounded-full! h-12! text-base! font-semibold! shadow-lg shadow-blue-500/20 bg-(--store-primary)!"
+              className="flex-1 rounded-full! h-12! text-base! font-semibold! shadow-lg shadow-orange-500/20 bg-[rgb(250,84,28)]!"
               onClick={() => onAdd(item)}
             >
               获取
@@ -67,7 +67,7 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
               {item?.tags?.map((tag: any) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 rounded-full bg-(--store-border)  text-xs"
+                  className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 text-xs"
                 >
                   {typeof tag === "string" ? tag : tag.name || tag.label}
                 </span>

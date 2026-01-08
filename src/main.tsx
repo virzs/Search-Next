@@ -6,6 +6,8 @@ import { Theme } from "@radix-ui/themes";
 
 import "./index.css";
 import Index from "./pages/index";
+import { storeRoutes } from "./pages/index/components/default-apps/store/routes";
+import { themeRoutes } from "./pages/index/components/default-apps/theme";
 import { App, ConfigProvider } from "antd";
 import theme from "./theme/config";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -17,6 +19,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
+    children: [storeRoutes, themeRoutes],
   },
 ]);
 

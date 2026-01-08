@@ -3,7 +3,6 @@ import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useMemo, useState } from "react";
 import { RiStore2Line, RiSettingsLine, RiBrushLine, RemixiconComponentType, RiUserLine } from "@remixicon/react";
-import StoreModal from "./components/default-apps/store";
 import type { DesktopItemData } from "../../types";
 import Settings from "./components/default-apps/settings";
 // import SearchWithAI from "../../components/ai-search";
@@ -16,8 +15,8 @@ import AccountModal from "./components/default-apps/account";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
 import { v4 as uuidv4 } from "uuid";
-import ThemeModal from "./components/default-apps/theme";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
+import { Outlet, useNavigate } from "react-router";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -26,6 +25,7 @@ function Index() {
   const { avatarSrc, coverGradientCss } = useAuth();
   const { userLimit } = useConfig();
   const { activeTheme, personalization } = useDesktopTheme();
+  const navigate = useNavigate();
 
   const desktopBackgroundCss = useMemo(() => {
     const wallpaper = personalization.wallpaper;
@@ -42,10 +42,8 @@ function Index() {
     return "background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);";
   }, [personalization.wallpaper]);
 
-  const [storeOpen, { toggle: toggleStore }] = useBoolean(false);
   const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
-  const [themeOpen, { toggle: toggleTheme }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
   const [fullWidget, setFullWidget] = useState<{ entry: string; props?: any; title?: string } | null>(null);
 
@@ -169,7 +167,7 @@ function Index() {
           IconComponent: RiBrushLine,
           tintStyle: "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
           iconSize: 30,
-          onClick: () => toggleTheme(),
+          onClick: () => navigate("/theme"),
         });
       case "*:store":
         return createFixedItem({
@@ -178,7 +176,7 @@ function Index() {
           IconComponent: RiStore2Line,
           tintStyle: "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
           iconSize: 30,
-          onClick: () => toggleStore(),
+          onClick: () => navigate("/store"),
         });
       case "*:settings":
         return createFixedItem({
@@ -364,14 +362,7 @@ function Index() {
           }}
         />
       </div>
-      <StoreModal
-        open={storeOpen}
-        onClose={() => {
-          toggleStore();
-        }}
-        onAddWebsite={handleAddWebsite}
-      />
-      <ThemeModal open={themeOpen} onClose={toggleTheme} />
+      <Outlet context={{ onAddWebsite: handleAddWebsite }} />
       <Settings open={settingsOpen} onClose={toggleSettings} />
       <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />
       {fullWidget && (
