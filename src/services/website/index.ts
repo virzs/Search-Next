@@ -33,8 +33,6 @@ export const getTabsWebsiteCollectionPublicList = (params = {}) => {
   return baseGetRequest<WebsiteCollectionPublicItem[]>("/tabs/website_collection/public/list")(params);
 };
 
-export interface WebsiteCollectionWebsitesPageParams extends BasePageParams {}
-
 // /tabs/website_collection/public/:id/websites get
 export const getTabsWebsiteCollectionPublicWebsitesPage = (id: string, params = {}) => {
   return baseGetRequest(`/tabs/website_collection/public/${id}/websites`)(params);

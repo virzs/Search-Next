@@ -178,7 +178,9 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({ childr
       setPersonalization(migrated);
       try {
         localStorage.setItem(PERSONALIZATION_STORAGE_KEY, JSON.stringify(migrated));
-      } catch {}
+      } catch {
+        void 0;
+      }
     } catch {
       setPersonalization({ themeId: defaultThemeId, wallpaper: { type: "none" } });
     }
@@ -200,7 +202,9 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({ childr
         setPersonalization(next);
         try {
           localStorage.setItem(PERSONALIZATION_STORAGE_KEY, JSON.stringify(next));
-        } catch {}
+        } catch {
+          void 0;
+        }
       },
       setWallpaper: (wallpaper) => {
         const nextWallpaper = wallpaper ?? { type: "none" };
@@ -208,7 +212,9 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({ childr
         setPersonalization(next);
         try {
           localStorage.setItem(PERSONALIZATION_STORAGE_KEY, JSON.stringify(next));
-        } catch {}
+        } catch {
+          void 0;
+        }
       },
     }),
     [themes, personalization, activeTheme]
