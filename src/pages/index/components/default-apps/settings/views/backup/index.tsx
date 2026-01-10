@@ -1,4 +1,4 @@
-import { Button, Space, Typography, Progress, Alert, Divider, Switch, List } from "antd";
+import { Button, Typography, Progress, Alert, Divider, Switch, List } from "antd";
 import {
   RiCloudLine,
   RiDownloadLine,
@@ -7,12 +7,11 @@ import {
   RiErrorWarningLine,
   RiDownloadFill,
   RiUploadFill,
-  RiInbox2Fill,
 } from "@remixicon/react";
 import { useState } from "react";
-import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
+import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
 
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 interface SyncStatus {
   isEnabled: boolean;

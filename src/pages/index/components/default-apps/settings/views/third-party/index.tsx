@@ -1,7 +1,7 @@
-import { Form, Input, Button, Switch, Space, Typography, Divider, message } from "antd";
+import { Form, Input, Button, Switch, Typography, Divider, message } from "antd";
 import { useState, useEffect } from "react";
-import { RiKeyFill, RiCloudLine, RiSaveFill, RiRefreshLine, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
-import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
+import { RiCloudLine, RiSaveFill, RiRefreshLine, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
+import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
 import { ThirdPartyConfig, SyncSettings } from "@/types/api-config";
 import {
   getLocalApiConfig,
@@ -11,7 +11,7 @@ import {
   pullConfigFromServer,
 } from "@/utils/api-config";
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { Item } = Form;
 
 interface ApiConfigFormData {
@@ -64,7 +64,7 @@ const ThirdPartyView = () => {
       } else {
         message.error(result.message);
       }
-    } catch (error) {
+    } catch {
       message.error("保存配置失败");
     } finally {
       setIsSaving(false);
@@ -112,7 +112,7 @@ const ThirdPartyView = () => {
       } else {
         message.error(result.message);
       }
-    } catch (error) {
+    } catch {
       message.error("同步失败");
     } finally {
       setIsSyncing(false);
@@ -255,18 +255,25 @@ const ThirdPartyView = () => {
 
           {/* 保存按钮 */}
           <Item>
-            <SettingsActions actions={[]}>
-              <Button type="primary" htmlType="submit" icon={<RiSaveFill />} loading={isSaving} size="large">
-                保存配置
-              </Button>
-
-              {syncSettings.enabled && isLoggedIn && (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <RiCloudLine size={16} />
-                  <span>将同步到服务器</span>
-                </div>
-              )}
-            </SettingsActions>
+            <SettingsActions
+              actions={[
+                {
+                  key: "save",
+                  label: "保存配置",
+                  type: "primary",
+                  icon: <RiSaveFill />,
+                  onClick: () => form.submit(),
+                  loading: isSaving,
+                  size: "large",
+                },
+              ]}
+            />
+            {syncSettings.enabled && isLoggedIn && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                <RiCloudLine size={16} />
+                <span>将同步到服务器</span>
+              </div>
+            )}
           </Item>
         </Form>
       </SettingsCard>

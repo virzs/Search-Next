@@ -1,7 +1,7 @@
-import { Typography, Radio, Space, Button, Divider, List } from "antd";
+import { Typography, Radio, Divider, List } from "antd";
 import { useState } from "react";
-import { RiGlobalLine, RiCheckLine } from "@remixicon/react";
-import { SettingsViewContainer, SettingsViewHeader, SettingsCard, SettingsActions } from "@/components/settings";
+import { RiCheckLine } from "@remixicon/react";
+import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -106,10 +106,6 @@ const LanguageView = () => {
   const handleResetLanguage = () => {
     setSelectedLanguage("zh-CN");
     setIsChanged(false);
-  };
-
-  const getCurrentLanguage = () => {
-    return languages.find((lang) => lang.code === selectedLanguage);
   };
 
   return (
