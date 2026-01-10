@@ -1,12 +1,11 @@
 import { useAppRouteContext } from "@/components";
-import WidgetView from "./views/widget";
-import WebsiteCollectionRoute from "./views/WebsiteCollectionRoute";
-import WebsiteDetailRoute from "./views/WebsiteDetailRoute";
-import StoreNotFoundRoute from "./views/StoreNotFoundRoute";
-import WebsiteLayoutRoute from "./views/WebsiteLayoutRoute";
-import WebsiteNotFoundRoute from "./views/WebsiteNotFoundRoute";
+import WebsiteCollectionRoute from "./views/website/collection";
+import WebsiteDetailView from "./views/website/detail";
+import StoreNotFoundRoute from "./views/not-found";
+import WebsiteView from "./views/website";
 import StoreModalRoute, { type StoreOutletContext } from "./index";
 import { Navigate } from "react-router";
+import WidgetView from "./views/widget";
 
 const WidgetRoute = () => {
   const { query, onAddWidget } = useAppRouteContext<StoreOutletContext>();
@@ -20,11 +19,11 @@ export const storeRoutes = {
     { index: true, element: <Navigate to="website" replace /> },
     {
       path: "website",
-      element: <WebsiteLayoutRoute />,
       children: [
+        { index: true, element: <WebsiteView /> },
         { path: "collection/:id", element: <WebsiteCollectionRoute /> },
-        { path: "detail/:id", element: <WebsiteDetailRoute /> },
-        { path: "*", element: <WebsiteNotFoundRoute /> },
+        { path: "detail/:id", element: <WebsiteDetailView /> },
+        { path: "*", element: <StoreNotFoundRoute /> },
       ],
     },
     { path: "widget", element: <WidgetRoute /> },

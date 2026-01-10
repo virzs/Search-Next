@@ -1,8 +1,14 @@
 import React, { useMemo } from "react";
 import { Button, Card, Typography } from "antd";
-import { RiTimeLine, RiSunLine, RiTodoLine, RiCalculatorLine, RiApps2Line } from "@remixicon/react";
+import {
+  RiTimeLine,
+  RiSunLine,
+  RiTodoLine,
+  RiCalculatorLine,
+  RiApps2Line,
+} from "@remixicon/react";
 import { WIDGET_CONFIGS } from "@/services/micro-frontend";
-import StoreHeroCard from "../components/StoreHeroCard";
+import StoreHeroCard from "../../components/StoreHeroCard";
 
 const { Title, Text } = Typography;
 
@@ -103,11 +109,15 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
           return (
             <Card key={widget.id} className="rounded-2xl! overflow-hidden">
               <div className="flex items-start gap-3">
-                <div className="shrink-0 rounded-xl bg-black/5 p-2 dark:bg-white/10">{widget.icon}</div>
+                <div className="shrink-0 rounded-xl bg-black/5 p-2 dark:bg-white/10">
+                  {widget.icon}
+                </div>
                 <div className="min-w-0 grow">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="font-medium text-gray-800 dark:text-gray-100 line-clamp-1">{widget.name}</div>
+                      <div className="font-medium text-gray-800 dark:text-gray-100 line-clamp-1">
+                        {widget.name}
+                      </div>
                       <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                         {widget.description}
                       </div>

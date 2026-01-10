@@ -1,8 +1,8 @@
 import { Button, Empty, Skeleton } from "antd";
 import type React from "react";
-import StoreHeroCard from "../components/StoreHeroCard";
-import WebsiteCard from "../components/WebsiteCard";
-import { getWebsiteId } from "../utils";
+import StoreHeroCard from "../../../components/StoreHeroCard";
+import { getWebsiteId } from "../../../utils";
+import WebsiteCard from "../../../components/WebsiteCard";
 
 export interface FeaturedViewProps {
   featuredHomeScrollRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -18,7 +18,10 @@ const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
     <div className="flex flex-nowrap gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1">
       {Array.from({ length: count }).map((_, idx) => (
         <div key={idx} className="w-56 shrink-0">
-          <Skeleton.Image active style={{ width: 224, height: 120, borderRadius: 16 }} />
+          <Skeleton.Image
+            active
+            style={{ width: 224, height: 120, borderRadius: 16 }}
+          />
           <div className="mt-2 px-1">
             <Skeleton
               active

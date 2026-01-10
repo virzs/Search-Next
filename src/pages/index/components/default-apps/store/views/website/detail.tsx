@@ -1,16 +1,27 @@
 import { Button, Image } from "antd";
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 import { RiExternalLinkLine } from "@remixicon/react";
-import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../utils";
-import { AppContentContainer } from "@/components";
+import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
+import { AppContentContainer, useAppRouteContext } from "@/components";
+import { useLocation, useNavigate } from "react-router";
 
-interface WebsiteDetailViewProps {
-  item: any;
-  onBack: () => void;
-  onAdd: (item: any) => void;
-}
+type StoreOutletContext = {
+  onAddWebsite?: (site: any) => void;
+};
 
-const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) => {
+const WebsiteDetailView: FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
+  const stateItem = (location.state as any)?.item ?? null;
+  const itemRef = useRef<any>(stateItem);
+  if (!itemRef.current && stateItem) itemRef.current = stateItem;
+  const item = itemRef.current;
+
+  useEffect(() => {
+    if (!item) navigate("/store/website", { replace: true });
+  }, [item, navigate]);
+
   if (!item) return null;
 
   const iconUrl = getWebsiteIconUrl(item);
@@ -18,7 +29,7 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
   const url = getWebsiteUrl(item);
 
   return (
-    <AppContentContainer className="h-full" animate onBack={onBack}>
+    <AppContentContainer className="h-full" animate onBack={() => navigate(-1)}>
       <div className="max-w-3xl mx-auto p-6 pt-0">
         <div className="flex flex-col items-center text-center mb-8 pt-8">
           <div className="relative mb-6">
@@ -43,7 +54,7 @@ const WebsiteDetailView: FC<WebsiteDetailViewProps> = ({ item, onBack, onAdd }) 
               type="primary"
               size="large"
               className="flex-1 rounded-full! h-12! text-base! font-semibold! shadow-lg shadow-orange-500/20 bg-[rgb(250,84,28)]!"
-              onClick={() => onAdd(item)}
+              onClick={() => onAddWebsite?.(item)}
             >
               获取
             </Button>

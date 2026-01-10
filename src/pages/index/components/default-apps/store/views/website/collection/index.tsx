@@ -7,8 +7,8 @@ import {
   getTabsWebsiteCollectionPublicWebsitesPage,
 } from "@/services/website";
 import { AppContentContainer, useAppRouteContext } from "@/components";
-import WebsiteCard from "../components/WebsiteCard";
-import { getWebsiteId } from "../utils";
+import WebsiteCard from "../../../components/WebsiteCard";
+import { getWebsiteId } from "../../../utils";
 
 type StoreOutletContext = {
   onAddWebsite?: (site: any) => void;
@@ -84,7 +84,9 @@ const WebsiteCollectionRoute: FC = () => {
   );
 
   const titleNode = activeCollection?.title ? (
-    <div className="text-lg font-bold  line-clamp-1">{activeCollection.title}</div>
+    <div className="text-lg font-bold  line-clamp-1">
+      {activeCollection.title}
+    </div>
   ) : (
     <Skeleton.Input active size="small" style={{ width: 180 }} />
   );

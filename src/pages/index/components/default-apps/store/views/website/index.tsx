@@ -6,50 +6,41 @@ import {
   getTabsWebsitePublic,
 } from "@/services/website";
 import { RiAddLine } from "@remixicon/react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import {
   buildCategoriesFromItems,
   fallbackCategories,
   getWebsiteId,
-} from "../utils";
-import WebsiteCard from "../components/WebsiteCard";
-import StoreSegmented from "../components/StoreSegmented";
-import FeaturedView from "./FeaturedView";
+} from "../../utils";
+import WebsiteCard from "../../components/WebsiteCard";
+import StoreSegmented from "../../components/StoreSegmented";
+import FeaturedView from "../website/featured";
+import { useAppRouteContext } from "@/components";
+import type { StoreOutletContext } from "../../index";
 
-interface WebsiteViewProps {
-  onAddWebsite?: (site: any) => void;
-  query?: string;
-}
-
-const WebsiteView: React.FC<WebsiteViewProps> = ({
-  onAddWebsite,
-  query,
-}) => {
+const WebsiteView: React.FC = () => {
+  const { query, onAddWebsite } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [activeView, setActiveView] = useState<string>("featured");
   const featuredHomeScrollRef = useRef<HTMLDivElement | null>(null);
   const featuredRequestedSizeRef = useRef(60);
-  const overlayOpen =
-    location.pathname.startsWith("/store/website/") &&
-    location.pathname !== "/store/website";
 
   const {
     data: listData,
     loading: listLoading,
     run: runList,
   } = useRequest(getTabsWebsitePublic, { manual: true });
-  const {
-    data: featuredData,
-    run: runFeatured,
-  } = useRequest(getTabsWebsitePublic, {
-    manual: true,
-  });
+  const { data: featuredData, run: runFeatured } = useRequest(
+    getTabsWebsitePublic,
+    {
+      manual: true,
+    },
+  );
   const {
     data: collectionListData,
     loading: collectionListLoading,
@@ -64,9 +55,8 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
       prevQueryRef.current = query;
       setPage(1);
       featuredRequestedSizeRef.current = 60;
-      if (overlayOpen) navigate("/store/website", { replace: true });
     }
-  }, [query, overlayOpen, navigate]);
+  }, [query]);
 
   const featuredItems = useMemo(
     () => (featuredData?.data as any[]) || [],
@@ -159,85 +149,79 @@ const WebsiteView: React.FC<WebsiteViewProps> = ({
 
   const openWebsiteDetail = (item: any) => {
     const id = getWebsiteId(item);
-    navigate(`/store/website/detail/${encodeURIComponent(id)}`, { state: { item } });
+    navigate(`/store/website/detail/${encodeURIComponent(id)}`, {
+      state: { item },
+    });
   };
 
   return (
-    <div className="h-full relative overflow-hidden">
-      <div
-        className={`h-full flex flex-col overflow-hidden transition-opacity duration-300 ${
-          overlayOpen
-            ? "opacity-0 pointer-events-none"
-            : "opacity-100"
-        }`}
-      >
-        <div className="shrink-0 flex items-center justify-between gap-3 px-1">
-          <StoreSegmented
-            options={viewOptions}
-            value={activeView}
-            onChange={handleViewChange}
-            className="max-w-full overflow-auto"
-          />
-          <Button
-            type="primary"
-            onClick={() => setAddVisible(true)}
-            icon={<RiAddLine size={16} />}
-          >
-            自定义
-          </Button>
-        </div>
-
-        {activeView === "featured" ? (
-          <FeaturedView
-            featuredHomeScrollRef={featuredHomeScrollRef}
-            collectionItems={collectionItems}
-            collectionListLoading={collectionListLoading}
-            onOpenCollection={openCollection}
-            onAddFromCard={handleAddFromCard}
-            onOpenWebsiteDetail={openWebsiteDetail}
-          />
-        ) : (
-          <>
-            <div className="mt-5 flex items-center justify-between shrink-0 px-1">
-              <div className="text-lg font-bold ">
-                {activeCategory ? activeCategory.label : "全部网站"}
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-y-auto pr-2 pl-1 pb-4 flex-1">
-              {listItems.map((item) => (
-                <WebsiteCard
-                  key={getWebsiteId(item)}
-                  item={item}
-                  layout="grid"
-                  variant="normal"
-                  onAdd={handleAddFromCard}
-                  onClick={openWebsiteDetail}
-                />
-              ))}
-              {!listLoading && listItems.length === 0 && (
-                <Empty description="暂无数据" />
-              )}
-            </div>
-
-            <div className="flex items-center justify-end pt-4 shrink-0">
-              <Pagination
-                size="small"
-                current={page}
-                pageSize={pageSize}
-                total={listTotal}
-                showSizeChanger
-                pageSizeOptions={[10, 20, 40, 80]}
-                onChange={(p, ps) => {
-                  setPage(p);
-                  if (ps !== pageSize) setPageSize(ps);
-                }}
-                disabled={listLoading}
-              />
-            </div>
-          </>
-        )}
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="shrink-0 flex items-center justify-between gap-3 px-1">
+        <StoreSegmented
+          options={viewOptions}
+          value={activeView}
+          onChange={handleViewChange}
+          className="max-w-full overflow-auto"
+        />
+        <Button
+          type="primary"
+          onClick={() => setAddVisible(true)}
+          icon={<RiAddLine size={16} />}
+        >
+          自定义
+        </Button>
       </div>
+
+      {activeView === "featured" ? (
+        <FeaturedView
+          featuredHomeScrollRef={featuredHomeScrollRef}
+          collectionItems={collectionItems}
+          collectionListLoading={collectionListLoading}
+          onOpenCollection={openCollection}
+          onAddFromCard={handleAddFromCard}
+          onOpenWebsiteDetail={openWebsiteDetail}
+        />
+      ) : (
+        <>
+          <div className="mt-5 flex items-center justify-between shrink-0 px-1">
+            <div className="text-lg font-bold ">
+              {activeCategory ? activeCategory.label : "全部网站"}
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-y-auto pr-2 pl-1 pb-4 flex-1">
+            {listItems.map((item) => (
+              <WebsiteCard
+                key={getWebsiteId(item)}
+                item={item}
+                layout="grid"
+                variant="normal"
+                onAdd={handleAddFromCard}
+                onClick={openWebsiteDetail}
+              />
+            ))}
+            {!listLoading && listItems.length === 0 && (
+              <Empty description="暂无数据" />
+            )}
+          </div>
+
+          <div className="flex items-center justify-end pt-4 shrink-0">
+            <Pagination
+              size="small"
+              current={page}
+              pageSize={pageSize}
+              total={listTotal}
+              showSizeChanger
+              pageSizeOptions={[10, 20, 40, 80]}
+              onChange={(p, ps) => {
+                setPage(p);
+                if (ps !== pageSize) setPageSize(ps);
+              }}
+              disabled={listLoading}
+            />
+          </div>
+        </>
+      )}
 
       <Modal
         zIndex={2001}
