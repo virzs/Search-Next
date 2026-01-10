@@ -23,7 +23,6 @@ const WidgetIcon: React.FC<WidgetIconProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isReady, setIsReady] = useState<boolean>(false);
   const appNameRef = useRef<string | null>(null);
   const mountedRef = useRef(false);
 
@@ -81,7 +80,6 @@ const WidgetIcon: React.FC<WidgetIconProps> = ({
         const app = await microAppManager.loadApp(iconConfig);
 
         if (app) {
-          setIsReady(true);
           mountedRef.current = true;
         } else {
           throw new Error(`Failed to load widget icon: ${stableConfig.name}`);

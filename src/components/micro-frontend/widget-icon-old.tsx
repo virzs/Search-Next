@@ -20,19 +20,16 @@ const WidgetIcon: React.FC<WidgetIconProps> = ({
   onDoubleClick,
   fallbackIcon,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);  const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isReady, setIsReady] = useState<boolean>(false);
   const appNameRef = useRef<string | null>(null);
   const mountedRef = useRef(false);
-  // 创建配置的稳定版本，避免无必要的重新渲染
-  const configKey = `${config.name}-${config.entry}-${config.container}`;
-  const propsString = JSON.stringify(config.props);
-    const stableConfig = useMemo(() => ({
+  const stableConfig = useMemo(() => ({
     name: config.name,
     entry: config.entry,
     container: config.container,
-    props: config.props
+    props: config.props,
   }), [config.name, config.entry, config.container, config.props]);
   useEffect(() => {
     if (!containerRef.current) return;
@@ -53,7 +50,8 @@ const WidgetIcon: React.FC<WidgetIconProps> = ({
       }
 
       setLoading(true);
-      setError(null);      try {
+      setError(null);
+      try {
         // 生成唯一的容器ID和应用名称
         const timestamp = Date.now();
         const containerId = `widget-icon-${stableConfig.name}-${timestamp}`;
@@ -75,11 +73,13 @@ const WidgetIcon: React.FC<WidgetIconProps> = ({
           },
         };
 
-        const app = await microAppManager.loadApp(iconConfig);        if (app) {
-          setIsReady(true);
-          mountedRef.current = true;} else {
+        const app = await microAppManager.loadApp(iconConfig);
+        if (app) {
+          mountedRef.current = true;
+        } else {
           throw new Error(`Failed to load widget icon: ${stableConfig.name}`);
-        }      } catch (err) {
+        }
+      } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
         console.warn(`Widget icon fallback for ${stableConfig.name}:`, err);
         
@@ -92,7 +92,8 @@ const WidgetIcon: React.FC<WidgetIconProps> = ({
       } finally {
         setLoading(false);
       }
-    };    // 如果配置中支持图标模式，则加载
+    };
+    // 如果配置中支持图标模式，则加载
     if (stableConfig.props?.supportIconMode) {
       loadApp();
     } else {

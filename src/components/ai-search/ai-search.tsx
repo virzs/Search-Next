@@ -77,14 +77,17 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
       setLoading(true);
 
       try {
-        // 获取对话上下文（最近3条消息）
         const context = messages
           .slice(-3)
           .map((msg) => `${msg.role}: ${msg.content}`)
           .join("\n");
 
         // 调用AI搜索服务进行网页搜索
-        const searchResponse = await performAISearch(query, selectedEngine);
+        const searchResponse = await performAISearch({
+          query,
+          searchEngine: selectedEngine,
+          context,
+        });
 
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -115,7 +118,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
         setLoading(false);
       }
     },
-    [selectedEngine, messages]
+    [messages, selectedEngine]
   );
 
   const saveCurrentConversation = useCallback(() => {
@@ -260,9 +263,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
                   avatar={
                     message.role === "user"
                       ? undefined
-                      : {
-                          icon: <RiRobot2Line />,
-                        }
+                      : <RiRobot2Line size={16} />
                   }
                   variant={message.role === "user" ? "filled" : "borderless"}
                   loading={loading && message.id === messages[messages.length - 1]?.id && message.role === "assistant"}

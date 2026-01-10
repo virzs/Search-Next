@@ -188,7 +188,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
         <AutoComplete
           value={searchQuery}
           onChange={setSearchQuery}
-          onKeyPress={handleKeyPress}
           options={autoCompleteOptions}
           style={{ flex: 1 }}
           placeholder={
@@ -215,6 +214,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
               font-size: 16px;
               ${searchMode === "ai" ? "border-color: #667eea;" : ""}
             `}
+            onKeyDown={handleKeyPress}
           />
         </AutoComplete>
 

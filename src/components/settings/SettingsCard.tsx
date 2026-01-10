@@ -1,8 +1,6 @@
 import { ReactNode } from "react";
-import { Card, Typography } from "antd";
+import { Card } from "antd";
 import { css } from "@emotion/css";
-
-const { Title } = Typography;
 
 interface SettingsCardProps {
   title?: string;
