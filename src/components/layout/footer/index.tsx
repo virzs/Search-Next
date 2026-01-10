@@ -1,13 +1,7 @@
 import { FC } from "react";
 import ThemeButton from "../../theme-button";
 
-interface FooterProps {
-  simple?: boolean;
-}
-
-const Footer: FC<FooterProps> = (props) => {
-  const { simple } = props;
-
+const Footer: FC = () => {
   return (
     <footer className="footer w-full py-4 px-8">
       <div className="max-w-7xl mx-auto flex items-center gap-4 justify-between">
