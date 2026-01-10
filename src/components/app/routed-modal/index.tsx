@@ -148,7 +148,12 @@ const AppRouteModal = <ParentContext, RouteContext>({
 
   const resolvedSidebarProps = useMemo<AppSidebarProps | undefined>(() => {
     if (!sidebarProps) return undefined;
-    const menuItems = (sidebarProps.menuItems ?? []).map(({ path, match, ...rest }) => rest);
+    const menuItems = (sidebarProps.menuItems ?? []).map((item) => {
+      const { path, match, ...rest } = item;
+      void path;
+      void match;
+      return rest;
+    });
     return {
       ...sidebarProps,
       menuItems,
@@ -172,7 +177,7 @@ const AppRouteModal = <ParentContext, RouteContext>({
     if (keepAlive.getKey) {
       return keepAlive.getKey({ pathname: location.pathname, activeMenuItem });
     }
-    return activeMenuItem?.path ?? location.pathname;
+    return location.pathname;
   }, [activeMenuItem, keepAlive, location.pathname]);
 
   const routeContextValue = useMemo(() => {

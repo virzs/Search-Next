@@ -5,6 +5,7 @@ import AppContentContainer from "./content-container";
 import AppRoutedContainer from "./routed-container";
 import AppRouteModal from "./routed-modal";
 import StackedDrawerOutlet from "./router/StackedDrawerOutlet";
+import StackedFadeOutlet from "./router/StackedFadeOutlet";
 import { AppRouteContextProvider, useAppRouteContext } from "./router/context";
 
 export {
@@ -16,5 +17,6 @@ export {
   AppSegmented,
   AppRouteContextProvider,
   StackedDrawerOutlet,
+  StackedFadeOutlet,
   useAppRouteContext,
 };
