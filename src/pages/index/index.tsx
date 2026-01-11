@@ -242,7 +242,7 @@ function Index() {
   const handleAddWebsite = (site: any) => {
     const name = site?.name;
     const url = site?.url;
-    const icon = site?.icon?.url;
+    const icon = site?.iconEdited?.url ?? site?.icon?.url;
     if (!url) return;
     const appItem = {
       id: uuidv4(),

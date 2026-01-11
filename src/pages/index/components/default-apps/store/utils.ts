@@ -2,7 +2,7 @@ export const getWebsiteId = (item: any) => item?._id ?? item?.id ?? item?.name ?
 
 export const getWebsiteName = (item: any) => item?.name ?? item?.title ?? "未命名";
 
-export const getWebsiteIconUrl = (item: any) => item?.icon?.url ?? item?.iconUrl ?? item?.icon;
+export const getWebsiteIconUrl = (item: any) => item?.iconEdited?.url ?? item?.icon?.url ?? item?.iconUrl ?? item?.icon;
 
 export const getWebsiteUrl = (item: any) => item?.url ?? item?.link ?? item?.href;
 
