@@ -65,22 +65,22 @@ const KeepAliveOutlet = ({
   );
 };
 
-export interface AppRouteModalMenuItem extends AppSidebarMenuItem {
+export interface AppRoutedOverlayMenuItem extends AppSidebarMenuItem {
   path: string;
   match?: (pathname: string) => boolean;
 }
 
-export interface AppRouteModalSidebarProps
+export interface AppRoutedOverlaySidebarProps
   extends Omit<AppSidebarProps, "menuItems" | "activeMenuKey" | "onMenuSelect" | "search"> {
-  menuItems?: AppRouteModalMenuItem[];
+  menuItems?: AppRoutedOverlayMenuItem[];
   search?: Omit<AppSidebarSearchProps, "value" | "onChange"> & { initialValue?: string };
 }
 
-export interface AppRouteModalProps<ParentContext = unknown, RouteContext = unknown> {
+export interface AppRoutedOverlayProps<ParentContext = unknown, RouteContext = unknown> {
   title?: ReactNode;
   closeTo?: string;
   wrapContent?: boolean;
-  sidebarProps?: AppRouteModalSidebarProps;
+  sidebarProps?: AppRoutedOverlaySidebarProps;
   outletWrapperClassName?: string;
   suspenseFallback?: ReactNode;
   children?: ReactNode;
@@ -89,20 +89,20 @@ export interface AppRouteModalProps<ParentContext = unknown, RouteContext = unkn
     maxSize?: number;
     getKey?: (args: {
       pathname: string;
-      activeMenuItem: AppRouteModalMenuItem | null;
+      activeMenuItem: AppRoutedOverlayMenuItem | null;
     }) => string;
   };
   getRouteContext?: (args: {
     parentContext: ParentContext;
     location: ReturnType<typeof useLocation>;
     search: { value: string; setValue: (value: string) => void };
-    activeMenuItem: AppRouteModalMenuItem | null;
+    activeMenuItem: AppRoutedOverlayMenuItem | null;
   }) => RouteContext;
 }
 
 const resolveActiveMenuItem = (
   pathname: string,
-  menuItems: AppRouteModalMenuItem[] | undefined,
+  menuItems: AppRoutedOverlayMenuItem[] | undefined,
 ) => {
   const items = menuItems ?? [];
   if (!items.length) return null;
@@ -113,14 +113,14 @@ const resolveActiveMenuItem = (
       const score = (item.match ? 10_000 : 0) + item.path.length;
       return { item, score };
     })
-    .filter(Boolean) as { item: AppRouteModalMenuItem; score: number }[];
+    .filter(Boolean) as { item: AppRoutedOverlayMenuItem; score: number }[];
 
   if (!scored.length) return items[0] ?? null;
   scored.sort((a, b) => b.score - a.score);
   return scored[0]?.item ?? items[0] ?? null;
 };
 
-const AppRouteModal = <ParentContext, RouteContext>({
+const AppRoutedOverlay = <ParentContext, RouteContext>({
   title,
   closeTo = "/",
   wrapContent,
@@ -130,14 +130,12 @@ const AppRouteModal = <ParentContext, RouteContext>({
   children,
   keepAlive,
   getRouteContext,
-}: AppRouteModalProps<ParentContext, RouteContext>) => {
+}: AppRoutedOverlayProps<ParentContext, RouteContext>) => {
   const navigate = useNavigate();
   const location = useLocation();
   const outlet = useOutlet();
   const parentContext = useOutletContext<ParentContext>();
-  const [searchValue, setSearchValue] = useState(
-    sidebarProps?.search?.initialValue ?? "",
-  );
+  const [searchValue, setSearchValue] = useState(sidebarProps?.search?.initialValue ?? "");
 
   const activeMenuItem = useMemo(
     () => resolveActiveMenuItem(location.pathname, sidebarProps?.menuItems),
@@ -208,9 +206,7 @@ const AppRouteModal = <ParentContext, RouteContext>({
     >
       <Suspense fallback={suspenseFallback}>
         {getRouteContext ? (
-          <AppRouteContextProvider value={routeContextValue}>
-            {content}
-          </AppRouteContextProvider>
+          <AppRouteContextProvider value={routeContextValue}>{content}</AppRouteContextProvider>
         ) : (
           content
         )}
@@ -219,4 +215,5 @@ const AppRouteModal = <ParentContext, RouteContext>({
   );
 };
 
-export default AppRouteModal;
+export default AppRoutedOverlay;
+

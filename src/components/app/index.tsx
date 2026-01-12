@@ -3,7 +3,7 @@ import AppResponsiveOverlay from "./responsive-overlay";
 import AppSegmented from "./segmented";
 import AppContentContainer from "./content-container";
 import AppRoutedContainer from "./routed-container";
-import AppRouteModal from "./routed-modal";
+import AppRoutedOverlay from "./routed-overlay";
 import StackedDrawerOutlet from "./router/StackedDrawerOutlet";
 import StackedFadeOutlet from "./router/StackedFadeOutlet";
 import { AppRouteContextProvider, useAppRouteContext } from "./router/context";
@@ -12,7 +12,7 @@ export {
   AppContentContainer,
   AppResponsiveOverlay,
   AppRoutedContainer,
-  AppRouteModal,
+  AppRoutedOverlay,
   AppSidebar,
   AppSegmented,
   AppRouteContextProvider,
