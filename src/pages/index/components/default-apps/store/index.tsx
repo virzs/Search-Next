@@ -4,11 +4,8 @@ import {
   RiAppsLine,
   RiLinksFill,
   RiLinksLine,
-  RiSearchLine,
 } from "@remixicon/react";
-import {
-  AppRouteModal,
-} from "@/components";
+import { AppRouteModal } from "@/components";
 
 export type DesktopOutletContext = {
   onAddWidget?: (widgetId: string) => void;
@@ -42,12 +39,9 @@ const StoreModalRoute: FC = () => {
       title="应用商店"
       wrapContent
       sidebarProps={{
-        header: <div className="text-2xl font-bold tracking-tight">应用商店</div>,
-        search: {
-          placeholder: "搜索应用与组件",
-          prefix: <RiSearchLine size={16} className="" />,
-          inputClassName: "border-transparent! transition-all h-10",
-        },
+        header: (
+          <div className="text-2xl font-bold tracking-tight">应用商店</div>
+        ),
         menuItems: [
           {
             key: "website",

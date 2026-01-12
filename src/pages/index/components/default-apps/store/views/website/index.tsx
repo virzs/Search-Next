@@ -19,7 +19,7 @@ import { useAppRouteContext } from "@/components";
 import type { StoreOutletContext } from "../../index";
 
 const WebsiteView: React.FC = () => {
-  const { query, onAddWebsite } = useAppRouteContext<StoreOutletContext>();
+  const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
@@ -46,17 +46,6 @@ const WebsiteView: React.FC = () => {
     loading: collectionListLoading,
     run: runCollectionList,
   } = useRequest(getTabsWebsiteCollectionPublicList, { manual: true });
-
-  const prevQueryRef = useRef(query);
-
-  useEffect(() => {
-    const isQueryChanged = prevQueryRef.current !== query;
-    if (isQueryChanged) {
-      prevQueryRef.current = query;
-      setPage(1);
-      featuredRequestedSizeRef.current = 60;
-    }
-  }, [query]);
 
   const featuredItems = useMemo(
     () => (featuredData?.data as any[]) || [],
@@ -95,9 +84,8 @@ const WebsiteView: React.FC = () => {
     runFeatured({
       page: 1,
       pageSize: featuredRequestedSizeRef.current,
-      search: query || undefined,
     });
-  }, [activeView, query, runFeatured]);
+  }, [activeView, runFeatured]);
 
   useEffect(() => {
     if (activeView !== "featured") return;
@@ -109,7 +97,6 @@ const WebsiteView: React.FC = () => {
     runList({
       page,
       pageSize,
-      search: query || undefined,
       ...(activeCategory?.filter ?? {}),
     });
   }, [
@@ -117,7 +104,6 @@ const WebsiteView: React.FC = () => {
     activeCategory?.key,
     page,
     pageSize,
-    query,
     runList,
     activeCategory?.filter,
   ]);
