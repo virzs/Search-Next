@@ -4,7 +4,6 @@ import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useMemo, useState } from "react";
 import { RiStore2Line, RiSettingsLine, RiBrushLine, RemixiconComponentType, RiUserLine } from "@remixicon/react";
 import type { DesktopItemData } from "../../types";
-import Settings from "./components/default-apps/settings";
 // import SearchWithAI from "../../components/ai-search";
 import { App, Spin } from "antd";
 import { getDefaultUserConfig } from "@/services/desktop";
@@ -42,7 +41,6 @@ function Index() {
     return "background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);";
   }, [personalization.wallpaper]);
 
-  const [settingsOpen, { toggle: toggleSettings }] = useBoolean(false);
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
   const [fullWidget, setFullWidget] = useState<{ entry: string; props?: any; title?: string } | null>(null);
@@ -186,7 +184,7 @@ function Index() {
           tintStyle: "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
           iconSize: 30,
           iconColor: "#1c1c1e",
-          onClick: () => toggleSettings(),
+          onClick: () => navigate("/settings"),
         });
       default:
         return null;
@@ -363,7 +361,6 @@ function Index() {
         />
       </div>
       <Outlet context={{ onAddWebsite: handleAddWebsite }} />
-      <Settings open={settingsOpen} onClose={toggleSettings} />
       <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />
       {fullWidget && (
         <PureWidgetWindow

@@ -8,6 +8,7 @@ import "./index.css";
 import Index from "./pages/index";
 import { storeRoutes } from "./pages/index/components/default-apps/store/routes";
 import { themeRoutes } from "./pages/index/components/default-apps/theme";
+import { settingsRoutes } from "./pages/index/components/default-apps/settings";
 import { App, ConfigProvider } from "antd";
 import theme from "./theme/config";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -19,7 +20,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
-    children: [storeRoutes, themeRoutes],
+    children: [storeRoutes, themeRoutes, settingsRoutes],
   },
 ]);
 
@@ -37,7 +38,7 @@ createRoot(document.getElementById("root")!).render(
         </AuthProvider>
       </ConfigProvider>
     </App>
-  </Theme>
+  </Theme>,
 );
 
 // 让外部纯 JS 小组件复用宿主项目的 React 和 ReactDOM
