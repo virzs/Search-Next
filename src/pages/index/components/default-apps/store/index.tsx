@@ -5,7 +5,7 @@ import {
   RiLinksFill,
   RiLinksLine,
 } from "@remixicon/react";
-import { AppRouteModal } from "@/components";
+import { AppRoutedOverlay } from "@/components";
 
 export type DesktopOutletContext = {
   onAddWidget?: (widgetId: string) => void;
@@ -34,7 +34,7 @@ const buildStoreRouteContext = ({
 
 const StoreModalRoute: FC = () => {
   return (
-    <AppRouteModal<DesktopOutletContext, StoreOutletContext>
+    <AppRoutedOverlay<DesktopOutletContext, StoreOutletContext>
       closeTo="/"
       title="应用商店"
       wrapContent

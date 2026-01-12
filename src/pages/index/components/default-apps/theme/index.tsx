@@ -1,11 +1,11 @@
-import { AppRouteModal } from "@/components";
+import { AppRoutedOverlay } from "@/components";
 import { FC } from "react";
 import ThemeView from "./views/theme";
 import WallpaperView from "./views/wallpaper";
 
 const ThemeModalRoute: FC = () => {
   return (
-    <AppRouteModal
+    <AppRoutedOverlay
       closeTo="/"
       title="个性化"
       wrapContent
