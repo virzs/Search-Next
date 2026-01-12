@@ -2,7 +2,7 @@ import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useOutlet, useOutletContext } from "react-router";
 import AppRoutedContainer from "../routed-container";
 import type { AppSidebarMenuItem, AppSidebarProps, AppSidebarSearchProps } from "../sidebar";
-import { AppRouteContextProvider } from "../router/context";
+import { AppRouteContextProvider } from "../router/route-context";
 
 type KeepAlivePage = {
   key: string;
@@ -216,4 +216,3 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
 };
 
 export default AppRoutedOverlay;
-

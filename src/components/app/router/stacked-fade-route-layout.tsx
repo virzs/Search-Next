@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
-import StackedFadeOutlet from "./StackedFadeOutlet";
+import StackedFadeOutlet from "./stacked-fade-outlet";
 
 export interface StackedFadeRouteLayoutProps {
   base: ReactNode;

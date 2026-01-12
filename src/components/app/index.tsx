@@ -4,9 +4,9 @@ import AppSegmented from "./segmented";
 import AppContentContainer from "./content-container";
 import AppRoutedContainer from "./routed-container";
 import AppRoutedOverlay from "./routed-overlay";
-import StackedDrawerOutlet from "./router/StackedDrawerOutlet";
-import StackedFadeOutlet from "./router/StackedFadeOutlet";
-import { AppRouteContextProvider, useAppRouteContext } from "./router/context";
+import StackedDrawerOutlet from "./router/stacked-drawer-outlet";
+import StackedFadeOutlet from "./router/stacked-fade-outlet";
+import { AppRouteContextProvider, useAppRouteContext } from "./router/route-context";
 
 export {
   AppContentContainer,
