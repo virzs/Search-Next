@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useOutlet } from "react-router";
+import { cx } from "@emotion/css";
 
 type FadePage = {
   key: string;
@@ -53,7 +54,8 @@ const StackedFadeOutlet = ({
       }
 
       const next = [...prev, { key: activeKey, element: outlet }];
-      if (maxSize && next.length > maxSize) return next.slice(next.length - maxSize);
+      if (maxSize && next.length > maxSize)
+        return next.slice(next.length - maxSize);
       return next;
     });
   }, [activeKey, maxSize, outlet]);
@@ -68,7 +70,8 @@ const StackedFadeOutlet = ({
   useEffect(() => {
     const prevActive = prevActiveKeyRef.current;
 
-    if (activeKey && prevActive && prevActive !== activeKey) setLeavingKey(prevActive);
+    if (activeKey && prevActive && prevActive !== activeKey)
+      setLeavingKey(prevActive);
     if (!activeKey) setLeavingKey(null);
 
     if (activeKey && prevActive !== activeKey) {
@@ -83,7 +86,7 @@ const StackedFadeOutlet = ({
   if (!activeKey && !leavingKey) return null;
 
   return (
-    <div className={["absolute inset-0 z-10", className].filter(Boolean).join(" ")}>
+    <div className={cx("absolute inset-0 z-10", className)}>
       {pages.map((p) => {
         const isCurrent = p.key === activeKey;
         const isLeaving = p.key === leavingKey;
@@ -92,18 +95,21 @@ const StackedFadeOutlet = ({
         return (
           <motion.div
             key={p.key}
-            className={["absolute inset-0", layerClassName].filter(Boolean).join(" ")}
+            className={cx("absolute inset-0", layerClassName)}
             style={{
               display: isVisible ? "block" : "none",
               zIndex: isLeaving ? 2 : 1,
               pointerEvents: isCurrent ? "auto" : "none",
             }}
-            initial={isCurrent && enteringKey === p.key ? { opacity: 0 } : false}
+            initial={
+              isCurrent && enteringKey === p.key ? { opacity: 0 } : false
+            }
             animate={isVisible ? { opacity: isLeaving ? 0 : 1 } : false}
             transition={{ duration, ease }}
             onAnimationComplete={() => {
               if (p.key === leavingKeyRef.current) setLeavingKey(null);
-              if (p.key === enteringKey && p.key === activeKeyRef.current) setEnteringKey(null);
+              if (p.key === enteringKey && p.key === activeKeyRef.current)
+                setEnteringKey(null);
             }}
           >
             {p.element}
@@ -115,4 +121,3 @@ const StackedFadeOutlet = ({
 };
 
 export default StackedFadeOutlet;
-

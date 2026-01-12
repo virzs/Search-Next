@@ -1,5 +1,6 @@
 import { Input, Menu } from "antd";
 import type { MenuProps } from "antd";
+import { cx } from "@emotion/css";
 import { FC, ReactNode } from "react";
 
 export interface AppSidebarMenuItem {
@@ -44,17 +45,16 @@ const AppSidebar: FC<AppSidebarProps> = ({
     key: item.key,
     label: item.label,
     disabled: item.disabled,
-    icon: activeMenuKey === item.key ? item.activeIcon ?? item.icon : item.icon,
+    icon:
+      activeMenuKey === item.key ? (item.activeIcon ?? item.icon) : item.icon,
   }));
 
   return (
     <aside
-      className={[
+      className={cx(
         "w-56 shrink-0 border-r pr-4 backdrop-blur-xl flex flex-col h-full",
         className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      )}
     >
       {header ? <div className="px-2 pt-1 pb-4">{header}</div> : null}
 
@@ -91,10 +91,11 @@ const AppSidebar: FC<AppSidebarProps> = ({
         <div className="flex-1" />
       )}
 
-      {footer ? <div className="mt-auto px-4 py-4 text-xs text-center">{footer}</div> : null}
+      {footer ? (
+        <div className="mt-auto px-4 py-4 text-xs text-center">{footer}</div>
+      ) : null}
     </aside>
   );
 };
 
 export default AppSidebar;
-

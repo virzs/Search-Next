@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigationType, useOutlet } from "react-router";
+import { cx } from "@emotion/css";
 
 type DrawerTransitionPhase = "idle" | "forward" | "back";
 
@@ -109,18 +110,18 @@ const StackedDrawerOutlet = ({
   const shouldRender = current || from || to;
   if (!shouldRender) return null;
 
-  const baseLayer = phase === "back" ? to : from ?? current;
+  const baseLayer = phase === "back" ? to : (from ?? current);
   const frontLayer = phase === "back" ? from : to;
 
   return (
-    <div className={["relative h-full w-full overflow-hidden", className].filter(Boolean).join(" ")}>
+    <div className={cx("relative h-full w-full overflow-hidden", className)}>
       {phase === "idle" && current ? (
-        <div className={["absolute inset-0", layerClassName].filter(Boolean).join(" ")}>
+        <div className={cx("absolute inset-0", layerClassName)}>
           {current.element}
         </div>
       ) : baseLayer ? (
         <div
-          className={["absolute inset-0", layerClassName].filter(Boolean).join(" ")}
+          className={cx("absolute inset-0", layerClassName)}
           style={{ pointerEvents: phase === "idle" ? "auto" : "none" }}
         >
           {baseLayer.element}
@@ -130,16 +131,14 @@ const StackedDrawerOutlet = ({
       {frontLayer ? (
         <motion.div
           key={frontLayer.key}
-          className={["absolute inset-0", layerClassName].filter(Boolean).join(" ")}
+          className={cx("absolute inset-0", layerClassName)}
           initial={
             phase === "forward"
               ? { x: "100%", opacity: 0 }
               : { x: 0, opacity: 1 }
           }
           animate={
-            phase === "back"
-              ? { x: "100%", opacity: 0 }
-              : { x: 0, opacity: 1 }
+            phase === "back" ? { x: "100%", opacity: 0 } : { x: 0, opacity: 1 }
           }
           transition={resolvedTransition}
           onAnimationComplete={() => {
@@ -167,4 +166,3 @@ const StackedDrawerOutlet = ({
 };
 
 export default StackedDrawerOutlet;
-

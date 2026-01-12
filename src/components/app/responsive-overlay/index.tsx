@@ -3,6 +3,7 @@ import type { DrawerProps } from "antd";
 import { configResponsive, useResponsive } from "ahooks";
 import { CSSProperties, FC, ReactNode } from "react";
 import { DesktopBaseModal } from "zs_library";
+import { cx } from "@emotion/css";
 
 export interface AppResponsiveOverlayProps {
   open: boolean;
@@ -47,19 +48,23 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({
   const resolvedIsDesktop = isDesktop ?? computedIsDesktop;
 
   const resolvedWrapContent =
-    wrapContent ?? !!(contentClassName || desktopContentClassName || mobileContentClassName || contentStyle);
+    wrapContent ??
+    !!(
+      contentClassName ||
+      desktopContentClassName ||
+      mobileContentClassName ||
+      contentStyle
+    );
   const defaultContentClassName = "w-full overflow-hidden";
   const defaultDesktopContentClassName = "h-[72vh] min-h-full max-h-[780px]";
   const defaultMobileContentClassName = "h-full";
-  const resolvedContentClassName = [
+  const resolvedContentClassName = cx(
     defaultContentClassName,
     resolvedIsDesktop
-      ? desktopContentClassName ?? defaultDesktopContentClassName
-      : mobileContentClassName ?? defaultMobileContentClassName,
+      ? (desktopContentClassName ?? defaultDesktopContentClassName)
+      : (mobileContentClassName ?? defaultMobileContentClassName),
     contentClassName,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  );
 
   const defaultDrawerStyles = { body: { padding: 0 } } as DrawerProps["styles"];
   const mergedDrawerStyles = {

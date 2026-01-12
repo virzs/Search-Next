@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import StackedFadeOutlet from "./stacked-fade-outlet";
+import { cx } from "@emotion/css";
 
 export interface StackedFadeRouteLayoutProps {
   base: ReactNode;
@@ -26,7 +27,8 @@ const StackedFadeRouteLayout = ({
   const location = useLocation();
   const navigate = useNavigate();
   const overlayOpen =
-    location.pathname.startsWith(`${basePath}/`) && location.pathname !== basePath;
+    location.pathname.startsWith(`${basePath}/`) &&
+    location.pathname !== basePath;
 
   const prevCloseValueRef = useRef(closeOnValueChange?.value);
   useEffect(() => {
@@ -43,15 +45,13 @@ const StackedFadeRouteLayout = ({
   }, [basePath, closeOnValueChange, navigate, overlayOpen]);
 
   return (
-    <div className={["h-full relative overflow-hidden", className].filter(Boolean).join(" ")}>
+    <div className={cx("h-full relative overflow-hidden", className)}>
       <div
-        className={[
+        className={cx(
           "h-full flex flex-col overflow-hidden transition-opacity duration-300",
           overlayOpen ? "opacity-0 pointer-events-none" : "opacity-100",
           baseWrapperClassName,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        )}
       >
         {base}
       </div>
@@ -61,4 +61,3 @@ const StackedFadeRouteLayout = ({
 };
 
 export default StackedFadeRouteLayout;
-

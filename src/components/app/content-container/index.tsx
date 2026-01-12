@@ -1,5 +1,6 @@
 import { RiArrowLeftLine } from "@remixicon/react";
 import { Button } from "antd";
+import { cx } from "@emotion/css";
 import type { FC, ReactNode } from "react";
 
 export interface AppContentContainerProps {
@@ -32,24 +33,20 @@ const AppContentContainer: FC<AppContentContainerProps> = ({
 
   return (
     <div
-      className={[
+      className={cx(
         "flex flex-col overflow-hidden",
         animate
           ? "animate-in fade-in slide-in-from-right-4 duration-300"
           : null,
         className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      )}
     >
       {showHeader ? (
         <div
-          className={[
+          className={cx(
             "shrink-0 flex items-center gap-2 p-4 pb-2",
             headerClassName,
-          ]
-            .filter(Boolean)
-            .join(" ")}
+          )}
         >
           {showBackButton ? (
             <Button
@@ -68,7 +65,7 @@ const AppContentContainer: FC<AppContentContainerProps> = ({
         </div>
       ) : null}
 
-      <div className={["flex-1 overflow-y-auto", contentClassName].filter(Boolean).join(" ")}>
+      <div className={cx("flex-1 overflow-y-auto", contentClassName)}>
         {children}
       </div>
     </div>
