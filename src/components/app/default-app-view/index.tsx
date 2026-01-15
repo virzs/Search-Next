@@ -25,7 +25,7 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
       {showHeader ? (
         <div
           className={cx(
-            "shrink-0 flex items-start gap-3 px-1",
+            "shrink-0 flex items-start gap-3",
             headerClassName,
           )}
         >
@@ -34,7 +34,7 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
         </div>
       ) : null}
 
-      <div className={cx("flex-1 overflow-hidden", contentClassName)}>
+      <div className={cx("flex-1 overflow-hidden pt-4", contentClassName)}>
         {children}
       </div>
     </div>
