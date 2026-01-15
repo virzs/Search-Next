@@ -1,18 +1,33 @@
-import { Desktop, DesktopSortItem, DesktopHandle, DesktopAppItem } from "zs_library";
+import {
+  Desktop,
+  DesktopSortItem,
+  DesktopHandle,
+  DesktopAppItem,
+} from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useMemo, useState } from "react";
-import { RiStore2Line, RiSettingsLine, RiBrushLine, RemixiconComponentType, RiUserLine } from "@remixicon/react";
+import {
+  RiStore2Line,
+  RiSettingsLine,
+  RiBrushLine,
+  RemixiconComponentType,
+  RiUserLine,
+} from "@remixicon/react";
 import type { DesktopItemData } from "../../types";
 // import SearchWithAI from "../../components/ai-search";
-import { App, Spin } from "antd";
+import { App } from "antd";
 import { getDefaultUserConfig } from "@/services/desktop";
-import { DESKTOP_LIST_MODIFIED_STORAGE_KEY, DESKTOP_LIST_STORAGE_KEY } from "@/utils/storage";
+import {
+  DESKTOP_LIST_MODIFIED_STORAGE_KEY,
+  DESKTOP_LIST_STORAGE_KEY,
+} from "@/utils/storage";
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
 import AccountModal from "./components/default-apps/account";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
+import LoadingOverlay from "./components/loading-overlay";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
@@ -43,7 +58,11 @@ function Index() {
 
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
   const [init, { toggle: toggleInit }] = useBoolean(true);
-  const [fullWidget, setFullWidget] = useState<{ entry: string; props?: any; title?: string } | null>(null);
+  const [fullWidget, setFullWidget] = useState<{
+    entry: string;
+    props?: any;
+    title?: string;
+  } | null>(null);
 
   // userLimit 由 ConfigContext 提供
 
@@ -54,7 +73,8 @@ function Index() {
         config: { list = [] },
       } = res;
 
-      const isModified = localStorage.getItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY) === "true";
+      const isModified =
+        localStorage.getItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY) === "true";
       if (!isModified) {
         desktopRef.current?.state.setList(list);
       }
@@ -109,7 +129,9 @@ function Index() {
                 -webkit-backdrop-filter: blur(22px) saturate(1.25);
                 backdrop-filter: blur(22px) saturate(1.25);
                 border: 1px solid rgba(255, 255, 255, 0.28);
-                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                box-shadow:
+                  0 8px 18px rgba(0, 0, 0, 0.18),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.3);
 
                 &::before {
                   content: "";
@@ -134,11 +156,16 @@ function Index() {
                   );
                   pointer-events: none;
                 }
-              `
+              `,
             )}
           >
-            <div className="w-full h-full flex items-center justify-center relative" style={{ zIndex: 1 }}>
-              <div style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}>
+            <div
+              className="w-full h-full flex items-center justify-center relative"
+              style={{ zIndex: 1 }}
+            >
+              <div
+                style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
+              >
                 <IconComponent size={iconSize ?? 30} />
               </div>
             </div>
@@ -153,9 +180,17 @@ function Index() {
           key: "my",
           name: "账号",
           IconComponent: avatarSrc
-            ? () => <img src={avatarSrc} alt="avatar" className="w-full h-full object-cover pointer-events-none" />
+            ? () => (
+                <img
+                  src={avatarSrc}
+                  alt="avatar"
+                  className="w-full h-full object-cover pointer-events-none"
+                />
+              )
             : RiUserLine,
-          tintStyle: coverGradientCss ?? "linear-gradient(135deg, rgba(255, 59, 48, 0.92) 0%, rgba(175, 82, 222, 0.9) 100%)",
+          tintStyle:
+            coverGradientCss ??
+            "linear-gradient(135deg, rgba(255, 59, 48, 0.92) 0%, rgba(175, 82, 222, 0.9) 100%)",
           onClick: () => toggleAccountInfo(),
         });
       case "*:theme":
@@ -163,7 +198,8 @@ function Index() {
           key: "theme",
           name: "个性化",
           IconComponent: RiBrushLine,
-          tintStyle: "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
+          tintStyle:
+            "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
           iconSize: 30,
           onClick: () => navigate("/theme"),
         });
@@ -172,7 +208,8 @@ function Index() {
           key: "store",
           name: "应用商店",
           IconComponent: RiStore2Line,
-          tintStyle: "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
+          tintStyle:
+            "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
           iconSize: 30,
           onClick: () => navigate("/store"),
         });
@@ -181,7 +218,8 @@ function Index() {
           key: "settings",
           name: "设置",
           IconComponent: RiSettingsLine,
-          tintStyle: "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
+          tintStyle:
+            "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
           iconSize: 30,
           iconColor: "#1c1c1e",
           onClick: () => navigate("/settings"),
@@ -224,7 +262,7 @@ function Index() {
           (child: any) =>
             child?.id === defaultClockItem.id ||
             child?.type === "widget:clock" ||
-            child?.data?.widgetConfig?.id === "clock"
+            child?.data?.widgetConfig?.id === "clock",
         );
 
       if (!hasClock) {
@@ -252,7 +290,10 @@ function Index() {
       },
     };
     const currentPage = desktopRef.current?.state?.currentSliderPage;
-    desktopRef.current?.state.addItem(appItem as any, currentPage ? [currentPage?.id] : []);
+    desktopRef.current?.state.addItem(
+      appItem as any,
+      currentPage ? [currentPage?.id] : [],
+    );
     message.success("添加成功");
   };
 
@@ -262,7 +303,7 @@ function Index() {
         "w-screen h-screen flex flex-col",
         css`
           ${desktopBackgroundCss}
-        `
+        `,
       )}
     >
       {/* <div className="pt-30 pb-10">
@@ -288,7 +329,10 @@ function Index() {
           }}
           itemIconBuilderAllowNull={(item) => {
             // 纯JS外部小组件渲染（icon模式）
-            if (item.type === "widget:clock" && item.data?.widgetConfig?.entry) {
+            if (
+              item.type === "widget:clock" &&
+              item.data?.widgetConfig?.entry
+            ) {
               return (
                 <PureWidget
                   config={{
@@ -372,15 +416,7 @@ function Index() {
           height={400}
         />
       )}
-
-      {init && (
-        <div className={cx("fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center")}>
-          <div className="flex flex-col items-center gap-3">
-            <Spin size="large" />
-            <div className="text-gray-700 text-sm">正在加载配置…</div>
-          </div>
-        </div>
-      )}
+      {init && <LoadingOverlay open text="正在加载配置…" />}
     </div>
   );
 }
