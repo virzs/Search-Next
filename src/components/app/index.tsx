@@ -7,6 +7,7 @@ import AppRoutedOverlay from "./routed-overlay";
 import StackedDrawerOutlet from "./router/stacked-drawer-outlet";
 import StackedFadeOutlet from "./router/stacked-fade-outlet";
 import { AppRouteContextProvider, useAppRouteContext } from "./router/route-context";
+import DefaultAppView from "./default-app-view";
 
 export {
   AppContentContainer,
@@ -15,6 +16,7 @@ export {
   AppRoutedOverlay,
   AppSidebar,
   AppSegmented,
+  DefaultAppView,
   AppRouteContextProvider,
   StackedDrawerOutlet,
   StackedFadeOutlet,
