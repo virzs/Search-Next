@@ -2,16 +2,13 @@ import { useRequest } from "ahooks";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Empty, Form, Modal, Pagination, Input } from "antd";
 import {
+  getTabsWebsiteClassifyPublicLevel1,
   getTabsWebsiteCollectionPublicList,
   getTabsWebsitePublic,
 } from "@/services/website";
 import { RiAddLine } from "@remixicon/react";
 import { useNavigate } from "react-router";
-import {
-  buildCategoriesFromItems,
-  fallbackCategories,
-  getWebsiteId,
-} from "../../utils";
+import { getWebsiteId, type WebsiteCategory } from "../../utils";
 import WebsiteCard from "../../components/WebsiteCard";
 import StoreSegmented from "../../components/StoreSegmented";
 import FeaturedView from "../website/featured";
@@ -28,29 +25,22 @@ const WebsiteView: React.FC = () => {
 
   const [activeView, setActiveView] = useState<string>("featured");
   const featuredHomeScrollRef = useRef<HTMLDivElement | null>(null);
-  const featuredRequestedSizeRef = useRef(60);
 
   const {
     data: listData,
     loading: listLoading,
     run: runList,
   } = useRequest(getTabsWebsitePublic, { manual: true });
-  const { data: featuredData, run: runFeatured } = useRequest(
-    getTabsWebsitePublic,
-    {
-      manual: true,
-    },
-  );
   const {
     data: collectionListData,
     loading: collectionListLoading,
     run: runCollectionList,
   } = useRequest(getTabsWebsiteCollectionPublicList, { manual: true });
-
-  const featuredItems = useMemo(
-    () => (featuredData?.data as any[]) || [],
-    [featuredData],
+  const { data: classifyLevel1Data, run: runClassifyLevel1 } = useRequest(
+    getTabsWebsiteClassifyPublicLevel1,
+    { manual: true },
   );
+
   const listItems = useMemo(() => (listData?.data as any[]) || [], [listData]);
   const listTotal = useMemo(
     () => (listData as any)?.total ?? (listData as any)?.count ?? 0,
@@ -61,17 +51,16 @@ const WebsiteView: React.FC = () => {
     [collectionListData],
   );
 
-  const categories = useMemo(() => {
-    const dynamic = buildCategoriesFromItems(
-      featuredItems.length ? featuredItems : listItems,
-    );
-    const merged = [...dynamic];
-    const existed = new Set(merged.map((c) => c.key));
-    for (const c of fallbackCategories) {
-      if (!existed.has(c.key)) merged.push(c);
-    }
-    return merged.slice(0, 10);
-  }, [featuredItems, listItems]);
+  const categories = useMemo<WebsiteCategory[]>(() => {
+    const items = (classifyLevel1Data as any[]) || [];
+    return items
+      .filter((c) => c?._id && c?.name)
+      .map((c) => ({
+        key: `classify:${c._id}`,
+        label: c.name,
+        filter: { classify: c._id },
+      }));
+  }, [classifyLevel1Data]);
 
   const activeCategory = useMemo(() => {
     if (!activeView.startsWith("cat:")) return null;
@@ -81,16 +70,12 @@ const WebsiteView: React.FC = () => {
 
   useEffect(() => {
     if (activeView !== "featured") return;
-    runFeatured({
-      page: 1,
-      pageSize: featuredRequestedSizeRef.current,
-    });
-  }, [activeView, runFeatured]);
-
-  useEffect(() => {
-    if (activeView !== "featured") return;
     runCollectionList({});
   }, [activeView, runCollectionList]);
+
+  useEffect(() => {
+    runClassifyLevel1({});
+  }, [runClassifyLevel1]);
 
   useEffect(() => {
     if (activeView === "featured") return;

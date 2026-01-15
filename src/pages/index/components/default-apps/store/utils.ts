@@ -62,7 +62,7 @@ export const buildCategoriesFromItems = (items: any[]): WebsiteCategory[] => {
     }
   }
 
-  return categories.slice(0, 10);
+  return categories;
 };
 
 export const fallbackCategories: WebsiteCategory[] = [

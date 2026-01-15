@@ -6,6 +6,18 @@ export const getTabsWebsiteClassify = (params = {}) => {
   return baseGetRequest("/tabs/website_classify/tree")(params);
 };
 
+export interface WebsiteClassifyLevel1Item {
+  _id: string;
+  name: string;
+  websiteCount?: number;
+}
+
+export const getTabsWebsiteClassifyPublicLevel1 = (params = {}) => {
+  return baseGetRequest<WebsiteClassifyLevel1Item[]>(
+    "/tabs/website_classify/public/level1",
+  )(params);
+};
+
 export interface WebsitePublicParams extends BasePageParams {
   classify?: string;
   tags?: string[];
