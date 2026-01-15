@@ -1,4 +1,4 @@
-import { AppSegmented } from "@/components";
+import { AppSegmented, DefaultAppView } from "@/components";
 import { cx } from "@emotion/css";
 import { FC, useMemo, useState } from "react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
@@ -31,7 +31,11 @@ const ThemeCard = ({
 }) => {
   const preview = getThemePreview(theme);
   const ringColor = active ? "rgba(22, 119, 255, 0.45)" : "transparent";
-  const cardClassName = cx("rounded-2xl border p-4 transition select-none", "hover:opacity-95 active:opacity-90", "cursor-pointer");
+  const cardClassName = cx(
+    "rounded-2xl border p-4 transition select-none",
+    "hover:opacity-95 active:opacity-90",
+    "cursor-pointer",
+  );
 
   return (
     <div
@@ -61,14 +65,26 @@ const ThemeCard = ({
             borderColor: preview.border,
           }}
         >
-          <div className="h-3 w-3 rounded-full" style={{ background: preview.iconBg }} />
+          <div
+            className="h-3 w-3 rounded-full"
+            style={{ background: preview.iconBg }}
+          />
         </div>
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <div className="h-2 w-10 rounded-full" style={{ background: preview.hover }} />
-        <div className="h-2 w-10 rounded-full" style={{ background: preview.dock }} />
-        <div className="h-2 w-10 rounded-full" style={{ background: preview.iconBg }} />
+        <div
+          className="h-2 w-10 rounded-full"
+          style={{ background: preview.hover }}
+        />
+        <div
+          className="h-2 w-10 rounded-full"
+          style={{ background: preview.dock }}
+        />
+        <div
+          className="h-2 w-10 rounded-full"
+          style={{ background: preview.iconBg }}
+        />
       </div>
     </div>
   );
@@ -79,37 +95,44 @@ const ThemeView: FC = () => {
   const [activeKind, setActiveKind] = useState<"all" | "light" | "dark">("all");
 
   const filteredThemes = useMemo(() => {
-    return activeKind === "all"
-      ? themes
-      : themes.filter((t) => (activeKind === "light" ? t.kind === "light" : t.kind === "dark"));
+    const kindFiltered =
+      activeKind === "all"
+        ? themes
+        : themes.filter((t) =>
+            activeKind === "light" ? t.kind === "light" : t.kind === "dark",
+          );
+
+    return kindFiltered;
   }, [themes, activeKind]);
 
   return (
-    <>
-      <div className="flex items-center justify-between gap-3 mb-5">
-        <div className="min-w-0">
-          <div className="text-lg font-semibold truncate">主题</div>
-          <div className="text-xs text-gray-500 mt-1">选择一套主题应用到桌面</div>
-        </div>
-        <div className="flex items-center gap-3">
-          <AppSegmented
-            options={[
-              { label: "全部", value: "all" },
-              { label: "浅色", value: "light" },
-              { label: "深色", value: "dark" },
-            ]}
-            value={activeKind}
-            onChange={(v) => setActiveKind(v as any)}
-            className="max-w-full overflow-auto"
-          />
-        </div>
-      </div>
+    <DefaultAppView
+      headerLeft={
+        <AppSegmented
+          options={[
+            { label: "全部", value: "all" },
+            { label: "浅色", value: "light" },
+            { label: "深色", value: "dark" },
+          ]}
+          value={activeKind}
+          onChange={(v) => setActiveKind(v as any)}
+          className="max-w-full overflow-auto"
+        />
+      }
+      contentClassName="overflow-y-auto pt-5 px-1 pb-4"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredThemes.map((t) => (
-          <ThemeCard key={t.id} name={t.name} theme={t.theme} active={t.id === activeThemeId} onClick={() => setActiveThemeId(t.id)} />
+          <ThemeCard
+            key={t.id}
+            name={t.name}
+            theme={t.theme}
+            active={t.id === activeThemeId}
+            onClick={() => setActiveThemeId(t.id)}
+          />
         ))}
       </div>
-    </>
+    </DefaultAppView>
   );
 };
 

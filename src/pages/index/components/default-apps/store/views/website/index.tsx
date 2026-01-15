@@ -10,9 +10,8 @@ import { RiAddLine } from "@remixicon/react";
 import { useNavigate } from "react-router";
 import { getWebsiteId, type WebsiteCategory } from "../../utils";
 import WebsiteCard from "../../components/WebsiteCard";
-import StoreSegmented from "../../components/StoreSegmented";
 import FeaturedView from "../website/featured";
-import { useAppRouteContext } from "@/components";
+import { AppSegmented, DefaultAppView, useAppRouteContext } from "@/components";
 import type { StoreOutletContext } from "../../index";
 
 const WebsiteView: React.FC = () => {
@@ -126,14 +125,17 @@ const WebsiteView: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <div className="shrink-0 flex items-center justify-between gap-3 px-1">
-        <StoreSegmented
+    <DefaultAppView
+      contentClassName="flex flex-col overflow-hidden"
+      headerLeft={
+        <AppSegmented
           options={viewOptions}
           value={activeView}
           onChange={handleViewChange}
           className="max-w-full overflow-auto"
         />
+      }
+      headerRight={
         <Button
           type="primary"
           onClick={() => setAddVisible(true)}
@@ -141,8 +143,8 @@ const WebsiteView: React.FC = () => {
         >
           自定义
         </Button>
-      </div>
-
+      }
+    >
       {activeView === "featured" ? (
         <FeaturedView
           featuredHomeScrollRef={featuredHomeScrollRef}
@@ -154,13 +156,7 @@ const WebsiteView: React.FC = () => {
         />
       ) : (
         <>
-          <div className="mt-5 flex items-center justify-between shrink-0 px-1">
-            <div className="text-lg font-bold ">
-              {activeCategory ? activeCategory.label : "全部网站"}
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-y-auto pr-2 pl-1 pb-4 flex-1">
+          <div className="mt-5 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-y-auto pr-2 pl-1 pb-4 flex-1">
             {listItems.map((item) => (
               <WebsiteCard
                 key={getWebsiteId(item)}
@@ -238,7 +234,7 @@ const WebsiteView: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </DefaultAppView>
   );
 };
 

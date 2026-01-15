@@ -9,6 +9,7 @@ import {
 } from "@remixicon/react";
 import { WIDGET_CONFIGS } from "@/services/micro-frontend";
 import StoreHeroCard from "../../components/StoreHeroCard";
+import { DefaultAppView } from "@/components";
 
 const { Title, Text } = Typography;
 
@@ -26,66 +27,65 @@ interface WidgetViewProps {
   query?: string;
 }
 
-const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
-  // 预定义的小组件信息
-  const widgets: WidgetInfo[] = [
-    {
-      id: "test",
-      name: "测试小组件",
-      description: "演示图标模式和完整模式的小组件，支持在图标状态下交互",
-      icon: <RiApps2Line className="text-2xl text-blue-500" />,
-      category: "演示",
-      size: "medium",
-    },
-    {
-      id: "weather",
-      name: "天气预报",
-      description: "实时天气信息和预报",
-      icon: <RiSunLine className="text-2xl text-orange-500" />,
-      category: "生活工具",
-      size: "medium",
-    },
-    {
-      id: "clock",
-      name: "时钟",
-      description: "数字时钟和定时器，支持图标模式显示",
-      icon: <RiTimeLine className="text-2xl text-blue-500" />,
-      category: "工具",
-      size: "small",
-    },
-    {
-      id: "todo",
-      name: "待办事项",
-      description: "任务管理和提醒",
-      icon: <RiTodoLine className="text-2xl text-green-500" />,
-      category: "效率工具",
-      size: "large",
-    },
-    {
-      id: "calculator",
-      name: "计算器",
-      description: "基础数学计算",
-      icon: <RiCalculatorLine className="text-2xl text-purple-500" />,
-      category: "工具",
-      size: "medium",
-    },
-  ];
+const WIDGETS: WidgetInfo[] = [
+  {
+    id: "test",
+    name: "测试小组件",
+    description: "演示图标模式和完整模式的小组件，支持在图标状态下交互",
+    icon: <RiApps2Line className="text-2xl text-blue-500" />,
+    category: "演示",
+    size: "medium",
+  },
+  {
+    id: "weather",
+    name: "天气预报",
+    description: "实时天气信息和预报",
+    icon: <RiSunLine className="text-2xl text-orange-500" />,
+    category: "生活工具",
+    size: "medium",
+  },
+  {
+    id: "clock",
+    name: "时钟",
+    description: "数字时钟和定时器，支持图标模式显示",
+    icon: <RiTimeLine className="text-2xl text-blue-500" />,
+    category: "工具",
+    size: "small",
+  },
+  {
+    id: "todo",
+    name: "待办事项",
+    description: "任务管理和提醒",
+    icon: <RiTodoLine className="text-2xl text-green-500" />,
+    category: "效率工具",
+    size: "large",
+  },
+  {
+    id: "calculator",
+    name: "计算器",
+    description: "基础数学计算",
+    icon: <RiCalculatorLine className="text-2xl text-purple-500" />,
+    category: "工具",
+    size: "medium",
+  },
+];
 
+const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
   const handleAddWidget = (widgetId: string) => {
     onAddWidget?.(widgetId);
   };
 
   const filteredWidgets = useMemo(() => {
     const q = (query || "").trim().toLowerCase();
-    if (!q) return widgets;
-    return widgets.filter((w) => {
+    if (!q) return WIDGETS;
+    return WIDGETS.filter((w) => {
       const haystack = `${w.name} ${w.description} ${w.category}`.toLowerCase();
       return haystack.includes(q);
     });
-  }, [query, widgets]);
+  }, [query]);
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <DefaultAppView contentClassName="h-full flex flex-col overflow-hidden pt-5 px-1 pb-4">
       <div className="shrink-0">
         <StoreHeroCard
           subtitle="精选"
@@ -96,14 +96,14 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
         />
       </div>
 
-      <div className="mt-5 shrink-0">
+      <div className="mt-5 shrink-0 px-1">
         <Title level={5} className="mb-1!">
           全部小组件
         </Title>
         <Text type="secondary">点击“获取”即可添加到桌面</Text>
       </div>
 
-      <div className="mt-3 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 overflow-y-auto pr-1 flex-1">
+      <div className="mt-3 grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 overflow-y-auto pr-1 flex-1 px-1">
         {filteredWidgets.map((widget) => {
           const disabled = !WIDGET_CONFIGS[widget.id];
           return (
@@ -151,13 +151,13 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
       </div>
 
       {filteredWidgets.filter((w) => !WIDGET_CONFIGS[w.id]).length > 0 && (
-        <div className="mt-4 shrink-0 rounded-2xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-300/20 dark:bg-yellow-200/10">
+        <div className="mt-4 shrink-0 rounded-2xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-300/20 dark:bg-yellow-200/10 mx-1">
           <Text type="warning" className="text-sm">
             部分小组件正在开发中，敬请期待...
           </Text>
         </div>
       )}
-    </div>
+    </DefaultAppView>
   );
 };
 
