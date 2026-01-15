@@ -1,6 +1,6 @@
 import { useRequest } from "ahooks";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Empty, Form, Modal, Pagination, Input } from "antd";
+import { Button, Empty, Pagination } from "antd";
 import {
   getTabsWebsiteClassifyPublicLevel1,
   getTabsWebsiteCollectionPublicList,
@@ -13,13 +13,13 @@ import WebsiteCard from "../../components/WebsiteCard";
 import FeaturedView from "../website/featured";
 import { AppSegmented, DefaultAppView, useAppRouteContext } from "@/components";
 import type { StoreOutletContext } from "../../index";
+import AddWebsiteModal from "./add-website-modal";
 
 const WebsiteView: React.FC = () => {
   const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
-  const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const [activeView, setActiveView] = useState<string>("featured");
@@ -191,50 +191,11 @@ const WebsiteView: React.FC = () => {
         </>
       )}
 
-      <Modal
-        zIndex={2001}
+      <AddWebsiteModal
         open={addVisible}
-        title="新增网站"
-        onCancel={() => setAddVisible(false)}
-        onOk={() => form.submit()}
-        okText="添加"
-        centered
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={(values) => {
-            const site = {
-              name: values.name,
-              url: values.url,
-              icon: values.iconUrl ? { url: values.iconUrl } : undefined,
-            };
-            onAddWebsite?.(site);
-            setAddVisible(false);
-            form.resetFields();
-          }}
-        >
-          <Form.Item name="name" label="名称" rules={[{ required: true }]}>
-            <Input placeholder="例如：我的常用站点" className="rounded-lg!" />
-          </Form.Item>
-          <Form.Item
-            name="url"
-            label="网址"
-            rules={[{ required: true, type: "url" }]}
-          >
-            <Input
-              placeholder="例如：https://example.com"
-              className="rounded-lg!"
-            />
-          </Form.Item>
-          <Form.Item name="iconUrl" label="图标URL" rules={[{ type: "url" }]}>
-            <Input
-              placeholder="例如：https://example.com/icon.png"
-              className="rounded-lg!"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+        onClose={() => setAddVisible(false)}
+        onAddWebsite={onAddWebsite}
+      />
     </DefaultAppView>
   );
 };
