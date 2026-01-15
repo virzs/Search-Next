@@ -1,5 +1,5 @@
 import { baseGetRequest } from "@/utils/axios";
-import { DesktopListItem } from "zs_library";
+import { DesktopListItem, DesktopTheme } from "zs_library";
 
 export interface DefaultUserConfig {
   config: {
@@ -12,7 +12,9 @@ export interface DefaultUserConfig {
  * @returns
  */
 export const getDefaultUserConfig = () => {
-  return baseGetRequest<DefaultUserConfig>("/tabs/desktop/config/user/default")();
+  return baseGetRequest<DefaultUserConfig>(
+    "/tabs/desktop/config/user/default",
+  )();
 };
 
 export interface UserLimit {
@@ -26,4 +28,23 @@ export interface UserLimit {
  */
 export const getUserLimit = () => {
   return baseGetRequest<UserLimit>("/tabs/desktop/user-limit/public")();
+};
+
+export interface ThemeConfigApiItem {
+  _id: string;
+  name: string;
+  description?: string;
+  lightConfig: DesktopTheme;
+  darkConfig?: DesktopTheme;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+/**
+ * 获取所有主题
+ */
+export const getActiveThemeConfigs = () => {
+  return baseGetRequest<ThemeConfigApiItem[]>(
+    "/tabs/desktop/theme-config/active",
+  )();
 };
