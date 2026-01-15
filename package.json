@@ -38,10 +38,11 @@
     "remixicon": "^4.7.0",
     "tailwindcss": "^4.1.17",
     "uuid": "^13.0.0",
-    "zs_library": "^0.7.15"
+    "zs_library": "^0.7.17"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/node": "^18.11.17",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.0",

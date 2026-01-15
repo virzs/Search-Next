@@ -28,7 +28,7 @@ importers:
         version: 4.8.0(react@19.2.3)
       '@tailwindcss/vite':
         specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
+        version: 4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
       ahooks:
         specifier: ^3.8.4
         version: 3.9.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -75,12 +75,15 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       zs_library:
-        specifier: ^0.7.15
-        version: 0.7.15(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76)
+        specifier: ^0.7.17
+        version: 0.7.17(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76)
     devDependencies:
       '@eslint/js':
         specifier: ^9.22.0
         version: 9.39.2
+      '@types/node':
+        specifier: ^18.11.17
+        version: 18.19.130
       '@types/react':
         specifier: ^19.0.10
         version: 19.2.7
@@ -89,7 +92,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.11.0(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
+        version: 3.11.0(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
       dotenv-cli:
         specifier: ^7.4.3
         version: 7.4.4
@@ -113,7 +116,7 @@ importers:
         version: 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.7.3)
       vite:
         specifier: ^7.1.12
-        version: 7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
+        version: 7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
 
 packages:
 
@@ -2748,6 +2751,9 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
+  '@types/node@18.19.130':
+    resolution: {integrity: sha512-GRaXQx6jGfL8sKfaIDD6OupbIHBr9jv7Jnaml9tB7l4v068PAOXqfcujMMo5PhbIs6ggR1XODELqahT2R8v0fg==}
+
   '@types/parse-json@4.0.2':
     resolution: {integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==}
 
@@ -5381,6 +5387,9 @@ packages:
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
 
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   unicode-emoji-modifier-base@1.0.0:
     resolution: {integrity: sha512-yLSH4py7oFH3oG/9K+XWrz1pSi3dfUrWEnInbxMfArOfc1+33BlGPQtLsOYwvdMy11AwUBetYuaRxSPqgkq+8g==}
     engines: {node: '>=4'}
@@ -5620,8 +5629,8 @@ packages:
   zrender@5.6.1:
     resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
-  zs_library@0.7.15:
-    resolution: {integrity: sha512-d7s+IReoJsFGsRyGzwiQZvG3+rCR/jRTC0dSmZMefzfoNRuz7ZaKwmlHcUwT4mWyglye2Aha70ET4Y5rZN0QOw==}
+  zs_library@0.7.17:
+    resolution: {integrity: sha512-Tu7EXf+PZTwFzgGRBP7mh2bFKH+a0tBq8E0jiD1v1shoYiIPrLzKWAIBgPtAt/TVTSnATU+hFTb0rWu74uTtpg==}
     peerDependencies:
       react: '>=18.0.0 <19.0.0'
       react-dom: '>=18.0.0 <19.0.0'
@@ -8263,12 +8272,12 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.1.18
 
-  '@tailwindcss/vite@4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))':
+  '@tailwindcss/vite@4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))':
     dependencies:
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
-      vite: 7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
+      vite: 7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
 
   '@tiptap/core@3.14.0(@tiptap/pm@3.14.0)':
     dependencies:
@@ -8671,6 +8680,10 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
+  '@types/node@18.19.130':
+    dependencies:
+      undici-types: 5.26.5
+
   '@types/parse-json@4.0.2': {}
 
   '@types/polylabel@1.1.3': {}
@@ -8806,11 +8819,11 @@ snapshots:
     optionalDependencies:
       maplibre-gl: 5.15.0
 
-  '@vitejs/plugin-react-swc@3.11.0(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))':
+  '@vitejs/plugin-react-swc@3.11.0(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@swc/core': 1.15.8
-      vite: 7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
+      vite: 7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@swc/helpers'
 
@@ -11899,6 +11912,8 @@ snapshots:
 
   ufo@1.6.1: {}
 
+  undici-types@5.26.5: {}
+
   unicode-emoji-modifier-base@1.0.0: {}
 
   unidiff@1.0.4:
@@ -12023,7 +12038,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2):
+  vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2):
     dependencies:
       esbuild: 0.27.2
       fdir: 6.5.0(picomatch@4.0.3)
@@ -12032,6 +12047,7 @@ snapshots:
       rollup: 4.54.0
       tinyglobby: 0.2.15
     optionalDependencies:
+      '@types/node': 18.19.130
       fsevents: 2.3.3
       jiti: 2.6.1
       lightningcss: 1.30.2
@@ -12101,7 +12117,7 @@ snapshots:
     dependencies:
       tslib: 2.3.0
 
-  zs_library@0.7.15(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76):
+  zs_library@0.7.17(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76):
     dependencies:
       '@ai-sdk/react': 1.2.12(react@19.2.3)(zod@3.25.76)
       '@emotion/css': 11.13.5
