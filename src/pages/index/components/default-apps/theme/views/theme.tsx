@@ -119,7 +119,7 @@ const ThemeView: FC = () => {
           className="max-w-full overflow-auto"
         />
       }
-      contentClassName="overflow-y-auto pt-5 px-1 pb-4"
+      contentClassName="overflow-y-auto px-1 pb-4"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredThemes.map((t) => (

@@ -80,7 +80,7 @@ const WallpaperView: FC = () => {
           className="max-w-full overflow-auto"
         />
       }
-      contentClassName="overflow-y-auto pt-5 px-1 pb-4"
+      contentClassName="overflow-y-auto px-1 pb-4"
     >
 
       {activeType === "gradient" ? (

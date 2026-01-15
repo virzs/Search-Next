@@ -140,6 +140,7 @@ const WebsiteView: React.FC = () => {
           type="primary"
           onClick={() => setAddVisible(true)}
           icon={<RiAddLine size={16} />}
+          shape="round"
         >
           自定义
         </Button>
@@ -156,7 +157,7 @@ const WebsiteView: React.FC = () => {
         />
       ) : (
         <>
-          <div className="mt-5 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-y-auto pr-2 pl-1 pb-4 flex-1">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 overflow-y-auto pr-2 pl-1 pb-4 flex-1">
             {listItems.map((item) => (
               <WebsiteCard
                 key={getWebsiteId(item)}

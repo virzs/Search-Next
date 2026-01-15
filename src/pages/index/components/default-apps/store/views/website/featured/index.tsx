@@ -46,7 +46,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
   return (
     <div
       ref={featuredHomeScrollRef}
-      className="mt-5 flex-1 overflow-y-auto pr-2 pl-1 pb-4"
+      className="flex-1 overflow-y-auto pr-2 pl-1 pb-4"
     >
       <StoreHeroCard
         subtitle="今日推荐"
