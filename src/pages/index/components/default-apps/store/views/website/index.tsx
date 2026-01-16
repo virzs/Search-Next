@@ -14,6 +14,7 @@ import FeaturedView from "../website/featured";
 import { AppSegmented, DefaultAppView, useAppRouteContext } from "@/components";
 import type { StoreOutletContext } from "../../index";
 import AddWebsiteModal from "./add-website-modal";
+import { storeRoute } from "../../route-paths";
 
 const WebsiteView: React.FC = () => {
   const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
@@ -114,12 +115,12 @@ const WebsiteView: React.FC = () => {
   };
 
   const openCollection = (collectionId: string) => {
-    navigate(`/store/website/collection/${encodeURIComponent(collectionId)}`);
+    navigate(storeRoute.path.website.collection(collectionId));
   };
 
   const openWebsiteDetail = (item: any) => {
     const id = getWebsiteId(item);
-    navigate(`/store/website/detail/${encodeURIComponent(id)}`, {
+    navigate(storeRoute.path.website.detail(id), {
       state: { item },
     });
   };

@@ -4,6 +4,7 @@ import { RiExternalLinkLine } from "@remixicon/react";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
 import { AppContentContainer, useAppRouteContext } from "@/components";
 import { useLocation, useNavigate } from "react-router";
+import { storeRoute } from "../../route-paths";
 
 type StoreOutletContext = {
   onAddWebsite?: (site: any) => void;
@@ -19,7 +20,7 @@ const WebsiteDetailView: FC = () => {
   const item = itemRef.current;
 
   useEffect(() => {
-    if (!item) navigate("/store/website", { replace: true });
+    if (!item) navigate(storeRoute.path.website.root, { replace: true });
   }, [item, navigate]);
 
   if (!item) return null;

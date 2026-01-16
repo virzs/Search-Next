@@ -9,6 +9,7 @@ import {
 import { AppContentContainer, useAppRouteContext } from "@/components";
 import WebsiteCard from "../../../components/WebsiteCard";
 import { getWebsiteId } from "../../../utils";
+import { storeRoute } from "../../../route-paths";
 
 type StoreOutletContext = {
   onAddWebsite?: (site: any) => void;
@@ -97,7 +98,7 @@ const WebsiteCollectionRoute: FC = () => {
 
   const handleOpenWebsiteDetail = (item: any) => {
     const websiteId = getWebsiteId(item);
-    navigate(`/store/website/detail/${encodeURIComponent(websiteId)}`, {
+    navigate(storeRoute.path.website.detail(websiteId), {
       state: { item },
     });
   };

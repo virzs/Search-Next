@@ -1,13 +1,12 @@
 import { AppRoutedOverlay } from "@/components";
 import { FC } from "react";
-import ThemeView from "./views/theme";
-import WallpaperView from "./views/wallpaper";
 import {
   RiLandscapeFill,
   RiLandscapeLine,
   RiTShirtFill,
   RiTShirtLine,
 } from "@remixicon/react";
+import { themeRoute } from "./route-paths";
 
 const ThemeModalRoute: FC = () => {
   return (
@@ -21,14 +20,14 @@ const ThemeModalRoute: FC = () => {
           {
             key: "theme",
             label: "主题",
-            path: "/theme",
+            path: themeRoute.path.root,
             icon: <RiTShirtLine size={16} />,
             activeIcon: <RiTShirtFill size={16} />,
           },
           {
             key: "wallpaper",
             label: "壁纸",
-            path: "/theme/wallpaper",
+            path: themeRoute.path.wallpaper,
             icon: <RiLandscapeLine size={16} />,
             activeIcon: <RiLandscapeFill size={16} />,
           },
@@ -37,15 +36,6 @@ const ThemeModalRoute: FC = () => {
       outletWrapperClassName="h-full w-full overflow-auto p-6"
     />
   );
-};
-
-export const themeRoutes = {
-  path: "theme",
-  element: <ThemeModalRoute />,
-  children: [
-    { index: true, element: <ThemeView /> },
-    { path: "wallpaper", element: <WallpaperView /> },
-  ],
 };
 
 export default ThemeModalRoute;

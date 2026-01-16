@@ -1,5 +1,6 @@
 import { Button, Empty } from "antd";
 import { useLocation, useNavigate } from "react-router";
+import { storeRoute } from "../../route-paths";
 
 const StoreNotFoundRoute = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const StoreNotFoundRoute = () => {
         <div className="mt-4 flex justify-center">
           <Button
             type="primary"
-            onClick={() => navigate("/store/website", { replace: true })}
+            onClick={() => navigate(storeRoute.path.website.root, { replace: true })}
           >
             返回应用商店
           </Button>

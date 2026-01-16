@@ -31,6 +31,9 @@ import LoadingOverlay from "./components/loading-overlay";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
+import { storeRoute } from "./components/default-apps/store/route-paths";
+import { themeRoute } from "./components/default-apps/theme/route-paths";
+import { settingsRoute } from "./components/default-apps/settings/route-paths";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -201,7 +204,7 @@ function Index() {
           tintStyle:
             "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
           iconSize: 30,
-          onClick: () => navigate("/theme"),
+          onClick: () => navigate(themeRoute.path.root),
         });
       case "*:store":
         return createFixedItem({
@@ -211,7 +214,7 @@ function Index() {
           tintStyle:
             "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
           iconSize: 30,
-          onClick: () => navigate("/store"),
+          onClick: () => navigate(storeRoute.path.root),
         });
       case "*:settings":
         return createFixedItem({
@@ -222,7 +225,7 @@ function Index() {
             "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
           iconSize: 30,
           iconColor: "#1c1c1e",
-          onClick: () => navigate("/settings"),
+          onClick: () => navigate(settingsRoute.path.root),
         });
       default:
         return null;

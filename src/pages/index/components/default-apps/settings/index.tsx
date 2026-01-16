@@ -1,13 +1,9 @@
 import { FC } from "react";
-import AccountView from "./views/account";
-import BackupView from "./views/backup";
 import { RiInbox2Fill, RiUserFill } from "@remixicon/react";
 import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
-import AboutView from "./views/about";
-import LanguageView from "./views/language";
-import ThirdPartyView from "./views/third-party";
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Outlet, useLocation } from "react-router";
+import { settingsRoute } from "./route-paths";
 
 const UnderConstructionOverlay = () => {
   return (
@@ -30,14 +26,14 @@ const UnderConstructionOverlay = () => {
   );
 };
 
-const SettingsOutletFrame = () => {
+export const SettingsOutletFrame = () => {
   const location = useLocation();
   const pathname = location.pathname;
   const showUnderConstruction =
-    pathname.startsWith("/settings/third-party") ||
-    pathname.startsWith("/settings/language") ||
-    pathname.startsWith("/settings/backup") ||
-    pathname.startsWith("/settings/about");
+    pathname.startsWith(settingsRoute.path.thirdParty) ||
+    pathname.startsWith(settingsRoute.path.language) ||
+    pathname.startsWith(settingsRoute.path.backup) ||
+    pathname.startsWith(settingsRoute.path.about);
 
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -62,56 +58,37 @@ const SettingsModalRoute: FC = () => {
           {
             key: "account",
             label: "账号",
-            path: "/settings/account",
+            path: settingsRoute.path.account,
             icon: <RiUserFill size={16} />,
           },
           {
             key: "third-party",
             label: "第三方服务",
-            path: "/settings/third-party",
+            path: settingsRoute.path.thirdParty,
             icon: <RiKeyFill size={16} />,
           },
           {
             key: "language",
             label: "语言",
-            path: "/settings/language",
+            path: settingsRoute.path.language,
             icon: <RiGlobalLine size={16} />,
           },
           {
             key: "backup",
             label: "备份与恢复",
-            path: "/settings/backup",
+            path: settingsRoute.path.backup,
             icon: <RiInbox2Fill size={16} />,
           },
           {
             key: "about",
             label: "关于",
-            path: "/settings/about",
+            path: settingsRoute.path.about,
             icon: <RiInformationFill size={16} />,
           },
         ],
       }}
     />
   );
-};
-
-export const settingsRoutes = {
-  path: "settings",
-  element: <SettingsModalRoute />,
-  children: [
-    {
-      element: <SettingsOutletFrame />,
-      children: [
-        { index: true, element: <Navigate to="account" replace /> },
-        { path: "account", element: <AccountView /> },
-        { path: "third-party", element: <ThirdPartyView /> },
-        { path: "language", element: <LanguageView /> },
-        { path: "backup", element: <BackupView /> },
-        { path: "about", element: <AboutView /> },
-        { path: "*", element: <Navigate to="account" replace /> },
-      ],
-    },
-  ],
 };
 
 export default SettingsModalRoute;

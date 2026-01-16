@@ -6,6 +6,7 @@ import WebsiteView from "./views/website";
 import StoreModalRoute, { type StoreOutletContext } from "./index";
 import { Navigate } from "react-router";
 import WidgetView from "./views/widget";
+import { storeRoute } from "./route-paths";
 
 const WidgetRoute = () => {
   const { query, onAddWidget } = useAppRouteContext<StoreOutletContext>();
@@ -13,20 +14,26 @@ const WidgetRoute = () => {
 };
 
 export const storeRoutes = {
-  path: "store",
+  path: storeRoute.segment.root,
   element: <StoreModalRoute />,
   children: [
-    { index: true, element: <Navigate to="website" replace /> },
     {
-      path: "website",
+      index: true,
+      element: <Navigate to={storeRoute.segment.website} replace />,
+    },
+    {
+      path: storeRoute.segment.website,
       children: [
         { index: true, element: <WebsiteView /> },
-        { path: "collection/:id", element: <WebsiteCollectionRoute /> },
-        { path: "detail/:id", element: <WebsiteDetailView /> },
-        { path: "*", element: <StoreNotFoundRoute /> },
+        {
+          path: storeRoute.segment.websiteCollection,
+          element: <WebsiteCollectionRoute />,
+        },
+        { path: storeRoute.segment.websiteDetail, element: <WebsiteDetailView /> },
+        { path: storeRoute.segment.wildcard, element: <StoreNotFoundRoute /> },
       ],
     },
-    { path: "widget", element: <WidgetRoute /> },
-    { path: "*", element: <StoreNotFoundRoute /> },
+    { path: storeRoute.segment.widget, element: <WidgetRoute /> },
+    { path: storeRoute.segment.wildcard, element: <StoreNotFoundRoute /> },
   ],
 };

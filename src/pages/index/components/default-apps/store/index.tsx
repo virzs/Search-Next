@@ -6,6 +6,7 @@ import {
   RiLinksLine,
 } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
+import { storeRoute } from "./route-paths";
 
 export type DesktopOutletContext = {
   onAddWidget?: (widgetId: string) => void;
@@ -46,14 +47,14 @@ const StoreModalRoute: FC = () => {
           {
             key: "website",
             label: "网站",
-            path: "/store/website",
+            path: storeRoute.path.website.root,
             icon: <RiLinksLine size={16} />,
             activeIcon: <RiLinksFill size={16} />,
           },
           {
             key: "widget",
             label: "小组件",
-            path: "/store/widget",
+            path: storeRoute.path.widget,
             icon: <RiAppsLine size={16} />,
             activeIcon: <RiAppsFill size={16} />,
           },
