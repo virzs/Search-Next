@@ -23,13 +23,8 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
   return (
     <div className={cx("h-full flex flex-col overflow-hidden", className)}>
       {showHeader ? (
-        <div
-          className={cx(
-            "shrink-0 flex items-start gap-3",
-            headerClassName,
-          )}
-        >
-          <div className="min-w-0 flex-1">{headerLeft}</div>
+        <div className={cx("shrink-0 flex items-start gap-3", headerClassName)}>
+          <div className="min-w-0 flex-1 ml-16">{headerLeft}</div>
           {headerRight ? <div className="shrink-0">{headerRight}</div> : null}
         </div>
       ) : null}

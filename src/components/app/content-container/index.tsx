@@ -1,5 +1,3 @@
-import { RiArrowLeftLine } from "@remixicon/react";
-import { Button } from "antd";
 import { cx } from "@emotion/css";
 import type { FC, ReactNode } from "react";
 
@@ -7,9 +5,6 @@ export interface AppContentContainerProps {
   children: ReactNode;
   className?: string;
   animate?: boolean;
-  onBack?: () => void;
-  showBack?: boolean;
-  backText?: ReactNode;
   title?: ReactNode;
   headerExtra?: ReactNode;
   headerClassName?: string;
@@ -20,16 +15,12 @@ const AppContentContainer: FC<AppContentContainerProps> = ({
   children,
   className,
   animate,
-  onBack,
-  showBack = true,
-  backText,
   title,
   headerExtra,
   headerClassName,
   contentClassName,
 }) => {
-  const showBackButton = Boolean(onBack && showBack);
-  const showHeader = showBackButton || Boolean(title) || Boolean(headerExtra);
+  const showHeader = Boolean(title) || Boolean(headerExtra);
 
   return (
     <div
@@ -48,16 +39,6 @@ const AppContentContainer: FC<AppContentContainerProps> = ({
             headerClassName,
           )}
         >
-          {showBackButton ? (
-            <Button
-              type="text"
-              className="rounded-full! !  hover:!"
-              icon={<RiArrowLeftLine size={16} />}
-              onClick={onBack}
-            >
-              {backText ?? "返回"}
-            </Button>
-          ) : null}
           {title ? <div className="min-w-0">{title}</div> : null}
           {headerExtra ? (
             <div className="ml-auto shrink-0">{headerExtra}</div>
