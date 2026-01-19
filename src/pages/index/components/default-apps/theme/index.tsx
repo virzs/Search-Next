@@ -33,7 +33,7 @@ const ThemeModalRoute: FC = () => {
           },
         ],
       }}
-      outletWrapperClassName="h-full w-full overflow-auto p-6"
+      outletWrapperClassName="h-full w-full overflow-auto"
     />
   );
 };

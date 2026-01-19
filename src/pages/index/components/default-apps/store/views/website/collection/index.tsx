@@ -107,7 +107,6 @@ const WebsiteCollectionRoute: FC = () => {
     <AppContentContainer
       className="h-full"
       animate
-      onBack={() => navigate(-1)}
       title={titleNode}
     >
       <div className="p-6 pt-0">
