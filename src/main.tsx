@@ -6,21 +6,19 @@ import { Theme } from "@radix-ui/themes";
 
 import "./index.css";
 import Index from "./pages/index";
-import { storeRoutes } from "./pages/index/components/default-apps/store/routes";
-import { themeRoutes } from "./pages/index/components/default-apps/theme/routes";
-import { settingsRoutes } from "./pages/index/components/default-apps/settings/routes";
 import { App, ConfigProvider } from "antd";
 import theme from "./theme/config";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppConfigProvider } from "./contexts/ConfigContext";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 import { DesktopThemeProvider } from "./contexts/DesktopThemeContext";
+import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
-    children: [storeRoutes, themeRoutes, settingsRoutes],
+    children: [...defaultAppRoutes],
   },
 ]);
 
