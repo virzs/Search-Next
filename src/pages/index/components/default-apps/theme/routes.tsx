@@ -1,6 +1,6 @@
 import { themeRoute } from "./route-paths";
 import ThemeModalRoute from "./index";
-import ThemeView from "./views/theme";
+import ThemeView, { ThemeDetailView } from "./views/theme";
 import WallpaperView from "./views/wallpaper";
 
 export const themeRoutes = {
@@ -8,7 +8,7 @@ export const themeRoutes = {
   element: <ThemeModalRoute />,
   children: [
     { index: true, element: <ThemeView /> },
+    { path: themeRoute.segment.detail, element: <ThemeDetailView /> },
     { path: themeRoute.segment.wallpaper, element: <WallpaperView /> },
   ],
 };
-

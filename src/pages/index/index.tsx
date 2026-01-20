@@ -3,6 +3,8 @@ import {
   DesktopSortItem,
   DesktopHandle,
   DesktopAppItem,
+  desktopThemeDark,
+  desktopThemeLight,
 } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
@@ -17,7 +19,11 @@ import {
 import type { DesktopItemData } from "../../types";
 // import SearchWithAI from "../../components/ai-search";
 import { App } from "antd";
-import { getDefaultUserConfig } from "@/services/desktop";
+import {
+  getActiveThemeConfigs,
+  getDefaultUserConfig,
+  resolveDesktopThemeFromConfigs,
+} from "@/services/desktop";
 import {
   DESKTOP_LIST_MODIFIED_STORAGE_KEY,
   DESKTOP_LIST_STORAGE_KEY,
@@ -41,8 +47,29 @@ function Index() {
   const { message } = App.useApp();
   const { avatarSrc, coverGradientCss } = useAuth();
   const { userLimit } = useConfig();
-  const { activeTheme, personalization } = useDesktopTheme();
+  const { activeThemeId, personalization } = useDesktopTheme();
   const navigate = useNavigate();
+
+  const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
+  const [preferDark, setPreferDark] = useState(() => {
+    return window.document.documentElement.dataset.theme === "dark";
+  });
+
+  useEffect(() => {
+    const el = window.document.documentElement;
+    const update = () => setPreferDark(el.dataset.theme === "dark");
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(el, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const desktopTheme = useMemo(() => {
+    return (
+      resolveDesktopThemeFromConfigs(themeConfigs, activeThemeId, preferDark) ??
+      (preferDark ? desktopThemeDark : desktopThemeLight)
+    );
+  }, [activeThemeId, preferDark, themeConfigs]);
 
   const desktopBackgroundCss = useMemo(() => {
     const wallpaper = personalization.wallpaper;
@@ -316,7 +343,7 @@ function Index() {
         <Desktop<DesktopItemData>
           ref={desktopRef}
           maxSlides={userLimit?.maxPages || 5}
-          theme={activeTheme.theme}
+          theme={desktopTheme}
           typeConfigMap={{
             "widget:clock": {
               sizeConfigs: [
