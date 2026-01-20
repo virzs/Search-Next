@@ -27,7 +27,9 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
           <div className="min-w-0 flex-1 ml-16">{headerLeft}</div>
           {headerRight ? <div className="shrink-0">{headerRight}</div> : null}
         </div>
-      ) : null}
+      ) : (
+        <div className="min-h-8"></div>
+      )}
 
       <div className={cx("flex-1 overflow-hidden pt-4", contentClassName)}>
         {children}
