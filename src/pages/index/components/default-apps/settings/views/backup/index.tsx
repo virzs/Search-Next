@@ -1,4 +1,12 @@
-import { Button, Typography, Progress, Alert, Divider, Switch, List } from "antd";
+import {
+  Button,
+  Typography,
+  Progress,
+  Alert,
+  Divider,
+  Switch,
+  List,
+} from "antd";
 import {
   RiCloudLine,
   RiDownloadLine,
@@ -9,7 +17,8 @@ import {
   RiUploadFill,
 } from "@remixicon/react";
 import { useState } from "react";
-import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
+import { SettingsCard, SettingsActions } from "@/components/settings";
+import { DefaultAppView } from "@/components";
 
 const { Text, Paragraph } = Typography;
 
@@ -69,7 +78,7 @@ const BackupView = () => {
 
   // 未登录视图
   const renderUnloggedView = () => (
-    <SettingsViewContainer>
+    <DefaultAppView>
       <Alert
         message="需要登录账号"
         description="登录后可以使用云端同步功能，确保您的数据安全备份。"
@@ -102,12 +111,12 @@ const BackupView = () => {
           ]}
         />
       </SettingsCard>
-    </SettingsViewContainer>
+    </DefaultAppView>
   );
 
   // 已登录视图
   const renderLoggedView = () => (
-    <SettingsViewContainer>
+    <DefaultAppView>
       {/* 云端同步 */}
       <SettingsCard
         title="云端同步"
@@ -129,12 +138,20 @@ const BackupView = () => {
               </Text>
             </div>
 
-            {syncStatus.isSyncing && <Progress percent={syncStatus.syncProgress} status="active" className="mb-3" />}
+            {syncStatus.isSyncing && (
+              <Progress
+                percent={syncStatus.syncProgress}
+                status="active"
+                className="mb-3"
+              />
+            )}
 
             {syncStatus.lastSyncTime && (
               <div className="flex justify-between items-center mb-4">
                 <Text>上次同步：</Text>
-                <Text type="secondary">{syncStatus.lastSyncTime.toLocaleString()}</Text>
+                <Text type="secondary">
+                  {syncStatus.lastSyncTime.toLocaleString()}
+                </Text>
               </div>
             )}
 
@@ -226,10 +243,14 @@ const BackupView = () => {
           icon={<RiErrorWarningLine />}
         />
       </SettingsCard>
-    </SettingsViewContainer>
+    </DefaultAppView>
   );
 
-  return <div className="flex-1 overflow-auto">{isLoggedIn ? renderLoggedView() : renderUnloggedView()}</div>;
+  return (
+    <div className="flex-1 overflow-auto">
+      {isLoggedIn ? renderLoggedView() : renderUnloggedView()}
+    </div>
+  );
 };
 
 export default BackupView;

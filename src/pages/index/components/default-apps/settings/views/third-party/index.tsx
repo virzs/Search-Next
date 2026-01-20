@@ -1,7 +1,21 @@
-import { Form, Input, Button, Switch, Typography, Divider, message } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Switch,
+  Typography,
+  Divider,
+  message,
+} from "antd";
 import { useState, useEffect } from "react";
-import { RiCloudLine, RiSaveFill, RiRefreshLine, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
-import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
+import {
+  RiCloudLine,
+  RiSaveFill,
+  RiRefreshLine,
+  RiEyeFill,
+  RiEyeOffFill,
+} from "@remixicon/react";
+import { SettingsCard, SettingsActions } from "@/components/settings";
 import { ThirdPartyConfig, SyncSettings } from "@/types/api-config";
 import {
   getLocalApiConfig,
@@ -10,6 +24,7 @@ import {
   syncApiConfig,
   pullConfigFromServer,
 } from "@/utils/api-config";
+import { DefaultAppView } from "@/components";
 
 const { Text } = Typography;
 const { Item } = Form;
@@ -27,7 +42,8 @@ const ThirdPartyView = () => {
 
   // 组件状态
   const [config, setConfig] = useState<ThirdPartyConfig>(getLocalApiConfig());
-  const [syncSettings, setSyncSettings] = useState<SyncSettings>(getSyncSettings());
+  const [syncSettings, setSyncSettings] =
+    useState<SyncSettings>(getSyncSettings());
   const [isSaving, setIsSaving] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showApiKeys, setShowApiKeys] = useState({
@@ -56,7 +72,10 @@ const ThirdPartyView = () => {
         },
       };
 
-      const result = await syncApiConfig(newConfig, syncSettings.enabled && isLoggedIn);
+      const result = await syncApiConfig(
+        newConfig,
+        syncSettings.enabled && isLoggedIn,
+      );
 
       if (result.success) {
         setConfig({ ...config, ...newConfig });
@@ -128,7 +147,7 @@ const ThirdPartyView = () => {
   };
 
   return (
-    <SettingsViewContainer>
+    <DefaultAppView>
       {/* 同步设置 */}
       {isLoggedIn && (
         <SettingsCard title="同步设置">
@@ -153,7 +172,12 @@ const ThirdPartyView = () => {
               <Text type="secondary" className="text-sm">
                 上次同步：{syncSettings.lastSyncTime.toLocaleString()}
               </Text>
-              <Button size="small" icon={<RiRefreshLine />} loading={isSyncing} onClick={handlePullFromServer}>
+              <Button
+                size="small"
+                icon={<RiRefreshLine />}
+                loading={isSyncing}
+                onClick={handlePullFromServer}
+              >
                 从服务器同步
               </Button>
             </div>
@@ -247,7 +271,12 @@ const ThirdPartyView = () => {
           <div className="mb-6">
             <Text type="secondary" className="text-sm">
               Serper API用于增强搜索结果和获取实时信息。
-              <a href="https://serper.dev/api-key" target="_blank" rel="noopener noreferrer" className="ml-1">
+              <a
+                href="https://serper.dev/api-key"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-1"
+              >
                 获取API Key
               </a>
             </Text>
@@ -301,7 +330,7 @@ const ThirdPartyView = () => {
           </div>
         </div>
       </SettingsCard>
-    </SettingsViewContainer>
+    </DefaultAppView>
   );
 };
 

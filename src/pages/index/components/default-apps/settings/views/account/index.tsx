@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import UnloggedView from "@/components/auth/UnloggedView";
 import AccountInfo from "@/components/auth/AccountInfo";
-import { SettingsViewContainer } from "@/components/settings";
+import { DefaultAppView } from "@/components";
 
 const AccountView = () => {
   const { user, isAuthenticated } = useAuth();
@@ -29,7 +29,11 @@ const AccountView = () => {
     return <AccountInfo user={user} showActions />;
   };
 
-  return isAuthenticated ? renderLoggedView() : <SettingsViewContainer className="h-full w-full">{renderUnloggedView()}</SettingsViewContainer>;
+  return isAuthenticated ? (
+    renderLoggedView()
+  ) : (
+    <DefaultAppView>{renderUnloggedView()}</DefaultAppView>
+  );
 };
 
 export default AccountView;

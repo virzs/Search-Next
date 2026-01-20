@@ -1,6 +1,14 @@
 import { Typography, Space, Tag, List, Avatar } from "antd";
-import { RiGithubLine, RiGlobalLine, RiMailLine, RiHeartLine, RiBugLine, RiQuestionLine } from "@remixicon/react";
-import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
+import {
+  RiGithubLine,
+  RiGlobalLine,
+  RiMailLine,
+  RiHeartLine,
+  RiBugLine,
+  RiQuestionLine,
+} from "@remixicon/react";
+import { SettingsCard, SettingsActions } from "@/components/settings";
+import { DefaultAppView } from "@/components";
 
 const { Title, Text, Paragraph, Link } = Typography;
 
@@ -17,7 +25,11 @@ const AboutView = () => {
   const dependencies = [
     { name: "React", version: "^19.0.0", description: "用户界面库" },
     { name: "Ant Design", version: "^5.24.9", description: "UI 组件库" },
-    { name: "TypeScript", version: "~5.7.2", description: "类型安全的 JavaScript" },
+    {
+      name: "TypeScript",
+      version: "~5.7.2",
+      description: "类型安全的 JavaScript",
+    },
     { name: "Vite", version: "^6.3.1", description: "构建工具" },
     { name: "Framer Motion", version: "^12.12.1", description: "动画库" },
   ];
@@ -59,11 +71,11 @@ const AboutView = () => {
   };
 
   return (
-    <SettingsViewContainer>
+    <DefaultAppView>
       {/* 应用信息 */}
       <SettingsCard>
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+          <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
             <Text className="text-white text-2xl font-bold">S</Text>
           </div>
           <Title level={2} className="mb-2">
@@ -75,7 +87,9 @@ const AboutView = () => {
           </Space>
         </div>
 
-        <Paragraph className="text-center text-gray-600 mb-6">{appInfo.description}</Paragraph>
+        <Paragraph className="text-center text-gray-600 mb-6">
+          {appInfo.description}
+        </Paragraph>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="text-center">
@@ -129,7 +143,10 @@ const AboutView = () => {
             <List.Item>
               <List.Item.Meta
                 avatar={
-                  <Avatar size={48} className="bg-gradient-to-br from-blue-400 to-purple-500">
+                  <Avatar
+                    size={48}
+                    className="bg-gradient-to-br from-blue-400 to-purple-500"
+                  >
                     {member.name.charAt(0)}
                   </Avatar>
                 }
@@ -137,7 +154,9 @@ const AboutView = () => {
                 description={
                   <div>
                     <Tag color="blue">{member.role}</Tag>
-                    <div className="mt-1 text-gray-600">{member.description}</div>
+                    <div className="mt-1 text-gray-600">
+                      {member.description}
+                    </div>
                   </div>
                 }
               />
@@ -172,7 +191,9 @@ const AboutView = () => {
         <Space direction="vertical" className="w-full">
           <div className="flex items-center gap-3">
             <RiMailLine className="text-gray-500" />
-            <Link href="mailto:support@searchnext.com">support@searchnext.com</Link>
+            <Link href="mailto:support@searchnext.com">
+              support@searchnext.com
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <RiGlobalLine className="text-gray-500" />
@@ -204,7 +225,7 @@ const AboutView = () => {
           </Text>
         </div>
       </SettingsCard>
-    </SettingsViewContainer>
+    </DefaultAppView>
   );
 };
 

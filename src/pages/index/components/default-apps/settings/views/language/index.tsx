@@ -1,7 +1,8 @@
 import { Typography, Radio, Divider, List } from "antd";
 import { useState } from "react";
 import { RiCheckLine } from "@remixicon/react";
-import { SettingsViewContainer, SettingsCard, SettingsActions } from "@/components/settings";
+import { SettingsCard, SettingsActions } from "@/components/settings";
+import { DefaultAppView } from "@/components";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -109,7 +110,7 @@ const LanguageView = () => {
   };
 
   return (
-    <SettingsViewContainer>
+    <DefaultAppView>
       {isChanged && (
         <SettingsCard>
           <SettingsActions
@@ -137,7 +138,11 @@ const LanguageView = () => {
           选择您希望使用的界面语言。更改语言后，界面将立即切换到所选语言。
         </Paragraph>
 
-        <Radio.Group value={selectedLanguage} onChange={(e) => handleLanguageChange(e.target.value)} className="w-full">
+        <Radio.Group
+          value={selectedLanguage}
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          className="w-full"
+        >
           <List
             dataSource={languages}
             renderItem={(language) => (
@@ -151,7 +156,9 @@ const LanguageView = () => {
                         {language.description}
                       </Text>
                     </div>
-                    {selectedLanguage === language.code && <RiCheckLine className="text-green-500" />}
+                    {selectedLanguage === language.code && (
+                      <RiCheckLine className="text-green-500" />
+                    )}
                   </div>
                 </Radio>
               </List.Item>
@@ -172,7 +179,7 @@ const LanguageView = () => {
           </ul>
         </div>
       </SettingsCard>
-    </SettingsViewContainer>
+    </DefaultAppView>
   );
 };
 
