@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { RiInbox2Fill, RiUserFill } from "@remixicon/react";
+import { RiBrushLine, RiInbox2Fill, RiUserFill } from "@remixicon/react";
 import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
 import { Outlet, useLocation } from "react-router";
@@ -51,7 +51,6 @@ const SettingsModalRoute: FC = () => {
       closeTo="/"
       title="设置"
       wrapContent
-      outletWrapperClassName="h-full w-full overflow-hidden p-6"
       sidebarProps={{
         header: <div className="text-2xl font-bold tracking-tight">设置</div>,
         menuItems: [
@@ -60,6 +59,12 @@ const SettingsModalRoute: FC = () => {
             label: "账号",
             path: settingsRoute.path.account,
             icon: <RiUserFill size={16} />,
+          },
+          {
+            key: "personalization",
+            label: "个性化",
+            path: settingsRoute.path.personalization,
+            icon: <RiBrushLine size={16} />,
           },
           {
             key: "third-party",

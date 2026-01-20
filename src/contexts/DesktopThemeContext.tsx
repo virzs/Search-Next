@@ -24,9 +24,9 @@ const DesktopThemeContext = createContext<DesktopThemeContextValue | undefined>(
 );
 
 export type PersonalizationWallpaper =
-  | { type: "none" }
-  | { type: "image"; url: string }
-  | { type: "gradient"; css: string };
+  | { type: "none"; name?: string }
+  | { type: "image"; url: string; name?: string }
+  | { type: "gradient"; css: string; name?: string };
 
 export interface PersonalizationConfig {
   themeId: DesktopThemeId;
@@ -45,7 +45,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
   const [personalization, setPersonalization] = useState<PersonalizationConfig>(
     {
       themeId: defaultThemeId,
-      wallpaper: { type: "none" },
+      wallpaper: { type: "none", name: "无" },
     },
   );
 
@@ -59,7 +59,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
           : defaultThemeId;
         const wallpaper = (parsed?.wallpaper as
           | PersonalizationWallpaper
-          | undefined) ?? { type: "none" };
+          | undefined) ?? { type: "none", name: "无" };
         setPersonalization({
           themeId: resolvedThemeId,
           wallpaper,
@@ -73,7 +73,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         : defaultThemeId;
       const migrated: PersonalizationConfig = {
         themeId: resolvedLegacyThemeId,
-        wallpaper: { type: "none" },
+        wallpaper: { type: "none", name: "无" },
       };
       setPersonalization(migrated);
       try {
@@ -87,7 +87,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
     } catch {
       setPersonalization({
         themeId: defaultThemeId,
-        wallpaper: { type: "none" },
+        wallpaper: { type: "none", name: "无" },
       });
     }
   }, []);
@@ -110,7 +110,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         }
       },
       setWallpaper: (wallpaper) => {
-        const nextWallpaper = wallpaper ?? { type: "none" };
+        const nextWallpaper = wallpaper ?? { type: "none", name: "无" };
         const next: PersonalizationConfig = {
           ...personalization,
           wallpaper: nextWallpaper,

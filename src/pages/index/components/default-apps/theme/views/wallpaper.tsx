@@ -59,12 +59,12 @@ const WallpaperView: FC = () => {
     );
   };
 
-  const handleSelectGradient = (css: string) => {
-    if (css === "") {
-      setWallpaper({ type: "none" });
+  const handleSelectGradient = (wallpaper: (typeof gradientWallpapers)[number]) => {
+    if (wallpaper.id === "none") {
+      setWallpaper({ type: "none", name: wallpaper.name });
       return;
     }
-    setWallpaper({ type: "gradient", css });
+    setWallpaper({ type: "gradient", css: wallpaper.css, name: wallpaper.name });
   };
 
   return (
@@ -101,10 +101,10 @@ const WallpaperView: FC = () => {
                   borderColor: "rgba(0,0,0,0.08)",
                   boxShadow: `0 0 0 2px ${ringColor}`,
                 }}
-                onClick={() => handleSelectGradient(w.css)}
+                onClick={() => handleSelectGradient(w)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ")
-                    handleSelectGradient(w.css);
+                    handleSelectGradient(w);
                 }}
               >
                 <div className="flex items-center justify-between gap-3">
