@@ -35,10 +35,27 @@ export interface ThemeConfigApiItem {
   name: string;
   description?: string;
   previewImages?: Array<{ url?: string } | string>;
+  categoryId?:
+    | {
+        _id: string;
+        name: string;
+        isActive?: boolean;
+        sortOrder?: number;
+      }
+    | string
+    | null;
   lightConfig: DesktopTheme;
   darkConfig?: DesktopTheme;
   sortOrder?: number;
   isActive?: boolean;
+}
+
+export interface ThemeCategoryApiItem {
+  _id: string;
+  name: string;
+  description?: string;
+  isActive?: boolean;
+  sortOrder?: number;
 }
 
 const toAbsUrl = (entry: string) => {
@@ -74,8 +91,17 @@ export const resolveDesktopThemeFromConfigs = (
 /**
  * 获取所有主题
  */
-export const getActiveThemeConfigs = () => {
+export const getActiveThemeConfigs = (params?: { categoryId?: string }) => {
   return baseGetRequest<ThemeConfigApiItem[]>(
     "/tabs/desktop/theme-config/active",
+  )(params ?? {});
+};
+
+/**
+ * 获取用户可用主题分类
+ */
+export const getUserThemeCategories = () => {
+  return baseGetRequest<ThemeCategoryApiItem[]>(
+    "/tabs/desktop/theme-config-category/user",
   )();
 };

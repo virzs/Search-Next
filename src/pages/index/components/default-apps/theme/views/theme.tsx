@@ -11,6 +11,8 @@ import useDesktopTheme from "@/hooks/useDesktopTheme";
 import {
   getActiveThemeConfigs,
   getThemePreviewImageUrl,
+  getUserThemeCategories,
+  ThemeCategoryApiItem,
   ThemeConfigApiItem,
 } from "@/services/desktop";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -82,16 +84,27 @@ const ThemeCard: FC<{
 const ThemeView: FC = () => {
   const navigate = useNavigate();
   const { activeThemeId } = useDesktopTheme();
-  const [activeKind, setActiveKind] = useState<"all" | "light" | "dark">("all");
-  const { data: themes, loading } = useRequest(getActiveThemeConfigs);
+  const [activeCategoryId, setActiveCategoryId] = useState<string>("all");
+  const { data: categories, loading: categoryLoading } = useRequest(
+    getUserThemeCategories,
+  );
+  const { data: themes, loading: themeLoading } = useRequest(
+    () =>
+      getActiveThemeConfigs(
+        activeCategoryId === "all"
+          ? undefined
+          : { categoryId: activeCategoryId },
+      ),
+    { refreshDeps: [activeCategoryId] },
+  );
 
-  const filteredThemes = useMemo(() => {
-    const items = themes ?? [];
-    if (activeKind === "all") return items;
-    if (activeKind === "dark")
-      return items.filter((t) => Boolean(t.darkConfig));
-    return items.filter((t) => !t.darkConfig);
-  }, [themes, activeKind]);
+  const categoryOptions = useMemo(() => {
+    const items: ThemeCategoryApiItem[] = categories ?? [];
+    return [
+      { label: "全部", value: "all" },
+      ...items.map((c) => ({ label: c.name, value: c._id })),
+    ];
+  }, [categories]);
 
   const openThemeDetail = (theme: ThemeConfigApiItem) => {
     navigate(themeRoute.path.detail(theme._id), { state: { theme } });
@@ -101,25 +114,21 @@ const ThemeView: FC = () => {
     <DefaultAppView
       headerLeft={
         <AppSegmented
-          options={[
-            { label: "全部", value: "all" },
-            { label: "浅色", value: "light" },
-            { label: "深色", value: "dark" },
-          ]}
-          value={activeKind}
-          onChange={(v) => setActiveKind(v as any)}
+          options={categoryOptions}
+          value={activeCategoryId}
+          onChange={(v) => setActiveCategoryId(String(v))}
           className="max-w-full overflow-auto"
         />
       }
       contentClassName="overflow-y-auto px-1 pb-4"
     >
-      {loading ? (
+      {themeLoading || categoryLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
           <div className="text-sm text-gray-500">正在加载主题…</div>
         </div>
-      ) : filteredThemes.length ? (
+      ) : themes?.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredThemes.map((t) => (
+          {themes?.map((t) => (
             <ThemeCard
               key={t._id}
               theme={t}
