@@ -1,8 +1,4 @@
-import {
-  AppContentContainer,
-  AppSegmented,
-  DefaultAppView,
-} from "@/components";
+import { AppSegmented, DefaultAppView } from "@/components";
 import { cx } from "@emotion/css";
 import { useRequest } from "ahooks";
 import { Button, Empty, Image } from "antd";
@@ -182,7 +178,7 @@ export const ThemeDetailView: FC = () => {
   const coverUrl = previewUrls[0] ?? null;
 
   return (
-    <AppContentContainer className="h-full" animate>
+    <DefaultAppView className="h-full" animate>
       <div className="max-w-3xl mx-auto p-6 pt-0">
         <div className="pt-8 flex items-start gap-4">
           <div className="min-w-0 flex-1">
@@ -209,7 +205,7 @@ export const ThemeDetailView: FC = () => {
 
         <div className="mt-6">
           <div
-            className="w-full aspect-[16/9] rounded-3xl border overflow-hidden"
+            className="w-full aspect-video rounded-3xl border overflow-hidden"
             style={{
               background: "rgba(255,255,255,0.18)",
               borderColor: "rgba(0,0,0,0.08)",
@@ -237,7 +233,7 @@ export const ThemeDetailView: FC = () => {
           ) : null}
         </div>
       </div>
-    </AppContentContainer>
+    </DefaultAppView>
   );
 };
 

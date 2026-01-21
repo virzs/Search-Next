@@ -2,7 +2,7 @@ import { Button, Image } from "antd";
 import { FC, useEffect, useRef } from "react";
 import { RiExternalLinkLine } from "@remixicon/react";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
-import { AppContentContainer, useAppRouteContext } from "@/components";
+import { DefaultAppView, useAppRouteContext } from "@/components";
 import { useLocation, useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
 
@@ -30,7 +30,7 @@ const WebsiteDetailView: FC = () => {
   const url = getWebsiteUrl(item);
 
   return (
-    <AppContentContainer className="h-full" animate>
+    <DefaultAppView className="h-full" animate>
       <div className="max-w-3xl mx-auto p-6 pt-0">
         <div className="flex flex-col items-center text-center mb-8 pt-8">
           <div className="relative mb-6">
@@ -102,7 +102,7 @@ const WebsiteDetailView: FC = () => {
           </div>
         </div>
       </div>
-    </AppContentContainer>
+    </DefaultAppView>
   );
 };
 

@@ -6,7 +6,7 @@ import {
   getTabsWebsiteCollectionPublicList,
   getTabsWebsiteCollectionPublicWebsitesPage,
 } from "@/services/website";
-import { AppContentContainer, useAppRouteContext } from "@/components";
+import { DefaultAppView, useAppRouteContext } from "@/components";
 import WebsiteCard from "../../../components/WebsiteCard";
 import { getWebsiteId } from "../../../utils";
 import { storeRoute } from "../../../route-paths";
@@ -104,10 +104,10 @@ const WebsiteCollectionRoute: FC = () => {
   };
 
   return (
-    <AppContentContainer
+    <DefaultAppView
       className="h-full"
       animate
-      title={titleNode}
+      headerLeft={titleNode}
     >
       <div className="p-6 pt-0">
         {collectionWebsitesLoading ? (
@@ -147,7 +147,7 @@ const WebsiteCollectionRoute: FC = () => {
           </>
         )}
       </div>
-    </AppContentContainer>
+    </DefaultAppView>
   );
 };
 
