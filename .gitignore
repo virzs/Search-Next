@@ -25,5 +25,6 @@ dist-ssr
 
 .old
 .history
+.trae
 
 *.env
