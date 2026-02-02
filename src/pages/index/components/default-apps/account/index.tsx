@@ -1,5 +1,6 @@
 import { DesktopBaseModal } from "zs_library";
-import AccountView from "../settings/views/account";
+import useAuth from "@/hooks/useAuth";
+import { AccountInfo, UnloggedView } from "@/components/auth";
 
 export interface AccountModalProps {
   open: boolean;
@@ -7,9 +8,24 @@ export interface AccountModalProps {
 }
 
 const AccountModal = ({ open, onClose }: AccountModalProps) => {
+  const { user, isAuthenticated } = useAuth();
+
   return (
     <DesktopBaseModal visible={open} onClose={onClose}>
-      <AccountView />
+      <div className="max-w-[400px] mx-auto py-4">
+        {isAuthenticated && user ? (
+          <AccountInfo user={user} showActions />
+        ) : (
+          <UnloggedView
+            mode="inline"
+            title="欢迎使用"
+            description="登录后可以同步您的数据和设置"
+            onLoginSuccess="show-account"
+            onRegisterSuccess="show-account"
+            showToggle={true}
+          />
+        )}
+      </div>
     </DesktopBaseModal>
   );
 };
