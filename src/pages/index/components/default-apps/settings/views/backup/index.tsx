@@ -6,9 +6,9 @@ import {
   Divider,
   Switch,
   List,
+  Card,
 } from "antd";
 import {
-  RiCloudLine,
   RiDownloadLine,
   RiUploadLine,
   RiHistoryLine,
@@ -17,7 +17,7 @@ import {
   RiUploadFill,
 } from "@remixicon/react";
 import { useState } from "react";
-import { SettingsCard, SettingsActions } from "@/components/settings";
+import { SettingsActions } from "@/components/settings";
 import { DefaultAppView } from "@/components";
 
 const { Text, Paragraph } = Typography;
@@ -45,27 +45,6 @@ const BackupView = () => {
     setSyncStatus((prev) => ({ ...prev, isEnabled: enabled }));
   };
 
-  const handleManualSync = () => {
-    setSyncStatus((prev) => ({ ...prev, isSyncing: true, syncProgress: 0 }));
-
-    // 模拟同步进度
-    const interval = setInterval(() => {
-      setSyncStatus((prev) => {
-        const newProgress = prev.syncProgress + 10;
-        if (newProgress >= 100) {
-          clearInterval(interval);
-          return {
-            ...prev,
-            syncProgress: 100,
-            isSyncing: false,
-            lastSyncTime: new Date(),
-          };
-        }
-        return { ...prev, syncProgress: newProgress };
-      });
-    }, 200);
-  };
-
   const handleExportData = () => {
     // 这里后续实现数据导出逻辑
     console.log("导出数据");
@@ -86,12 +65,10 @@ const BackupView = () => {
         showIcon
         className="mb-6"
       />
-
-      <SettingsCard title="本地备份">
+      <Card title="本地备份" styles={{ root: { marginBottom: 16 } }}>
         <Paragraph type="secondary" className="mb-4">
           即使未登录，您也可以导出和导入本地数据。
         </Paragraph>
-
         <SettingsActions
           layout="vertical"
           actions={[
@@ -110,7 +87,7 @@ const BackupView = () => {
             },
           ]}
         />
-      </SettingsCard>
+      </Card>
     </DefaultAppView>
   );
 
@@ -118,7 +95,7 @@ const BackupView = () => {
   const renderLoggedView = () => (
     <DefaultAppView>
       {/* 云端同步 */}
-      <SettingsCard
+      <Card
         title="云端同步"
         extra={
           <Switch
@@ -128,6 +105,7 @@ const BackupView = () => {
             unCheckedChildren="关闭"
           />
         }
+        styles={{ root: { marginBottom: 16 } }}
       >
         {syncStatus.isEnabled ? (
           <div>
@@ -154,20 +132,6 @@ const BackupView = () => {
                 </Text>
               </div>
             )}
-
-            <SettingsActions
-              actions={[
-                {
-                  key: "sync",
-                  label: syncStatus.isSyncing ? "同步中..." : "立即同步",
-                  type: "primary",
-                  icon: <RiCloudLine />,
-                  onClick: handleManualSync,
-                  disabled: syncStatus.isSyncing,
-                  loading: syncStatus.isSyncing,
-                },
-              ]}
-            />
           </div>
         ) : (
           <Alert
@@ -177,10 +141,10 @@ const BackupView = () => {
             showIcon
           />
         )}
-      </SettingsCard>
+      </Card>
 
       {/* 备份历史 */}
-      <SettingsCard title="备份历史">
+      <Card title="备份历史" styles={{ root: { marginBottom: 16 } }}>
         <List
           size="small"
           dataSource={[
@@ -207,10 +171,10 @@ const BackupView = () => {
             </List.Item>
           )}
         />
-      </SettingsCard>
+      </Card>
 
       {/* 本地备份 */}
-      <SettingsCard title="本地备份">
+      <Card title="本地备份" styles={{ root: { marginBottom: 16 } }}>
         <Paragraph type="secondary" className="mb-4">
           除了云端同步，您还可以手动导出和导入数据文件。
         </Paragraph>
@@ -242,7 +206,7 @@ const BackupView = () => {
           showIcon
           icon={<RiErrorWarningLine />}
         />
-      </SettingsCard>
+      </Card>
     </DefaultAppView>
   );
 

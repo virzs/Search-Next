@@ -1,6 +1,11 @@
 import { Form, Input, Button, Checkbox, Typography, message } from "antd";
 import { useState } from "react";
-import { RiMailFill, RiLockFill, RiEyeFill, RiEyeOffFill } from "@remixicon/react";
+import {
+  RiMailFill,
+  RiLockFill,
+  RiEyeFill,
+  RiEyeOffFill,
+} from "@remixicon/react";
 import { LoginFormProps, LoginFormData, LoginResponse } from "../../types/auth";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -95,9 +100,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
               <Button
                 type="text"
                 size="small"
-                icon={showPassword ? <RiEyeOffFill size={16} /> : <RiEyeFill size={16} />}
+                icon={
+                  showPassword ? (
+                    <RiEyeOffFill size={16} />
+                  ) : (
+                    <RiEyeFill size={16} />
+                  )
+                }
                 onClick={() => setShowPassword(!showPassword)}
-                className="!p-0 !border-0 text-gray-400 hover:text-gray-600"
+                className="p-0! border-0! text-gray-400 hover:text-gray-600"
               />
             }
           />
@@ -107,7 +118,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         {(showRemember || showForgotPassword) && (
           <div className="flex justify-between items-center mb-6">
             {showRemember && (
-              <Item name="remember" valuePropName="checked" className="!mb-0">
+              <Item name="remember" valuePropName="checked" className="mb-0!">
                 <Checkbox>记住我</Checkbox>
               </Item>
             )}
@@ -120,8 +131,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
         )}
 
         {/* 登录按钮 */}
-        <Item className="!mb-0">
-          <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-12 font-medium">
+        <Item className="mb-0!">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isLoading}
+            block
+            size="large"
+            className="h-12 font-medium"
+          >
             {isLoading ? "登录中..." : "登录"}
           </Button>
         </Item>

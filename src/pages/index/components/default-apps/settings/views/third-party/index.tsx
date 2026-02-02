@@ -6,6 +6,7 @@ import {
   Typography,
   Divider,
   message,
+  Card,
 } from "antd";
 import { useState, useEffect } from "react";
 import {
@@ -15,7 +16,7 @@ import {
   RiEyeFill,
   RiEyeOffFill,
 } from "@remixicon/react";
-import { SettingsCard, SettingsActions } from "@/components/settings";
+import { SettingsActions } from "@/components/settings";
 import { ThirdPartyConfig, SyncSettings } from "@/types/api-config";
 import {
   getLocalApiConfig,
@@ -150,7 +151,7 @@ const ThirdPartyView = () => {
     <DefaultAppView>
       {/* 同步设置 */}
       {isLoggedIn && (
-        <SettingsCard title="同步设置">
+        <Card title="同步设置" styles={{ root: { marginBottom: 16 } }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <Text strong>服务器同步</Text>
@@ -182,11 +183,11 @@ const ThirdPartyView = () => {
               </Button>
             </div>
           )}
-        </SettingsCard>
+        </Card>
       )}
 
       {/* API配置表单 */}
-      <SettingsCard title="API密钥配置">
+      <Card title="API密钥配置" styles={{ root: { marginBottom: 16 } }}>
         <Form
           form={form}
           layout="vertical"
@@ -305,10 +306,10 @@ const ThirdPartyView = () => {
             )}
           </Item>
         </Form>
-      </SettingsCard>
+      </Card>
 
       {/* 使用说明 */}
-      <SettingsCard title="使用说明">
+      <Card title="使用说明" styles={{ root: { marginBottom: 16 } }}>
         <div className="space-y-3">
           <div>
             <Text strong>• 安全性：</Text>
@@ -329,7 +330,7 @@ const ThirdPartyView = () => {
             </Text>
           </div>
         </div>
-      </SettingsCard>
+      </Card>
     </DefaultAppView>
   );
 };

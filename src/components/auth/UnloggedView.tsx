@@ -32,7 +32,8 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   // 使用 ConfigContext 提供的项目公共信息（用于控制注册提示）
   const { projectInfo } = useConfig();
   const allowRegister = projectInfo?.register?.allowRegister ?? true;
-  const registerDisabledTip = projectInfo?.register?.registerDisabledTip || "当前项目暂不开放注册";
+  const registerDisabledTip =
+    projectInfo?.register?.registerDisabledTip || "当前项目暂不开放注册";
 
   // 处理登录成功
   const handleLoginSuccess = useCallback(
@@ -62,7 +63,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         }
       }
     },
-    [onLoginSuccess, mode, modalProps]
+    [onLoginSuccess, mode, modalProps],
   );
 
   // 处理注册成功
@@ -91,7 +92,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         }
       }
     },
-    [onRegisterSuccess, mode, modalProps]
+    [onRegisterSuccess, mode, modalProps],
   );
 
   // 已迁移到 useRequest 上方
@@ -99,7 +100,11 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   // 登录提交处理
   const handleLogin = async (data: LoginFormData): Promise<LoginResponse> => {
     try {
-      const response = await login({ email: data.email, password: data.password, remember: data.remember });
+      const response = await login({
+        email: data.email,
+        password: data.password,
+        remember: data.remember,
+      });
 
       if (response.success && response.user) {
         handleLoginSuccess(response.user);
@@ -115,7 +120,9 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   };
 
   // 注册提交处理
-  const handleRegister = async (data: RegisterFormData): Promise<LoginResponse> => {
+  const handleRegister = async (
+    data: RegisterFormData,
+  ): Promise<LoginResponse> => {
     try {
       const response = await register({
         username: data.username,
@@ -140,7 +147,10 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
 
   // 渲染内容
   const defaultTitle = currentAction === "login" ? "欢迎回来" : "创建账号";
-  const defaultDescription = currentAction === "login" ? "登录后可以同步您的数据和设置" : "注册账号以享受完整功能";
+  const defaultDescription =
+    currentAction === "login"
+      ? "登录后可以同步您的数据和设置"
+      : "注册账号以享受完整功能";
 
   return (
     <div className="unlogged-view-content">
@@ -163,20 +173,37 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
           className="auth-tabs"
         >
           <TabPane tab="登录" key="login">
-            <LoginForm onSubmit={handleLogin} loading={loginLoading} showRemember={true} showForgotPassword={true} />
+            <LoginForm
+              onSubmit={handleLogin}
+              loading={loginLoading}
+              showRemember={true}
+              showForgotPassword={true}
+            />
           </TabPane>
           <TabPane tab="注册" key="register">
             {allowRegister ? (
-              <RegisterForm onSubmit={handleRegister} loading={registerLoading} />
+              <RegisterForm
+                onSubmit={handleRegister}
+                loading={registerLoading}
+              />
             ) : (
-              <Alert description={registerDisabledTip} type="warning" showIcon />
+              <Alert
+                description={registerDisabledTip}
+                type="warning"
+                showIcon
+              />
             )}
           </TabPane>
         </Tabs>
       ) : (
         <div>
           {currentAction === "login" ? (
-            <LoginForm onSubmit={handleLogin} loading={loginLoading} showRemember={true} showForgotPassword={true} />
+            <LoginForm
+              onSubmit={handleLogin}
+              loading={loginLoading}
+              showRemember={true}
+              showForgotPassword={true}
+            />
           ) : allowRegister ? (
             <RegisterForm onSubmit={handleRegister} loading={registerLoading} />
           ) : (
@@ -192,8 +219,12 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
             <Button
               type="link"
               size="small"
-              onClick={() => setCurrentAction(currentAction === "login" ? "register" : "login")}
-              className="!p-0 !h-auto ml-1"
+              onClick={() =>
+                setCurrentAction(
+                  currentAction === "login" ? "register" : "login",
+                )
+              }
+              className="p-0! h-auto! ml-1"
             >
               {currentAction === "login" ? "立即注册" : "立即登录"}
             </Button>

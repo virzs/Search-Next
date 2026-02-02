@@ -1,7 +1,18 @@
 import { Form, Input, Button, Typography, message } from "antd";
 import { useState } from "react";
-import { RiUserFill, RiMailFill, RiLockFill, RiEyeFill, RiEyeOffFill, RiShieldCheckFill } from "@remixicon/react";
-import { RegisterFormProps, RegisterFormData, LoginResponse } from "../../types/auth";
+import {
+  RiUserFill,
+  RiMailFill,
+  RiLockFill,
+  RiEyeFill,
+  RiEyeOffFill,
+  RiShieldCheckFill,
+} from "@remixicon/react";
+import {
+  RegisterFormProps,
+  RegisterFormData,
+  LoginResponse,
+} from "../../types/auth";
 import { getEmailCaptcha } from "../../services/auth";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -27,7 +38,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const isLoading = externalLoading || contextRegisterLoading;
 
   // 默认注册处理
-  const defaultRegister = async (data: RegisterFormData): Promise<LoginResponse> => {
+  const defaultRegister = async (
+    data: RegisterFormData,
+  ): Promise<LoginResponse> => {
     return await register(data);
   };
 
@@ -107,7 +120,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <div className={`register-form ${className}`}>
-      <Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={initialValues} size="large">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={initialValues}
+        size="large"
+      >
         {/* 用户名输入 */}
         <Item
           label="用户名"
@@ -115,7 +134,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           rules={[
             { required: true, message: "请输入用户名" },
             { min: 2, max: 20, message: "用户名长度为2-20个字符" },
-            { pattern: /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/, message: "用户名只能包含字母、数字、下划线和中文" },
+            {
+              pattern: /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/,
+              message: "用户名只能包含字母、数字、下划线和中文",
+            },
           ]}
         >
           <Input
@@ -153,7 +175,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           >
             <div className="flex gap-2">
               <Input
-                prefix={<RiShieldCheckFill size={16} className="text-gray-400" />}
+                prefix={
+                  <RiShieldCheckFill size={16} className="text-gray-400" />
+                }
                 placeholder="请输入6位验证码"
                 maxLength={6}
                 className="flex-1"
@@ -177,7 +201,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           rules={[
             { required: true, message: "请输入密码" },
             { min: 6, message: "密码长度至少6位" },
-            { pattern: /^(?=.*[a-zA-Z])(?=.*\d)/, message: "密码必须包含字母和数字" },
+            {
+              pattern: /^(?=.*[a-zA-Z])(?=.*\d)/,
+              message: "密码必须包含字母和数字",
+            },
           ]}
         >
           <Input
@@ -189,9 +216,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               <Button
                 type="text"
                 size="small"
-                icon={showPassword ? <RiEyeOffFill size={16} /> : <RiEyeFill size={16} />}
+                icon={
+                  showPassword ? (
+                    <RiEyeOffFill size={16} />
+                  ) : (
+                    <RiEyeFill size={16} />
+                  )
+                }
                 onClick={() => setShowPassword(!showPassword)}
-                className="!p-0 !border-0 text-gray-400 hover:text-gray-600"
+                className="p-0! border-0! text-gray-400 hover:text-gray-600"
               />
             }
           />
@@ -223,17 +256,30 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               <Button
                 type="text"
                 size="small"
-                icon={showConfirmPassword ? <RiEyeOffFill size={16} /> : <RiEyeFill size={16} />}
+                icon={
+                  showConfirmPassword ? (
+                    <RiEyeOffFill size={16} />
+                  ) : (
+                    <RiEyeFill size={16} />
+                  )
+                }
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="!p-0 !border-0 text-gray-400 hover:text-gray-600"
+                className="p-0! border-0! text-gray-400 hover:text-gray-600"
               />
             }
           />
         </Item>
 
         {/* 注册按钮 */}
-        <Item className="!mb-0 !mt-6">
-          <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-12 font-medium">
+        <Item className="mb-0! mt-6!">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isLoading}
+            block
+            size="large"
+            className="h-12 font-medium"
+          >
             {isLoading ? "注册中..." : "注册账号"}
           </Button>
         </Item>

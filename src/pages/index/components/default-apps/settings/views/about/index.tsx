@@ -1,13 +1,11 @@
-import { Typography, Space, Tag, List, Avatar } from "antd";
+import { Typography, Space, Tag, List, Avatar, Card, Button } from "antd";
 import {
   RiGithubLine,
   RiGlobalLine,
   RiMailLine,
-  RiHeartLine,
   RiBugLine,
   RiQuestionLine,
 } from "@remixicon/react";
-import { SettingsCard, SettingsActions } from "@/components/settings";
 import { DefaultAppView } from "@/components";
 
 const { Title, Text, Paragraph, Link } = Typography;
@@ -55,25 +53,32 @@ const AboutView = () => {
     },
   ];
 
-  const handleCheckUpdate = () => {
-    // 这里后续实现检查更新逻辑
-    console.log("检查更新");
-  };
-
-  const handleReportBug = () => {
-    // 这里后续实现问题反馈逻辑
-    console.log("反馈问题");
-  };
-
-  const handleOpenGithub = () => {
-    // 这里后续实现打开GitHub逻辑
-    window.open("https://github.com", "_blank");
-  };
-
   return (
     <DefaultAppView>
       {/* 应用信息 */}
-      <SettingsCard>
+      <Card
+        styles={{ root: { marginBottom: 16 } }}
+        actions={[
+          <Button
+            key="github"
+            type="link"
+            icon={<RiGithubLine />}
+            title="Github"
+            href="https://github.com/virzs/Search-Next"
+            target="_blank"
+            rel="noopener noreferrer"
+          />,
+          <Button
+            key="bug"
+            type="link"
+            icon={<RiBugLine />}
+            title="反馈问题"
+            href="https://github.com/virzs/Search-Next/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+          />,
+        ]}
+      >
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
             <Text className="text-white text-2xl font-bold">S</Text>
@@ -109,34 +114,10 @@ const AboutView = () => {
             <div className="font-semibold">{appInfo.license}</div>
           </div>
         </div>
-
-        <SettingsActions
-          layout="vertical"
-          actions={[
-            {
-              key: "update",
-              label: "检查更新",
-              type: "primary",
-              onClick: handleCheckUpdate,
-            },
-            {
-              key: "github",
-              label: "GitHub",
-              icon: <RiGithubLine />,
-              onClick: handleOpenGithub,
-            },
-            {
-              key: "bug",
-              label: "反馈问题",
-              icon: <RiBugLine />,
-              onClick: handleReportBug,
-            },
-          ]}
-        />
-      </SettingsCard>
+      </Card>
 
       {/* 开发团队 */}
-      <SettingsCard title="开发团队">
+      <Card title="开发团队" styles={{ root: { marginBottom: 16 } }}>
         <List
           dataSource={teamMembers}
           renderItem={(member) => (
@@ -163,10 +144,10 @@ const AboutView = () => {
             </List.Item>
           )}
         />
-      </SettingsCard>
+      </Card>
 
       {/* 技术栈 */}
-      <SettingsCard title="技术栈">
+      <Card title="技术栈" styles={{ root: { marginBottom: 16 } }}>
         <List
           size="small"
           dataSource={dependencies}
@@ -184,10 +165,10 @@ const AboutView = () => {
             </List.Item>
           )}
         />
-      </SettingsCard>
+      </Card>
 
       {/* 联系方式 */}
-      <SettingsCard title="联系我们">
+      <Card title="联系我们" styles={{ root: { marginBottom: 16 } }}>
         <Space direction="vertical" className="w-full">
           <div className="flex items-center gap-3">
             <RiMailLine className="text-gray-500" />
@@ -208,12 +189,11 @@ const AboutView = () => {
             </Link>
           </div>
         </Space>
-      </SettingsCard>
+      </Card>
 
       {/* 致谢 */}
-      <SettingsCard>
+      <Card>
         <div className="text-center">
-          <RiHeartLine className="text-red-500 text-2xl mb-3" />
           <Title level={4} className="mb-2">
             特别感谢
           </Title>
@@ -221,10 +201,10 @@ const AboutView = () => {
             感谢所有开源项目的贡献者，以及每一位用户的支持与反馈。
           </Paragraph>
           <Text type="secondary" className="text-sm">
-            © 2024 Search Next. All rights reserved.
+            © 2026 Search Next. All rights reserved.
           </Text>
         </div>
-      </SettingsCard>
+      </Card>
     </DefaultAppView>
   );
 };

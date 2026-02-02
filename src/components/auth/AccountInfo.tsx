@@ -14,7 +14,11 @@ interface AccountInfoProps {
   className?: string;
 }
 
-const AccountInfo: React.FC<AccountInfoProps> = ({ user: propUser, showActions = true, className = "" }) => {
+const AccountInfo: React.FC<AccountInfoProps> = ({
+  user: propUser,
+  showActions = true,
+  className = "",
+}) => {
   const { user: contextUser, logout, avatarSrc, coverGradientCss } = useAuth();
   const user = propUser || contextUser;
 
@@ -30,9 +34,16 @@ const AccountInfo: React.FC<AccountInfoProps> = ({ user: propUser, showActions =
       animate={{ opacity: 1, y: 0 }}
       className={`account-info h-full flex flex-col gap-12 ${className}`}
     >
-      <Card className="overflow-hidden grow" bodyStyle={{ padding: 0 }} variant="borderless">
+      <Card
+        className="overflow-hidden grow"
+        bodyStyle={{ padding: 0 }}
+        variant="borderless"
+      >
         {/* 背景封面 */}
-        <div className="h-32 relative" style={{ backgroundImage: coverGradientCss || undefined }}>
+        <div
+          className="h-32 relative"
+          style={{ backgroundImage: coverGradientCss || undefined }}
+        >
           {/* 头像 */}
           <div className="absolute -bottom-8 left-6">
             <Avatar
@@ -50,7 +61,7 @@ const AccountInfo: React.FC<AccountInfoProps> = ({ user: propUser, showActions =
         <div className="pt-12 pb-6 px-6">
           <div className="mb-4 flex justify-between items-start">
             <div>
-              <Title level={3} className="!mb-1">
+              <Title level={3} className="mb-1!">
                 {user?.username}
               </Title>
               <Text type="secondary" className="block">
@@ -61,13 +72,21 @@ const AccountInfo: React.FC<AccountInfoProps> = ({ user: propUser, showActions =
 
           <div className="flex items-center space-x-1 text-xs text-gray-500 mb-4">
             <RiShieldCheckLine size={14} />
-            <span>加入于 {user?.createdAt && format(user.createdAt, "yyyy-MM-dd")}</span>
+            <span>
+              加入于 {user?.createdAt && format(user.createdAt, "yyyy-MM-dd")}
+            </span>
           </div>
         </div>
       </Card>
       {showActions && (
         <Space direction="vertical" className="w-full shrink-0">
-          <Button type="primary" danger icon={<RiLogoutBoxRLine size={16} />} onClick={handleLogout} block>
+          <Button
+            type="primary"
+            danger
+            icon={<RiLogoutBoxRLine size={16} />}
+            onClick={handleLogout}
+            block
+          >
             退出登录
           </Button>
         </Space>

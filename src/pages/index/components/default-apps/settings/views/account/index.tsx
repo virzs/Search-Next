@@ -2,14 +2,15 @@ import { useAuth } from "@/hooks/useAuth";
 import UnloggedView from "@/components/auth/UnloggedView";
 import AccountInfo from "@/components/auth/AccountInfo";
 import { DefaultAppView } from "@/components";
+import { Card } from "antd";
 
 const AccountView = () => {
   const { user, isAuthenticated } = useAuth();
 
   // 未登录视图
   const renderUnloggedView = () => (
-    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-white/70 shadow-sm backdrop-blur-xl">
-      <div className="w-full max-w-[520px] py-10">
+    <Card>
+      <div className="w-full max-w-[520px] mx-auto">
         <UnloggedView
           mode="inline"
           title="欢迎使用"
@@ -19,7 +20,7 @@ const AccountView = () => {
           showToggle={true}
         />
       </div>
-    </div>
+    </Card>
   );
 
   // 已登录视图

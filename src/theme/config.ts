@@ -3,6 +3,7 @@ import type { ThemeConfig } from "antd";
 const theme: ThemeConfig = {
   token: {
     colorPrimary: "rgb(250, 84, 28)",
+    borderRadius: 12,
   },
   components: {
     Button: {
@@ -10,7 +11,7 @@ const theme: ThemeConfig = {
       primaryShadow: "none",
     },
     Menu: {
-      itemBg: 'transparent',
+      itemBg: "transparent",
       activeBarBorderWidth: 0,
       itemMarginInline: 0,
       itemHeight: 36,
@@ -19,8 +20,7 @@ const theme: ThemeConfig = {
     Input: {
       borderRadius: 12,
     },
-    Segmented: {
-    }
+    Segmented: {},
   },
 };
 

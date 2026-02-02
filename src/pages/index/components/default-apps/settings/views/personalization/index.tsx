@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Card } from "antd";
 import { useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
@@ -8,7 +8,6 @@ import {
   RiTShirtLine,
 } from "@remixicon/react";
 import { cx } from "@emotion/css";
-import { SettingsCard } from "@/components/settings";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import {
   getActiveThemeConfigs,
@@ -76,7 +75,7 @@ const PersonalizationView = () => {
 
   return (
     <DefaultAppView>
-      <SettingsCard>
+      <Card>
         <div className="grid gap-3">
           <div>
             <div
@@ -253,7 +252,7 @@ const PersonalizationView = () => {
             ) : null}
           </div>
         </div>
-      </SettingsCard>
+      </Card>
     </DefaultAppView>
   );
 };
