@@ -55,7 +55,7 @@ const PersonalizationView = () => {
   }, [personalization.wallpaper]);
 
   const itemHeaderClassName =
-    "flex items-center justify-between gap-4 rounded-2xl border border-black/5 bg-white/70 px-4 py-3 transition select-none hover:bg-white/85 active:bg-white";
+    "flex items-center justify-between transition select-none hover:bg-white/85 active:bg-white";
 
   const panelClassName =
     "mt-2 rounded-2xl border border-black/5 bg-white/60 p-3";

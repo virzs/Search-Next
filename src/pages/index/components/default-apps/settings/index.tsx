@@ -12,48 +12,7 @@ import {
 } from "@remixicon/react";
 import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
-import { Outlet, useLocation } from "react-router";
 import { settingsRoute } from "./route-paths";
-
-const UnderConstructionOverlay = () => {
-  return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-md">
-      <div className="w-[420px] max-w-[calc(100%-48px)] rounded-2xl border bg-white/70 p-6 shadow-xl">
-        <div className="text-xs font-medium tracking-wide text-gray-600">
-          示例
-        </div>
-        <div className="mt-2 text-2xl font-bold tracking-tight">开发中</div>
-        <div className="mt-1 text-sm text-gray-600">
-          该功能正在开发，敬请期待。
-        </div>
-        <div className="mt-5 grid gap-3">
-          <div className="h-10 rounded-xl bg-gray-100" />
-          <div className="h-24 rounded-xl bg-gray-100" />
-          <div className="h-10 rounded-xl bg-gray-100" />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const SettingsOutletFrame = () => {
-  const location = useLocation();
-  const pathname = location.pathname;
-  const showUnderConstruction =
-    pathname.startsWith(settingsRoute.path.thirdParty) ||
-    pathname.startsWith(settingsRoute.path.language) ||
-    pathname.startsWith(settingsRoute.path.backup) ||
-    pathname.startsWith(settingsRoute.path.about);
-
-  return (
-    <div className="relative h-full w-full overflow-hidden">
-      <div className="h-full w-full overflow-y-auto">
-        <Outlet />
-      </div>
-      {showUnderConstruction ? <UnderConstructionOverlay /> : null}
-    </div>
-  );
-};
 
 const SettingsModalRoute: FC = () => {
   return (

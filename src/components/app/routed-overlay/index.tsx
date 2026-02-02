@@ -1,7 +1,16 @@
 import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useOutlet, useOutletContext } from "react-router";
+import {
+  useLocation,
+  useNavigate,
+  useOutlet,
+  useOutletContext,
+} from "react-router";
 import AppRoutedContainer from "../routed-container";
-import type { AppSidebarMenuItem, AppSidebarProps, AppSidebarSearchProps } from "../sidebar";
+import type {
+  AppSidebarMenuItem,
+  AppSidebarProps,
+  AppSidebarSearchProps,
+} from "../sidebar";
 import { AppRouteContextProvider } from "../router/route-context";
 
 type KeepAlivePage = {
@@ -31,7 +40,8 @@ const KeepAliveOutlet = ({
         return next;
       }
       const next = [...prev, { key: activeKey, element: outlet }];
-      if (maxSize && next.length > maxSize) return next.slice(next.length - maxSize);
+      if (maxSize && next.length > maxSize)
+        return next.slice(next.length - maxSize);
       return next;
     });
   }, [activeKey, maxSize, outlet]);
@@ -70,13 +80,20 @@ export interface AppRoutedOverlayMenuItem extends AppSidebarMenuItem {
   match?: (pathname: string) => boolean;
 }
 
-export interface AppRoutedOverlaySidebarProps
-  extends Omit<AppSidebarProps, "menuItems" | "activeMenuKey" | "onMenuSelect" | "search"> {
+export interface AppRoutedOverlaySidebarProps extends Omit<
+  AppSidebarProps,
+  "menuItems" | "activeMenuKey" | "onMenuSelect" | "search"
+> {
   menuItems?: AppRoutedOverlayMenuItem[];
-  search?: Omit<AppSidebarSearchProps, "value" | "onChange"> & { initialValue?: string };
+  search?: Omit<AppSidebarSearchProps, "value" | "onChange"> & {
+    initialValue?: string;
+  };
 }
 
-export interface AppRoutedOverlayProps<ParentContext = unknown, RouteContext = unknown> {
+export interface AppRoutedOverlayProps<
+  ParentContext = unknown,
+  RouteContext = unknown,
+> {
   title?: ReactNode;
   closeTo?: string;
   wrapContent?: boolean;
@@ -108,7 +125,9 @@ const resolveActiveMenuItem = (
   if (!items.length) return null;
   const scored = items
     .map((item) => {
-      const match = item.match ? item.match(pathname) : pathname.startsWith(item.path);
+      const match = item.match
+        ? item.match(pathname)
+        : pathname.startsWith(item.path);
       if (!match) return null;
       const score = (item.match ? 10_000 : 0) + item.path.length;
       return { item, score };
@@ -125,8 +144,10 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
   closeTo = "/",
   wrapContent,
   sidebarProps,
-  outletWrapperClassName,
-  suspenseFallback = <div className="p-6 text-sm text-gray-500">Loading...</div>,
+  outletWrapperClassName = "h-full w-full overflow-auto",
+  suspenseFallback = (
+    <div className="p-6 text-sm text-gray-500">Loading...</div>
+  ),
   children,
   keepAlive,
   getRouteContext,
@@ -135,7 +156,9 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
   const location = useLocation();
   const outlet = useOutlet();
   const parentContext = useOutletContext<ParentContext>();
-  const [searchValue, setSearchValue] = useState(sidebarProps?.search?.initialValue ?? "");
+  const [searchValue, setSearchValue] = useState(
+    sidebarProps?.search?.initialValue ?? "",
+  );
 
   const activeMenuItem = useMemo(
     () => resolveActiveMenuItem(location.pathname, sidebarProps?.menuItems),
@@ -206,7 +229,9 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
     >
       <Suspense fallback={suspenseFallback}>
         {getRouteContext ? (
-          <AppRouteContextProvider value={routeContextValue}>{content}</AppRouteContextProvider>
+          <AppRouteContextProvider value={routeContextValue}>
+            {content}
+          </AppRouteContextProvider>
         ) : (
           content
         )}

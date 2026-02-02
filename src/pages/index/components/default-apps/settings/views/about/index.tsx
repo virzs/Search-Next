@@ -145,7 +145,7 @@ const AboutView = () => {
                 avatar={
                   <Avatar
                     size={48}
-                    className="bg-gradient-to-br from-blue-400 to-purple-500"
+                    className="bg-linear-to-br from-blue-400 to-purple-500"
                   >
                     {member.name.charAt(0)}
                   </Avatar>
