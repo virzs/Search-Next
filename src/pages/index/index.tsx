@@ -40,6 +40,8 @@ import { Outlet, useNavigate } from "react-router";
 import { storeRoute } from "./components/default-apps/store/route-paths";
 import { themeRoute } from "./components/default-apps/theme/route-paths";
 import { settingsRoute } from "./components/default-apps/settings/route-paths";
+import Notice from "./components/notice";
+import Feedback from "./components/feedback";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
@@ -336,6 +338,10 @@ function Index() {
         `,
       )}
     >
+      <div className="flex items-center justify-end py-2 px-6 max-w-7xl mx-auto w-full gap-2">
+        <Notice />
+        <Feedback />
+      </div>
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}

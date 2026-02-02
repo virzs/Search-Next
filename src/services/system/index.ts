@@ -17,3 +17,20 @@ export interface ProjectPublicInfo {
 export const getProjectPublicInfo = () => {
   return baseGetRequest<ProjectPublicInfo>("/system/project/public")();
 };
+
+export interface NoticeItem {
+  _id: string;
+  title: string;
+  content: string;
+  effectiveStart: string;
+  effectiveEnd: string;
+}
+
+/**
+ * 获取公告
+ */
+export const getNotice = () => {
+  return baseGetRequest<NoticeItem[]>("/system/notice/public/list")({
+    key: "tabs",
+  });
+};
