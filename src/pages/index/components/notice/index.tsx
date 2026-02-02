@@ -5,7 +5,7 @@ import { RiNotification3Fill } from "@remixicon/react";
 import { useBoolean, useRequest } from "ahooks";
 import { Badge, Button, Empty, Tooltip } from "antd";
 import { format } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DesktopBaseModal, SimpleEditorViewer } from "zs_library";
 
 const Notice = () => {
@@ -13,6 +13,7 @@ const Notice = () => {
     useBoolean(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [readIds, setReadIds] = useState<string[]>(() => getNoticeReadIds());
+  const autoOpenCheckedRef = useRef(false);
 
   const { data, run } = useRequest(getNotice, {
     pollingInterval: 60 * 60 * 1000,
@@ -67,6 +68,15 @@ const Notice = () => {
   const hasUnread = useMemo(() => {
     return notices.some((n) => !readIdSet.has(n._id));
   }, [notices, readIdSet]);
+
+  useEffect(() => {
+    if (autoOpenCheckedRef.current) return;
+    if (data === undefined) return;
+    autoOpenCheckedRef.current = true;
+    if (!hasUnread) return;
+    setActiveId(null);
+    openModal();
+  }, [data, hasUnread, openModal]);
 
   return (
     <div>
