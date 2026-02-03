@@ -29,8 +29,8 @@ const WebsiteDetailView: FC = () => {
   return (
     <DefaultAppView className="h-full" animate>
       <Card className="min-h-full">
-        <div className="flex items-center text-center mb-8 gap-4">
-          <div className="relative mb-6">
+        <div className="flex items-center text-center mb-8 gap-6">
+          <div className="shrink-0">
             {iconUrl ? (
               <Image
                 className="w-24! h-24! rounded-3xl shadow-xl border-4 border-black/10 bg-white dark:border-white/10 dark:bg-white/10"
@@ -43,9 +43,11 @@ const WebsiteDetailView: FC = () => {
               </div>
             )}
           </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-2">{item.name}</h1>
-            <p className="text-sm mb-6 max-w-md break-all">{item.url}</p>
+          <div className="text-left">
+            <h1 className="text-2xl font-bold mb-1 line-clamp-1 overflow-hidden text-ellipsis">
+              {item.name}
+            </h1>
+            <p className="text-sm mb-3 max-w-md break-all">{item.url}</p>
             <div className="flex gap-4 w-full max-w-xs">
               <Button type="primary" onClick={() => onAddWebsite?.(item)}>
                 获取
