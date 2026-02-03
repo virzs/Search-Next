@@ -1,3 +1,4 @@
+import { Resource } from "@/types";
 import { baseGetRequest } from "@/utils/axios";
 import { DesktopListItem, DesktopTheme } from "zs_library";
 
@@ -82,7 +83,8 @@ export const resolveDesktopThemeFromConfigs = (
   preferDark: boolean,
 ): DesktopTheme | null => {
   const items = configs ?? [];
-  const active = (themeId ? items.find((t) => t._id === themeId) : null) ?? items[0] ?? null;
+  const active =
+    (themeId ? items.find((t) => t._id === themeId) : null) ?? items[0] ?? null;
   if (!active) return null;
   if (preferDark && active.darkConfig) return active.darkConfig;
   return active.lightConfig;
@@ -104,4 +106,57 @@ export const getUserThemeCategories = () => {
   return baseGetRequest<ThemeCategoryApiItem[]>(
     "/tabs/desktop/theme-config-category/user",
   )();
+};
+
+export interface WallpaperCategoryApiItem {
+  _id: string;
+  name: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+/**
+ * 获取用户可用壁纸分类
+ */
+export const getUserWallpaperCategories = () => {
+  return baseGetRequest<WallpaperCategoryApiItem[]>(
+    "/tabs/desktop/wallpaper/category/user",
+  )();
+};
+
+export interface WallpaperApiItem {
+  _id: string;
+  name: string;
+  description?: string;
+  thumbnail?: Resource;
+  image?: Resource;
+  categoryId?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export const getWallpaperImageUrl = (
+  wallpaper: WallpaperApiItem | null | undefined,
+): string | null => {
+  const url = wallpaper?.image?.url ?? wallpaper?.thumbnail?.url;
+  if (!url || typeof url !== "string") return null;
+  return toAbsUrl(url);
+};
+
+export interface WallpaperPageResult {
+  data: WallpaperApiItem[];
+  total: number;
+}
+
+/**
+ * 获取用户可用壁纸
+ */
+export const getUserWallpapers = (params?: {
+  page?: number;
+  pageSize?: number;
+  categoryId?: string;
+}) => {
+  return baseGetRequest<WallpaperPageResult>(
+    "/tabs/desktop/wallpaper/upload/active",
+  )(params ?? {});
 };

@@ -1,5 +1,5 @@
 // 桌面项目类型定义
-export type ItemType = 'group' | 'app' | 'widget';
+export type ItemType = "group" | "app" | "widget";
 
 // 小组件配置接口
 export interface WidgetConfig {
@@ -8,7 +8,7 @@ export interface WidgetConfig {
   entry: string;
   container?: string;
   props?: Record<string, unknown>;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   category?: string;
 }
 
@@ -18,4 +18,12 @@ export interface DesktopItemData {
   icon?: string | { iconName: string; iconType: string };
   widgetConfig?: WidgetConfig; // 小组件特有配置
   url?: string; // 网站链接 (for app type)
+}
+
+export interface Resource {
+  name: string;
+  key: string;
+  mimetype: string;
+  size: number;
+  url?: string;
 }

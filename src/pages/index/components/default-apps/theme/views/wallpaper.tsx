@@ -1,55 +1,68 @@
 import { AppSegmented, DefaultAppView } from "@/components";
 import { cx } from "@emotion/css";
-import { FC, useMemo, useState } from "react";
+import { useRequest } from "ahooks";
+import { Empty, Image, Pagination, Space } from "antd";
+import { FC, useEffect, useMemo, useState } from "react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
+import {
+  getWallpaperImageUrl,
+  getUserWallpaperCategories,
+  getUserWallpapers,
+  WallpaperApiItem,
+  WallpaperCategoryApiItem,
+} from "@/services/desktop";
+import {
+  GradientWallpaperPreset,
+  gradientWallpaperPresets,
+} from "./wallpaper-gradients";
 
 const WallpaperView: FC = () => {
   const { personalization, setWallpaper } = useDesktopTheme();
   const [activeType, setActiveType] = useState<"gradient" | "image">(
     "gradient",
   );
+  const [activeCategoryId, setActiveCategoryId] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(24);
+
+  const { data: categories, loading: categoryLoading } = useRequest(
+    getUserWallpaperCategories,
+    { ready: activeType === "image" },
+  );
+
+  const {
+    data: wallpapersPage,
+    loading: wallpaperLoading,
+    run: runWallpapers,
+  } = useRequest(getUserWallpapers as any, { manual: true });
+
   const cardClassName = cx(
     "rounded-2xl border p-4 transition select-none",
     "hover:opacity-95 active:opacity-90",
     "cursor-pointer",
   );
 
-  const gradientWallpapers = useMemo(
-    () => [
-      { id: "none", name: "无", css: "" },
-      {
-        id: "aurora",
-        name: "极光",
-        css: "radial-gradient(80% 70% at 15% 20%, rgba(0, 199, 190, 0.70) 0%, rgba(0, 0, 0, 0) 65%), radial-gradient(80% 70% at 85% 15%, rgba(10, 132, 255, 0.62) 0%, rgba(0, 0, 0, 0) 60%), radial-gradient(90% 80% at 55% 92%, rgba(255, 45, 85, 0.55) 0%, rgba(0, 0, 0, 0) 62%), linear-gradient(135deg, #0b0b10 0%, #111325 40%, #0b1220 100%)",
-      },
-      {
-        id: "sky",
-        name: "天光",
-        css: "radial-gradient(120% 90% at 20% 10%, rgba(90, 200, 250, 0.85) 0%, rgba(10, 132, 255, 0.0) 55%), radial-gradient(100% 80% at 90% 30%, rgba(88, 86, 214, 0.55) 0%, rgba(88, 86, 214, 0) 60%), linear-gradient(135deg, rgba(242, 242, 247, 1) 0%, rgba(224, 235, 255, 1) 55%, rgba(236, 232, 255, 1) 100%)",
-      },
-      {
-        id: "sunset",
-        name: "落日",
-        css: "radial-gradient(110% 90% at 15% 25%, rgba(255, 159, 10, 0.80) 0%, rgba(255, 159, 10, 0) 55%), radial-gradient(120% 100% at 85% 20%, rgba(255, 45, 85, 0.70) 0%, rgba(255, 45, 85, 0) 60%), linear-gradient(135deg, rgba(255, 250, 245, 1) 0%, rgba(255, 231, 220, 1) 60%, rgba(255, 220, 236, 1) 100%)",
-      },
-      {
-        id: "lime",
-        name: "青柠",
-        css: "radial-gradient(110% 90% at 20% 20%, rgba(48, 209, 88, 0.70) 0%, rgba(48, 209, 88, 0) 55%), radial-gradient(120% 90% at 80% 30%, rgba(0, 199, 190, 0.55) 0%, rgba(0, 199, 190, 0) 60%), linear-gradient(135deg, rgba(245, 255, 252, 1) 0%, rgba(226, 255, 243, 1) 55%, rgba(224, 248, 255, 1) 100%)",
-      },
-      {
-        id: "mono",
-        name: "雾白",
-        css: "radial-gradient(120% 90% at 25% 20%, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0) 55%), radial-gradient(120% 90% at 85% 35%, rgba(199, 199, 204, 0.55) 0%, rgba(199, 199, 204, 0) 60%), linear-gradient(135deg, rgba(242, 242, 247, 1) 0%, rgba(232, 232, 236, 1) 100%)",
-      },
-      {
-        id: "midnight",
-        name: "深夜",
-        css: "radial-gradient(100% 80% at 20% 25%, rgba(88, 86, 214, 0.55) 0%, rgba(88, 86, 214, 0) 60%), radial-gradient(120% 90% at 82% 18%, rgba(10, 132, 255, 0.55) 0%, rgba(10, 132, 255, 0) 60%), radial-gradient(110% 90% at 60% 92%, rgba(255, 45, 85, 0.40) 0%, rgba(255, 45, 85, 0) 62%), linear-gradient(135deg, #050509 0%, #0b0b14 55%, #070710 100%)",
-      },
-    ],
-    [],
-  );
+  const categoryOptions = useMemo(() => {
+    const items: WallpaperCategoryApiItem[] = categories ?? [];
+    return [
+      { label: "全部", value: "all" },
+      ...items.map((c) => ({ label: c.name, value: c._id })),
+    ];
+  }, [categories]);
+
+  useEffect(() => {
+    if (activeType !== "image") return;
+    const params = {
+      page,
+      pageSize,
+      categoryId: activeCategoryId === "all" ? undefined : activeCategoryId,
+    };
+    runWallpapers(params);
+  }, [activeCategoryId, activeType, page, pageSize, runWallpapers]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeCategoryId]);
 
   const isGradientActive = (css: string) => {
     if (css === "") return personalization.wallpaper.type === "none";
@@ -59,33 +72,67 @@ const WallpaperView: FC = () => {
     );
   };
 
-  const handleSelectGradient = (wallpaper: (typeof gradientWallpapers)[number]) => {
+  const handleSelectGradient = (wallpaper: GradientWallpaperPreset) => {
     if (wallpaper.id === "none") {
       setWallpaper({ type: "none", name: wallpaper.name });
       return;
     }
-    setWallpaper({ type: "gradient", css: wallpaper.css, name: wallpaper.name });
+    setWallpaper({
+      type: "gradient",
+      css: wallpaper.css,
+      name: wallpaper.name,
+    });
+  };
+
+  const visibleWallpapers = useMemo(() => {
+    return ((wallpapersPage as any)?.data as WallpaperApiItem[]) ?? [];
+  }, [wallpapersPage]);
+
+  const total = useMemo(() => {
+    return (wallpapersPage as any)?.total ?? 0;
+  }, [wallpapersPage]);
+
+  const isImageActive = (url: string) => {
+    return (
+      personalization.wallpaper.type === "image" &&
+      personalization.wallpaper.url === url
+    );
+  };
+
+  const handleSelectImage = (wallpaper: WallpaperApiItem) => {
+    const url = getWallpaperImageUrl(wallpaper);
+    if (!url) return;
+    setWallpaper({ type: "image", url, name: wallpaper.name });
   };
 
   return (
     <DefaultAppView
       headerLeft={
-        <AppSegmented
-          options={[
-            { label: "渐变", value: "gradient" },
-            { label: "图片", value: "image", disabled: true },
-          ]}
-          value={activeType}
-          onChange={(v) => setActiveType(v as any)}
-          className="max-w-full overflow-auto"
-        />
+        <Space>
+          <AppSegmented
+            options={[
+              { label: "渐变", value: "gradient" },
+              { label: "图片", value: "image" },
+            ]}
+            value={activeType}
+            onChange={(v) => setActiveType(v as any)}
+            className="max-w-full overflow-auto"
+          />
+          {activeType === "image" ? (
+            <AppSegmented
+              options={categoryOptions}
+              value={activeCategoryId}
+              onChange={(v) => setActiveCategoryId(String(v))}
+              className="max-w-full overflow-auto"
+            />
+          ) : null}
+        </Space>
       }
       contentClassName="overflow-y-auto px-1 pb-4"
     >
-
       {activeType === "gradient" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {gradientWallpapers.map((w) => {
+          {gradientWallpaperPresets.map((w) => {
             const active = isGradientActive(w.css);
             const ringColor = active
               ? "rgba(22, 119, 255, 0.45)"
@@ -138,9 +185,90 @@ const WallpaperView: FC = () => {
             );
           })}
         </div>
+      ) : wallpaperLoading || categoryLoading ? (
+        <div className="h-[220px] w-full flex items-center justify-center">
+          <div className="text-sm text-gray-500">正在加载壁纸…</div>
+        </div>
+      ) : visibleWallpapers.length ? (
+        <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {visibleWallpapers.map((w) => {
+              const url = getWallpaperImageUrl(w);
+              const active = url ? isImageActive(url) : false;
+              const ringColor = active
+                ? "rgba(22, 119, 255, 0.45)"
+                : "transparent";
+              return (
+                <div
+                  key={w._id}
+                  role="button"
+                  tabIndex={0}
+                  className={cardClassName}
+                  style={{
+                    background: "rgba(255,255,255,0.18)",
+                    borderColor: "rgba(0,0,0,0.08)",
+                    boxShadow: `0 0 0 2px ${ringColor}`,
+                    cursor: url ? "pointer" : "not-allowed",
+                    opacity: url ? 1 : 0.55,
+                  }}
+                  onClick={() => (url ? handleSelectImage(w) : null)}
+                  onKeyDown={(e) => {
+                    if (!url) return;
+                    if (e.key === "Enter" || e.key === " ")
+                      handleSelectImage(w);
+                  }}
+                >
+                  <div
+                    className="h-28 rounded-xl border overflow-hidden"
+                    style={{ borderColor: "rgba(0,0,0,0.08)" }}
+                  >
+                    {url ? (
+                      <Image
+                        className="w-full! h-full! object-cover"
+                        src={url}
+                        preview={false}
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-black/5" />
+                    )}
+                  </div>
+
+                  <div className="mt-3 min-w-0">
+                    <div className="font-semibold truncate">{w.name}</div>
+                    {w.description ? (
+                      <div className="text-xs opacity-70 mt-1 line-clamp-2">
+                        {w.description}
+                      </div>
+                    ) : (
+                      <div className="text-xs opacity-50 mt-1">暂无描述</div>
+                    )}
+                  </div>
+
+                  <div className="text-xs opacity-70 mt-2">
+                    {active ? "已应用" : url ? "点击应用到桌面" : "资源不可用"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 flex justify-end">
+            <Pagination
+              current={page}
+              pageSize={pageSize}
+              total={total}
+              showSizeChanger
+              showQuickJumper
+              onChange={(nextPage, nextPageSize) => {
+                setPage(nextPage);
+                if (nextPageSize !== pageSize) setPageSize(nextPageSize);
+              }}
+            />
+          </div>
+        </div>
       ) : (
-        <div className="h-[280px] w-full flex items-center justify-center">
-          <div className="text-sm text-gray-500">图片壁纸功能开发中</div>
+        <div className="h-[220px] w-full flex items-center justify-center">
+          <Empty description="暂无数据" />
         </div>
       )}
     </DefaultAppView>
