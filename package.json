@@ -38,7 +38,7 @@
     "remixicon": "^4.7.0",
     "tailwindcss": "^4.1.17",
     "uuid": "^13.0.0",
-    "zs_library": "^0.7.18"
+    "zs_library": "^0.7.19"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
