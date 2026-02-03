@@ -1,6 +1,7 @@
 import { Image, Button } from "antd";
 import { FC } from "react";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../utils";
+import { cx } from "@emotion/css";
 
 interface WebsiteCardProps {
   item: any;
@@ -10,7 +11,13 @@ interface WebsiteCardProps {
   variant?: "normal" | "small";
 }
 
-const WebsiteCard: FC<WebsiteCardProps> = ({ item, onAdd, onClick, layout = "grid", variant = "normal" }) => {
+const WebsiteCard: FC<WebsiteCardProps> = ({
+  item,
+  onAdd,
+  onClick,
+  layout = "grid",
+  variant = "normal",
+}) => {
   const iconUrl = getWebsiteIconUrl(item);
   const name = getWebsiteName(item);
   const url = getWebsiteUrl(item);
@@ -19,12 +26,26 @@ const WebsiteCard: FC<WebsiteCardProps> = ({ item, onAdd, onClick, layout = "gri
 
   return (
     <div
-      className={`group relative flex items-center gap-3 rounded-2xl  border   hover: transition-all duration-200 cursor-pointer ${
-        layout === "grid" ? (isSmall ? "flex-row items-center! p-3 gap-3" : "flex-col items-start! p-4 gap-4") : "p-3"
-      }`}
+      className={cx(
+        "group relative flex items-center gap-3 rounded-2xl hover:bg-gray-50 transition-all duration-200 cursor-pointer bg-white",
+        layout === "grid"
+          ? isSmall
+            ? "flex-row items-center! p-3 gap-3"
+            : "flex-col items-start! p-4 gap-4"
+          : "p-3",
+      )}
       onClick={() => onClick(item)}
     >
-      <div className={`shrink-0 relative ${layout === "grid" ? (isSmall ? "w-12 h-12" : "w-16 h-16") : "w-12 h-12"}`}>
+      <div
+        className={cx(
+          "shrink-0 relative",
+          layout === "grid"
+            ? isSmall
+              ? "w-12 h-12"
+              : "w-16 h-16"
+            : "w-12 h-12",
+        )}
+      >
         {iconUrl ? (
           <Image
             className="w-full! h-full! rounded-xl object-cover shadow-sm"
@@ -38,22 +59,25 @@ const WebsiteCard: FC<WebsiteCardProps> = ({ item, onAdd, onClick, layout = "gri
           </div>
         )}
       </div>
-
       <div className="flex-1 min-w-0 text-left w-full">
         <div
-          className={`font-semibold  truncate ${
-            layout === "grid" ? (isSmall ? "text-sm" : "text-base") : "text-sm"
-          }`}
+          className={cx(
+            "font-semibold  truncate",
+            layout === "grid" ? (isSmall ? "text-sm" : "text-base") : "text-sm",
+          )}
         >
           {name}
         </div>
         <div className="text-xs  truncate mt-0.5">{url || "无描述"}</div>
       </div>
-
       <div
-        className={`${
-          layout === "grid" ? (isSmall ? "shrink-0 ml-auto self-center" : "w-full mt-auto pt-1") : "shrink-0"
-        }`}
+        className={cx(
+          layout === "grid"
+            ? isSmall
+              ? "shrink-0 ml-auto self-center"
+              : "w-full mt-auto pt-1"
+            : "shrink-0",
+        )}
       >
         <Button
           type="primary"

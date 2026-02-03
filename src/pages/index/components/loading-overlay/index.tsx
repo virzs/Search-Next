@@ -39,7 +39,7 @@ const LoadingOverlay: FC<LoadingOverlayProps> = ({
         <motion.div
           className={
             className ??
-            "fixed inset-0 z-50 flex items-center justify-center overflow-hidden backdrop-blur-3xl"
+            "fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
           }
           style={{
             backgroundImage:
@@ -120,7 +120,7 @@ const LoadingOverlay: FC<LoadingOverlayProps> = ({
           />
 
           <motion.div
-            className="relative z-[1] flex flex-col items-center gap-3 px-6 py-5"
+            className="relative z-1 flex flex-col items-center gap-3 px-6 py-5"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.99 }}

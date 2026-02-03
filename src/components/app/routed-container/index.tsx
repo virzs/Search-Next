@@ -122,11 +122,11 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
       title={overlayProps?.title ?? title}
       wrapContent={overlayProps?.wrapContent ?? wrapContent}
     >
-      <div className="flex h-full w-full overflow-hidden backdrop-blur-3xl">
+      <div className="flex h-full w-full overflow-hidden">
         {sidebarProps ? <AppSidebar {...sidebarProps} /> : null}
         <div className="h-full w-0 grow overflow-hidden relative">
           {showHistoryControls ? (
-            <div className="absolute left-0 top-0 z-20 flex items-center gap-1 rounded-full border border-black/10 bg-white/70 backdrop-blur-md px-1 py-1 shadow-sm">
+            <div className="absolute left-0 top-0 z-20 flex items-center gap-1 rounded-full border border-black/10 bg-white/7 backdrop-blur-md px-1 py-1 shadow-sm">
               <Button
                 type="text"
                 size="small"
