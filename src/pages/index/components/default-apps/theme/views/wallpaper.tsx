@@ -61,7 +61,7 @@ const WallpaperView: FC = () => {
   }, [categories]);
 
   const resolvedCategoryId = useMemo(() => {
-    return activeCategoryId ? activeCategoryId : categoryIdList[0] ?? "";
+    return activeCategoryId ? activeCategoryId : (categoryIdList[0] ?? "");
   }, [activeCategoryId, categoryIdList]);
 
   const { data: wallpapersPage, loading: wallpaperLoading } = useRequest(
@@ -73,7 +73,13 @@ const WallpaperView: FC = () => {
       }),
     {
       ready: activeType === "image" && imageViewMode === "category",
-      refreshDeps: [activeType, imageViewMode, page, pageSize, resolvedCategoryId],
+      refreshDeps: [
+        activeType,
+        imageViewMode,
+        page,
+        pageSize,
+        resolvedCategoryId,
+      ],
     },
   );
 
@@ -203,7 +209,11 @@ const WallpaperView: FC = () => {
           style={{ borderColor: "rgba(0,0,0,0.08)" }}
         >
           {url ? (
-            <Image className="w-full! h-full! object-cover" src={url} preview={false} />
+            <Image
+              className="w-full! h-full! object-cover"
+              src={url}
+              preview={false}
+            />
           ) : (
             <div className="h-full w-full bg-black/5" />
           )}
@@ -235,29 +245,15 @@ const WallpaperView: FC = () => {
           : undefined
       }
       headerLeft={
-        <div className="flex items-center gap-3 max-w-full overflow-hidden">
-          <AppSegmented
-            options={[
-              { label: "渐变", value: "gradient" },
-              { label: "图片", value: "image" },
-            ]}
-            value={activeType}
-            onChange={(v) => setActiveType(v as any)}
-            className="max-w-full overflow-auto"
-          />
-          {activeType === "image" && imageViewMode === "category" ? (
-            <Button
-              type="link"
-              className="px-0!"
-              onClick={() => {
-                setPage(1);
-                setImageViewMode("categories");
-              }}
-            >
-              返回
-            </Button>
-          ) : null}
-        </div>
+        <AppSegmented
+          options={[
+            { label: "渐变", value: "gradient" },
+            { label: "图片", value: "image" },
+          ]}
+          value={activeType}
+          onChange={(v) => setActiveType(v as any)}
+          className="max-w-full overflow-auto"
+        />
       }
       contentClassName="overflow-y-auto px-1 pb-4"
     >
@@ -370,12 +366,8 @@ const WallpaperView: FC = () => {
                       查看更多
                     </Button>
                   </div>
-                  <div className="flex flex-nowrap gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1">
-                    {items.map((item) => (
-                      <div key={item._id} className="w-56 shrink-0">
-                        {renderWallpaperCard(item)}
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {items.map((item) => renderWallpaperCard(item))}
                     {items.length === 0 ? (
                       <Empty className="mt-2" description="暂无壁纸" />
                     ) : null}
@@ -415,7 +407,9 @@ const WallpaperView: FC = () => {
         </div>
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <Empty description={imageViewMode === "category" ? "暂无壁纸" : "暂无数据"} />
+          <Empty
+            description={imageViewMode === "category" ? "暂无壁纸" : "暂无数据"}
+          />
         </div>
       )}
     </DefaultAppView>
