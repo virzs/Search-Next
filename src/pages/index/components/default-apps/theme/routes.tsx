@@ -3,6 +3,7 @@ import ThemeModalRoute from "./index";
 import ThemeView from "./views/theme";
 import WallpaperView from "./views/wallpaper";
 import ThemeDetailView from "./views/theme-detail";
+import WallpaperCategoryView from "./views/wallpaper-category";
 
 export const themeRoutes = {
   path: themeRoute.segment.root,
@@ -10,6 +11,7 @@ export const themeRoutes = {
   children: [
     { index: true, element: <ThemeView /> },
     { path: themeRoute.segment.detail, element: <ThemeDetailView /> },
+    { path: themeRoute.segment.wallpaperCategory, element: <WallpaperCategoryView /> },
     { path: themeRoute.segment.wallpaper, element: <WallpaperView /> },
   ],
 };

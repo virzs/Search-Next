@@ -14,6 +14,7 @@ const ThemeModalRoute: FC = () => {
       closeTo="/"
       title="个性化"
       wrapContent
+      keepAlive={{ enabled: true }}
       sidebarProps={{
         header: <div className="text-2xl font-bold tracking-tight">个性化</div>,
         menuItems: [
