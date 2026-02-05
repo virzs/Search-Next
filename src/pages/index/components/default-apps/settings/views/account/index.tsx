@@ -30,10 +30,10 @@ const AccountView = () => {
     return <AccountInfo user={user} showActions />;
   };
 
-  return isAuthenticated ? (
-    renderLoggedView()
-  ) : (
-    <DefaultAppView>{renderUnloggedView()}</DefaultAppView>
+  return (
+    <DefaultAppView>
+      {isAuthenticated ? renderLoggedView() : renderUnloggedView()}
+    </DefaultAppView>
   );
 };
 

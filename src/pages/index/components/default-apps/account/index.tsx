@@ -12,10 +12,10 @@ const AccountModal = ({ open, onClose }: AccountModalProps) => {
 
   return (
     <DesktopBaseModal visible={open} onClose={onClose}>
-      <div className="max-w-[400px] mx-auto py-4">
-        {isAuthenticated && user ? (
-          <AccountInfo user={user} showActions />
-        ) : (
+      {isAuthenticated && user ? (
+        <AccountInfo user={user} showActions />
+      ) : (
+        <div className="max-w-[400px] mx-auto py-4">
           <UnloggedView
             mode="inline"
             title="欢迎使用"
@@ -24,8 +24,8 @@ const AccountModal = ({ open, onClose }: AccountModalProps) => {
             onRegisterSuccess="show-account"
             showToggle={true}
           />
-        )}
-      </div>
+        </div>
+      )}
     </DesktopBaseModal>
   );
 };

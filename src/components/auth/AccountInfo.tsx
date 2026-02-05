@@ -69,7 +69,6 @@ const AccountInfo: React.FC<AccountInfoProps> = ({
               </Text>
             </div>
           </div>
-
           <div className="flex items-center space-x-1 text-xs text-gray-500 mb-4">
             <RiShieldCheckLine size={14} />
             <span>
