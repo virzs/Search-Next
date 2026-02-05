@@ -6,11 +6,11 @@ import {
   RiInbox2Fill,
   RiInbox2Line,
   RiInformationLine,
-  RiKeyLine,
   RiUserFill,
   RiUserLine,
+  RiGlobalLine,
+  RiInformationFill,
 } from "@remixicon/react";
-import { RiGlobalLine, RiInformationFill, RiKeyFill } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
 import { settingsRoute } from "./route-paths";
 
@@ -36,13 +36,6 @@ const SettingsModalRoute: FC = () => {
             path: settingsRoute.path.personalization,
             icon: <RiBrushLine size={16} />,
             activeIcon: <RiBrushFill size={16} />,
-          },
-          {
-            key: "third-party",
-            label: "第三方服务",
-            path: settingsRoute.path.thirdParty,
-            icon: <RiKeyLine size={16} />,
-            activeIcon: <RiKeyFill size={16} />,
           },
           {
             key: "language",

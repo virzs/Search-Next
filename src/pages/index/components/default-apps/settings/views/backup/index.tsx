@@ -4,13 +4,12 @@ import {
   Progress,
   Alert,
   Switch,
-  List,
   Card,
   message,
   Flex,
   Modal,
 } from "antd";
-import { RiDownloadLine, RiUploadLine, RiHistoryLine } from "@remixicon/react";
+import { RiDownloadLine, RiUploadLine } from "@remixicon/react";
 import { useState } from "react";
 import { DefaultAppView } from "@/components";
 import useAuth from "@/hooks/useAuth";
@@ -225,35 +224,6 @@ const BackupView = () => {
             showIcon
           />
         )}
-      </Card>
-      {/* 备份历史 */}
-      <Card title="备份历史" styles={{ root: { marginBottom: 16 } }}>
-        <List
-          size="small"
-          dataSource={[
-            { time: "2024-01-15 14:30", size: "2.3 MB", type: "自动备份" },
-            { time: "2024-01-14 09:15", size: "2.1 MB", type: "手动备份" },
-            { time: "2024-01-13 16:45", size: "2.0 MB", type: "自动备份" },
-          ]}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Button type="link" size="small" key="restore">
-                  恢复
-                </Button>,
-                <Button type="link" size="small" key="download">
-                  下载
-                </Button>,
-              ]}
-            >
-              <List.Item.Meta
-                avatar={<RiHistoryLine />}
-                title={item.type}
-                description={`${item.time} · ${item.size}`}
-              />
-            </List.Item>
-          )}
-        />
       </Card>
       {/* 本地备份 */}
       {renderLocalBackupCard()}
