@@ -1,7 +1,7 @@
-import { Typography, Radio, List } from "antd";
+import { Typography, Radio, List, Card } from "antd";
 import { useState } from "react";
 import { RiCheckLine } from "@remixicon/react";
-import { SettingsCard, SettingsActions } from "@/components/settings";
+import { SettingsActions } from "@/components/settings";
 import { DefaultAppView } from "@/components";
 
 const { Text, Paragraph } = Typography;
@@ -49,7 +49,7 @@ const LanguageView = () => {
   return (
     <DefaultAppView>
       {isChanged && (
-        <SettingsCard>
+        <Card>
           <SettingsActions
             align="center"
             actions={[
@@ -66,11 +66,11 @@ const LanguageView = () => {
               },
             ]}
           />
-        </SettingsCard>
+        </Card>
       )}
 
       {/* 语言选择列表 */}
-      <SettingsCard title="选择语言">
+      <Card title="选择语言">
         <Paragraph type="secondary" className="mb-4">
           选择您希望使用的界面语言。更改语言后，界面将立即切换到所选语言。
         </Paragraph>
@@ -102,7 +102,7 @@ const LanguageView = () => {
             )}
           />
         </Radio.Group>
-      </SettingsCard>
+      </Card>
     </DefaultAppView>
   );
 };
