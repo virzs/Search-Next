@@ -201,7 +201,6 @@ const BackupView = () => {
                 {syncStatus.isSyncing ? "同步中..." : "已同步"}
               </Text>
             </div>
-
             {syncStatus.isSyncing && (
               <Progress
                 percent={syncStatus.syncProgress}
@@ -209,7 +208,6 @@ const BackupView = () => {
                 className="mb-3"
               />
             )}
-
             {syncStatus.lastSyncTime && (
               <div className="flex justify-between items-center mb-4">
                 <Text>上次同步：</Text>
@@ -228,7 +226,6 @@ const BackupView = () => {
           />
         )}
       </Card>
-
       {/* 备份历史 */}
       <Card title="备份历史" styles={{ root: { marginBottom: 16 } }}>
         <List
@@ -258,7 +255,6 @@ const BackupView = () => {
           )}
         />
       </Card>
-
       {/* 本地备份 */}
       {renderLocalBackupCard()}
     </>

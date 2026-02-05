@@ -5,10 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import {
-  DESKTOP_THEME_STORAGE_KEY,
-  PERSONALIZATION_STORAGE_KEY,
-} from "@/utils/storage";
+import { PERSONALIZATION_STORAGE_KEY } from "@/utils/storage";
 
 export type DesktopThemeId = string;
 
@@ -66,23 +63,6 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
           fontFamily: parsed?.fontFamily,
         });
         return;
-      }
-      const legacyRaw = localStorage.getItem(DESKTOP_THEME_STORAGE_KEY);
-      const resolvedLegacyThemeId = isThemeId(legacyRaw)
-        ? legacyRaw
-        : defaultThemeId;
-      const migrated: PersonalizationConfig = {
-        themeId: resolvedLegacyThemeId,
-        wallpaper: { type: "none", name: "无" },
-      };
-      setPersonalization(migrated);
-      try {
-        localStorage.setItem(
-          PERSONALIZATION_STORAGE_KEY,
-          JSON.stringify(migrated),
-        );
-      } catch {
-        void 0;
       }
     } catch {
       setPersonalization({
