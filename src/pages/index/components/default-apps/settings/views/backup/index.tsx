@@ -3,24 +3,26 @@ import {
   Typography,
   Progress,
   Alert,
-  Divider,
   Switch,
   List,
   Card,
+  message,
+  Flex,
+  Modal,
 } from "antd";
-import {
-  RiDownloadLine,
-  RiUploadLine,
-  RiHistoryLine,
-  RiErrorWarningLine,
-  RiDownloadFill,
-  RiUploadFill,
-} from "@remixicon/react";
+import { RiDownloadLine, RiUploadLine, RiHistoryLine } from "@remixicon/react";
 import { useState } from "react";
-import { SettingsActions } from "@/components/settings";
 import { DefaultAppView } from "@/components";
+import useAuth from "@/hooks/useAuth";
+import {
+  SEARCH_NEXT_STORAGE_KEYS,
+  createStorageBackup,
+  parseStorageBackup,
+  applyStorageBackup,
+  stringifyStorageBackup,
+} from "@/utils/storage";
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 interface SyncStatus {
   isEnabled: boolean;
@@ -30,8 +32,7 @@ interface SyncStatus {
 }
 
 const BackupView = () => {
-  // 模拟登录状态，后续可以从全局状态管理中获取
-  const [isLoggedIn] = useState(true);
+  const { isAuthenticated } = useAuth();
 
   // 同步状态
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
@@ -46,57 +47,142 @@ const BackupView = () => {
   };
 
   const handleExportData = () => {
-    // 这里后续实现数据导出逻辑
-    console.log("导出数据");
+    const backup = createStorageBackup(SEARCH_NEXT_STORAGE_KEYS);
+    const text = stringifyStorageBackup(backup);
+
+    const createdAtSafe = backup.createdAt.replace(/[:.]/g, "-");
+    const filename = `search-next-backup-${createdAtSafe}.snbak`;
+
+    const blob = new Blob([text], { type: "application/x-search-next-backup" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    message.success("已导出备份文件");
   };
 
   const handleImportData = () => {
-    // 这里后续实现数据导入逻辑
-    console.log("导入数据");
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/x-search-next-backup,.snbak";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const backup = parseStorageBackup(text);
+
+        const expectedKeySet = new Set<string>(SEARCH_NEXT_STORAGE_KEYS);
+        const backupKeys = Object.keys(backup.items);
+        const missingKeys = SEARCH_NEXT_STORAGE_KEYS.filter(
+          (k) => !(k in backup.items),
+        );
+        const extraKeys = backupKeys.filter((k) => !expectedKeySet.has(k));
+        const isSameFormat = missingKeys.length === 0 && extraKeys.length === 0;
+        const originMismatch = Boolean(
+          backup.origin && backup.origin !== window.location.origin,
+        );
+
+        const confirmImport = (mode: "strict" | "merge") => {
+          Modal.confirm({
+            title: "确认导入备份？",
+            content: (
+              <Flex vertical gap={8}>
+                <Text type="secondary">
+                  文件：{file.name}（{Math.ceil(file.size / 1024)} KB）
+                </Text>
+                <Text type="secondary">备份时间：{backup.createdAt}</Text>
+                <Text type="danger">
+                  导入将覆盖当前本地所有设置，建议先导出当前数据作为备份。
+                </Text>
+              </Flex>
+            ),
+            okText: mode === "strict" ? "确认导入" : "强制导入",
+            cancelText: "取消",
+            onOk: () => {
+              applyStorageBackup(backup, SEARCH_NEXT_STORAGE_KEYS, undefined, {
+                mode,
+              });
+              message.success("导入成功，正在刷新页面…");
+              window.setTimeout(() => window.location.reload(), 300);
+            },
+          });
+        };
+
+        if (isSameFormat && !originMismatch) {
+          confirmImport("strict");
+          return;
+        }
+
+        Modal.confirm({
+          title: originMismatch ? "备份文件来源不一致" : "备份文件字段不一致",
+          content: (
+            <Flex vertical gap={8}>
+              <Text type="secondary">
+                文件：{file.name}（{Math.ceil(file.size / 1024)} KB）
+              </Text>
+              <Text type="secondary">备份时间：{backup.createdAt}</Text>
+              {originMismatch ? (
+                <Text type="secondary">
+                  备份来源：{backup.origin}，当前页面：{window.location.origin}
+                </Text>
+              ) : (
+                <Text type="secondary">
+                  缺失字段：{missingKeys.length}，额外字段：{extraKeys.length}
+                </Text>
+              )}
+              <Text type="danger">
+                {originMismatch
+                  ? "继续后将允许导入该来源的备份，导入将覆盖当前本地设置。"
+                  : "继续后将尝试强制导入，未包含的字段会保留当前本地值。"}
+              </Text>
+            </Flex>
+          ),
+          okText: "继续",
+          cancelText: "取消",
+          onOk: () => confirmImport(originMismatch ? "strict" : "merge"),
+        });
+      } catch (e) {
+        const err = e instanceof Error ? e.message : String(e);
+        message.error(`导入失败：${err}`);
+      } finally {
+        input.value = "";
+      }
+    };
+    input.click();
   };
 
-  // 未登录视图
-  const renderUnloggedView = () => (
-    <DefaultAppView>
-      <Alert
-        message="需要登录账号"
-        description="登录后可以使用云端同步功能，确保您的数据安全备份。"
-        type="info"
-        showIcon
-        className="mb-6"
-      />
-      <Card title="本地备份" styles={{ root: { marginBottom: 16 } }}>
-        <Paragraph type="secondary" className="mb-4">
-          即使未登录，您也可以导出和导入本地数据。
-        </Paragraph>
-        <SettingsActions
-          layout="vertical"
-          actions={[
-            {
-              key: "export",
-              label: "导出数据",
-              type: "primary",
-              icon: <RiDownloadLine />,
-              onClick: handleExportData,
-            },
-            {
-              key: "import",
-              label: "导入数据",
-              icon: <RiUploadLine />,
-              onClick: handleImportData,
-            },
-          ]}
+  const renderLocalBackupCard = () => (
+    <Card title="本地备份" styles={{ root: { marginBottom: 16 } }}>
+      <Flex vertical gap="middle">
+        <Button icon={<RiUploadLine size={16} />} onClick={handleExportData}>
+          导出数据
+        </Button>
+        <Button icon={<RiDownloadLine size={16} />} onClick={handleImportData}>
+          导入数据
+        </Button>
+        <Alert
+          title="注意"
+          description="导入数据将覆盖当前所有设置，请谨慎操作。建议先导出当前数据作为备份。"
+          type="warning"
         />
-      </Card>
-    </DefaultAppView>
+      </Flex>
+    </Card>
   );
+
+  // 未登录视图
+  const renderUnloggedView = () => <>{renderLocalBackupCard()}</>;
 
   // 已登录视图
   const renderLoggedView = () => (
-    <DefaultAppView>
+    <>
       {/* 云端同步 */}
       <Card
-        title="云端同步"
+        title="同步"
         extra={
           <Switch
             checked={syncStatus.isEnabled}
@@ -174,46 +260,14 @@ const BackupView = () => {
       </Card>
 
       {/* 本地备份 */}
-      <Card title="本地备份" styles={{ root: { marginBottom: 16 } }}>
-        <Paragraph type="secondary" className="mb-4">
-          除了云端同步，您还可以手动导出和导入数据文件。
-        </Paragraph>
-
-        <SettingsActions
-          layout="vertical"
-          actions={[
-            {
-              key: "export",
-              label: "导出数据",
-              icon: <RiDownloadFill />,
-              onClick: handleExportData,
-            },
-            {
-              key: "import",
-              label: "导入数据",
-              icon: <RiUploadFill />,
-              onClick: handleImportData,
-            },
-          ]}
-        />
-
-        <Divider />
-
-        <Alert
-          message="注意"
-          description="导入数据将覆盖当前所有设置，请谨慎操作。建议先导出当前数据作为备份。"
-          type="warning"
-          showIcon
-          icon={<RiErrorWarningLine />}
-        />
-      </Card>
-    </DefaultAppView>
+      {renderLocalBackupCard()}
+    </>
   );
 
   return (
-    <div className="flex-1 overflow-auto">
-      {isLoggedIn ? renderLoggedView() : renderUnloggedView()}
-    </div>
+    <DefaultAppView>
+      {isAuthenticated ? renderLoggedView() : renderUnloggedView()}
+    </DefaultAppView>
   );
 };
 
