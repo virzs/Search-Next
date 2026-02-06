@@ -1,5 +1,4 @@
 import { AppSegmented, DefaultAppView } from "@/components";
-import { cx } from "@emotion/css";
 import { useRequest } from "ahooks";
 import { Empty, Image } from "antd";
 import { FC, useMemo, useState } from "react";
@@ -14,68 +13,7 @@ import {
 import { useNavigate } from "react-router";
 import { themeRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
-
-const ThemeCard: FC<{
-  theme: ThemeConfigApiItem;
-  active: boolean;
-  onOpen: () => void;
-}> = ({ theme, active, onOpen }) => {
-  const ringColor = active ? "rgba(22, 119, 255, 0.45)" : "transparent";
-  const previewUrl = getThemePreviewImageUrl(theme, 0);
-  const cardClassName = cx(
-    "rounded-2xl border p-4 transition select-none",
-    "hover:opacity-95 active:opacity-90",
-    "cursor-pointer",
-  );
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      className={cardClassName}
-      style={{
-        background: "rgba(255,255,255,0.18)",
-        borderColor: "rgba(0,0,0,0.08)",
-        color: "rgba(0,0,0,0.88)",
-        boxShadow: `0 0 0 2px ${ringColor}`,
-      }}
-      onClick={onOpen}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") onOpen();
-      }}
-    >
-      <div
-        className="h-28 rounded-xl border overflow-hidden"
-        style={{ borderColor: "rgba(0,0,0,0.08)" }}
-      >
-        {previewUrl ? (
-          <Image
-            className="w-full! h-full! object-cover"
-            src={previewUrl}
-            preview={false}
-          />
-        ) : (
-          <ThemeDesktopPreview theme={theme} />
-        )}
-      </div>
-
-      <div className="mt-3 min-w-0">
-        <div className="font-semibold truncate">{theme.name}</div>
-        {theme.description ? (
-          <div className="text-xs opacity-70 mt-1 line-clamp-2">
-            {theme.description}
-          </div>
-        ) : (
-          <div className="text-xs opacity-50 mt-1">暂无描述</div>
-        )}
-      </div>
-
-      <div className="text-xs opacity-70 mt-2">
-        {active ? "已应用" : "查看详情"}
-      </div>
-    </div>
-  );
-};
+import PreviewCard from "../components/PreviewCard";
 
 const ThemeView: FC = () => {
   const navigate = useNavigate();
@@ -124,14 +62,32 @@ const ThemeView: FC = () => {
         </div>
       ) : themes?.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {themes?.map((t) => (
-            <ThemeCard
-              key={t._id}
-              theme={t}
-              active={t._id === activeThemeId}
-              onOpen={() => openThemeDetail(t)}
-            />
-          ))}
+          {themes?.map((t) => {
+            const previewUrl = getThemePreviewImageUrl(t, 0);
+            const active = t._id === activeThemeId;
+            return (
+              <PreviewCard
+                key={t._id}
+                active={active}
+                title={t.name}
+                description={t.description}
+                onClick={() => openThemeDetail(t)}
+                cover={
+                  <div className="aspect-video">
+                    {previewUrl ? (
+                      <Image
+                        className="w-full! h-full! object-cover"
+                        src={previewUrl}
+                        preview={false}
+                      />
+                    ) : (
+                      <ThemeDesktopPreview theme={t} />
+                    )}
+                  </div>
+                }
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">

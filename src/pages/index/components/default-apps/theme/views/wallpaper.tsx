@@ -1,5 +1,4 @@
 import { AppSegmented, DefaultAppView } from "@/components";
-import { cx } from "@emotion/css";
 import { useRequest } from "ahooks";
 import { Button, Empty, Image, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
@@ -17,6 +16,7 @@ import {
   GradientWallpaperPreset,
   gradientWallpaperPresets,
 } from "./wallpaper-gradients";
+import PreviewCard from "../components/PreviewCard";
 
 const WallpaperView: FC = () => {
   const navigate = useNavigate();
@@ -81,12 +81,6 @@ const WallpaperView: FC = () => {
         resolvedCategoryId,
       ],
     },
-  );
-
-  const cardClassName = cx(
-    "rounded-2xl border p-4 transition select-none",
-    "hover:opacity-95 active:opacity-90",
-    "cursor-pointer",
   );
 
   useEffect(() => {
@@ -184,56 +178,37 @@ const WallpaperView: FC = () => {
   const renderWallpaperCard = (w: WallpaperApiItem) => {
     const url = getWallpaperImageUrl(w);
     const active = url ? isImageActive(url) : false;
-    const ringColor = active ? "rgba(22, 119, 255, 0.45)" : "transparent";
+    const disabled = !url;
     return (
-      <div
+      <PreviewCard
         key={w._id}
-        role="button"
-        tabIndex={0}
-        className={cardClassName}
-        style={{
-          background: "rgba(255,255,255,0.18)",
-          borderColor: "rgba(0,0,0,0.08)",
-          boxShadow: `0 0 0 2px ${ringColor}`,
-          cursor: url ? "pointer" : "not-allowed",
-          opacity: url ? 1 : 0.55,
-        }}
+        active={active}
+        disabled={disabled}
+        title={w.name}
+        description={w.description}
         onClick={() => (url ? handleSelectImage(w) : null)}
-        onKeyDown={(e) => {
-          if (!url) return;
-          if (e.key === "Enter" || e.key === " ") handleSelectImage(w);
-        }}
-      >
-        <div
-          className="h-28 rounded-xl border overflow-hidden"
-          style={{ borderColor: "rgba(0,0,0,0.08)" }}
-        >
-          {url ? (
+        cover={
+          url ? (
             <Image
-              className="w-full! h-full! object-cover"
+              styles={{
+                root: {
+                  aspectRatio: "16 / 9",
+                  width: "100%",
+                  height: "100%",
+                },
+                image: {
+                  height: "100%",
+                  objectFit: "cover",
+                },
+              }}
               src={url}
               preview={false}
             />
           ) : (
             <div className="h-full w-full bg-black/5" />
-          )}
-        </div>
-
-        <div className="mt-3 min-w-0">
-          <div className="font-semibold truncate">{w.name}</div>
-          {w.description ? (
-            <div className="text-xs opacity-70 mt-1 line-clamp-2">
-              {w.description}
-            </div>
-          ) : (
-            <div className="text-xs opacity-50 mt-1">暂无描述</div>
-          )}
-        </div>
-
-        <div className="text-xs opacity-70 mt-2">
-          {active ? "已应用" : url ? "点击应用到桌面" : "资源不可用"}
-        </div>
-      </div>
+          )
+        }
+      />
     );
   };
 
@@ -261,54 +236,24 @@ const WallpaperView: FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {gradientWallpaperPresets.map((w) => {
             const active = isGradientActive(w.css);
-            const ringColor = active
-              ? "rgba(22, 119, 255, 0.45)"
-              : "transparent";
+            const coverBackground =
+              w.id === "none" ? "rgba(0,0,0,0.04)" : w.css;
             return (
-              <div
+              <PreviewCard
                 key={w.id}
-                role="button"
-                tabIndex={0}
-                className={cardClassName}
-                style={{
-                  background: "rgba(255,255,255,0.18)",
-                  borderColor: "rgba(0,0,0,0.08)",
-                  boxShadow: `0 0 0 2px ${ringColor}`,
-                }}
+                active={active}
+                title={w.name}
+                description={w.id === "none" ? "使用默认背景" : "渐变背景"}
                 onClick={() => handleSelectGradient(w)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ")
-                    handleSelectGradient(w);
-                }}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="font-semibold truncate">{w.name}</div>
-                    <div className="text-xs opacity-70 mt-1">
-                      {w.id === "none" ? "使用默认背景" : "点击应用到桌面"}
-                    </div>
+                cover={
+                  <div className="aspect-video">
+                    <div
+                      className="h-full w-full"
+                      style={{ background: coverBackground }}
+                    />
                   </div>
-                  <div
-                    className="h-8 w-8 rounded-xl border"
-                    style={{
-                      background: w.id === "none" ? "rgba(0,0,0,0.04)" : w.css,
-                      borderColor: "rgba(0,0,0,0.08)",
-                    }}
-                  />
-                </div>
-
-                <div
-                  className="mt-4 h-20 rounded-xl border overflow-hidden"
-                  style={{ borderColor: "rgba(0,0,0,0.08)" }}
-                >
-                  <div
-                    className="h-full w-full"
-                    style={{
-                      background: w.id === "none" ? "rgba(0,0,0,0.04)" : w.css,
-                    }}
-                  />
-                </div>
-              </div>
+                }
+              />
             );
           })}
         </div>

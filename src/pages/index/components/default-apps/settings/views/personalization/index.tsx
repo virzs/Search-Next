@@ -16,6 +16,7 @@ import {
 import { themeRoute } from "../../../theme/route-paths";
 import { ThemeDesktopPreview } from "../../../theme/views/theme-preview";
 import { DefaultAppView } from "@/components";
+import PreviewCard from "../../../theme/components/PreviewCard";
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
@@ -59,10 +60,6 @@ const PersonalizationView = () => {
   const panelClassName =
     "mt-2 rounded-2xl border border-black/5 bg-white/60 p-3";
 
-  const themeCardClassName = cx(
-    "rounded-2xl border p-4 transition select-none",
-    "bg-[rgba(255,255,255,0.18)]",
-  );
   const activeRingColor = "rgba(22, 119, 255, 0.45)";
 
   const themePreviewUrl = useMemo(() => {
@@ -120,45 +117,31 @@ const PersonalizationView = () => {
 
             {openKey === "theme" ? (
               <div className={panelClassName}>
-                <div
-                  className={themeCardClassName}
+                <PreviewCard
+                  active
+                  title={
+                    activeTheme ? activeTheme.name : personalization.themeId
+                  }
+                  description={activeTheme?.description}
                   style={{
-                    borderColor: "rgba(0,0,0,0.08)",
                     boxShadow: `0 0 0 2px ${activeRingColor}`,
                   }}
-                >
-                  <div
-                    className="h-28 rounded-xl border overflow-hidden"
-                    style={{ borderColor: "rgba(0,0,0,0.08)" }}
-                  >
-                    {themePreviewUrl ? (
-                      <img
-                        className="h-full w-full object-cover"
-                        src={themePreviewUrl}
-                        alt=""
-                      />
-                    ) : activeTheme ? (
-                      <ThemeDesktopPreview theme={activeTheme} />
-                    ) : (
-                      <div className="h-full w-full bg-black/5" />
-                    )}
-                  </div>
-
-                  <div className="mt-3 min-w-0">
-                    <div className="font-semibold truncate">
-                      {activeTheme ? activeTheme.name : personalization.themeId}
+                  cover={
+                    <div className="aspect-video rounded-xl border overflow-hidden">
+                      {themePreviewUrl ? (
+                        <img
+                          className="h-full w-full object-cover"
+                          src={themePreviewUrl}
+                          alt=""
+                        />
+                      ) : activeTheme ? (
+                        <ThemeDesktopPreview theme={activeTheme} />
+                      ) : (
+                        <div className="h-full w-full bg-black/5" />
+                      )}
                     </div>
-                    {activeTheme?.description ? (
-                      <div className="text-xs opacity-70 mt-1 line-clamp-2">
-                        {activeTheme.description}
-                      </div>
-                    ) : (
-                      <div className="text-xs opacity-50 mt-1">暂无描述</div>
-                    )}
-                  </div>
-
-                  <div className="text-xs opacity-70 mt-2">已应用</div>
-                </div>
+                  }
+                />
               </div>
             ) : null}
           </div>
@@ -206,48 +189,21 @@ const PersonalizationView = () => {
 
             {openKey === "wallpaper" ? (
               <div className={panelClassName}>
-                <div
-                  className={cx(
-                    "rounded-2xl border p-4 transition select-none",
-                    "bg-[rgba(255,255,255,0.18)]",
-                  )}
+                <PreviewCard
+                  active
+                  title={wallpaperName}
                   style={{
-                    borderColor: "rgba(0,0,0,0.08)",
                     boxShadow: `0 0 0 2px ${activeRingColor}`,
                   }}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="font-semibold truncate">
-                        {wallpaperName}
-                      </div>
-                      <div className="text-xs opacity-70 mt-1">
-                        {personalization.wallpaper.type === "none"
-                          ? "使用默认背景"
-                          : "已应用"}
-                      </div>
+                  cover={
+                    <div className="aspect-video">
+                      <div
+                        className="h-full w-full"
+                        style={wallpaperPreviewStyle}
+                      />
                     </div>
-                    <div
-                      className="h-8 w-8 rounded-xl border"
-                      style={{
-                        ...(personalization.wallpaper.type === "none"
-                          ? { background: "rgba(0,0,0,0.04)" }
-                          : wallpaperPreviewStyle),
-                        borderColor: "rgba(0,0,0,0.08)",
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="mt-4 h-20 rounded-xl border overflow-hidden"
-                    style={{ borderColor: "rgba(0,0,0,0.08)" }}
-                  >
-                    <div
-                      className="h-full w-full"
-                      style={wallpaperPreviewStyle}
-                    />
-                  </div>
-                </div>
+                  }
+                />
               </div>
             ) : null}
           </div>
