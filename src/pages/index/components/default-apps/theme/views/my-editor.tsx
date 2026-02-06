@@ -1,0 +1,430 @@
+import { AppSegmented, DefaultAppView } from "@/components";
+import { useEffect, useMemo, useState } from "react";
+import { App, Button, Card, ColorPicker, Form, Input, Slider, Space } from "antd";
+import { useNavigate, useParams } from "react-router";
+import { v4 as uuidv4 } from "uuid";
+import useDesktopTheme from "@/hooks/useDesktopTheme";
+import { MY_WALLPAPERS_STORAGE_KEY } from "@/utils/storage";
+import { themeRoute } from "../route-paths";
+
+type MyWallpaperItem =
+  | {
+      id: string;
+      type: "gradient";
+      name: string;
+      css: string;
+      createdAt: string;
+    }
+  | {
+      id: string;
+      type: "image";
+      name: string;
+      url: string;
+      createdAt: string;
+    };
+
+type MyWallpapersStorageV1 = {
+  version: 1;
+  items: MyWallpaperItem[];
+};
+
+const parseMyWallpapersStorage = (raw: string | null): MyWallpaperItem[] => {
+  if (!raw) return [];
+  const parsed = JSON.parse(raw) as unknown;
+  if (!parsed || typeof parsed !== "object") return [];
+  const record = parsed as Record<string, unknown>;
+  if (record.version !== 1) return [];
+  const items = record.items;
+  if (!Array.isArray(items)) return [];
+  return items.filter(Boolean) as MyWallpaperItem[];
+};
+
+const stringifyMyWallpapersStorage = (items: MyWallpaperItem[]): string => {
+  const payload: MyWallpapersStorageV1 = { version: 1, items };
+  return JSON.stringify(payload);
+};
+
+const isValidUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" || url.protocol === "data:";
+  } catch {
+    return false;
+  }
+};
+
+const buildLinearGradient = (angle: number, start: string, end: string) => {
+  const safeAngle = Number.isFinite(angle) ? Math.max(0, Math.min(360, angle)) : 135;
+  return `linear-gradient(${safeAngle}deg, ${start} 0%, ${end} 100%)`;
+};
+
+const extractColors = (css: string) => {
+  const matches = css.match(/(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))/g) ?? [];
+  return matches.slice(0, 2);
+};
+
+const extractAngle = (css: string) => {
+  const m = css.match(/(-?\d+(\.\d+)?)deg/);
+  if (!m) return null;
+  const v = Number(m[1]);
+  if (!Number.isFinite(v)) return null;
+  return v;
+};
+
+const colorToHex = (color: any, hex?: string) => {
+  if (typeof hex === "string" && hex) return hex;
+  if (color && typeof color.toHexString === "function") return color.toHexString();
+  return String(color ?? "");
+};
+
+const ThemeMyEditorView = () => {
+  const { message, modal } = App.useApp();
+  const navigate = useNavigate();
+  const params = useParams();
+  const editId = params.id ? decodeURIComponent(String(params.id)) : null;
+  const isEdit = Boolean(editId);
+  const { personalization, setWallpaper } = useDesktopTheme();
+
+  const [items, setItems] = useState<MyWallpaperItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+  const [type, setType] = useState<"gradient" | "image">("gradient");
+  const [form] = Form.useForm<{ name: string; url?: string }>();
+  const watchedName = Form.useWatch("name", form);
+  const watchedUrl = Form.useWatch("url", form);
+
+  const [gradientStart, setGradientStart] = useState("#1677ff");
+  const [gradientEnd, setGradientEnd] = useState("#fa541c");
+  const [gradientAngle, setGradientAngle] = useState(135);
+
+  useEffect(() => {
+    try {
+      setItems(parseMyWallpapersStorage(localStorage.getItem(MY_WALLPAPERS_STORAGE_KEY)));
+    } catch {
+      setItems([]);
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
+
+  const currentItem = useMemo(() => {
+    if (!editId) return null;
+    return items.find((i) => i.id === editId) ?? null;
+  }, [editId, items]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!isEdit) return;
+    if (!currentItem) navigate(themeRoute.path.my, { replace: true });
+  }, [currentItem, hydrated, isEdit, navigate]);
+
+  useEffect(() => {
+    if (!currentItem) return;
+    setType(currentItem.type);
+    form.setFieldsValue({
+      name: currentItem.name,
+      url: currentItem.type === "image" ? currentItem.url : undefined,
+    });
+
+    if (currentItem.type === "gradient") {
+      const colors = extractColors(currentItem.css);
+      const angle = extractAngle(currentItem.css);
+      if (colors[0]) setGradientStart(colors[0]);
+      if (colors[1]) setGradientEnd(colors[1]);
+      if (angle != null) setGradientAngle(angle);
+    }
+  }, [currentItem, form]);
+
+  const gradientCss = useMemo(() => {
+    return buildLinearGradient(gradientAngle, gradientStart, gradientEnd);
+  }, [gradientAngle, gradientEnd, gradientStart]);
+
+  const persist = (nextItems: MyWallpaperItem[]) => {
+    setItems(nextItems);
+    try {
+      localStorage.setItem(MY_WALLPAPERS_STORAGE_KEY, stringifyMyWallpapersStorage(nextItems));
+    } catch {
+      void 0;
+    }
+    window.dispatchEvent(new Event("search-next:my-wallpapers-changed"));
+  };
+
+  const isReadyToApply = useMemo(() => {
+    const name = String(watchedName ?? "").trim();
+    if (!name) return false;
+    if (type === "image") {
+      const url = String(watchedUrl ?? "").trim();
+      return isValidUrl(url);
+    }
+    return true;
+  }, [type, watchedName, watchedUrl]);
+
+  const isDirty = useMemo(() => {
+    if (!isEdit) return true;
+    if (!currentItem) return false;
+
+    const name = String(watchedName ?? "").trim();
+    const currentName = String(currentItem.name ?? "").trim();
+
+    if (type !== currentItem.type) return true;
+
+    if (currentItem.type === "gradient") {
+      return name !== currentName || gradientCss !== currentItem.css;
+    }
+
+    const url = String(watchedUrl ?? "").trim();
+    return name !== currentName || url !== currentItem.url;
+  }, [currentItem, gradientCss, isEdit, type, watchedName, watchedUrl]);
+
+  const applied = useMemo(() => {
+    const wallpaper = personalization.wallpaper;
+    if (type === "gradient") {
+      return wallpaper.type === "gradient" && wallpaper.css === gradientCss;
+    }
+    const url = String(watchedUrl ?? "").trim();
+    return wallpaper.type === "image" && wallpaper.url === url;
+  }, [gradientCss, personalization.wallpaper, type, watchedUrl]);
+
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      const name = String(values.name ?? "").trim();
+      if (!name) return;
+
+      if (type === "image") {
+        const url = String(values.url ?? "").trim();
+        if (!isValidUrl(url)) {
+          message.error("请输入有效的图片链接（http/https/data）");
+          return;
+        }
+        if (isEdit && currentItem) {
+          const next: MyWallpaperItem = {
+            ...currentItem,
+            type: "image",
+            name,
+            url,
+          };
+          persist(items.map((i) => (i.id === currentItem.id ? next : i)));
+        } else {
+          const createdAt = new Date().toISOString();
+          const next: MyWallpaperItem = { id: uuidv4(), type: "image", name, url, createdAt };
+          persist([next, ...items]);
+        }
+      } else {
+        const css = gradientCss;
+        if (isEdit && currentItem) {
+          const next: MyWallpaperItem = {
+            ...currentItem,
+            type: "gradient",
+            name,
+            css,
+          };
+          persist(items.map((i) => (i.id === currentItem.id ? next : i)));
+        } else {
+          const createdAt = new Date().toISOString();
+          const next: MyWallpaperItem = { id: uuidv4(), type: "gradient", name, css, createdAt };
+          persist([next, ...items]);
+        }
+      }
+
+      message.success("已保存");
+      navigate(themeRoute.path.my, { replace: true });
+    } catch {
+      void 0;
+    }
+  };
+
+  const handleApply = async () => {
+    try {
+      const values = await form.validateFields();
+      const name = String(values.name ?? "").trim();
+      if (!name) return;
+
+      if (type === "gradient") {
+        setWallpaper({ type: "gradient", css: gradientCss, name });
+        return;
+      }
+
+      const url = String(values.url ?? "").trim();
+      if (!isValidUrl(url)) {
+        message.error("请输入有效的图片链接（http/https/data）");
+        return;
+      }
+      setWallpaper({ type: "image", url, name });
+    } catch {
+      void 0;
+    }
+  };
+
+  const handleDelete = () => {
+    if (!currentItem) return;
+    const restoreDefault = () => setWallpaper({ type: "none", name: "无" });
+    modal.confirm({
+      title: "删除此项？",
+      content: "删除后不可恢复",
+      okText: "删除",
+      okButtonProps: { danger: true },
+      cancelText: "取消",
+      onOk: () => {
+        const wallpaper = personalization.wallpaper;
+        if (currentItem.type === "gradient") {
+          if (
+            wallpaper.type === "gradient" &&
+            wallpaper.css === currentItem.css
+          ) {
+            restoreDefault();
+          }
+        } else {
+          if (wallpaper.type === "image" && wallpaper.url === currentItem.url) {
+            restoreDefault();
+          }
+        }
+
+        persist(items.filter((i) => i.id !== currentItem.id));
+        navigate(themeRoute.path.my, { replace: true });
+      },
+    });
+  };
+
+  const previewNode = (() => {
+    if (type === "gradient") {
+      return (
+        <div
+          className="w-full aspect-video rounded-2xl border overflow-hidden"
+          style={{
+            background: gradientCss,
+            borderColor: "rgba(0,0,0,0.08)",
+          }}
+        />
+      );
+    }
+
+    const url = String(watchedUrl ?? "").trim();
+    const safeUrl = url.replace(/"/g, '\\"');
+    return (
+      <div
+        className="w-full aspect-video rounded-2xl border overflow-hidden"
+        style={{
+          borderColor: "rgba(0,0,0,0.08)",
+          backgroundColor: "rgba(0,0,0,0.06)",
+          backgroundImage: url ? `url("${safeUrl}")` : undefined,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+    );
+  })();
+
+  return (
+    <DefaultAppView
+      className="h-full"
+      animate
+      title={isEdit ? "编辑" : "新增"}
+      headerRight={
+        <Space size={8}>
+          {isEdit ? (
+            <Button danger onClick={handleDelete}>
+              删除
+            </Button>
+          ) : null}
+          <Button onClick={handleSave}>保存</Button>
+          <Button
+            type="primary"
+            shape="round"
+            disabled={!isEdit || !isReadyToApply || isDirty || applied}
+            onClick={handleApply}
+          >
+            {applied ? "已应用" : "应用"}
+          </Button>
+        </Space>
+      }
+    >
+      <Card styles={{ body: { padding: 16 } }}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="font-medium">类型</div>
+          <AppSegmented
+            value={type}
+            disabled={isEdit}
+            onChange={(v) => setType(v as any)}
+            options={[
+              { label: "渐变", value: "gradient" },
+              { label: "图片", value: "image" },
+            ]}
+          />
+        </div>
+
+        <div className="mt-4">
+          <Form form={form} layout="vertical">
+            <Form.Item
+              name="name"
+              label="名称"
+              rules={[{ required: true, message: "请输入名称" }]}
+            >
+              <Input placeholder="例如：我的极光" />
+            </Form.Item>
+
+            {type === "gradient" ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-sm mb-2">起始色</div>
+                    <ColorPicker
+                      value={gradientStart}
+                      onChange={(color, hex) => setGradientStart(colorToHex(color, hex))}
+                      showText
+                      format="hex"
+                      getPopupContainer={() => document.body}
+                      styles={{ popup: { root: { zIndex: 6000 } } }}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-sm mb-2">结束色</div>
+                    <ColorPicker
+                      value={gradientEnd}
+                      onChange={(color, hex) => setGradientEnd(colorToHex(color, hex))}
+                      showText
+                      format="hex"
+                      getPopupContainer={() => document.body}
+                      styles={{ popup: { root: { zIndex: 6000 } } }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <div className="text-sm mb-2">角度</div>
+                  <Slider
+                    min={0}
+                    max={360}
+                    value={gradientAngle}
+                    onChange={(v) => setGradientAngle(Number(v))}
+                  />
+                </div>
+              </>
+            ) : (
+              <Form.Item
+                name="url"
+                label="图片链接"
+                rules={[
+                  { required: true, message: "请输入图片链接" },
+                  {
+                    validator: async (_, value) => {
+                      if (!value) return;
+                      if (!isValidUrl(String(value))) {
+                        throw new Error("请输入有效的图片链接（http/https/data）");
+                      }
+                    },
+                  },
+                ]}
+              >
+                <Input placeholder="https://..." />
+              </Form.Item>
+            )}
+          </Form>
+        </div>
+
+        <div className="mt-4">{previewNode}</div>
+      </Card>
+    </DefaultAppView>
+  );
+};
+
+export default ThemeMyEditorView;

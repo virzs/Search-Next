@@ -5,6 +5,8 @@ import {
   RiLandscapeLine,
   RiTShirtFill,
   RiTShirtLine,
+  RiUserFill,
+  RiUserLine,
 } from "@remixicon/react";
 import { themeRoute } from "./route-paths";
 
@@ -31,6 +33,13 @@ const ThemeModalRoute: FC = () => {
             path: themeRoute.path.wallpaper,
             icon: <RiLandscapeLine size={16} />,
             activeIcon: <RiLandscapeFill size={16} />,
+          },
+          {
+            key: "my",
+            label: "我的",
+            path: themeRoute.path.my,
+            icon: <RiUserLine size={16} />,
+            activeIcon: <RiUserFill size={16} />,
           },
         ],
       }}

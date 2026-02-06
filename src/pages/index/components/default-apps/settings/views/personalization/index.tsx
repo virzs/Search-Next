@@ -177,6 +177,16 @@ const PersonalizationView = () => {
                 >
                   管理
                 </Button>
+                <Button
+                  type="text"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(themeRoute.path.my);
+                  }}
+                >
+                  我的
+                </Button>
                 <RiArrowDownSLine
                   size={18}
                   className={cx(
