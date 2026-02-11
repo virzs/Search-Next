@@ -1,6 +1,12 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { useRequest } from "ahooks";
-import { UserInfo, AuthContextValue, LoginResponse, LoginFormData, RegisterFormData } from "../types/auth";
+import {
+  UserInfo,
+  AuthContextValue,
+  LoginResponse,
+  LoginFormData,
+  RegisterFormData,
+} from "../types/auth";
 import { postLogin, postRegister, postLogout } from "../services/auth";
 import { getToken, setToken, setRefreshToken } from "../utils/token";
 import { notification } from "../utils/globalNotification";
@@ -26,7 +32,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initAuth = async () => {
       try {
         const token = getToken();
-        const userStr = localStorage.getItem("user_info") || sessionStorage.getItem("user_info");
+        const userStr =
+          localStorage.getItem("user_info") ||
+          sessionStorage.getItem("user_info");
 
         if (token && userStr) {
           const userData = JSON.parse(userStr);
@@ -53,7 +61,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const cover = emailToGradient(email);
         setCoverGradientCss(cover.css);
-        const avatar = createAvatar(thumbs, { seed: email, size: 80, backgroundColor: ["transparent"] }).toDataUri();
+        const avatar = createAvatar(thumbs, {
+          seed: email,
+          size: 80,
+          backgroundColor: ["transparent"],
+        }).toDataUri();
         setAvatarSrc(avatar);
       } catch (e) {
         console.log("🚀 ~ AuthProvider ~ e:", e);
@@ -72,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     async (data: LoginFormData) => {
       return await postLogin({ email: data.email, password: data.password });
     },
-    { manual: true }
+    { manual: true },
   );
 
   const login = async (data: LoginFormData): Promise<LoginResponse> => {
@@ -118,7 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         invitationCode: "",
       });
     },
-    { manual: true }
+    { manual: true },
   );
 
   const register = async (data: RegisterFormData): Promise<LoginResponse> => {
@@ -185,7 +197,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(updatedUser);
 
       // 更新本地存储
-      const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+      const token =
+        localStorage.getItem("auth_token") ||
+        sessionStorage.getItem("auth_token");
       if (token) {
         if (localStorage.getItem("auth_token")) {
           localStorage.setItem("user_info", JSON.stringify(updatedUser));
