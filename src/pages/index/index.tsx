@@ -45,6 +45,7 @@ import Feedback from "./components/feedback";
 
 function Index() {
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
+  const ignoreDesktopChangeUntilRef = useRef(0);
 
   const { message } = App.useApp();
   const { avatarSrc, coverGradientCss } = useAuth();
@@ -108,6 +109,10 @@ function Index() {
       const isModified =
         localStorage.getItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY) === "true";
       if (!isModified) {
+        ignoreDesktopChangeUntilRef.current = Math.max(
+          ignoreDesktopChangeUntilRef.current,
+          Date.now() + 500,
+        );
         desktopRef.current?.state.setList(list);
       }
       if (init) toggleInit();
@@ -299,10 +304,18 @@ function Index() {
 
       if (!hasClock) {
         // 通过 desktopRef 的 addItem 注入，默认放入第一页根
+        ignoreDesktopChangeUntilRef.current = Math.max(
+          ignoreDesktopChangeUntilRef.current,
+          Date.now() + 500,
+        );
         desktopRef.current?.state.addItem(defaultClockItem as any, []);
       }
     } catch {
       // 若解析失败，仍尝试通过 addItem 注入，默认放入第一页根
+      ignoreDesktopChangeUntilRef.current = Math.max(
+        ignoreDesktopChangeUntilRef.current,
+        Date.now() + 500,
+      );
       desktopRef.current?.state.addItem(defaultClockItem as any, []);
     }
   }, []);
@@ -430,6 +443,8 @@ function Index() {
           storageKey={DESKTOP_LIST_STORAGE_KEY}
           onChange={(list) => {
             if (!list.length) return;
+            if (init) return;
+            if (Date.now() < ignoreDesktopChangeUntilRef.current) return;
             localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
           }}
           onItemClick={(item) => {
