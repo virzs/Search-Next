@@ -6,6 +6,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const appReactPath = pathResolve("node_modules/react");
+const appReactDomPath = pathResolve("node_modules/react-dom");
 
 function pathResolve(dir: string) {
   return resolve(__dirname, ".", dir);
@@ -30,10 +32,31 @@ export default defineConfig(({ mode }) => {
     },
     css: { postcss: {} },
     resolve: {
+      dedupe: ["react", "react-dom"],
       alias: [
         {
           find: /@\//,
           replacement: pathResolve("src") + "/",
+        },
+        {
+          find: "react",
+          replacement: appReactPath,
+        },
+        {
+          find: "react/jsx-runtime",
+          replacement: resolve(appReactPath, "jsx-runtime.js"),
+        },
+        {
+          find: "react/jsx-dev-runtime",
+          replacement: resolve(appReactPath, "jsx-dev-runtime.js"),
+        },
+        {
+          find: "react-dom",
+          replacement: appReactDomPath,
+        },
+        {
+          find: "react-dom/client",
+          replacement: resolve(appReactDomPath, "client.js"),
         },
       ],
     },

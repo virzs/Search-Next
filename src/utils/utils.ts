@@ -24,6 +24,26 @@ export const getApiPrefix = (
   return path;
 };
 
+export const getBackendOrigin = () => {
+  const configuredOrigin = import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_PROXY_TARGET;
+  if (configuredOrigin) return configuredOrigin.replace(/\/+$/, "");
+
+  if (import.meta.env.DEV) return "http://localhost:5151";
+  return window.location.origin;
+};
+
+export const toBackendAssetUrl = (entry: string) => {
+  if (!entry) return entry;
+  if (entry.startsWith("http://") || entry.startsWith("https://")) return entry;
+  if (entry.startsWith("//")) return `${window.location.protocol}${entry}`;
+
+  const normalized = entry.startsWith("/") ? entry : `/${entry}`;
+  if (normalized.startsWith("/static/") || normalized.startsWith("/uploads/")) {
+    return new URL(normalized, getBackendOrigin()).href;
+  }
+  return new URL(normalized, window.location.origin).href;
+};
+
 // 默认表单布局
 export const baseFormItemLayout: {
   [x: string]: any;

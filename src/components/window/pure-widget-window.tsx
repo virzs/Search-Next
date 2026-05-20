@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Modal, Button, Space } from 'antd';
 import { RiCloseLine, RiSubtractLine, RiFullscreenLine, RiFullscreenExitLine } from '@remixicon/react';
 import PureWidget, { PureWidgetConfig } from '../micro-frontend/pure-widget';
+import type { WidgetSDK } from '@/sdk';
 
 interface PureWidgetWindowProps {
   config: PureWidgetConfig;
@@ -10,6 +11,8 @@ interface PureWidgetWindowProps {
   title?: string;
   width?: number | string;
   height?: number | string;
+  /** 小组件 SDK 实例 */
+  sdk?: WidgetSDK;
 }
 
 const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
@@ -19,6 +22,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   title,
   width = 600,
   height = 400,
+  sdk,
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -69,7 +73,8 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
         <div className="relative w-full h-full">
           {!isMinimized && (
             <PureWidget
-              config={{ ...config, mode: 'full' }}
+              // 将宿主注入的 SDK 透传给 PureWidget，供小组件 mount 时使用
+              config={{ ...config, mode: 'full', ...(sdk ? { sdk } : {}) }}
               className="w-full h-full"
             />
           )}

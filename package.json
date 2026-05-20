@@ -10,6 +10,9 @@
     "build": "tsc -b && vite build",
     "build:local": "dotenv -e local.env -- tsc -b && vite build",
     "build:prod": "dotenv -e prod.env -- tsc -b && vite build",
+    "widget:pack": "node scripts/pack-widget.mjs",
+    "widget:pack:clock": "node scripts/pack-widget.mjs clock",
+    "widget:pack:todo": "node scripts/pack-widget.mjs todo",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:local": "dotenv -e local.env -- vite preview",
@@ -28,7 +31,6 @@
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.12.1",
-    "qiankun": "^2.10.16",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-draggable": "^4.4.6",
@@ -38,7 +40,7 @@
     "remixicon": "^4.7.0",
     "tailwindcss": "^4.1.17",
     "uuid": "^13.0.0",
-    "zs_library": "^0.7.20"
+    "zs_library": "^0.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

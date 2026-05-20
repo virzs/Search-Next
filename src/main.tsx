@@ -12,6 +12,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AppConfigProvider } from "./contexts/ConfigContext";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 import { DesktopThemeProvider } from "./contexts/DesktopThemeContext";
+import { WidgetProvider } from "./contexts/WidgetContext";
 import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 
 const router = createBrowserRouter([
@@ -30,7 +31,9 @@ createRoot(document.getElementById("root")!).render(
         <AuthProvider>
           <AppConfigProvider>
             <DesktopThemeProvider>
-              <RouterProvider router={router} />
+              <WidgetProvider>
+                <RouterProvider router={router} />
+              </WidgetProvider>
             </DesktopThemeProvider>
           </AppConfigProvider>
         </AuthProvider>

@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import type { WidgetSDK } from "@/sdk";
 
 export interface PureWidgetConfig {
   entry: string;
   props?: Record<string, unknown>;
   mode?: "icon" | "full";
+  /** 小组件 SDK 实例（由宿主创建并注入） */
+  sdk?: WidgetSDK;
 }
 
 interface PureWidgetProps {
@@ -13,33 +16,39 @@ interface PureWidgetProps {
   onClick?: () => void;
 }
 
+/**
+ * 仅在 entry/mode 变化时重新加载 ESM 模块。
+ * props 和 sdk 通过 ref 传递，避免引用变化导致不必要的重新挂载。
+ */
 const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onClick }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // 使用 ref 避免 props/sdk 引用变化触发 ESM 模块重新加载
+  const propsRef = useRef(config.props);
+  propsRef.current = config.props;
+  const sdkRef = useRef(config.sdk);
+  sdkRef.current = config.sdk;
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
 
     const load = async () => {
       try {
-        // 某些打包后的库可能引用 Node 的 process 变量，运行时为其提供最小 polyfill
         try {
           (globalThis as any).process = (globalThis as any).process || { env: {} };
         } catch {
           /* empty */
         }
-        // 构建绝对 URL，确保在 dev 模式下从 public 正确加载
         const toAbsUrl = (entry: string) => {
           if (!entry) return entry;
           if (entry.startsWith("http://") || entry.startsWith("https://")) return entry;
           if (entry.startsWith("//")) return `${window.location.protocol}${entry}`;
-          // 相对或以 / 开头的路径，统一转为基于 origin 的绝对地址
           return new URL(entry, window.location.origin).href;
         };
 
         const abs = toAbsUrl(String(config.entry));
 
-        // 为跨源小组件注入对应 Vite HMR 客户端，让 import.meta.hot 正常工作
         try {
           const u = new URL(abs);
           const clientUrl = `${u.protocol}//${u.host}/@vite/client`;
@@ -57,7 +66,6 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
           /* empty */
         }
 
-        // 动态导入外部 ESM（来自 public），避免 Vite 静态分析和路径重写
         let mod: any;
         try {
           mod = await import(/* @vite-ignore */ abs);
@@ -80,7 +88,11 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
         }
 
         if (containerRef.current) {
-          const ret = mount(containerRef.current, { ...(config.props || {}), mode: config.mode || "icon" });
+          const ret = mount(containerRef.current, {
+            ...(propsRef.current || {}),
+            mode: config.mode || "icon",
+            ...(sdkRef.current ? { sdk: sdkRef.current } : {}),
+          });
           if (typeof ret === "function") cleanup = ret;
         }
       } catch (e) {
@@ -98,7 +110,7 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
         /* empty */
       }
     };
-  }, [config.entry, config.mode, config.props]);
+  }, [config.entry, config.mode]);
 
   if (error) {
     return (
