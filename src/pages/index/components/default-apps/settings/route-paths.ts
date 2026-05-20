@@ -7,6 +7,7 @@ export const settingsRoute = {
     language: "language",
     backup: "backup",
     about: "about",
+    developer: "developer",
     wildcard: "*",
   },
   path: {
@@ -17,5 +18,6 @@ export const settingsRoute = {
     language: "/settings/language",
     backup: "/settings/backup",
     about: "/settings/about",
+    developer: "/settings/developer",
   },
 } as const;

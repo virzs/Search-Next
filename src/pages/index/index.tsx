@@ -6,9 +6,10 @@ import {
   desktopThemeDark,
   desktopThemeLight,
 } from "zs_library";
+import type { DesktopTypeConfigMap } from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import {
   RiStore2Line,
   RiSettingsLine,
@@ -17,6 +18,7 @@ import {
   RiUserLine,
 } from "@remixicon/react";
 import type { DesktopItemData } from "../../types";
+import type { WidgetSettingsField } from "../../types";
 // import SearchWithAI from "../../components/ai-search";
 import { App } from "antd";
 import {
@@ -30,10 +32,16 @@ import {
 } from "@/utils/storage";
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
+import { useWidget } from "@/hooks/useWidget";
 import AccountModal from "./components/default-apps/account";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
+import { createHostSDK, sharedEventBus } from "@/sdk";
+import type { WidgetSDK, WidgetThemeInfo } from "@/sdk";
+import { notification } from "@/utils/globalNotification";
+import axiosInstance from "@/utils/axios";
 import LoadingOverlay from "./components/loading-overlay";
+import WidgetSettingsModal from "@/components/widget-settings-modal";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
@@ -43,15 +51,69 @@ import { settingsRoute } from "./components/default-apps/settings/route-paths";
 import Notice from "./components/notice";
 import Feedback from "./components/feedback";
 
+type DesktopItem = DesktopSortItem<DesktopItemData>;
+
+type DesktopRootItem = {
+  id: string | number;
+  type?: string;
+  children?: DesktopStorageItem[];
+};
+
+type DesktopStorageItem = Omit<DesktopItem, "children"> & {
+  children?: DesktopStorageItem[];
+};
+
+const getWidgetDesktopType = (item: Pick<DesktopItem, "type" | "dataType">) => {
+  if (typeof item.type === "string" && item.type.startsWith("widget:")) {
+    return item.type;
+  }
+  if (typeof item.dataType === "string" && item.dataType.startsWith("widget:")) {
+    return item.dataType;
+  }
+  return null;
+};
+
+const normalizeWidgetDesktopItem = (item: DesktopStorageItem): DesktopStorageItem => {
+  const widgetType = getWidgetDesktopType(item);
+  return {
+    ...item,
+    type: widgetType ?? item.type,
+    children: item.children?.map(normalizeWidgetDesktopItem),
+  };
+};
+
+const normalizeWidgetDesktopList = (list: DesktopRootItem[]) =>
+  list.map((root) => ({
+    ...root,
+    children: root.children?.map(normalizeWidgetDesktopItem),
+  }));
+
+const migrateStoredWidgetDesktopList = () => {
+  const raw = localStorage.getItem(DESKTOP_LIST_STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return;
+    const normalized = normalizeWidgetDesktopList(parsed as DesktopRootItem[]);
+    const nextRaw = JSON.stringify(normalized);
+    if (nextRaw !== raw) localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, nextRaw);
+  } catch (error) {
+    console.warn("Failed to migrate desktop widget list", error);
+  }
+};
+
 function Index() {
+  useState(migrateStoredWidgetDesktopList);
+
   const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
   const ignoreDesktopChangeUntilRef = useRef(0);
 
   const { message } = App.useApp();
-  const { avatarSrc, coverGradientCss } = useAuth();
+  const { avatarSrc, coverGradientCss, user, isAuthenticated } = useAuth();
   const { userLimit } = useConfig();
   const { activeThemeId, personalization } = useDesktopTheme();
   const navigate = useNavigate();
+  const { widgets, devWidgets, registerDesktopRef } = useWidget();
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
   const [preferDark, setPreferDark] = useState(() => {
@@ -95,7 +157,99 @@ function Index() {
     entry: string;
     props?: any;
     title?: string;
+    widgetId?: string;
   } | null>(null);
+
+  // 小组件设置弹窗状态
+  const [settingsTarget, setSettingsTarget] = useState<{
+    widgetId: string;
+    widgetName: string;
+    settingsSchema: WidgetSettingsField[];
+  } | null>(null);
+
+  /** 为指定小组件创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
+  const sdkDepsRef = useRef({
+    activeThemeId,
+    user,
+    isAuthenticated,
+    userLimit,
+    navigate,
+  });
+  sdkDepsRef.current = {
+    activeThemeId,
+    user,
+    isAuthenticated,
+    userLimit,
+    navigate,
+  };
+
+  const buildSDK = useCallback(
+    (widgetId: string, sizeId: string, mode: "icon" | "full"): WidgetSDK => {
+      const deps = sdkDepsRef.current;
+      return createHostSDK({
+        widgetId,
+        sizeId,
+        mode,
+        theme: { activeThemeId: deps.activeThemeId },
+        user: deps.user
+          ? {
+              _id: deps.user._id,
+              username: deps.user.username,
+              email: deps.user.email,
+            }
+          : null,
+        isAuthenticated: deps.isAuthenticated,
+        config: { userLimit: deps.userLimit ?? null, projectInfo: null },
+        notification,
+        axiosInstance,
+        navigateFn: deps.navigate,
+        eventBus: sharedEventBus,
+      });
+    },
+    [],
+  );
+
+  /** 当主题变化时通过事件总线广播，让所有小组件收到通知 */
+  useEffect(() => {
+    sharedEventBus.emit("theme:change", { activeThemeId } as WidgetThemeInfo);
+  }, [activeThemeId]);
+
+  /** 根据后端小组件数据动态构建 Desktop 的 typeConfigMap */
+  const typeConfigMap = useMemo((): DesktopTypeConfigMap => {
+    const map: DesktopTypeConfigMap = {};
+    const applyConfig = (key: string, config: DesktopTypeConfigMap[string]) => {
+      map[key] = config;
+    };
+
+    for (const w of widgets) {
+      const hasSettings = (w.settingsSchema?.length ?? 0) > 0;
+      const config = {
+        sizeConfigs: w.sizeConfigs?.length
+          ? w.sizeConfigs
+          : [{ row: 2, col: 2, name: "2x2", id: "2x2" }],
+        defaultSizeId: w.defaultSizeId || w.sizeConfigs?.[0]?.id || "2x2",
+        allowShare: false,
+        allowInfo: hasSettings,
+        allowDelete: true,
+        allowResize: (w.sizeConfigs?.length ?? 0) > 1,
+      };
+      applyConfig(`widget:${w._id}`, config);
+    }
+    for (const dw of devWidgets) {
+      const config = {
+        sizeConfigs: dw.sizeConfigs?.length
+          ? dw.sizeConfigs
+          : [{ row: 2, col: 2, name: "2x2", id: "2x2" }],
+        defaultSizeId: dw.defaultSizeId || dw.sizeConfigs?.[0]?.id || "2x2",
+        allowShare: false,
+        allowInfo: false,
+        allowDelete: true,
+        allowResize: (dw.sizeConfigs?.length ?? 0) > 1,
+      };
+      applyConfig(`widget:${dw.id}`, config);
+    }
+    return map;
+  }, [widgets, devWidgets]);
 
   // userLimit 由 ConfigContext 提供
 
@@ -113,7 +267,9 @@ function Index() {
           ignoreDesktopChangeUntilRef.current,
           Date.now() + 500,
         );
-        desktopRef.current?.state.setList(list);
+        desktopRef.current?.state.setList(
+          normalizeWidgetDesktopList(list as DesktopRootItem[]),
+        );
       }
       if (init) toggleInit();
     },
@@ -141,6 +297,7 @@ function Index() {
     }) => (
       <DesktopAppItem
         key={key}
+        onClick={onClick}
         disabledDrag
         iconSize={56}
         data={{
@@ -148,7 +305,6 @@ function Index() {
           type: "app",
           data: { name },
         }}
-        onClick={onClick}
         itemIndex={-1}
         noLetters
         contextMenuProps={false}
@@ -271,53 +427,17 @@ function Index() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 本地默认：注入一个时钟小组件，便于验证方案
+  // 注册 desktopRef 到 WidgetContext，使 addToDesktop 可直接操控桌面
   useEffect(() => {
-    const defaultClockItem = {
-      id: "widget:clock",
-      type: "widget:clock" as const,
-      data: {
-        name: "时钟",
-        widgetConfig: {
-          id: "clock",
-          name: "时钟",
-          // entry:  "/widgets/clock/index.js",
-          entry: "http://localhost:3002/src/index.jsx",
-          props: { title: "时钟小组件" },
-        },
-      },
-    };
+    registerDesktopRef(desktopRef);
+  }, [registerDesktopRef]);
 
-    try {
-      const raw = localStorage.getItem(DESKTOP_LIST_STORAGE_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-      const hasClock =
-        Array.isArray(list) &&
-        list.length > 0 &&
-        Array.isArray(list[0]?.children) &&
-        list[0].children.some(
-          (child: any) =>
-            child?.id === defaultClockItem.id ||
-            child?.type === "widget:clock" ||
-            child?.data?.widgetConfig?.id === "clock",
-        );
-
-      if (!hasClock) {
-        // 通过 desktopRef 的 addItem 注入，默认放入第一页根
-        ignoreDesktopChangeUntilRef.current = Math.max(
-          ignoreDesktopChangeUntilRef.current,
-          Date.now() + 500,
-        );
-        desktopRef.current?.state.addItem(defaultClockItem as any, []);
-      }
-    } catch {
-      // 若解析失败，仍尝试通过 addItem 注入，默认放入第一页根
-      ignoreDesktopChangeUntilRef.current = Math.max(
-        ignoreDesktopChangeUntilRef.current,
-        Date.now() + 500,
-      );
-      desktopRef.current?.state.addItem(defaultClockItem as any, []);
-    }
+  const addItemToCurrentPage = useCallback((item: DesktopItem) => {
+    const currentPage = desktopRef.current?.state.currentSliderPage;
+    desktopRef.current?.state.addItem(
+      item,
+      currentPage ? [currentPage.id] : [],
+    );
   }, []);
 
   const handleAddWebsite = (site: any) => {
@@ -334,11 +454,7 @@ function Index() {
         url,
       },
     };
-    const currentPage = desktopRef.current?.state?.currentSliderPage;
-    desktopRef.current?.state.addItem(
-      appItem as any,
-      currentPage ? [currentPage?.id] : [],
-    );
+    addItemToCurrentPage(appItem);
     message.success("添加成功");
   };
 
@@ -363,31 +479,50 @@ function Index() {
           ref={desktopRef}
           maxSlides={userLimit?.maxPages || 5}
           theme={desktopTheme}
-          typeConfigMap={{
-            "widget:clock": {
-              sizeConfigs: [
-                { row: 1, col: 2, name: "2x1", id: "2x1" },
-                { row: 2, col: 2, name: "2x2", id: "2x2" },
-              ],
-              defaultSizeId: "2x1",
-              allowShare: false,
-              allowInfo: false,
-              allowDelete: true,
-              allowResize: true,
-            },
+          typeConfigMap={typeConfigMap}
+          contextMenu={(item) => {
+            const widgetDesktopType = getWidgetDesktopType(item);
+            if (!widgetDesktopType) return false;
+
+            const schema = item.data?.widgetConfig?.settingsSchema;
+            const hasSettings = Array.isArray(schema) && schema.length > 0;
+
+            return {
+              showInfoButton: hasSettings,
+              showRemoveButton: true,
+              onInfoClick: () => {
+                if (!hasSettings) return;
+                const widgetId =
+                  item.data?.widgetConfig?.id ||
+                  widgetDesktopType.replace("widget:", "");
+                setSettingsTarget({
+                  widgetId,
+                  widgetName:
+                    item.data?.widgetConfig?.name ||
+                    item.data?.name ||
+                    "小组件",
+                  settingsSchema: schema,
+                });
+              },
+            };
           }}
           itemIconBuilderAllowNull={(item) => {
-            // 纯JS外部小组件渲染（icon模式）
+            const widgetDesktopType = getWidgetDesktopType(item);
+            // 动态匹配所有 widget: 前缀的桌面项，渲染对应小组件（icon 模式）
             if (
-              item.type === "widget:clock" &&
+              widgetDesktopType &&
               item.data?.widgetConfig?.entry
             ) {
+              const widgetId =
+                item.data.widgetConfig.id || widgetDesktopType.replace("widget:", "");
+              const sdk = buildSDK(widgetId, "icon", "icon");
               return (
                 <PureWidget
                   config={{
                     entry: item.data.widgetConfig.entry,
                     props: item.data.widgetConfig.props,
                     mode: "icon",
+                    sdk,
                   }}
                   className={css`
                     width: 100%;
@@ -398,6 +533,7 @@ function Index() {
                       entry: item.data!.widgetConfig!.entry,
                       props: item.data!.widgetConfig!.props,
                       title: item.data?.name || "小组件",
+                      widgetId,
                     })
                   }
                 />
@@ -465,6 +601,20 @@ function Index() {
           title={fullWidget.title}
           width={600}
           height={400}
+          sdk={
+            fullWidget.widgetId
+              ? buildSDK(fullWidget.widgetId, "full", "full")
+              : undefined
+          }
+        />
+      )}
+      {settingsTarget && (
+        <WidgetSettingsModal
+          visible={true}
+          onClose={() => setSettingsTarget(null)}
+          widgetId={settingsTarget.widgetId}
+          widgetName={settingsTarget.widgetName}
+          settingsSchema={settingsTarget.settingsSchema}
         />
       )}
       {init && <LoadingOverlay open text="正在加载配置…" />}

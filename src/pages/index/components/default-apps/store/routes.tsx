@@ -6,6 +6,7 @@ import WebsiteView from "./views/website";
 import StoreModalRoute, { type StoreOutletContext } from "./index";
 import { Navigate } from "react-router";
 import WidgetView from "./views/widget";
+import DevView from "./views/dev";
 import { storeRoute } from "./route-paths";
 
 const WidgetRoute = () => {
@@ -34,6 +35,7 @@ export const storeRoutes = {
       ],
     },
     { path: storeRoute.segment.widget, element: <WidgetRoute /> },
+    { path: storeRoute.segment.dev, element: <DevView /> },
     { path: storeRoute.segment.wildcard, element: <StoreNotFoundRoute /> },
   ],
 };

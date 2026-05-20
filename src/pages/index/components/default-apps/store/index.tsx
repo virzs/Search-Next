@@ -2,11 +2,14 @@ import { FC } from "react";
 import {
   RiAppsFill,
   RiAppsLine,
+  RiCodeSSlashFill,
+  RiCodeSSlashLine,
   RiLinksFill,
   RiLinksLine,
 } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
 import { storeRoute } from "./route-paths";
+import { useWidget } from "@/hooks/useWidget";
 
 export type DesktopOutletContext = {
   onAddWidget?: (widgetId: string) => void;
@@ -34,6 +37,36 @@ const buildStoreRouteContext = ({
 });
 
 const StoreModalRoute: FC = () => {
+  const { devModeEnabled } = useWidget();
+
+  const menuItems = [
+    {
+      key: "website",
+      label: "网站",
+      path: storeRoute.path.website.root,
+      icon: <RiLinksLine size={16} />,
+      activeIcon: <RiLinksFill size={16} />,
+    },
+    {
+      key: "widget",
+      label: "小组件",
+      path: storeRoute.path.widget,
+      icon: <RiAppsLine size={16} />,
+      activeIcon: <RiAppsFill size={16} />,
+    },
+    ...(devModeEnabled
+      ? [
+          {
+            key: "dev",
+            label: "开发者",
+            path: storeRoute.path.dev,
+            icon: <RiCodeSSlashLine size={16} />,
+            activeIcon: <RiCodeSSlashFill size={16} />,
+          },
+        ]
+      : []),
+  ];
+
   return (
     <AppRoutedOverlay<DesktopOutletContext, StoreOutletContext>
       closeTo="/"
@@ -43,22 +76,7 @@ const StoreModalRoute: FC = () => {
         header: (
           <div className="text-2xl font-bold tracking-tight">应用商店</div>
         ),
-        menuItems: [
-          {
-            key: "website",
-            label: "网站",
-            path: storeRoute.path.website.root,
-            icon: <RiLinksLine size={16} />,
-            activeIcon: <RiLinksFill size={16} />,
-          },
-          {
-            key: "widget",
-            label: "小组件",
-            path: storeRoute.path.widget,
-            icon: <RiAppsLine size={16} />,
-            activeIcon: <RiAppsFill size={16} />,
-          },
-        ],
+        menuItems,
         footer: "点击卡片查看详情，点击获取按钮添加到桌面",
       }}
       keepAlive={{ enabled: true }}

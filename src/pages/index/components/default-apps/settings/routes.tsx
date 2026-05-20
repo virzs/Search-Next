@@ -3,6 +3,7 @@ import SettingsModalRoute from "./index";
 import AboutView from "./views/about";
 import AccountView from "./views/account";
 import BackupView from "./views/backup";
+import DeveloperView from "./views/developer";
 import LanguageView from "./views/language";
 import PersonalizationView from "./views/personalization";
 import { settingsRoute } from "./route-paths";
@@ -23,6 +24,7 @@ export const settingsRoutes = {
     { path: settingsRoute.segment.language, element: <LanguageView /> },
     { path: settingsRoute.segment.backup, element: <BackupView /> },
     { path: settingsRoute.segment.about, element: <AboutView /> },
+    { path: settingsRoute.segment.developer, element: <DeveloperView /> },
     {
       path: settingsRoute.segment.wildcard,
       element: <Navigate to={settingsRoute.segment.account} replace />,

@@ -2,6 +2,8 @@ import { FC } from "react";
 import {
   RiBrushFill,
   RiBrushLine,
+  RiCodeSSlashFill,
+  RiCodeSSlashLine,
   RiGlobalFill,
   RiInbox2Fill,
   RiInbox2Line,
@@ -57,6 +59,13 @@ const SettingsModalRoute: FC = () => {
             path: settingsRoute.path.about,
             icon: <RiInformationLine size={16} />,
             activeIcon: <RiInformationFill size={16} />,
+          },
+          {
+            key: "developer",
+            label: "开发者",
+            path: settingsRoute.path.developer,
+            icon: <RiCodeSSlashLine size={16} />,
+            activeIcon: <RiCodeSSlashFill size={16} />,
           },
         ],
       }}

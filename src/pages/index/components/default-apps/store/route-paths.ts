@@ -3,6 +3,7 @@ export const storeRoute = {
     root: "store",
     website: "website",
     widget: "widget",
+    dev: "dev",
     websiteCollection: "collection/:id",
     websiteDetail: "detail/:id",
     wildcard: "*",
@@ -17,6 +18,7 @@ export const storeRoute = {
         `/store/website/detail/${encodeURIComponent(websiteId)}`,
     },
     widget: "/store/widget",
+    dev: "/store/dev",
   },
 } as const;
 

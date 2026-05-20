@@ -1,6 +1,6 @@
 import { Resource } from "@/types";
 import { baseGetRequest } from "@/utils/axios";
-import { DesktopListItem, DesktopTheme } from "zs_library";
+import type { DesktopListItem, DesktopTheme } from "zs_library";
 
 export interface DefaultUserConfig {
   config: {
