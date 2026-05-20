@@ -67,13 +67,18 @@ const getWidgetDesktopType = (item: Pick<DesktopItem, "type" | "dataType">) => {
   if (typeof item.type === "string" && item.type.startsWith("widget:")) {
     return item.type;
   }
-  if (typeof item.dataType === "string" && item.dataType.startsWith("widget:")) {
+  if (
+    typeof item.dataType === "string" &&
+    item.dataType.startsWith("widget:")
+  ) {
     return item.dataType;
   }
   return null;
 };
 
-const normalizeWidgetDesktopItem = (item: DesktopStorageItem): DesktopStorageItem => {
+const normalizeWidgetDesktopItem = (
+  item: DesktopStorageItem,
+): DesktopStorageItem => {
   const widgetType = getWidgetDesktopType(item);
   return {
     ...item,
@@ -96,7 +101,8 @@ const migrateStoredWidgetDesktopList = () => {
     if (!Array.isArray(parsed)) return;
     const normalized = normalizeWidgetDesktopList(parsed as DesktopRootItem[]);
     const nextRaw = JSON.stringify(normalized);
-    if (nextRaw !== raw) localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, nextRaw);
+    if (nextRaw !== raw)
+      localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, nextRaw);
   } catch (error) {
     console.warn("Failed to migrate desktop widget list", error);
   }
@@ -222,14 +228,13 @@ function Index() {
     };
 
     for (const w of widgets) {
-      const hasSettings = (w.settingsSchema?.length ?? 0) > 0;
       const config = {
         sizeConfigs: w.sizeConfigs?.length
           ? w.sizeConfigs
           : [{ row: 2, col: 2, name: "2x2", id: "2x2" }],
         defaultSizeId: w.defaultSizeId || w.sizeConfigs?.[0]?.id || "2x2",
         allowShare: false,
-        allowInfo: hasSettings,
+        allowInfo: false,
         allowDelete: true,
         allowResize: (w.sizeConfigs?.length ?? 0) > 1,
       };
@@ -486,35 +491,43 @@ function Index() {
 
             const schema = item.data?.widgetConfig?.settingsSchema;
             const hasSettings = Array.isArray(schema) && schema.length > 0;
+            const widgetId =
+              item.data?.widgetConfig?.id ||
+              widgetDesktopType.replace("widget:", "");
+            const widgetName =
+              item.data?.widgetConfig?.name || item.data?.name || "小组件";
 
             return {
-              showInfoButton: hasSettings,
+              showInfoButton: false,
               showRemoveButton: true,
-              onInfoClick: () => {
-                if (!hasSettings) return;
-                const widgetId =
-                  item.data?.widgetConfig?.id ||
-                  widgetDesktopType.replace("widget:", "");
-                setSettingsTarget({
-                  widgetId,
-                  widgetName:
-                    item.data?.widgetConfig?.name ||
-                    item.data?.name ||
-                    "小组件",
-                  settingsSchema: schema,
-                });
-              },
+              menuItems: hasSettings
+                ? [
+                    {
+                      text: "设置",
+                      icon: <RiSettingsLine size={18} />,
+                      onClick: (
+                        _item: unknown,
+                        contextActions: { hideContextMenu: () => void },
+                      ) => {
+                        contextActions.hideContextMenu();
+                        setSettingsTarget({
+                          widgetId,
+                          widgetName,
+                          settingsSchema: schema,
+                        });
+                      },
+                    },
+                  ]
+                : [],
             };
           }}
           itemIconBuilderAllowNull={(item) => {
             const widgetDesktopType = getWidgetDesktopType(item);
             // 动态匹配所有 widget: 前缀的桌面项，渲染对应小组件（icon 模式）
-            if (
-              widgetDesktopType &&
-              item.data?.widgetConfig?.entry
-            ) {
+            if (widgetDesktopType && item.data?.widgetConfig?.entry) {
               const widgetId =
-                item.data.widgetConfig.id || widgetDesktopType.replace("widget:", "");
+                item.data.widgetConfig.id ||
+                widgetDesktopType.replace("widget:", "");
               const sdk = buildSDK(widgetId, "icon", "icon");
               return (
                 <PureWidget
