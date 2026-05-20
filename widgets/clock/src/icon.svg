@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="26" fill="url(#bg)"/>
+  <circle cx="60" cy="60" r="38" stroke="#fff" stroke-width="3.5" opacity="0.9"/>
+  <circle cx="60" cy="60" r="2.5" fill="#fff"/>
+  <!-- 时针 -->
+  <line x1="60" y1="60" x2="60" y2="34" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 分针 -->
+  <line x1="60" y1="60" x2="80" y2="50" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 秒针 -->
+  <line x1="60" y1="60" x2="52" y2="78" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+  <!-- 刻度 12点 -->
+  <line x1="60" y1="25" x2="60" y2="30" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <!-- 刻度 3点 -->
+  <line x1="95" y1="60" x2="90" y2="60" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <!-- 刻度 6点 -->
+  <line x1="60" y1="95" x2="60" y2="90" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <!-- 刻度 9点 -->
+  <line x1="25" y1="60" x2="30" y2="60" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+</svg>

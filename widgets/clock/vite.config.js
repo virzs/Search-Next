@@ -1,10 +1,33 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import { resolve } from "path";
+import { copyFileSync, existsSync, mkdirSync } from "fs";
+
+// 构建完成后将静态资源（图标、配置JSON）复制到输出目录
+function copyWidgetAssets() {
+  const outDir = resolve(__dirname, "../../dist/widget-build/clock");
+  return {
+    name: "copy-widget-assets",
+    closeBundle() {
+      if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+      const assets = [
+        { src: resolve(__dirname, "src/icon.svg"), dest: resolve(outDir, "icon.svg") },
+        { src: resolve(__dirname, "widget.config.json"), dest: resolve(outDir, "widget.config.json") },
+      ];
+      for (const { src, dest } of assets) {
+        if (existsSync(src)) {
+          copyFileSync(src, dest);
+          console.log(`[copy-widget-assets] ${src} -> ${dest}`);
+        }
+      }
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
-    // 使远端小组件复用宿主的 React Refresh 运行时，支持跨应用 HMR
     react({ reactRefreshHost: "http://localhost:8132" }),
+    copyWidgetAssets(),
   ],
   server: {
     port: 3002,
@@ -22,11 +45,10 @@ export default defineConfig({
       formats: ["esm"],
       fileName: () => "index.js",
     },
-    // 新位置相对项目根目录向上两级
-    outDir: "../../public/widgets/clock",
+    outDir: "../../dist/widget-build/clock",
+    emptyOutDir: true,
     rollupOptions: {
-      // 开发时安装 react 依赖，但库构建时忽略（不打包）
-      external: ["react", "react-dom/client", "react/jsx-runtime"],
+      external: ["react", "react-dom/client"],
       output: {
         inlineDynamicImports: true,
       },

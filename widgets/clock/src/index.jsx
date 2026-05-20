@@ -1,5 +1,6 @@
 // React 版本时钟小组件（不打包 React），导出 mount(container, props)
 // 依赖宿主页面提前暴露 window.React 与 window.ReactDOM
+// 支持通过 props.sdk 接收宿主注入的 Widget SDK 实例
 import Clock from "./Clock.jsx";
 
 // 记录当前挂载的根与属性，便于 HMR 触发时重新渲染
@@ -19,13 +20,16 @@ export function mount(container, props = {}) {
   }
   const root = ReactDOM.createRoot(container);
   const { createElement } = React;
-  root.render(createElement(Clock, { mode: props.mode || "icon", title: props.title }));
-  // 保存当前根与属性以支持 HMR 重新渲染
+  root.render(createElement(Clock, {
+    mode: props.mode || "icon",
+    title: props.title,
+    sdk: props.sdk,
+  }));
   __clock_root = root;
   __clock_props = { ...props };
   return () => root.unmount();
 }
-// 默认导出为 mount，保持与宿主加载约定一致
+
 export default mount;
 
 // 接受 Clock 组件的热更新，并在同一根内重新渲染
@@ -40,6 +44,7 @@ if (import.meta && import.meta.hot) {
         createElement(NewClock, {
           mode: __clock_props?.mode || "icon",
           title: __clock_props?.title,
+          sdk: __clock_props?.sdk,
         })
       );
     } catch (err) {

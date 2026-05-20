@@ -1,0 +1,54 @@
+{
+  "name": "clock",
+  "displayName": "时钟",
+  "version": "0.1.2",
+  "description": "简洁实时时钟小组件，支持世界时区切换",
+  "author": "Search-Next",
+  "entry": "index.js",
+  "icon": "icon.svg",
+  "tags": ["工具", "时钟", "时间"],
+  "sizeConfigs": [
+    { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
+    { "row": 1, "col": 2, "name": "2x1", "id": "2x1" },
+    { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
+  ],
+  "defaultSizeId": "2x2",
+  "supportIconMode": true,
+  "settingsSchema": [
+    {
+      "key": "timezone",
+      "label": "时区",
+      "type": "select",
+      "default": "",
+      "description": "选择要显示的时区，留空使用本地时间",
+      "options": [
+        { "label": "本地时间", "value": "" },
+        { "label": "UTC", "value": "UTC" },
+        { "label": "北京 (UTC+8)", "value": "Asia/Shanghai" },
+        { "label": "东京 (UTC+9)", "value": "Asia/Tokyo" },
+        { "label": "纽约 (UTC-5)", "value": "America/New_York" },
+        { "label": "伦敦 (UTC+0)", "value": "Europe/London" },
+        { "label": "巴黎 (UTC+1)", "value": "Europe/Paris" },
+        { "label": "悉尼 (UTC+11)", "value": "Australia/Sydney" },
+        { "label": "洛杉矶 (UTC-8)", "value": "America/Los_Angeles" },
+        { "label": "迪拜 (UTC+4)", "value": "Asia/Dubai" },
+        { "label": "莫斯科 (UTC+3)", "value": "Europe/Moscow" },
+        { "label": "新加坡 (UTC+8)", "value": "Asia/Singapore" }
+      ]
+    },
+    {
+      "key": "title",
+      "label": "标题",
+      "type": "input",
+      "default": "时钟",
+      "description": "自定义小组件标题"
+    },
+    {
+      "key": "showSeconds",
+      "label": "显示秒",
+      "type": "switch",
+      "default": true,
+      "description": "是否显示秒数"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "todo",
+  "displayName": "Todo",
+  "version": "0.1.1",
+  "description": "用于验证 .snwidget 后端导入流程的轻量 Todo 小组件",
+  "author": "Search-Next",
+  "entry": "index.js",
+  "tags": ["工具", "Todo", "测试"],
+  "sizeConfigs": [
+    { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
+    { "row": 2, "col": 4, "name": "4x2", "id": "4x2" }
+  ],
+  "defaultSizeId": "2x2",
+  "supportIconMode": true,
+  "settingsSchema": []
+}
