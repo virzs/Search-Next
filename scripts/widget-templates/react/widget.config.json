@@ -1,0 +1,18 @@
+{
+  "name": "__WIDGET_NAME__",
+  "displayName": "__WIDGET_DISPLAY_NAME__",
+  "version": "0.1.0",
+  "description": "React 小组件脚手架",
+  "author": "Search-Next",
+  "entry": "index.js",
+  "icon": "icon.svg",
+  "tags": ["React", "脚手架"],
+  "sizeConfigs": [
+    { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
+    { "row": 1, "col": 2, "name": "2x1", "id": "2x1" },
+    { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
+  ],
+  "defaultSizeId": "2x2",
+  "supportIconMode": true,
+  "settingsSchema": []
+}

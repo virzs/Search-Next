@@ -1,0 +1,17 @@
+{
+  "name": "__WIDGET_PACKAGE_NAME__",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "vite": "^7.1.12",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}

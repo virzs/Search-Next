@@ -6,17 +6,33 @@ import { spawn } from "node:child_process";
 import zlib from "node:zlib";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const name = process.argv[2];
+const name = process.argv.slice(2).find((arg) => arg !== "--");
+const widgetNamePattern = /^[a-z][a-z0-9-]*$/;
+const widgetVersionPattern = /^[0-9A-Za-z][0-9A-Za-z._-]*$/;
 
 if (!name) {
   console.error("Usage: node scripts/pack-widget.mjs <widget-name>");
   process.exit(1);
 }
 
-const widgetDir = path.join(root, "widgets", name);
-const buildDir = path.join(root, "dist", "widget-build", name);
-const distDir = path.join(root, "dist", "widgets");
+if (!widgetNamePattern.test(name)) {
+  console.error("Widget name must use kebab-case: letters, numbers, and dashes only.");
+  process.exit(1);
+}
+
+const widgetsRoot = path.resolve(root, "widgets");
+const buildRoot = path.resolve(root, "dist", "widget-build");
+const widgetDir = path.resolve(widgetsRoot, name);
+const buildDir = path.resolve(buildRoot, name);
+const distDir = path.resolve(root, "dist", "widgets");
 const configFile = path.join(widgetDir, "widget.config.json");
+
+const assertInside = (parent, child, label) => {
+  const relative = path.relative(parent, child);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error(`${label} escapes expected directory`);
+  }
+};
 
 const run = (command, args, options) => new Promise((resolve, reject) => {
   const child = spawn(command, args, { stdio: "inherit", shell: false, ...options });
@@ -120,7 +136,15 @@ const writeZip = async (sourceDir, output) => {
 };
 
 const main = async () => {
+  assertInside(widgetsRoot, widgetDir, "Widget directory");
+  assertInside(buildRoot, buildDir, "Build directory");
   const config = JSON.parse(await readFile(configFile, "utf8"));
+  if (!widgetNamePattern.test(String(config.name || ""))) {
+    throw new Error("widget.config.json name must use kebab-case.");
+  }
+  if (!widgetVersionPattern.test(String(config.version || ""))) {
+    throw new Error("widget.config.json version contains unsupported characters.");
+  }
   await rm(buildDir, { recursive: true, force: true });
   await run("npm", ["run", "build"], { cwd: widgetDir });
   await cp(configFile, path.join(buildDir, "widget.config.json"));
