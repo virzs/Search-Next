@@ -1,15 +1,20 @@
 import {
-  Desktop,
-  DesktopSortItem,
-  DesktopHandle,
-  DesktopAppItem,
-  desktopThemeDark,
-  desktopThemeLight,
+  DesktopNext,
+  desktopNextThemeDark,
+  desktopNextThemeLight,
 } from "zs_library";
-import type { DesktopTypeConfigMap } from "zs_library";
+import "zs_library/style.css";
+import type {
+  ContextMenuActionPayload,
+  DataTypeMenuConfigMap,
+  DndPageItem,
+  DndSortItem,
+  TypeConfigMap,
+} from "zs_library";
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useMemo, useState, useCallback } from "react";
+import type { ReactNode } from "react";
 import {
   RiStore2Line,
   RiSettingsLine,
@@ -51,7 +56,13 @@ import { settingsRoute } from "./components/default-apps/settings/route-paths";
 import Notice from "./components/notice";
 import Feedback from "./components/feedback";
 
-type DesktopItem = DesktopSortItem<DesktopItemData>;
+type DesktopItem = DndSortItem<DesktopItemData>;
+type DesktopPage = DndPageItem<DesktopItemData>;
+type DesktopNextHandleRef = {
+  pages: DesktopPage[];
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+};
 
 type DesktopRootItem = {
   id: string | number;
@@ -83,35 +94,106 @@ const normalizeWidgetDesktopItem = (
   return {
     ...item,
     type: widgetType ?? item.type,
+    dataType: widgetType ?? item.dataType,
     children: item.children?.map(normalizeWidgetDesktopItem),
   };
 };
 
-const normalizeWidgetDesktopList = (list: DesktopRootItem[]) =>
-  list.map((root) => ({
-    ...root,
-    children: root.children?.map(normalizeWidgetDesktopItem),
-  }));
+const normalizeWidgetDesktopList = (list: DesktopRootItem[]): DesktopPage[] =>
+  list
+    .filter((root) => root.id !== "dock")
+    .map((root) => ({
+      ...root,
+      children: root.children?.map(normalizeWidgetDesktopItem) ?? [],
+    }));
 
-const migrateStoredWidgetDesktopList = () => {
+const createEmptyDesktopPages = (): DesktopPage[] => [
+  { id: "page-1", children: [] },
+];
+
+const normalizeHttpUrl = (rawUrl: string | undefined) => {
+  if (!rawUrl) return null;
+  try {
+    const url = new URL(rawUrl, window.location.origin);
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? url.href
+      : null;
+  } catch (error) {
+    console.warn("Invalid desktop website url", error);
+    return null;
+  }
+};
+
+const grayRouteBase = "/desktop-next";
+const withGrayRouteBase = (path: string) => `${grayRouteBase}${path}`;
+
+const readStoredDesktopRoots = (): DesktopRootItem[] => {
   const raw = localStorage.getItem(DESKTOP_LIST_STORAGE_KEY);
-  if (!raw) return;
+  if (!raw) return [];
+
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return;
-    const normalized = normalizeWidgetDesktopList(parsed as DesktopRootItem[]);
-    const nextRaw = JSON.stringify(normalized);
-    if (nextRaw !== raw)
-      localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, nextRaw);
+    return Array.isArray(parsed) ? (parsed as DesktopRootItem[]) : [];
   } catch (error) {
-    console.warn("Failed to migrate desktop widget list", error);
+    console.warn("Failed to read desktop-next roots", error);
+    return [];
   }
+};
+
+const readStoredDockItems = (): DesktopItem[] => {
+  const dockRoot = readStoredDesktopRoots().find((root) => root.id === "dock");
+  return dockRoot?.children?.map(normalizeWidgetDesktopItem) ?? [];
+};
+
+const extractDockItems = (list: DesktopRootItem[]): DesktopItem[] => {
+  const dockRoot = list.find((root) => root.id === "dock");
+  return dockRoot?.children?.map(normalizeWidgetDesktopItem) ?? [];
+};
+
+const persistDesktopStorage = (
+  pages: DesktopPage[],
+  dockItems: DesktopItem[],
+) => {
+  const nextPages = pages.length ? pages : createEmptyDesktopPages();
+  const roots: DesktopRootItem[] = [
+    { id: "dock", children: dockItems },
+    ...nextPages,
+  ];
+  localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, JSON.stringify(roots));
+};
+
+const toDesktopNextPages = (list: DesktopRootItem[]): DesktopPage[] => {
+  const pages = normalizeWidgetDesktopList(list).map((root, index) => ({
+    id: root.id ?? `page-${index + 1}`,
+    children: root.children ?? [],
+  }));
+
+  return pages.length ? pages : createEmptyDesktopPages();
+};
+
+const readStoredDesktopPages = (): DesktopPage[] => {
+  return toDesktopNextPages(readStoredDesktopRoots());
+};
+
+const migrateStoredWidgetDesktopList = () => {
+  const roots = readStoredDesktopRoots();
+  if (!roots.length) return;
+  persistDesktopStorage(toDesktopNextPages(roots), readStoredDockItems());
 };
 
 function Index() {
   useState(migrateStoredWidgetDesktopList);
 
-  const desktopRef = useRef<DesktopHandle<DesktopItemData>>(null);
+  const desktopRef = useRef<DesktopNextHandleRef>(null);
+  const desktopPagesRef = useRef<DesktopPage[]>(createEmptyDesktopPages());
+  const dockItemsRef = useRef<DesktopItem[]>(readStoredDockItems());
+  const [desktopPages, setDesktopPages] = useState<DesktopPage[]>(
+    readStoredDesktopPages,
+  );
+  const [dockItems, setDockItems] = useState<DesktopItem[]>(
+    () => dockItemsRef.current,
+  );
+  const [desktopMountKey, setDesktopMountKey] = useState(0);
   const ignoreDesktopChangeUntilRef = useRef(0);
 
   const { message } = App.useApp();
@@ -138,9 +220,20 @@ function Index() {
   const desktopTheme = useMemo(() => {
     return (
       resolveDesktopThemeFromConfigs(themeConfigs, activeThemeId, preferDark) ??
-      (preferDark ? desktopThemeDark : desktopThemeLight)
+      (preferDark ? desktopNextThemeDark : desktopNextThemeLight)
     );
   }, [activeThemeId, preferDark, themeConfigs]);
+
+  const persistDesktopPages = useCallback(
+    (pages: DesktopPage[], remountDesktop: boolean) => {
+      const nextPages = pages.length ? pages : createEmptyDesktopPages();
+      desktopPagesRef.current = nextPages;
+      persistDesktopStorage(nextPages, dockItemsRef.current);
+      setDesktopPages(nextPages);
+      if (remountDesktop) setDesktopMountKey((key) => key + 1);
+    },
+    [],
+  );
 
   const desktopBackgroundCss = useMemo(() => {
     const wallpaper = personalization.wallpaper;
@@ -221,9 +314,9 @@ function Index() {
   }, [activeThemeId]);
 
   /** 根据后端小组件数据动态构建 Desktop 的 typeConfigMap */
-  const typeConfigMap = useMemo((): DesktopTypeConfigMap => {
-    const map: DesktopTypeConfigMap = {};
-    const applyConfig = (key: string, config: DesktopTypeConfigMap[string]) => {
+  const typeConfigMap = useMemo((): TypeConfigMap => {
+    const map: TypeConfigMap = {};
+    const applyConfig = (key: string, config: TypeConfigMap[string]) => {
       map[key] = config;
     };
 
@@ -256,6 +349,28 @@ function Index() {
     return map;
   }, [widgets, devWidgets]);
 
+  const dataTypeMenuConfigMap = useMemo((): DataTypeMenuConfigMap => {
+    const map: DataTypeMenuConfigMap = {};
+    const addSettingsItem = (widgetType: string) => {
+      map[widgetType] = [
+        {
+          text: "设置",
+          icon: <RiSettingsLine size={18} />,
+        },
+      ];
+    };
+
+    for (const widget of widgets) {
+      const schema =
+        widget.configSnapshot?.settingsSchema || widget.settingsSchema;
+      if (Array.isArray(schema) && schema.length > 0) {
+        addSettingsItem(`widget:${widget._id}`);
+      }
+    }
+
+    return map;
+  }, [widgets]);
+
   // userLimit 由 ConfigContext 提供
 
   const { run: runDefaultDesktop } = useRequest(getDefaultUserConfig, {
@@ -272,16 +387,22 @@ function Index() {
           ignoreDesktopChangeUntilRef.current,
           Date.now() + 500,
         );
-        desktopRef.current?.state.setList(
-          normalizeWidgetDesktopList(list as DesktopRootItem[]),
-        );
+        const roots = list as DesktopRootItem[];
+        const nextPages = toDesktopNextPages(roots);
+        const storedDockItems = dockItemsRef.current;
+        const nextDockItems = storedDockItems.length
+          ? storedDockItems
+          : extractDockItems(roots);
+        dockItemsRef.current = nextDockItems;
+        setDockItems(nextDockItems);
+        persistDesktopPages(nextPages, true);
       }
       if (init) toggleInit();
     },
   });
 
   // 封装固定项构建器
-  const createFixedItemBuilder = (i: DesktopSortItem) => {
+  const createFixedItemBuilder = (i: DesktopItem) => {
     // 封装通用的固定项组件
     const createFixedItem = ({
       key,
@@ -294,82 +415,70 @@ function Index() {
     }: {
       key: string;
       name: string;
-      IconComponent: RemixiconComponentType;
+      IconComponent: RemixiconComponentType | (() => ReactNode);
       tintStyle?: string;
       iconSize?: number;
       iconColor?: string;
       onClick?: () => void;
     }) => (
-      <DesktopAppItem
+      <button
         key={key}
         onClick={onClick}
-        disabledDrag
-        iconSize={56}
-        data={{
-          id: i.id,
-          type: "app",
-          data: { name },
-        }}
-        itemIndex={-1}
-        noLetters
-        contextMenuProps={false}
-        icon={
-          <div
-            className={cx(
-              "flex items-center justify-center w-full h-full rounded-[16px] overflow-hidden",
-              css`
-                position: relative;
-                color: ${iconColor ?? "#fff"};
-                background: rgba(255, 255, 255, 0.16);
-                background-image: ${tintStyle ?? "none"};
-                background-size: cover;
-                background-position: center;
-                -webkit-backdrop-filter: blur(22px) saturate(1.25);
-                backdrop-filter: blur(22px) saturate(1.25);
-                border: 1px solid rgba(255, 255, 255, 0.28);
-                box-shadow:
-                  0 8px 18px rgba(0, 0, 0, 0.18),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        title={name}
+        type="button"
+        className={cx(
+          "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[16px] border-0 p-0",
+          css`
+            position: relative;
+            color: ${iconColor ?? "#fff"};
+            background: rgba(255, 255, 255, 0.16);
+            background-image: ${tintStyle ?? "none"};
+            background-size: cover;
+            background-position: center;
+            -webkit-backdrop-filter: blur(22px) saturate(1.25);
+            backdrop-filter: blur(22px) saturate(1.25);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow:
+              0 8px 18px rgba(0, 0, 0, 0.18),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            cursor: pointer;
 
-                &::before {
-                  content: "";
-                  position: absolute;
-                  inset: 0;
-                  background: radial-gradient(
-                    120% 90% at 30% 18%,
-                    rgba(255, 255, 255, 0.38) 0%,
-                    rgba(255, 255, 255, 0) 62%
-                  );
-                  pointer-events: none;
-                }
+            &::before {
+              content: "";
+              position: absolute;
+              inset: 0;
+              background: radial-gradient(
+                120% 90% at 30% 18%,
+                rgba(255, 255, 255, 0.38) 0%,
+                rgba(255, 255, 255, 0) 62%
+              );
+              pointer-events: none;
+            }
 
-                &::after {
-                  content: "";
-                  position: absolute;
-                  inset: 0;
-                  background: radial-gradient(
-                    120% 120% at 60% 86%,
-                    rgba(0, 0, 0, 0.14) 0%,
-                    rgba(0, 0, 0, 0) 56%
-                  );
-                  pointer-events: none;
-                }
-              `,
-            )}
-          >
-            <div
-              className="w-full h-full flex items-center justify-center relative"
-              style={{ zIndex: 1 }}
-            >
-              <div
-                style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}
-              >
-                <IconComponent size={iconSize ?? 30} />
-              </div>
-            </div>
-          </div>
-        }
-      />
+            &::after {
+              content: "";
+              position: absolute;
+              inset: 0;
+              background: radial-gradient(
+                120% 120% at 60% 86%,
+                rgba(0, 0, 0, 0.14) 0%,
+                rgba(0, 0, 0, 0) 56%
+              );
+              pointer-events: none;
+            }
+          `,
+        )}
+      >
+        <span
+          className="flex h-full w-full items-center justify-center"
+          style={{
+            zIndex: 1,
+            filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))",
+          }}
+        >
+          <IconComponent size={iconSize ?? 30} />
+        </span>
+      </button>
     );
 
     switch (i.id) {
@@ -399,7 +508,7 @@ function Index() {
           tintStyle:
             "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
           iconSize: 30,
-          onClick: () => navigate(themeRoute.path.root),
+          onClick: () => navigate(withGrayRouteBase(themeRoute.path.root)),
         });
       case "*:store":
         return createFixedItem({
@@ -409,7 +518,7 @@ function Index() {
           tintStyle:
             "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
           iconSize: 30,
-          onClick: () => navigate(storeRoute.path.root),
+          onClick: () => navigate(withGrayRouteBase(storeRoute.path.root)),
         });
       case "*:settings":
         return createFixedItem({
@@ -420,36 +529,177 @@ function Index() {
             "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
           iconSize: 30,
           iconColor: "#1c1c1e",
-          onClick: () => navigate(settingsRoute.path.root),
+          onClick: () => navigate(withGrayRouteBase(settingsRoute.path.root)),
         });
       default:
         return null;
     }
   };
 
+  const createDockHistoryItem = useCallback((item: DesktopItem) => {
+    const icon = item.data?.icon;
+    const name = item.data?.name || "应用";
+
+    return (
+      <button
+        type="button"
+        title={name}
+        className={cx(
+          "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[16px] border-0 p-0",
+          css`
+            position: relative;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow:
+              0 8px 18px rgba(0, 0, 0, 0.18),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            -webkit-backdrop-filter: blur(22px) saturate(1.25);
+            backdrop-filter: blur(22px) saturate(1.25);
+
+            &::before {
+              content: "";
+              position: absolute;
+              inset: 0;
+              background: radial-gradient(
+                120% 90% at 30% 18%,
+                rgba(255, 255, 255, 0.38) 0%,
+                rgba(255, 255, 255, 0) 62%
+              );
+              pointer-events: none;
+            }
+          `,
+        )}
+      >
+        {typeof icon === "string" && icon ? (
+          <img
+            src={icon}
+            alt={name}
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        ) : (
+          <span className="relative z-1 text-lg font-semibold text-white">
+            {name.charAt(0)}
+          </span>
+        )}
+      </button>
+    );
+  }, []);
+
   useEffect(() => {
     runDefaultDesktop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 注册 desktopRef 到 WidgetContext，使 addToDesktop 可直接操控桌面
-  useEffect(() => {
-    registerDesktopRef(desktopRef);
-  }, [registerDesktopRef]);
+  const handleDesktopPagesChange = useCallback(
+    (pages: DesktopPage[]) => {
+      const nextPages = pages.length ? pages : createEmptyDesktopPages();
+      desktopPagesRef.current = nextPages;
+      persistDesktopStorage(nextPages, dockItemsRef.current);
+      setDesktopPages(nextPages);
+      if (!pages.length) return;
+      if (init) return;
+      if (Date.now() < ignoreDesktopChangeUntilRef.current) return;
+      localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
+    },
+    [init],
+  );
 
-  const addItemToCurrentPage = useCallback((item: DesktopItem) => {
-    const currentPage = desktopRef.current?.state.currentSliderPage;
-    desktopRef.current?.state.addItem(
-      item,
-      currentPage ? [currentPage.id] : [],
-    );
+  const addItemToCurrentPage = useCallback(
+    (item: DesktopItem) => {
+      const currentPageIndex = desktopRef.current?.currentPage ?? 0;
+      const sourcePages = desktopPagesRef.current.length
+        ? desktopPagesRef.current
+        : createEmptyDesktopPages();
+      const targetPageIndex = Math.min(
+        currentPageIndex,
+        sourcePages.length - 1,
+      );
+      const nextPages = sourcePages.map((page, index) =>
+        index === targetPageIndex
+          ? { ...page, children: [...page.children, item] }
+          : page,
+      );
+      persistDesktopPages(nextPages, true);
+      localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
+    },
+    [persistDesktopPages],
+  );
+
+  const persistDockItems = useCallback((items: DesktopItem[]) => {
+    dockItemsRef.current = items;
+    setDockItems(items);
+    persistDesktopStorage(desktopPagesRef.current, items);
   }, []);
 
-  const handleAddWebsite = (site: any) => {
-    const name = site?.name;
-    const url = site?.url;
+  const syncDockItemFromDesktopClick = useCallback(
+    (item: DesktopItem) => {
+      if (item.type !== "app") return;
+      const sourceId = String(item.id);
+      const existingIdx = dockItemsRef.current.findIndex(
+        (dockItem) => String(dockItem.config?.sourceId) === sourceId,
+      );
+      const nextDockItem: DesktopItem =
+        existingIdx >= 0
+          ? {
+              ...dockItemsRef.current[existingIdx],
+              ...item,
+              id: dockItemsRef.current[existingIdx].id,
+              config: {
+                ...(dockItemsRef.current[existingIdx].config ?? {}),
+                ...(item.config ?? {}),
+                sourceId,
+              },
+            }
+          : {
+              ...item,
+              id: uuidv4(),
+              config: { ...(item.config ?? {}), sourceId },
+            };
+      const nextDockItems = [
+        nextDockItem,
+        ...dockItemsRef.current.filter((_, index) => index !== existingIdx),
+      ].slice(0, 3);
+      persistDockItems(nextDockItems);
+    },
+    [persistDockItems],
+  );
+
+  const removeDesktopItemsByType = useCallback(
+    (dataType: string) => {
+      const sourcePages = desktopPagesRef.current.length
+        ? desktopPagesRef.current
+        : createEmptyDesktopPages();
+      const nextPages = sourcePages.map((page) => ({
+        ...page,
+        children: page.children.filter(
+          (item) => item.type !== dataType && item.dataType !== dataType,
+        ),
+      }));
+      persistDesktopPages(nextPages, true);
+    },
+    [persistDesktopPages],
+  );
+
+  // 注册 desktopRef 到 WidgetContext，使 addToDesktop 可直接操控桌面
+  useEffect(() => {
+    registerDesktopRef(
+      desktopRef,
+      addItemToCurrentPage,
+      removeDesktopItemsByType,
+    );
+  }, [addItemToCurrentPage, registerDesktopRef, removeDesktopItemsByType]);
+
+  const handleAddWebsite = (site: {
+    name?: string;
+    url?: string;
+    iconEdited?: { url?: string };
+    icon?: { url?: string };
+  }) => {
+    const url = normalizeHttpUrl(site?.url);
     const icon = site?.iconEdited?.url ?? site?.icon?.url;
     if (!url) return;
+    const name = site?.name || url;
     const appItem = {
       id: uuidv4(),
       type: "app",
@@ -462,6 +712,27 @@ function Index() {
     addItemToCurrentPage(appItem);
     message.success("添加成功");
   };
+
+  const handleContextMenuItemClick = useCallback(
+    (item: DesktopItem, payload: ContextMenuActionPayload) => {
+      if (payload.actionType !== "custom") return;
+      const widgetDesktopType = getWidgetDesktopType(item);
+      if (!widgetDesktopType) return;
+
+      const schema = item.data?.widgetConfig?.settingsSchema;
+      if (!Array.isArray(schema) || schema.length === 0) return;
+
+      setSettingsTarget({
+        widgetId:
+          item.data?.widgetConfig?.id ??
+          widgetDesktopType.replace("widget:", ""),
+        widgetName:
+          item.data?.widgetConfig?.name ?? item.data?.name ?? "小组件",
+        settingsSchema: schema,
+      });
+    },
+    [],
+  );
 
   return (
     <div
@@ -479,61 +750,31 @@ function Index() {
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}
-      <div className="h-full pb-8 w-full max-w-7xl mx-auto">
-        <Desktop<DesktopItemData>
+      <div className="flex-1 min-h-0 pb-8 w-full max-w-7xl mx-auto">
+        <DesktopNext<DesktopItemData>
+          key={desktopMountKey}
           ref={desktopRef}
-          maxSlides={userLimit?.maxPages || 5}
+          pages={desktopPages}
+          onChange={handleDesktopPagesChange}
+          maxPages={userLimit?.maxPages || 5}
           theme={desktopTheme}
           typeConfigMap={typeConfigMap}
-          contextMenu={(item) => {
-            const widgetDesktopType = getWidgetDesktopType(item);
-            if (!widgetDesktopType) return false;
-
-            const schema = item.data?.widgetConfig?.settingsSchema;
-            const hasSettings = Array.isArray(schema) && schema.length > 0;
-            const widgetId =
-              item.data?.widgetConfig?.id ||
-              widgetDesktopType.replace("widget:", "");
-            const widgetName =
-              item.data?.widgetConfig?.name || item.data?.name || "小组件";
-
-            return {
-              showInfoButton: false,
-              showRemoveButton: true,
-              menuItems: hasSettings
-                ? [
-                    {
-                      text: "设置",
-                      icon: <RiSettingsLine size={18} />,
-                      onClick: (
-                        _item: unknown,
-                        contextActions: { hideContextMenu: () => void },
-                      ) => {
-                        contextActions.hideContextMenu();
-                        setSettingsTarget({
-                          widgetId,
-                          widgetName,
-                          settingsSchema: schema,
-                        });
-                      },
-                    },
-                  ]
-                : [],
-            };
-          }}
-          itemIconBuilderAllowNull={(item) => {
+          contextMenuProps={{ showRemoveButton: true }}
+          dataTypeMenuConfigMap={dataTypeMenuConfigMap}
+          onContextMenuItemClick={handleContextMenuItemClick}
+          itemIconBuilder={(item) => {
             const widgetDesktopType = getWidgetDesktopType(item);
             // 动态匹配所有 widget: 前缀的桌面项，渲染对应小组件（icon 模式）
-            if (widgetDesktopType && item.data?.widgetConfig?.entry) {
+            const widgetConfig = item.data?.widgetConfig;
+            if (widgetDesktopType && widgetConfig?.entry) {
               const widgetId =
-                item.data.widgetConfig.id ||
-                widgetDesktopType.replace("widget:", "");
+                widgetConfig.id || widgetDesktopType.replace("widget:", "");
               const sdk = buildSDK(widgetId, "icon", "icon");
               return (
                 <PureWidget
                   config={{
-                    entry: item.data.widgetConfig.entry,
-                    props: item.data.widgetConfig.props,
+                    entry: widgetConfig.entry,
+                    props: widgetConfig.props,
                     mode: "icon",
                     sdk,
                   }}
@@ -543,8 +784,8 @@ function Index() {
                   `}
                   onClick={() =>
                     setFullWidget({
-                      entry: item.data!.widgetConfig!.entry,
-                      props: item.data!.widgetConfig!.props,
+                      entry: widgetConfig.entry,
+                      props: widgetConfig.props,
                       title: item.data?.name || "小组件",
                       widgetId,
                     })
@@ -555,8 +796,9 @@ function Index() {
 
             return null;
           }}
-          dock={{
-            enabled: true,
+          dockProps={{
+            items: dockItems,
+            itemBuilder: createDockHistoryItem,
             fixedItems: [
               {
                 id: "*:my",
@@ -589,17 +831,12 @@ function Index() {
             ],
             fixedItemBuilder: createFixedItemBuilder,
           }}
-          storageKey={DESKTOP_LIST_STORAGE_KEY}
-          onChange={(list) => {
-            if (!list.length) return;
-            if (init) return;
-            if (Date.now() < ignoreDesktopChangeUntilRef.current) return;
-            localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
-          }}
           onItemClick={(item) => {
+            syncDockItemFromDesktopClick(item);
             if (item.type === "app" && item.data?.url) {
-              // 点击应用时，打开应用链接
-              window.open(item.data.url, "_blank");
+              const url = normalizeHttpUrl(item.data.url);
+              if (!url) return;
+              window.open(url, "_blank", "noopener,noreferrer");
             }
           }}
         />

@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { Theme } from "@radix-ui/themes";
 
 import "./index.css";
-import DesktopNextIndex from "./pages/index/desktop-next";
+import DesktopNextIndex from "./pages/index";
 import { App, ConfigProvider } from "antd";
 import theme from "./theme/config";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -18,11 +18,6 @@ import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <DesktopNextIndex />,
-    children: [...defaultAppRoutes],
-  },
-  {
-    path: "/desktop-next",
     element: <DesktopNextIndex />,
     children: [...defaultAppRoutes],
   },
