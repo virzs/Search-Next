@@ -5,7 +5,7 @@ import {
   buildWidgetEntryUrl,
   getWidgetIconUrl,
 } from "@/services/widget";
-import type { WidgetApiItem, WidgetSizeConfig } from "@/types";
+import type { WidgetApiItem, WidgetSettingsField, WidgetSizeConfig } from "@/types";
 import {
   DEV_MODE_STORAGE_KEY,
   DEV_WIDGETS_STORAGE_KEY,
@@ -21,14 +21,40 @@ export interface DevWidget {
   createdAt: string;
 }
 
-/** Desktop handle 最小类型，避免直接依赖 zs_library */
-interface DesktopRefLike {
+type DesktopItemForWidget = {
+  id: string | number;
+  type: string;
+  dataType?: string;
+  data: {
+    name: string;
+    widgetConfig: {
+      id: string;
+      name: string;
+      entry: string;
+      props: { title: string };
+      settingsSchema?: WidgetSettingsField[];
+    };
+  };
+};
+
+interface LegacyDesktopRefLike {
   state: {
     list: Array<{ children?: Array<{ type?: string; dataType?: string }> }>;
-    addItem: (data: any, parentIds: (string | number)[]) => void;
-    setList: (list: any[]) => void;
+    addItem: (data: DesktopItemForWidget, parentIds: (string | number)[]) => void;
+    setList: (list: unknown[]) => void;
   };
 }
+
+interface DesktopNextRefLike {
+  pages: Array<{ children: unknown[] }>;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+}
+
+type DesktopRefLike = LegacyDesktopRefLike | DesktopNextRefLike;
+
+type AddDesktopItem = (item: DesktopItemForWidget) => void;
+type RemoveDesktopItemsByType = (dataType: string) => void;
 
 interface WidgetContextValue {
   widgets: WidgetApiItem[];
@@ -40,7 +66,11 @@ interface WidgetContextValue {
   getEntryUrl: (widget: WidgetApiItem) => string | null;
   getIconUrl: (widget: WidgetApiItem) => string | null;
   /** 注册 Desktop ref，使 addToDesktop 可直接操控桌面 */
-  registerDesktopRef: (ref: React.RefObject<DesktopRefLike | null>) => void;
+  registerDesktopRef: (
+    ref: React.RefObject<DesktopRefLike | null>,
+    addItem?: AddDesktopItem,
+    removeItemsByType?: RemoveDesktopItemsByType,
+  ) => void;
 
   // —— 开发者模式 ——
   devModeEnabled: boolean;
@@ -83,12 +113,17 @@ const saveDevWidgets = (list: DevWidget[]) => {
 
 let devIdCounter = 0;
 const generateDevId = () => `dev_${Date.now()}_${++devIdCounter}`;
+let desktopWidgetInstanceCounter = 0;
+const generateDesktopWidgetInstanceId = (widgetId: string) =>
+  `widget-instance:${widgetId}:${Date.now()}:${++desktopWidgetInstanceCounter}`;
 
 /** 小组件上下文 Provider，管理小组件列表与桌面添加 */
 export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
   const [devModeEnabled, setDevModeEnabled] = useState(loadDevMode);
   const [devWidgets, setDevWidgets] = useState<DevWidget[]>(loadDevWidgets);
   const desktopRefInternal = useRef<React.RefObject<DesktopRefLike | null> | null>(null);
+  const addDesktopItemRef = useRef<AddDesktopItem | null>(null);
+  const removeDesktopItemsByTypeRef = useRef<RemoveDesktopItemsByType | null>(null);
 
   const {
     data: widgets,
@@ -106,16 +141,25 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
   const devWidgetsRef = useRef(devWidgets);
   devWidgetsRef.current = devWidgets;
 
-  const registerDesktopRef = useCallback((ref: React.RefObject<DesktopRefLike | null>) => {
-    desktopRefInternal.current = ref;
-  }, []);
+  const registerDesktopRef = useCallback(
+    (
+      ref: React.RefObject<DesktopRefLike | null>,
+      addItem?: AddDesktopItem,
+      removeItemsByType?: RemoveDesktopItemsByType,
+    ) => {
+      desktopRefInternal.current = ref;
+      addDesktopItemRef.current = addItem ?? null;
+      removeDesktopItemsByTypeRef.current = removeItemsByType ?? null;
+    },
+    [],
+  );
 
   /** 根据 widgetId 构建桌面项数据 */
   const buildDesktopItem = useCallback((widgetId: string) => {
     const devMatch = devWidgetsRef.current.find((d) => d.id === widgetId);
     let entryUrl: string | null = null;
     let widgetName: string;
-    let settingsSchema: any[] | undefined;
+    let settingsSchema: WidgetSettingsField[] | undefined;
 
     if (devMatch) {
       entryUrl = devMatch.entry;
@@ -130,10 +174,11 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
 
     if (!entryUrl) return null;
 
-    const itemId = `widget:${widgetId}`;
+    const widgetType = `widget:${widgetId}`;
     return {
-      id: itemId,
-      type: itemId,
+      id: generateDesktopWidgetInstanceId(widgetId),
+      type: widgetType,
+      dataType: widgetType,
       data: {
         name: widgetName,
         widgetConfig: {
@@ -152,7 +197,14 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     const desktop = desktopRefInternal.current?.current;
     if (!desktop) return;
     const desktopItem = buildDesktopItem(widgetId);
-    if (desktopItem) {
+    if (!desktopItem) return;
+
+    if (addDesktopItemRef.current) {
+      addDesktopItemRef.current?.(desktopItem);
+      return;
+    }
+
+    if ("state" in desktop) {
       desktop.state.addItem(desktopItem, []);
     }
   }, [buildDesktopItem]);
@@ -243,18 +295,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     });
 
     // 从桌面移除该组件的所有实例
-    const desktop = desktopRefInternal.current?.current;
-    if (desktop) {
-      const dataType = `widget:${id}`;
-      desktop.state.setList(
-        desktop.state.list.map((page) => ({
-          ...page,
-          children: (page.children ?? []).filter(
-            (item) => item.type !== dataType && item.dataType !== dataType,
-          ),
-        })),
-      );
-    }
+    removeDesktopItemsByTypeRef.current?.(`widget:${id}`);
   }, []);
 
   const widgetList = useMemo(() => widgets ?? [], [widgets]);

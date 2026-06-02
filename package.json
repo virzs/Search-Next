@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "build:local": "dotenv -e local.env -- tsc -b && vite build",
     "build:prod": "dotenv -e prod.env -- tsc -b && vite build",
+    "widget:create": "node scripts/create-widget.mjs",
     "widget:pack": "node scripts/pack-widget.mjs",
     "widget:pack:clock": "node scripts/pack-widget.mjs clock",
     "widget:pack:todo": "node scripts/pack-widget.mjs todo",
@@ -40,7 +41,7 @@
     "remixicon": "^4.7.0",
     "tailwindcss": "^4.1.17",
     "uuid": "^13.0.0",
-    "zs_library": "^0.9.2"
+    "zs_library": "^0.9.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -53,6 +54,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "sass-embedded": "^1.100.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^7.1.12"
