@@ -78,6 +78,45 @@ pnpm dev
 pnpm build
 ```
 
+## 小组件开发
+
+项目内置 `widgets/<name>` 小组件工作流。小组件需要导出 `mount(container, props = {})`，并返回清理函数；打包产物入口固定为 `index.js`，清单文件 `widget.config.json` 的 `entry` 也应保持为 `index.js`。
+
+创建脚手架：
+
+```bash
+npm run widget:create -- react my-widget
+npm run widget:create -- vue my-widget
+npm run widget:create -- solid my-widget
+```
+
+脚手架会生成 `widgets/<name>/package.json`、`vite.config.js`、`widget.config.json`、`src/index`、组件、样式、图标和本地开发页。React 模板沿用宿主全局 `React`/`ReactDOM`，不会把 React 打进小组件；Vue 和 Solid 模板会随小组件打包各自运行时。
+
+安装并启动某个小组件：
+
+```bash
+cd widgets/my-widget
+npm install
+npm run dev
+```
+
+构建某个小组件：
+
+```bash
+cd widgets/my-widget
+npm run build
+```
+
+构建输出位于 `dist/widget-build/<name>/index.js`。生成 `.snwidget`：
+
+```bash
+npm run widget:pack -- my-widget
+```
+
+该命令会在 `widgets/<name>` 中执行 `npm run build`，复制 `widget.config.json`，并输出到 `dist/widgets/<name>-<version>.snwidget`。生成后可在开发者小组件页面填写后端解压后的远程入口进行调试。
+
+注意：小组件入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的小组件。
+
 ## 常见问题说明
 
 待更新
