@@ -20,7 +20,7 @@ if (!widgetNamePattern.test(name)) {
   process.exit(1);
 }
 
-const widgetsRoot = path.resolve(root, "widgets");
+const widgetsRoot = path.resolve(root, "apps", "widgets");
 const buildRoot = path.resolve(root, "dist", "widget-build");
 const widgetDir = path.resolve(widgetsRoot, name);
 const buildDir = path.resolve(buildRoot, name);
@@ -146,7 +146,7 @@ const main = async () => {
     throw new Error("widget.config.json version contains unsupported characters.");
   }
   await rm(buildDir, { recursive: true, force: true });
-  await run("npm", ["run", "build"], { cwd: widgetDir });
+  await run("pnpm", ["--filter", `${name}-widget`, "build"], { cwd: root });
   await cp(configFile, path.join(buildDir, "widget.config.json"));
   const output = path.join(distDir, `${config.name}-${config.version}.snwidget`);
   const count = await writeZip(buildDir, output);

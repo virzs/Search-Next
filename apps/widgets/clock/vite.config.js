@@ -1,30 +1,36 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "path";
+import { copyFileSync, existsSync, mkdirSync } from "fs";
 
-const root = dirname(fileURLToPath(import.meta.url));
-const outDir = resolve(root, "../../../dist/widget-build/__WIDGET_NAME__");
-
+// 构建完成后将静态资源（图标、配置JSON）复制到输出目录
 function copyWidgetAssets() {
+  const outDir = resolve(__dirname, "../../../dist/widget-build/clock");
   return {
     name: "copy-widget-assets",
     closeBundle() {
       if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
       const assets = [
-        { src: resolve(root, "src/icon.svg"), dest: resolve(outDir, "icon.svg") },
+        { src: resolve(__dirname, "src/icon.svg"), dest: resolve(outDir, "icon.svg") },
+        { src: resolve(__dirname, "widget.config.json"), dest: resolve(outDir, "widget.config.json") },
       ];
       for (const { src, dest } of assets) {
-        if (existsSync(src)) copyFileSync(src, dest);
+        if (existsSync(src)) {
+          copyFileSync(src, dest);
+          console.log(`[copy-widget-assets] ${src} -> ${dest}`);
+        }
       }
     },
   };
 }
 
 export default defineConfig({
-  plugins: [react({ reactRefreshHost: "http://localhost:8132" }), copyWidgetAssets()],
+  plugins: [
+    react({ reactRefreshHost: "http://localhost:8132" }),
+    copyWidgetAssets(),
+  ],
   server: {
+    port: 3002,
     host: true,
   },
   define: {
@@ -35,11 +41,11 @@ export default defineConfig({
   build: {
     lib: {
       entry: "src/index.jsx",
-      name: "__WIDGET_CLASS_NAME__Widget",
+      name: "ClockWidget",
       formats: ["esm"],
       fileName: () => "index.js",
     },
-    outDir,
+    outDir: "../../../dist/widget-build/clock",
     emptyOutDir: true,
     rollupOptions: {
       external: ["react", "react-dom/client"],

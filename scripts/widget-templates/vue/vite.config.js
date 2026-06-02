@@ -5,7 +5,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const outDir = resolve(root, "../../dist/widget-build/__WIDGET_NAME__");
+const outDir = resolve(root, "../../../dist/widget-build/__WIDGET_NAME__");
 
 function copyWidgetAssets() {
   return {

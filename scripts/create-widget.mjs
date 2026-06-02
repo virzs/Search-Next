@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const templatesDir = path.join(root, "scripts", "widget-templates");
-const widgetsDir = path.join(root, "widgets");
+const widgetsDir = path.join(root, "apps", "widgets");
 
 const supportedFrameworks = new Set(["react", "vue", "solid"]);
 const args = process.argv.slice(2);
@@ -15,7 +15,7 @@ const framework = supportedFrameworks.has(first)
   : (second || "").toLowerCase();
 const name = supportedFrameworks.has(first) ? second : args[0];
 
-const usage = "Usage: npm run widget:create -- <react|vue|solid> <widget-name>";
+const usage = "Usage: pnpm widget:create <react|vue|solid> <widget-name>";
 const namePattern = /^[a-z][a-z0-9-]*$/;
 
 if (!framework || !name) {
@@ -83,17 +83,16 @@ if (!(await exists(templateDir))) {
 }
 
 if (await exists(targetDir)) {
-  console.error(`Widget already exists: widgets/${name}`);
+  console.error(`Widget already exists: apps/widgets/${name}`);
   process.exit(1);
 }
 
 await mkdir(widgetsDir, { recursive: true });
 await copyTemplate(templateDir, targetDir);
 
-console.log(`Created widgets/${name} from ${framework} template.`);
+console.log(`Created apps/widgets/${name} from ${framework} template.`);
 console.log(`Next steps:`);
-console.log(`  cd widgets/${name}`);
-console.log(`  npm install`);
-console.log(`  npm run dev`);
-console.log(`  npm run build`);
-console.log(`  cd ../.. && npm run widget:pack -- ${name}`);
+console.log(`  pnpm install`);
+console.log(`  pnpm --filter ${name}-widget dev`);
+console.log(`  pnpm --filter ${name}-widget build`);
+console.log(`  pnpm widget:pack ${name}`);
