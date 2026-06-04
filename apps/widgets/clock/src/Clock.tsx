@@ -1,18 +1,14 @@
-// 标准 JSX 格式的时钟组件
-// 注意：不直接从 'react' 导入 hooks，改用宿主注入的全局 React，避免出现多份 React 导致的 Invalid hook call
 // 支持通过 props.sdk 获取主题信息并监听主题变化
 // 支持通过 sdk.storage 读取用户设置（时区、标题、是否显示秒）
+import { useEffect, useState } from "react";
+import type { ClockProps } from "./types";
 
-function pad(n) {
+function pad(n: number) {
   return n.toString().padStart(2, "0");
 }
 
-/**
- * 根据时区选项获取当前时间
- * @param {string} timezone - IANA 时区标识（如 "Asia/Tokyo"），空字符串表示本地时间
- * @returns {Date} 调整后的日期对象（本地时区）或原始 Date（带 toLocaleString 输出）
- */
-function getTimeInZone(timezone) {
+// 根据时区选项获取当前时间，空字符串表示本地时间。
+function getTimeInZone(timezone: string) {
   const now = new Date();
   if (!timezone) return now;
   try {
@@ -23,7 +19,7 @@ function getTimeInZone(timezone) {
       year: "numeric", month: "numeric", day: "numeric",
       hour12: false,
     }).formatToParts(now);
-    const get = (type) => {
+    const get = (type: Intl.DateTimeFormatPartTypes) => {
       const p = parts.find((x) => x.type === type);
       return p ? parseInt(p.value, 10) : 0;
     };
@@ -34,9 +30,7 @@ function getTimeInZone(timezone) {
   }
 }
 
-const Clock = ({ mode = "icon", title, sdk }) => {
-  const React = globalThis.React;
-  const { createElement, useEffect, useState } = React;
+const Clock = ({ mode = "icon", title, sdk }: ClockProps) => {
   const [now, setNow] = useState(new Date());
   // 通过 SDK 获取当前主题，默认 "light"
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
@@ -62,11 +56,11 @@ const Clock = ({ mode = "icon", title, sdk }) => {
   // 监听 storage 变化事件，支持实时更新设置（由设置面板触发）
   useEffect(() => {
     if (!sdk?.events) return;
-    const handler = (payload) => {
+    const handler = (payload: Record<string, unknown>) => {
       if (!payload) return;
       const { key, value } = payload;
-      if (key === "timezone") setTimezone(value || "");
-      if (key === "title") setCustomTitle(value || "");
+      if (key === "timezone") setTimezone(value ? String(value) : "");
+      if (key === "title") setCustomTitle(value ? String(value) : "");
       if (key === "showSeconds") setShowSeconds(value !== "false" && value !== false);
     };
     const unsub = sdk.events.on("storage:changed", handler);
@@ -95,54 +89,62 @@ const Clock = ({ mode = "icon", title, sdk }) => {
   const s = pad(now.getSeconds());
   // 根据设置决定时间显示格式
   const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`;
+  const iconTimeStr = `${h}:${m}`;
 
   const isIcon = mode === "icon";
   const isDark = themeId === "dark";
 
   // 显示标题优先级：自定义标题 > props.title > 默认
   const displayTitle = customTitle || title || "时钟";
-  // 如果设置了时区，在标题下方显示时区标签
-  const timezoneLabel = timezone ? timezone.replace(/_/g, " ").split("/").pop() : "";
+  const timezoneLabel = timezone
+    ? timezone.replace(/_/g, " ").split("/").pop()
+    : "本地时间";
+  const dateLabel = new Intl.DateTimeFormat("zh-CN", {
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  }).format(now);
+  const periodLabel = now.getHours() < 6
+    ? "夜深了"
+    : now.getHours() < 12
+      ? "上午"
+      : now.getHours() < 18
+        ? "下午"
+        : "晚上";
+  const shellClassName = [
+    "clock-widget-shell tw:flex tw:h-full tw:w-full tw:items-center tw:justify-center tw:box-border tw:[container-type:size] tw:overflow-hidden tw:rounded-[14px] tw:font-sans",
+    isIcon ? "clock-widget-shell--icon tw:px-1.5 tw:py-1.5" : "clock-widget-shell--full tw:p-6",
+    isDark
+      ? "tw:border tw:border-white/10 tw:bg-[linear-gradient(145deg,#263238_0%,#11191d_100%)] tw:text-[#f3f7f5] tw:shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+      : "tw:border tw:border-[#2b6655]/15 tw:bg-[linear-gradient(145deg,#f7fbf8_0%,#dcefe7_100%)] tw:text-[#17352d] tw:shadow-[0_10px_28px_rgba(37,88,74,0.16)]",
+  ].join(" ");
 
-  return createElement(
-    "div",
-    {
-      style: {
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 12,
-        background: isIcon
-          ? "transparent"
-          : isDark
-            ? "linear-gradient(135deg, #1f2937 0%, #111827 100%)"
-            : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        color: isIcon ? (isDark ? "#e5e7eb" : "#111827") : "#ffffff",
-        fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial",
-        padding: isIcon ? 0 : 16,
-        boxShadow: isIcon ? "none" : "0 8px 30px rgba(0,0,0,0.25)",
-      },
-    },
-    createElement(
-      "div",
-      { style: { textAlign: "center" } },
-      !isIcon
-        ? createElement(
-            "div",
-            { style: { marginBottom: 8 } },
-            createElement("div", { style: { fontSize: 14, opacity: 0.8 } }, displayTitle),
-            timezoneLabel
-              ? createElement("div", { style: { fontSize: 11, opacity: 0.55, marginTop: 2 } }, timezoneLabel)
-              : null,
-          )
-        : null,
-      createElement("div", { style: { fontSize: isIcon ? 20 : 48, fontWeight: 600, letterSpacing: 1 } }, timeStr),
-      !isIcon
-        ? createElement("div", { style: { marginTop: 6, fontSize: 14, opacity: 0.85 } }, String(now.toLocaleDateString()))
-        : null,
-    ),
+  return (
+    <div className={shellClassName}>
+      <div className="tw:w-full tw:text-center">
+        {!isIcon && (
+          <div className="tw:mb-5">
+            <div className="tw:text-[13px] tw:font-bold tw:tracking-[2px] tw:opacity-70">{displayTitle}</div>
+            <div className="tw:mt-[5px] tw:text-xs tw:opacity-55">{timezoneLabel}</div>
+          </div>
+        )}
+        {isIcon ? (
+          <div className="clock-widget-icon-time" aria-label={timeStr}>
+            <span className="clock-widget-icon-time__main">{iconTimeStr}</span>
+          </div>
+        ) : (
+          <div className="tw:whitespace-nowrap tw:text-[clamp(42px,14cqw,68px)] tw:font-bold tw:leading-none tw:tracking-[1px]">
+            {timeStr}
+          </div>
+        )}
+        {!isIcon && (
+          <div className="tw:mt-[18px]">
+            <div className="tw:text-[15px] tw:font-semibold tw:opacity-[0.88]">{dateLabel}</div>
+            <div className="tw:mt-[7px] tw:text-xs tw:tracking-[1px] tw:opacity-[0.58]">{periodLabel}</div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

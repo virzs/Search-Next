@@ -17,11 +17,14 @@ apps/widgets/<name>/
   package.json
   vite.config.js
   widget.config.json
+  tsconfig.json
   index.html
   src/
-    index.*
-    Widget.*
-    dev.*
+    index.tsx
+    Widget.tsx
+    dev.tsx
+    types.ts
+    vite-env.d.ts
     style.css
     icon.svg
 ```
@@ -44,13 +47,14 @@ pnpm widget:pack <name>
 
 ## 框架约定
 
-- React 模板复用宿主页面暴露的 `globalThis.React` 与 `globalThis.ReactDOM`，避免多个 React 实例。
-- Vue 和 Solid 模板会把各自运行时打进小组件产物，不要求宿主暴露全局变量。
+- React 模板默认使用 TypeScript/TSX，并在构建前执行 `tsc --noEmit` 做类型检查。
+- React 模板默认接入 Tailwind CSS utilities，使用 `tw:` 前缀类名；模板只导入 utilities，不导入全局 preflight/base，打包后的样式会随小组件注入到容器内。
+- React、Vue 和 Solid 模板都会把各自运行时打进小组件产物，不要求宿主暴露全局变量，避免不同框架或不同版本依赖互相冲突。
 - 三种模板都支持 `props.mode` 的 `icon` / `full` 模式，以及 `props.sdk` 注入的宿主能力。
 
 ## 接入宿主
 
-开发模式下，可以在应用商店的开发者页面手动添加入口 URL，例如 Vite dev server 的 `http://localhost:<port>/src/index.jsx` 或构建后的 `index.js` 地址。线上推荐上传 `.snwidget`，由后台解压并提供 `/static/widgets/...` 入口。
+开发模式下，可以在应用商店的开发者页面手动添加入口 URL，例如 React Vite dev server 的 `http://localhost:<port>/src/index.tsx` 或构建后的 `index.js` 地址。线上推荐上传 `.snwidget`，由后台解压并提供 `/static/widgets/...` 入口。
 
 小组件入口是远程 ESM 代码，加载后会在宿主页面权限下运行，并能访问注入的 `props.sdk`。只加载自己开发或可信来源的小组件，不要导入未知 URL。
 

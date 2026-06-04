@@ -1,8 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [react({ reactRefreshHost: "http://localhost:8132" })],
+  plugins: [react({ reactRefreshHost: "http://localhost:8132" }), tailwindcss()],
   server: {
     port: 3003,
     host: true,
@@ -14,7 +15,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: "src/index.jsx",
+      entry: "src/index.tsx",
       name: "TodoWidget",
       formats: ["esm"],
       fileName: () => "index.js",
@@ -22,7 +23,6 @@ export default defineConfig({
     outDir: "../../../dist/widget-build/todo",
     emptyOutDir: true,
     rollupOptions: {
-      external: ["react", "react-dom/client"],
       output: {
         inlineDynamicImports: true,
       },

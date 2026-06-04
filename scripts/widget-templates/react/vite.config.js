@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,7 +24,7 @@ function copyWidgetAssets() {
 }
 
 export default defineConfig({
-  plugins: [react({ reactRefreshHost: "http://localhost:8132" }), copyWidgetAssets()],
+  plugins: [react({ reactRefreshHost: "http://localhost:8132" }), tailwindcss(), copyWidgetAssets()],
   server: {
     host: true,
   },
@@ -34,7 +35,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: "src/index.jsx",
+      entry: "src/index.tsx",
       name: "__WIDGET_CLASS_NAME__Widget",
       formats: ["esm"],
       fileName: () => "index.js",
@@ -42,7 +43,6 @@ export default defineConfig({
     outDir,
     emptyOutDir: true,
     rollupOptions: {
-      external: ["react", "react-dom/client"],
       output: {
         inlineDynamicImports: true,
       },

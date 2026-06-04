@@ -90,7 +90,7 @@ pnpm widget:create vue my-widget
 pnpm widget:create solid my-widget
 ```
 
-脚手架会生成 `apps/widgets/<name>/package.json`、`vite.config.js`、`widget.config.json`、`src/index`、组件、样式、图标和本地开发页。React 模板沿用宿主全局 `React`/`ReactDOM`，不会把 React 打进小组件；Vue 和 Solid 模板会随小组件打包各自运行时。
+脚手架会生成 `apps/widgets/<name>/package.json`、`tsconfig.json`、`vite.config.js`、`widget.config.json`、`src/index`、组件、样式、图标和本地开发页。React 模板默认使用 TypeScript/TSX 和 Tailwind CSS utilities；React、Vue 和 Solid 模板都按各自框架的标准组件写法开发，并随小组件打包各自运行时，避免不同框架或不同版本依赖在宿主页面中互相冲突。React 模板只引入带 `tw:` 前缀的 Tailwind utilities，不引入全局 preflight/base，并把样式注入到小组件容器内，减少组件之间和宿主页面之间的样式串扰。
 
 安装依赖并启动某个小组件：
 

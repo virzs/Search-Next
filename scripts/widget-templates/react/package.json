@@ -5,13 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.8.0",
+    "@tailwindcss/vite": "^4.1.4",
     "vite": "^7.1.12",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "tailwindcss": "^4.1.17",
+    "typescript": "~5.7.2"
   }
 }

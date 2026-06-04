@@ -16,9 +16,31 @@ interface PureWidgetProps {
   onClick?: () => void;
 }
 
+const createShadowMount = (container: HTMLElement) => {
+  const shadowRoot = container.shadowRoot || container.attachShadow({ mode: "open" });
+  shadowRoot.querySelectorAll('[data-pure-widget-mount="true"]').forEach((node) => node.remove());
+  const mountHost = document.createElement("div");
+  const mountPoint = document.createElement("div");
+
+  mountHost.className = "w-full h-full";
+  mountHost.dataset.pureWidgetMount = "true";
+  mountHost.style.width = "100%";
+  mountHost.style.height = "100%";
+  mountPoint.className = "w-full h-full";
+  mountPoint.style.width = "100%";
+  mountPoint.style.height = "100%";
+  mountHost.append(mountPoint);
+  shadowRoot.append(mountHost);
+
+  return {
+    mountPoint,
+    cleanup: () => mountHost.remove(),
+  };
+};
+
 /**
  * 仅在 entry/mode 变化时重新加载 ESM 模块。
- * props 和 sdk 通过 ref 传递，避免引用变化导致不必要的重新挂载。
+ * props 和 sdk 通过 ref 提供给本次挂载，避免引用变化导致不必要的重新挂载。
  */
 const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onClick }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,9 +54,12 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
+    let shadowMount: ReturnType<typeof createShadowMount> | undefined;
+    let cancelled = false;
 
     const load = async () => {
       try {
+        setError(null);
         try {
           (globalThis as any).process = (globalThis as any).process || { env: {} };
         } catch {
@@ -88,14 +113,27 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
         }
 
         if (containerRef.current) {
-          const ret = mount(containerRef.current, {
+          if (cancelled) return;
+          shadowMount = createShadowMount(containerRef.current);
+
+          const ret = mount(shadowMount.mountPoint, {
             ...(propsRef.current || {}),
             mode: config.mode || "icon",
             ...(sdkRef.current ? { sdk: sdkRef.current } : {}),
           });
+          if (cancelled) {
+            if (typeof ret === "function") ret();
+            shadowMount.cleanup();
+            return;
+          }
           if (typeof ret === "function") cleanup = ret;
         }
       } catch (e) {
+        if (cancelled) return;
+        if (shadowMount) {
+          shadowMount.cleanup();
+          shadowMount = undefined;
+        }
         const msg = e instanceof Error ? e.message : String(e);
         setError(msg);
         console.error("Failed to load widget:", msg);
@@ -104,11 +142,13 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
 
     load();
     return () => {
+      cancelled = true;
       try {
         cleanup?.();
       } catch {
         /* empty */
       }
+      shadowMount?.cleanup();
     };
   }, [config.entry, config.mode]);
 

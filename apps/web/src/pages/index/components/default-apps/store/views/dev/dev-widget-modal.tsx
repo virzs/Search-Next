@@ -196,7 +196,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
               { type: "url", message: "请输入有效的 URL" },
             ]}
           >
-            <Input placeholder="http://localhost:5173/src/index.jsx" />
+            <Input placeholder="http://localhost:5173/src/index.tsx" />
           </Form.Item>
 
           <Form.Item

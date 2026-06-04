@@ -17,10 +17,10 @@
   "settingsSchema": [
     {
       "key": "timezone",
-      "label": "时区",
+      "label": "显示时区",
       "type": "select",
       "default": "",
-      "description": "选择要显示的时区，留空使用本地时间",
+      "description": "选择时钟使用的城市时间，默认跟随当前设备",
       "options": [
         { "label": "本地时间", "value": "" },
         { "label": "UTC", "value": "UTC" },
@@ -38,17 +38,17 @@
     },
     {
       "key": "title",
-      "label": "标题",
+      "label": "展开页标题",
       "type": "input",
       "default": "时钟",
-      "description": "自定义小组件标题"
+      "description": "仅在展开时显示，例如“工作时间”或“北京时间”"
     },
     {
       "key": "showSeconds",
-      "label": "显示秒",
+      "label": "显示秒数",
       "type": "switch",
       "default": true,
-      "description": "是否显示秒数"
+      "description": "关闭后时间更简洁，也更适合较小布局"
     }
   ]
 }

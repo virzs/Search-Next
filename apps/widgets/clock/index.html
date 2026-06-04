@@ -19,7 +19,7 @@
   </head>
   <body>
     <h1 style="font-size: 16px;">Clock Widget 开发页面</h1>
-    <p style="color:#6b7280;">此页面用于独立开发与调试小组件，使用本地依赖注入 React/ReactDOM。</p>
+    <p style="color:#6b7280;">此页面用于独立开发与调试小组件，React 运行时由小组件自身打包隔离。</p>
     <div class="grid">
       <div class="card">
         <div class="title">图标模式（icon）</div>
@@ -55,11 +55,6 @@
     </div>
 
     <script type="module">
-      import React from 'react';
-      import * as ReactDOMClient from 'react-dom/client';
-      window.React = React;
-      window.ReactDOM = ReactDOMClient;
-
       const storage = {};
       const eventListeners = {};
 
@@ -89,7 +84,7 @@
         },
       };
 
-      const mod = await import('./src/index.jsx');
+      const mod = await import('./src/index.tsx');
       mod.mount(document.getElementById('icon'), { mode: 'icon', title: '时钟 Dev', sdk: mockSdk });
       mod.mount(document.getElementById('full'), { mode: 'full', title: '时钟 Dev', sdk: mockSdk });
 

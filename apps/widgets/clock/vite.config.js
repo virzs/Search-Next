@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 import { copyFileSync, existsSync, mkdirSync } from "fs";
 
@@ -27,6 +28,7 @@ function copyWidgetAssets() {
 export default defineConfig({
   plugins: [
     react({ reactRefreshHost: "http://localhost:8132" }),
+    tailwindcss(),
     copyWidgetAssets(),
   ],
   server: {
@@ -40,7 +42,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: "src/index.jsx",
+      entry: "src/index.tsx",
       name: "ClockWidget",
       formats: ["esm"],
       fileName: () => "index.js",
@@ -48,7 +50,6 @@ export default defineConfig({
     outDir: "../../../dist/widget-build/clock",
     emptyOutDir: true,
     rollupOptions: {
-      external: ["react", "react-dom/client"],
       output: {
         inlineDynamicImports: true,
       },
