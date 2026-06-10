@@ -1,4 +1,18 @@
-export type WidgetMode = "icon" | "full";
+export type WidgetMode = "icon" | "full" | "settings";
+export type TimeFormat = "24h" | "12h";
+
+export interface ClockSettings {
+  timezone: string;
+  timeFormat: TimeFormat;
+  showSeconds: boolean;
+  showProgress: boolean;
+  worldTimezones: string[];
+}
+
+export interface TimezoneOption {
+  city: string;
+  value: string;
+}
 
 export interface WidgetThemeInfo {
   activeThemeId: string;
@@ -6,6 +20,7 @@ export interface WidgetThemeInfo {
 
 export interface WidgetEvents {
   on: (event: string, handler: (payload: Record<string, unknown>) => void) => (() => void) | void;
+  off?: (event: string, handler: (payload: Record<string, unknown>) => void) => void;
 }
 
 export interface WidgetStorage {
@@ -15,14 +30,21 @@ export interface WidgetStorage {
 
 export interface WidgetSDK {
   widgetId?: string;
+  sizeId?: string;
+  mode?: WidgetMode;
   theme?: WidgetThemeInfo;
   storage?: WidgetStorage;
   events?: WidgetEvents;
+  toast?: {
+    success: (message: string, description?: string) => void;
+    error: (message: string, description?: string) => void;
+  };
   onThemeChange?: (handler: (theme: WidgetThemeInfo) => void) => (() => void) | void;
 }
 
 export interface ClockProps {
   mode?: WidgetMode;
+  pagePath?: string;
   title?: string;
   sdk?: WidgetSDK;
 }

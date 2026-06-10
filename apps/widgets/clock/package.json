@@ -9,16 +9,18 @@
     "preview": "vite preview --host"
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.4"
   },
   "devDependencies": {
-    "vite": "^7.1.12",
-    "@vitejs/plugin-react-swc": "^3.8.0",
     "@tailwindcss/vite": "^4.1.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react-swc": "^3.8.0",
     "tailwindcss": "^4.1.17",
-    "typescript": "~5.7.2"
+    "typescript": "~5.7.2",
+    "vite": "^7.1.12"
   }
 }
