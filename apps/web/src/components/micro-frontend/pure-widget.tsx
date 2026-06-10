@@ -4,7 +4,7 @@ import type { WidgetSDK } from "@/sdk";
 export interface PureWidgetConfig {
   entry: string;
   props?: Record<string, unknown>;
-  mode?: "icon" | "full";
+  mode?: "icon" | "full" | "settings";
   /** 小组件 SDK 实例（由宿主创建并注入） */
   sdk?: WidgetSDK;
 }
@@ -38,19 +38,16 @@ const createShadowMount = (container: HTMLElement) => {
   };
 };
 
-/**
- * 仅在 entry/mode 变化时重新加载 ESM 模块。
- * props 和 sdk 通过 ref 提供给本次挂载，避免引用变化导致不必要的重新挂载。
- */
 const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onClick }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 使用 ref 避免 props/sdk 引用变化触发 ESM 模块重新加载
   const propsRef = useRef(config.props);
   propsRef.current = config.props;
   const sdkRef = useRef(config.sdk);
   sdkRef.current = config.sdk;
+  const propsKey = JSON.stringify(config.props ?? {});
+  const sdkSizeId = config.sdk?.sizeId;
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -150,7 +147,7 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
       }
       shadowMount?.cleanup();
     };
-  }, [config.entry, config.mode]);
+  }, [config.entry, config.mode, propsKey, sdkSizeId]);
 
   if (error) {
     return (

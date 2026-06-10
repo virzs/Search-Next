@@ -11,6 +11,13 @@ export interface WidgetConfig {
   size?: "small" | "medium" | "large";
   category?: string;
   settingsSchema?: WidgetSettingsField[];
+  defaultSizeId?: string;
+  pagePaths?: WidgetPagePaths;
+  pages?: WidgetPagePaths;
+  settingsPagePath?: string;
+  settingsPath?: string;
+  settingsPage?: string;
+  customSettings?: boolean;
 }
 
 // 桌面项目数据接口
@@ -35,6 +42,11 @@ export interface WidgetSizeConfig {
   col: number;
   name: string;
   id: string;
+}
+
+export interface WidgetPagePaths {
+  /** 配置后，宿主用小组件 settings mode 渲染自带设置页 */
+  settings?: string;
 }
 
 // 小组件分类信息（populated 后的结构）
@@ -75,6 +87,12 @@ export interface WidgetApiItem {
   tags: string[];
   sortOrder: number;
   settingsSchema?: WidgetSettingsField[]; // 设置表单Schema
+  pagePaths?: WidgetPagePaths;
+  pages?: WidgetPagePaths;
+  settingsPagePath?: string;
+  settingsPath?: string;
+  settingsPage?: string;
+  customSettings?: boolean;
   sourceType?: 'legacy' | 'snwidget';
   packageName?: string;
   entryUrl?: string;
@@ -84,6 +102,12 @@ export interface WidgetApiItem {
     defaultSizeId?: string;
     supportIconMode?: boolean;
     settingsSchema?: WidgetSettingsField[];
+    pagePaths?: WidgetPagePaths;
+    pages?: WidgetPagePaths;
+    settingsPagePath?: string;
+    settingsPath?: string;
+    settingsPage?: string;
+    customSettings?: boolean;
     tags?: string[];
     version?: string;
     author?: string;

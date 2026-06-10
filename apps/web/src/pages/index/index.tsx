@@ -111,6 +111,26 @@ const createEmptyDesktopPages = (): DesktopPage[] => [
   { id: "page-1", children: [] },
 ];
 
+const resolveWidgetSettingsPagePath = (
+  config: DesktopItemData["widgetConfig"] | undefined,
+  fallbackConfig?: DesktopItemData["widgetConfig"],
+) => {
+  const value =
+    config?.pagePaths?.settings ??
+    config?.pages?.settings ??
+    config?.settingsPagePath ??
+    config?.settingsPath ??
+    config?.settingsPage ??
+    fallbackConfig?.pagePaths?.settings ??
+    fallbackConfig?.pages?.settings ??
+    fallbackConfig?.settingsPagePath ??
+    fallbackConfig?.settingsPath ??
+    fallbackConfig?.settingsPage;
+  if (typeof value === "string" && value.trim()) return value;
+  if (config?.customSettings || fallbackConfig?.customSettings) return "/settings";
+  return undefined;
+};
+
 const normalizeHttpUrl = (rawUrl: string | undefined) => {
   if (!rawUrl) return null;
   try {
@@ -198,7 +218,7 @@ function Index() {
   const { userLimit } = useConfig();
   const { activeThemeId, personalization } = useDesktopTheme();
   const navigate = useNavigate();
-  const { widgets, devWidgets, registerDesktopRef } = useWidget();
+  const { widgets, devWidgets, getEntryUrl, registerDesktopRef } = useWidget();
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
   const [preferDark, setPreferDark] = useState(() => {
@@ -260,6 +280,9 @@ function Index() {
   const [settingsTarget, setSettingsTarget] = useState<{
     widgetId: string;
     widgetName: string;
+    entry?: string;
+    props?: Record<string, unknown>;
+    settingsPagePath?: string;
     settingsSchema: WidgetSettingsField[];
   } | null>(null);
 
@@ -280,7 +303,11 @@ function Index() {
   };
 
   const buildSDK = useCallback(
-    (widgetId: string, sizeId: string, mode: "icon" | "full"): WidgetSDK => {
+    (
+      widgetId: string,
+      sizeId: string,
+      mode: "icon" | "full" | "settings",
+    ): WidgetSDK => {
       const deps = sdkDepsRef.current;
       return createHostSDK({
         widgetId,
@@ -360,7 +387,37 @@ function Index() {
     for (const widget of widgets) {
       const schema =
         widget.configSnapshot?.settingsSchema || widget.settingsSchema;
-      if (Array.isArray(schema) && schema.length > 0) {
+      const settingsPagePath = resolveWidgetSettingsPagePath(
+        widget.configSnapshot
+          ? {
+              id: widget._id,
+              name: widget.name,
+              entry: widget.entryFileName,
+              pagePaths: widget.configSnapshot.pagePaths ?? widget.pagePaths,
+              pages: widget.configSnapshot.pages ?? widget.pages,
+              settingsPagePath: widget.configSnapshot.settingsPagePath ?? widget.settingsPagePath,
+              settingsPath: widget.configSnapshot.settingsPath ?? widget.settingsPath,
+              settingsPage: widget.configSnapshot.settingsPage ?? widget.settingsPage,
+              customSettings: Boolean(widget.configSnapshot.customSettings ?? widget.customSettings),
+            }
+          : widget.pagePaths || widget.pages || widget.settingsPagePath || widget.settingsPath || widget.settingsPage || widget.customSettings
+            ? {
+                id: widget._id,
+                name: widget.name,
+                entry: widget.entryFileName,
+                pagePaths: widget.pagePaths,
+                pages: widget.pages,
+                settingsPagePath: widget.settingsPagePath,
+                settingsPath: widget.settingsPath,
+                settingsPage: widget.settingsPage,
+                customSettings: Boolean(widget.customSettings),
+              }
+            : undefined,
+      );
+      if (
+        settingsPagePath ||
+        (Array.isArray(schema) && schema.length > 0)
+      ) {
         addSettingsItem(`widget:${widget._id}`);
       }
     }
@@ -716,19 +773,55 @@ function Index() {
       const widgetDesktopType = getWidgetDesktopType(item);
       if (!widgetDesktopType) return;
 
-      const schema = item.data?.widgetConfig?.settingsSchema;
-      if (!Array.isArray(schema) || schema.length === 0) return;
+      const widgetConfig = item.data?.widgetConfig;
+      const widgetId =
+        widgetConfig?.id ?? widgetDesktopType.replace("widget:", "");
+      const latestWidget = widgets.find((widget) => widget._id === widgetId);
+      const latestDevWidget = devWidgets.find((widget) => widget.id === widgetId);
+      const latestSchema = latestWidget
+        ? latestWidget.configSnapshot?.settingsSchema ?? latestWidget.settingsSchema
+        : undefined;
+      const schema = latestSchema ?? widgetConfig?.settingsSchema;
+      const latestWidgetConfig = latestWidget
+        ? {
+            id: latestWidget._id,
+            name: latestWidget.name,
+            entry: getEntryUrl(latestWidget) ?? widgetConfig?.entry ?? "",
+            pagePaths: latestWidget.configSnapshot?.pagePaths ?? latestWidget.pagePaths,
+            pages: latestWidget.configSnapshot?.pages ?? latestWidget.pages,
+            settingsPagePath: latestWidget.configSnapshot?.settingsPagePath ?? latestWidget.settingsPagePath,
+            settingsPath: latestWidget.configSnapshot?.settingsPath ?? latestWidget.settingsPath,
+            settingsPage: latestWidget.configSnapshot?.settingsPage ?? latestWidget.settingsPage,
+            customSettings: Boolean(latestWidget.configSnapshot?.customSettings ?? latestWidget.customSettings),
+          }
+        : undefined;
+      const settingsPagePath = resolveWidgetSettingsPagePath(
+        latestWidgetConfig,
+        widgetConfig,
+      );
+      const entry = latestWidget
+        ? getEntryUrl(latestWidget) ?? widgetConfig?.entry
+        : latestDevWidget?.entry ?? widgetConfig?.entry;
+      const effectiveSettingsPagePath = settingsPagePath ?? (entry ? "/settings" : undefined);
+      if (
+        !effectiveSettingsPagePath &&
+        (!Array.isArray(schema) || schema.length === 0)
+      ) return;
 
       setSettingsTarget({
-        widgetId:
-          item.data?.widgetConfig?.id ??
-          widgetDesktopType.replace("widget:", ""),
+        widgetId,
         widgetName:
-          item.data?.widgetConfig?.name ?? item.data?.name ?? "小组件",
-        settingsSchema: schema,
+          latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
+        entry,
+        props: {
+          title: latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
+          ...(widgetConfig?.props ?? {}),
+        },
+        settingsPagePath: effectiveSettingsPagePath,
+        settingsSchema: Array.isArray(schema) ? schema : [],
       });
     },
-    [],
+    [devWidgets, getEntryUrl, widgets],
   );
 
   return (
@@ -766,7 +859,11 @@ function Index() {
             if (widgetDesktopType && widgetConfig?.entry) {
               const widgetId =
                 widgetConfig.id || widgetDesktopType.replace("widget:", "");
-              const sdk = buildSDK(widgetId, "icon", "icon");
+              const sizeId =
+                typeof item.config?.sizeId === "string"
+                  ? item.config.sizeId
+                  : widgetConfig.defaultSizeId || "2x2";
+              const sdk = buildSDK(widgetId, sizeId, "icon");
               return (
                 <PureWidget
                   config={{
@@ -862,6 +959,20 @@ function Index() {
           widgetId={settingsTarget.widgetId}
           widgetName={settingsTarget.widgetName}
           settingsSchema={settingsTarget.settingsSchema}
+          settingsPagePath={settingsTarget.settingsPagePath}
+          customConfig={
+            settingsTarget.entry
+              ? {
+                  entry: settingsTarget.entry,
+                  props: {
+                    ...(settingsTarget.props ?? {}),
+                    pagePath: settingsTarget.settingsPagePath ?? "/settings",
+                  },
+                  mode: "settings",
+                  sdk: buildSDK(settingsTarget.widgetId, "settings", "settings"),
+                }
+              : undefined
+          }
         />
       )}
       {init && <LoadingOverlay open text="正在加载配置…" />}

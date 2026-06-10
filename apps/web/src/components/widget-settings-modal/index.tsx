@@ -3,6 +3,8 @@ import { Form, Input, InputNumber, Select, Switch, Button } from "antd";
 import { useEffect, useMemo, type FC } from "react";
 import type { WidgetSettingsField } from "@/types";
 import { sharedEventBus } from "@/sdk";
+import PureWidget from "@/components/micro-frontend/pure-widget";
+import type { PureWidgetConfig } from "@/components/micro-frontend/pure-widget";
 
 interface WidgetSettingsModalProps {
   visible: boolean;
@@ -10,6 +12,8 @@ interface WidgetSettingsModalProps {
   widgetId: string;
   widgetName?: string;
   settingsSchema: WidgetSettingsField[];
+  settingsPagePath?: string;
+  customConfig?: PureWidgetConfig;
 }
 
 /** 从 localStorage 读取小组件的已保存设置值 */
@@ -97,6 +101,8 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
   widgetId,
   widgetName,
   settingsSchema,
+  settingsPagePath,
+  customConfig,
 }) => {
   const [form] = Form.useForm();
 
@@ -118,12 +124,36 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
     });
   };
 
+  const customSettingsConfig = settingsPagePath ? customConfig : undefined;
+
+  if (customSettingsConfig) {
+    return (
+      <DesktopBaseModal
+        visible={visible}
+        onClose={onClose}
+        width={560}
+        destroyOnClose
+        contentClassName="w-full overflow-hidden"
+      >
+        <div className="w-full h-full overflow-hidden">
+          <div className="text-lg font-semibold tracking-tight pb-4">
+            {widgetName ? `${widgetName} - 设置` : "小组件设置"}
+          </div>
+          <div className="relative w-full overflow-hidden rounded-2xl" style={{ height: 520 }}>
+            <PureWidget config={customSettingsConfig} className="w-full h-full" />
+          </div>
+        </div>
+      </DesktopBaseModal>
+    );
+  }
+
   return (
     <DesktopBaseModal
       visible={visible}
       onClose={onClose}
       width={480}
       destroyOnClose
+      contentClassName="w-full overflow-hidden"
     >
       <div className="w-full h-full overflow-hidden">
         <div className="text-lg font-semibold tracking-tight pb-4">

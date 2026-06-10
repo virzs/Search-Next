@@ -52,7 +52,7 @@ export interface WidgetSDK {
   /** 当前尺寸 ID */
   sizeId: string;
   /** 显示模式 */
-  mode: 'icon' | 'full';
+  mode: 'icon' | 'full' | 'settings';
   /** 主题信息 */
   theme: WidgetThemeInfo;
   /** 监听主题变化 */
@@ -79,7 +79,7 @@ export interface WidgetSDK {
 export interface CreateHostSDKOptions {
   widgetId: string;
   sizeId: string;
-  mode: 'icon' | 'full';
+  mode: 'icon' | 'full' | 'settings';
   /** 当前主题 */
   theme: WidgetThemeInfo;
   /** 用户信息 */
