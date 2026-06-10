@@ -17,23 +17,16 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   config,
   visible,
   onClose,
-  title,
   width = 600,
   height = 400,
   sdk,
 }) => {
-  const windowTitle = (title ||
-    (config.props?.title as string) ||
-    "小组件") as string;
-
   return (
     <DesktopBaseModal
       visible={visible}
       onClose={onClose}
-      title={windowTitle}
       width={typeof width === "number" ? width : undefined}
       destroyOnClose
-      contentClassName="w-full overflow-hidden"
     >
       <div className="relative w-full overflow-hidden" style={{ height }}>
         <PureWidget

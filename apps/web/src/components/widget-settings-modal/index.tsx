@@ -65,7 +65,9 @@ const saveValues = (
 const renderField = (field: WidgetSettingsField) => {
   switch (field.type) {
     case "input":
-      return <Input placeholder={field.placeholder ?? `请输入${field.label}`} />;
+      return (
+        <Input placeholder={field.placeholder ?? `请输入${field.label}`} />
+      );
     case "textarea":
       return (
         <Input.TextArea
@@ -136,11 +138,14 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
         contentClassName="w-full overflow-hidden"
       >
         <div className="w-full h-full overflow-hidden">
-          <div className="text-lg font-semibold tracking-tight pb-4">
-            {widgetName ? `${widgetName} - 设置` : "小组件设置"}
-          </div>
-          <div className="relative w-full overflow-hidden rounded-2xl" style={{ height: 520 }}>
-            <PureWidget config={customSettingsConfig} className="w-full h-full" />
+          <div
+            className="relative w-full overflow-hidden rounded-2xl"
+            style={{ height: 520 }}
+          >
+            <PureWidget
+              config={customSettingsConfig}
+              className="w-full h-full"
+            />
           </div>
         </div>
       </DesktopBaseModal>

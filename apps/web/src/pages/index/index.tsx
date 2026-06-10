@@ -942,7 +942,6 @@ function Index() {
           visible={true}
           onClose={() => setFullWidget(null)}
           config={{ entry: fullWidget.entry, props: fullWidget.props }}
-          title={fullWidget.title}
           width={600}
           height={400}
           sdk={
