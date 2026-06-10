@@ -14,5 +14,8 @@
   ],
   "defaultSizeId": "2x2",
   "supportIconMode": true,
+  "pagePaths": {
+    "settings": "/settings"
+  },
   "settingsSchema": []
 }
