@@ -5,12 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && pnpm run screenshots",
+    "screenshots": "node ../../../scripts/capture-widget-screenshots.mjs __WIDGET_NAME__",
     "preview": "vite preview --host"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.8.0",

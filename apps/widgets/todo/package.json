@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && pnpm run screenshots",
+    "screenshots": "node ../../../scripts/capture-widget-screenshots.mjs todo",
     "preview": "vite preview --host"
   },
   "dependencies": {

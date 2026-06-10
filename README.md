@@ -90,7 +90,7 @@ pnpm widget:create vue my-widget
 pnpm widget:create solid my-widget
 ```
 
-脚手架会生成 `apps/widgets/<name>/package.json`、`tsconfig.json`、`vite.config.js`、`widget.config.json`、`src/index`、组件、样式、图标和本地开发页。React 模板默认使用 TypeScript/TSX 和 Tailwind CSS utilities；React、Vue 和 Solid 模板都按各自框架的标准组件写法开发，并随小组件打包各自运行时，避免不同框架或不同版本依赖在宿主页面中互相冲突。React 模板只引入带 `tw:` 前缀的 Tailwind utilities，不引入全局 preflight/base，并把样式注入到小组件容器内，减少组件之间和宿主页面之间的样式串扰。
+脚手架会生成 `apps/widgets/<name>/package.json`、`tsconfig.json`、`vite.config.js`、`widget.config.json`、`src/index`、组件、样式、图标和本地开发页。React 模板默认使用 TypeScript/TSX、Tailwind CSS utilities 和 shadcn/ui 风格的本地组件；React、Vue 和 Solid 模板都按各自框架的标准组件写法开发，并随小组件打包各自运行时，避免不同框架或不同版本依赖在宿主页面中互相冲突。React 模板只引入带 `tw:` 前缀的 Tailwind utilities，不引入全局 preflight/base，并把样式注入到小组件容器内，减少组件之间和宿主页面之间的样式串扰。模板细节见 `scripts/widget-templates/README.md`。
 
 安装依赖并启动某个小组件：
 
@@ -105,13 +105,13 @@ pnpm --filter my-widget-widget dev
 pnpm --filter my-widget-widget build
 ```
 
-构建输出位于 `dist/widget-build/<name>/index.js`。生成 `.snwidget`：
+构建输出位于 `dist/widget-build/<name>/index.js`，并在 `dist/widget-build/<name>/screenshots/icon` 生成 icon 模式下每个 `sizeConfigs` 与浅/深主题组合的截图；`screenshots/manifest.json` 会记录截图清单。生成 `.snwidget`：
 
 ```bash
 pnpm widget:pack my-widget
 ```
 
-该命令会通过 pnpm workspace 执行对应小组件的 `build`，复制 `widget.config.json`，并输出到 `dist/widgets/<name>-<version>.snwidget`。生成后可在开发者小组件页面填写后端解压后的远程入口进行调试。
+该命令会通过 pnpm workspace 执行对应小组件的 `build`，复制 `widget.config.json`，确保截图清单已生成，并把 `screenshots` 目录一起写入 `dist/widgets/<name>-<version>.snwidget`。生成后可在开发者小组件页面填写后端解压后的远程入口进行调试。
 
 注意：小组件入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的小组件。
 

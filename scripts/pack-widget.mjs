@@ -26,6 +26,8 @@ const widgetDir = path.resolve(widgetsRoot, name);
 const buildDir = path.resolve(buildRoot, name);
 const distDir = path.resolve(root, "dist", "widgets");
 const configFile = path.join(widgetDir, "widget.config.json");
+const screenshotManifestFile = path.join(buildDir, "screenshots", "manifest.json");
+const screenshotScript = path.join(root, "scripts", "capture-widget-screenshots.mjs");
 
 const assertInside = (parent, child, label) => {
   const relative = path.relative(parent, child);
@@ -42,6 +44,15 @@ const run = (command, args, options) => new Promise((resolve, reject) => {
     else reject(new Error(`${command} ${args.join(" ")} exited with ${code}`));
   });
 });
+
+const exists = async (file) => {
+  try {
+    await stat(file);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 const crcTable = new Uint32Array(256).map((_, index) => {
   let c = index;
@@ -66,6 +77,13 @@ const collect = async (dir, prefix = "") => {
     if (info.isFile()) files.push({ full, relative });
   }
   return files;
+};
+
+const countScreenshotFiles = async () => {
+  const screenshotsDir = path.join(buildDir, "screenshots");
+  if (!(await exists(screenshotsDir))) return 0;
+  const files = await collect(screenshotsDir, "screenshots");
+  return files.length;
 };
 
 const writeZip = async (sourceDir, output) => {
@@ -148,9 +166,14 @@ const main = async () => {
   await rm(buildDir, { recursive: true, force: true });
   await run("pnpm", ["--filter", `${name}-widget`, "build"], { cwd: root });
   await cp(configFile, path.join(buildDir, "widget.config.json"));
+  if (config.supportIconMode !== false && !(await exists(screenshotManifestFile))) {
+    console.log("[pack-widget] Missing screenshots manifest; generating icon screenshots before packing.");
+    await run(process.execPath, [screenshotScript, name], { cwd: root });
+  }
   const output = path.join(distDir, `${config.name}-${config.version}.snwidget`);
+  const screenshotCount = await countScreenshotFiles();
   const count = await writeZip(buildDir, output);
-  console.log(`Packed ${count} files -> ${output}`);
+  console.log(`Packed ${count} files (${screenshotCount} screenshot files) -> ${output}`);
 };
 
 main().catch((error) => {

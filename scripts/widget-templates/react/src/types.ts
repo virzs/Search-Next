@@ -5,14 +5,28 @@ export interface WidgetThemeInfo {
 }
 
 export interface WidgetSDK {
+  widgetId?: string;
   sizeId?: string;
   mode?: WidgetMode;
   theme?: WidgetThemeInfo;
+  storage?: {
+    get: (key: string) => Promise<unknown>;
+    set: (key: string, value: string) => Promise<void>;
+  };
+  events?: {
+    on: (event: string, handler: (payload: Record<string, unknown>) => void) => (() => void) | void;
+    off?: (event: string, handler: (payload: Record<string, unknown>) => void) => void;
+  };
+  toast?: {
+    success: (message: string, description?: string) => void;
+    error: (message: string, description?: string) => void;
+  };
   onThemeChange?: (handler: (theme: WidgetThemeInfo) => void) => (() => void) | void;
 }
 
 export interface WidgetProps {
   mode?: WidgetMode;
   pagePath?: string;
+  title?: string;
   sdk?: WidgetSDK;
 }

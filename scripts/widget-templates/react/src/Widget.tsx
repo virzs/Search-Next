@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { WidgetProps } from "./types";
 
 const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
@@ -11,12 +13,12 @@ const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
 
   const isIcon = mode === "icon";
   const isSettings = mode === "settings";
-  const shellClassName = [
+  const shellClassName = cn(
     "tw:box-border tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-center tw:gap-2 tw:overflow-hidden tw:rounded-2xl tw:p-[14px]",
     themeId === "dark"
       ? "tw:bg-[linear-gradient(135deg,#064e3b_0%,#022c22_100%)] tw:text-emerald-100"
       : "tw:bg-[linear-gradient(135deg,#d1fae5_0%,#a7f3d0_100%)] tw:text-emerald-950",
-  ].join(" ");
+  );
 
   return (
     <div className={shellClassName}>
@@ -30,6 +32,13 @@ const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
             ? "这是由小组件自行渲染的设置页。可通过 props.sdk.storage 保存偏好。"
             : "通过 props.sdk 获取宿主能力，支持 icon/full/settings 三种模式。"}
         </p>
+      )}
+      {!isIcon && (
+        <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
+          <Button size="sm" variant={themeId === "dark" ? "ghost" : "secondary"} type="button">
+            shadcn/ui Button
+          </Button>
+        </div>
       )}
     </div>
   );

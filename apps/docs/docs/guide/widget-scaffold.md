@@ -37,20 +37,21 @@ pnpm --filter <name>-widget dev
 pnpm --filter <name>-widget build
 ```
 
-构建产物输出到 `dist/widget-build/<name>/index.js`。需要生成可导入后台的包时，在项目根目录执行：
+构建产物输出到 `dist/widget-build/<name>/index.js`。构建完成后会读取 `widget.config.json` 的 `sizeConfigs`，为 icon 模式生成每个尺寸与浅/深主题组合的截图，输出到 `dist/widget-build/<name>/screenshots/icon`，并写入 `screenshots/manifest.json`。需要生成可导入后台的包时，在项目根目录执行：
 
 ```bash
 pnpm widget:pack <name>
 ```
 
-打包脚本会读取 `apps/widgets/<name>/widget.config.json`，通过 pnpm workspace 执行小组件自己的 `build`，再生成 `dist/widgets/<name>-<version>.snwidget`。
+打包脚本会读取 `apps/widgets/<name>/widget.config.json`，通过 pnpm workspace 执行小组件自己的 `build`，确保截图清单已生成，再把构建目录完整写入 `dist/widgets/<name>-<version>.snwidget`。其中 `screenshots/manifest.json` 和 `screenshots/icon/*.png` 会随包一起发布。
 
 ## 框架约定
 
 - React 模板默认使用 TypeScript/TSX，并在构建前执行 `tsc --noEmit` 做类型检查。
-- React 模板默认接入 Tailwind CSS utilities，使用 `tw:` 前缀类名；模板只导入 utilities，不导入全局 preflight/base，打包后的样式会随小组件注入到容器内。
+- React 模板默认接入 Tailwind CSS utilities 和 shadcn/ui 风格的本地组件，使用 `tw:` 前缀类名；模板只导入 theme/utilities，不导入全局 preflight/base，打包后的样式会随小组件注入到容器内。
+- React 模板内置 `components.json`、`src/lib/utils.ts` 和 `src/components/ui/button.tsx`，新增 UI 组件时优先沿用 `src/components/ui` 目录。
 - React、Vue 和 Solid 模板都会把各自运行时打进小组件产物，不要求宿主暴露全局变量，避免不同框架或不同版本依赖互相冲突。
-- 三种模板都支持 `props.mode` 的 `icon` / `full` 模式，以及 `props.sdk` 注入的宿主能力。
+- 三种模板都支持 `props.mode` 的 `icon` / `full` / `settings` 模式，以及 `props.sdk` 注入的宿主能力。
 
 ## 接入宿主
 

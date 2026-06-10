@@ -96,3 +96,4 @@ console.log(`  pnpm install`);
 console.log(`  pnpm --filter ${name}-widget dev`);
 console.log(`  pnpm --filter ${name}-widget build`);
 console.log(`  pnpm widget:pack ${name}`);
+console.log(`Template notes: scripts/widget-templates/README.md`);

@@ -7,9 +7,11 @@
 - 小组件必须导出 `mount(container, props)` 函数，也可以默认导出该函数。
 - React 小组件默认使用 TypeScript/TSX，构建前执行 `tsc --noEmit` 做类型检查。
 - React 小组件默认接入 Tailwind CSS utilities，组件内使用 `tw:` 前缀类名。
+- React 模板内置 shadcn/ui 风格的本地组件，默认包含 `components.json`、`src/lib/utils.ts` 和 `src/components/ui/button.tsx`。
 - 样式文件只导入 Tailwind utilities，不导入全局 preflight/base；入口会把编译后的样式注入小组件容器，减少宿主页面样式干扰。
 - 构建产物入口固定为 `dist/widget-build/<name>/index.js`。
-- 组件需支持两种显示模式：`icon`（桌面图标位置展示）与 `full`（窗口内完整展示）。
+- 构建后会为 icon 模式生成 `sizeConfigs x light/dark` 的截图，输出到 `dist/widget-build/<name>/screenshots`。
+- 组件需支持三种显示模式：`icon`（桌面图标位置展示）、`full`（窗口内完整展示）与 `settings`（设置页）。
 - 组件通过 `props.sdk` 获取宿主注入的主题、storage、事件等能力。
 
 ## 目录结构
@@ -29,11 +31,16 @@ apps/widgets/
       Clock.tsx
       types.ts
       vite-env.d.ts
+      lib/
+        utils.ts
+      components/
+        ui/
+          button.tsx
       style.css
       icon.svg
 ```
 
-构建输出位于：`dist/widget-build/clock/index.js`。
+构建输出位于：`dist/widget-build/clock/index.js`。截图输出位于：`dist/widget-build/clock/screenshots/icon`。
 
 ## 入口协议
 
@@ -105,9 +112,18 @@ React 小组件的 `vite.config.js` 使用 Vite library mode，入口指向 TSX 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "@tailwindcss/vite";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "@": resolve(root, "src"),
+    },
+  },
   build: {
     lib: {
       entry: "src/index.tsx",
@@ -125,16 +141,21 @@ export default defineConfig({
 });
 ```
 
-`package.json` 的构建脚本应先做类型检查：
+`package.json` 的构建脚本应先做类型检查，再生成截图：
 
 ```json
 {
   "scripts": {
-    "build": "tsc --noEmit && vite build"
+    "build": "tsc --noEmit && vite build && pnpm run screenshots",
+    "screenshots": "node ../../../scripts/capture-widget-screenshots.mjs clock"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.10",
@@ -148,13 +169,48 @@ export default defineConfig({
 }
 ```
 
-`src/style.css` 只导入 Tailwind utilities，并启用前缀，避免生成全局 reset：
+`src/style.css` 只导入 Tailwind theme/utilities，并启用前缀，避免生成全局 reset：
 
 ```css
-@import "tailwindcss/utilities" prefix(tw);
-
 @source "./**/*.{ts,tsx}";
+
+@import "tailwindcss/theme" layer(theme) prefix(tw);
+@import "tailwindcss/utilities" layer(utilities) prefix(tw);
 ```
+
+## shadcn/ui 组件
+
+React 模板默认提供 `Button`，路径为 `src/components/ui/button.tsx`。组件类名同样使用 `tw:` 前缀：
+
+```tsx
+import { Button } from "@/components/ui/button";
+
+export function Actions() {
+  return <Button size="sm">保存</Button>;
+}
+```
+
+`components.json` 已配置 `@/*` alias；新增 shadcn/ui 风格组件时，优先放在 `src/components/ui`，通用类名合并使用 `src/lib/utils.ts` 的 `cn`。
+
+## icon 截图
+
+截图脚本会读取 `widget.config.json`：
+
+- `sizeConfigs` 决定需要截图的尺寸。
+- `supportIconMode: false` 时跳过。
+- 每个尺寸会分别生成 `light` 与 `dark` 主题截图。
+
+输出示例：
+
+```text
+dist/widget-build/clock/screenshots/
+  manifest.json
+  icon/
+    icon-2x2-light.png
+    icon-2x2-dark.png
+```
+
+默认使用本机 Chrome/Chromium headless。可设置 `WIDGET_SCREENSHOT_CHROME=/path/to/chrome` 指定浏览器；无浏览器环境可设置 `WIDGET_SCREENSHOTS=0` 跳过。
 
 ## 开发流程
 
@@ -162,10 +218,10 @@ export default defineConfig({
 2. 安装依赖：`pnpm install`。
 3. 启动开发服务：`pnpm --filter my-widget-widget dev`。
 4. 在开发者小组件页面填写入口 URL，例如 `http://localhost:<port>/src/index.tsx`。
-5. 构建：`pnpm --filter my-widget-widget build`。
+5. 构建并生成 icon 截图：`pnpm --filter my-widget-widget build`。
 6. 打包：`pnpm widget:pack my-widget`。
 
-打包后会生成 `dist/widgets/<name>-<version>.snwidget`，可上传到后台，由后台解压并提供远程入口。
+打包后会生成 `dist/widgets/<name>-<version>.snwidget`，其中包含构建后的 `index.js`、`widget.config.json`、图标和 `screenshots` 目录，可上传到后台，由后台解压并提供远程入口与截图资源。
 
 ## 调试与故障排查
 

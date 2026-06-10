@@ -18,6 +18,7 @@
     "build:docs": "pnpm --filter search-next-docs build",
     "widget:create": "node scripts/create-widget.mjs",
     "widget:pack": "node scripts/pack-widget.mjs",
+    "widget:screenshots": "node scripts/capture-widget-screenshots.mjs",
     "widget:pack:clock": "node scripts/pack-widget.mjs clock",
     "widget:pack:todo": "node scripts/pack-widget.mjs todo",
     "build:widgets": "pnpm --filter './apps/widgets/*' build",

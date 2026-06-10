@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && pnpm run screenshots",
+    "screenshots": "node ../../../scripts/capture-widget-screenshots.mjs __WIDGET_NAME__",
     "preview": "vite preview --host"
   },
   "dependencies": {

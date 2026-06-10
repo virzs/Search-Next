@@ -33,6 +33,11 @@ export default defineConfig({
     "process.env": "{}",
     process: "{}",
   },
+  resolve: {
+    alias: {
+      "@": resolve(root, "src"),
+    },
+  },
   build: {
     lib: {
       entry: "src/index.tsx",
