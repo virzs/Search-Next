@@ -1,7 +1,25 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { TIMEZONES } from "../constants";
+import { cn } from "../styles";
 import type { ClockSettings } from "../types";
+
+const frameClassName = "tw:grid tw:h-full tw:w-full tw:grid-cols-[220px_minmax(0,1fr)] tw:overflow-hidden tw:rounded-[inherit] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-app)] tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:grid-cols-[180px_minmax(0,1fr)] tw:[@container(max-width:700px)]:!grid-cols-1 tw:max-[760px]:!grid-cols-1";
+const sidebarClassName = "tw:flex tw:min-w-0 tw:flex-col tw:gap-[18px] tw:border-r tw:border-[var(--clock-divider)] tw:bg-[var(--clock-sidebar)] tw:px-4 tw:py-5 tw:[@container(max-width:860px)]:px-3.5 tw:[@container(max-width:860px)]:py-[18px] tw:[@container(max-width:700px)]:hidden tw:max-[760px]:hidden";
+const contentClassName = "tw:h-full tw:min-w-0 tw:overflow-auto tw:p-6 tw:[@container(max-width:860px)]:p-[18px] tw:[@container(max-width:700px)]:p-4 tw:max-[520px]:p-[18px]";
+const brandClassName = "tw:flex tw:min-w-0 tw:flex-col tw:gap-1";
+const brandLabelClassName = "tw:truncate tw:text-xs tw:font-[760] tw:text-[var(--clock-fg-3)]";
+const brandTitleClassName = "tw:text-[28px] tw:font-[780] tw:leading-none tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:text-2xl";
+const navClassName = "tw:flex tw:flex-col tw:gap-1.5";
+const navItemClassName = (active = false) => cn(
+  "tw:rounded-[10px] tw:px-3 tw:py-2.5 tw:text-[15px] tw:font-[720] tw:text-[var(--clock-fg-2)] tw:[@container(max-width:860px)]:px-2.5 tw:[@container(max-width:860px)]:py-[9px] tw:[@container(max-width:860px)]:text-sm",
+  active && "tw:bg-[rgba(255,159,10,0.18)] tw:text-[var(--clock-accent)]",
+);
+const groupClassName = "tw:mb-3.5 tw:overflow-hidden tw:rounded-3xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card)] tw:shadow-[0_18px_36px_rgba(0,0,0,0.26)]";
+const rowClassName = "tw:relative tw:flex tw:min-h-16 tw:items-center tw:justify-between tw:gap-[18px] tw:border-b tw:border-[var(--clock-divider)] tw:px-4 tw:py-3 tw:text-[var(--clock-fg)] tw:last:border-b-0 tw:[@container(max-width:520px)]:flex-col tw:[@container(max-width:520px)]:items-start tw:max-[520px]:flex-col tw:max-[520px]:items-start";
+const rowTextClassName = "tw:min-w-0";
+const rowTitleClassName = "tw:block tw:text-[15px] tw:font-[760] tw:text-[var(--clock-fg)]";
+const rowDescriptionClassName = "tw:mt-1 tw:block tw:text-xs tw:font-[620] tw:leading-[1.35] tw:text-[var(--clock-fg-2)]";
 
 export function SettingsPage({ settings, saving, onSave }: { settings: ClockSettings; saving: boolean; onSave: (next: ClockSettings) => Promise<void> }) {
   const [draft, setDraft] = useState<ClockSettings>(settings);
@@ -20,63 +38,76 @@ export function SettingsPage({ settings, saving, onSave }: { settings: ClockSett
   };
 
   return (
-    <div className="clock-settings-app">
-      <aside className="clock-settings-sidebar">
-        <div className="clock-app-brand"><span>Clock</span><strong>时钟</strong></div>
-        <nav className="clock-settings-nav" aria-label="设置分类">
-          <span className="is-active">显示偏好</span>
-          <span>世界时钟</span>
-          <span>小组件</span>
+    <div className={frameClassName}>
+      <aside className={sidebarClassName}>
+        <div className={brandClassName}><span className={brandLabelClassName}>Clock</span><strong className={brandTitleClassName}>时钟</strong></div>
+        <nav className={navClassName} aria-label="设置分类">
+          <span className={navItemClassName(true)}>显示偏好</span>
+          <span className={navItemClassName()}>世界时钟</span>
+          <span className={navItemClassName()}>小组件</span>
         </nav>
       </aside>
-      <main className="clock-settings-content">
-        <header className="clock-settings-header">
-          <h2>显示偏好</h2>
-          <p>时钟小组件</p>
+      <main className={contentClassName}>
+        <header className="tw:mb-[18px]">
+          <h2 className="tw:m-0 tw:mt-1 tw:text-[34px] tw:font-[780] tw:leading-[1.08] tw:tracking-[0] tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:text-[30px] tw:[@container(max-width:700px)]:text-[28px] tw:max-[520px]:text-[28px]">显示偏好</h2>
+          <p className="tw:m-0 tw:mt-1.5 tw:text-sm tw:font-[650] tw:text-[var(--clock-fg-2)]">时钟小组件</p>
         </header>
 
-        <section className="clock-settings-group">
+        <section className={groupClassName}>
           <SettingRow title="主时区" description="桌面小组件与展开页的基准时间">
-            <select value={draft.timezone} onChange={(event) => setDraft((prev) => ({ ...prev, timezone: event.target.value }))}>
+            <select className="tw:min-w-[150px] tw:rounded-xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card-soft)] tw:px-2.5 tw:py-2 tw:text-sm tw:font-bold tw:text-[var(--clock-fg)] tw:outline-none tw:[@container(max-width:520px)]:w-full tw:max-[520px]:w-full" value={draft.timezone} onChange={(event) => setDraft((prev) => ({ ...prev, timezone: event.target.value }))}>
               {TIMEZONES.map((item) => <option key={item.value || "local"} value={item.value}>{item.city}</option>)}
             </select>
           </SettingRow>
           <SettingRow title="时间制式" description="数字时间的显示方式">
-            <div className="clock-format-switch" role="group" aria-label="时间制式">
-              <button className={draft.timeFormat === "24h" ? "is-active" : ""} type="button" onClick={() => setDraft((prev) => ({ ...prev, timeFormat: "24h" }))}>24h</button>
-              <button className={draft.timeFormat === "12h" ? "is-active" : ""} type="button" onClick={() => setDraft((prev) => ({ ...prev, timeFormat: "12h" }))}>12h</button>
+            <div className="tw:grid tw:min-w-[136px] tw:grid-cols-2 tw:gap-[3px] tw:rounded-xl tw:bg-[var(--clock-card-soft)] tw:p-[3px] tw:[@container(max-width:520px)]:w-full tw:max-[520px]:w-full" role="group" aria-label="时间制式">
+              <button className={cn("tw:cursor-pointer tw:rounded-[9px] tw:border-0 tw:bg-transparent tw:px-2.5 tw:py-[7px] tw:text-[13px] tw:font-[780] tw:text-[var(--clock-fg-2)]", draft.timeFormat === "24h" && "tw:bg-[var(--clock-accent)] tw:text-[var(--clock-active-fg)]")} type="button" onClick={() => setDraft((prev) => ({ ...prev, timeFormat: "24h" }))}>24h</button>
+              <button className={cn("tw:cursor-pointer tw:rounded-[9px] tw:border-0 tw:bg-transparent tw:px-2.5 tw:py-[7px] tw:text-[13px] tw:font-[780] tw:text-[var(--clock-fg-2)]", draft.timeFormat === "12h" && "tw:bg-[var(--clock-accent)] tw:text-[var(--clock-active-fg)]")} type="button" onClick={() => setDraft((prev) => ({ ...prev, timeFormat: "12h" }))}>12h</button>
             </div>
           </SettingRow>
         </section>
 
-        <section className="clock-settings-group">
+        <section className={groupClassName}>
           <ToggleRow title="秒针与秒数" description="在较大尺寸与展开页显示" checked={draft.showSeconds} onChange={(checked) => setDraft((prev) => ({ ...prev, showSeconds: checked }))} />
           <ToggleRow title="日程进度" description="显示今日与今年进度" checked={draft.showProgress} onChange={(checked) => setDraft((prev) => ({ ...prev, showProgress: checked }))} />
         </section>
 
-        <section className="clock-settings-group clock-settings-group--cities">
-          <div className="clock-settings-group-title"><strong>世界时钟城市</strong><span>最多选择 6 个，用于 4x2 和展开页。</span></div>
-          <div className="clock-city-grid">
-            {TIMEZONES.filter((item) => item.value).map((item) => (
-              <label className="clock-city-option" key={item.value}>
-                <input type="checkbox" checked={draft.worldTimezones.includes(item.value)} disabled={!draft.worldTimezones.includes(item.value) && draft.worldTimezones.length >= 6} onChange={(event) => toggleWorldTimezone(item.value, event.target.checked)} />
-                <span>{item.city}</span>
-                <i aria-hidden="true" />
-              </label>
-            ))}
+        <section className={cn(groupClassName, "tw:pb-3.5")}>
+          <div className={cn(rowClassName, "tw:items-start tw:border-b-0")}><strong className={rowTitleClassName}>世界时钟城市</strong><span className={rowDescriptionClassName}>最多选择 6 个，用于 4x2 和展开页。</span></div>
+          <div className="tw:grid tw:grid-cols-2 tw:gap-2.5 tw:px-4 tw:[@container(max-width:520px)]:grid-cols-1 tw:max-[520px]:grid-cols-1">
+            {TIMEZONES.filter((item) => item.value).map((item) => {
+              const checked = draft.worldTimezones.includes(item.value);
+              const disabled = !checked && draft.worldTimezones.length >= 6;
+
+              return (
+                <label className={cn("tw:relative tw:flex tw:min-w-0 tw:cursor-pointer tw:items-center tw:gap-2.5 tw:rounded-[14px] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card-soft)] tw:p-3 tw:text-sm tw:font-[720] tw:text-[var(--clock-fg)]", disabled && "tw:cursor-not-allowed tw:opacity-45")} key={item.value}>
+                  <input className="tw:pointer-events-none tw:absolute tw:opacity-0" type="checkbox" checked={checked} disabled={disabled} onChange={(event) => toggleWorldTimezone(item.value, event.target.checked)} />
+                  <span className="tw:min-w-0 tw:truncate">{item.city}</span>
+                  <i className={cn("tw:relative tw:ml-auto tw:h-[18px] tw:w-[18px] tw:flex-none tw:rounded-full tw:border-2", checked ? "tw:border-[var(--clock-accent)] tw:bg-[var(--clock-accent)]" : "tw:border-white/25")} aria-hidden="true">
+                    {checked && <span className="tw:absolute tw:left-[5px] tw:top-[3px] tw:h-2 tw:w-[5px] tw:rotate-[42deg] tw:border-b-2 tw:border-r-2 tw:border-[var(--clock-active-fg)]" />}
+                  </i>
+                </label>
+              );
+            })}
           </div>
         </section>
 
-        <button className="clock-save-button" type="button" disabled={saving} onClick={() => onSave(draft)}>{saving ? "保存中…" : "保存设置"}</button>
+        <button className="tw:w-full tw:cursor-pointer tw:rounded-2xl tw:border-0 tw:bg-[var(--clock-accent)] tw:px-4 tw:py-[13px] tw:text-[15px] tw:font-[780] tw:text-[var(--clock-active-fg)] tw:disabled:cursor-wait tw:disabled:opacity-60" type="button" disabled={saving} onClick={() => onSave(draft)}>{saving ? "保存中…" : "保存设置"}</button>
       </main>
     </div>
   );
 }
 
 const SettingRow = ({ title, description, children }: { title: string; description: string; children: ReactNode }) => (
-  <div className="clock-settings-row"><span><strong>{title}</strong><small>{description}</small></span>{children}</div>
+  <div className={rowClassName}><span className={rowTextClassName}><strong className={rowTitleClassName}>{title}</strong><small className={rowDescriptionClassName}>{description}</small></span>{children}</div>
 );
 
 const ToggleRow = ({ title, description, checked, onChange }: { title: string; description: string; checked: boolean; onChange: (checked: boolean) => void }) => (
-  <label className="clock-settings-row"><span><strong>{title}</strong><small>{description}</small></span><input className="clock-switch-input" type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} /><i className="clock-switch" aria-hidden="true" /></label>
+  <label className={rowClassName}>
+    <span className={rowTextClassName}><strong className={rowTitleClassName}>{title}</strong><small className={rowDescriptionClassName}>{description}</small></span>
+    <input className="tw:pointer-events-none tw:absolute tw:h-px tw:w-px tw:opacity-0" type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+    <i className={cn("tw:relative tw:h-[30px] tw:w-[50px] tw:flex-none tw:rounded-full tw:bg-[var(--clock-card-soft)] tw:transition-colors tw:duration-200", checked && "tw:bg-[var(--clock-accent)]")} aria-hidden="true">
+      <span className={cn("tw:absolute tw:left-[3px] tw:top-[3px] tw:h-6 tw:w-6 tw:rounded-full tw:bg-white tw:shadow-[0_2px_8px_rgba(0,0,0,0.35)] tw:transition-transform tw:duration-200", checked && "tw:translate-x-5")} />
+    </i>
+  </label>
 );

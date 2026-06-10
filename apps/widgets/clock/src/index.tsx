@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import Clock from "./Clock";
-import styleText from "./style.css?inline";
+import styleText from "./tailwind.css?inline";
 import type { ClockProps } from "./types";
 
 type WidgetInstance = {

@@ -1,0 +1,4 @@
+@source "./**/*.{ts,tsx}";
+
+@import "tailwindcss/theme" layer(theme) prefix(tw);
+@import "tailwindcss/utilities" layer(utilities) prefix(tw);
