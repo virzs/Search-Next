@@ -36,6 +36,16 @@ export interface Resource {
   url?: string;
 }
 
+export interface WidgetScreenshot {
+  mode?: string;
+  themeId: string;
+  sizeId: string;
+  width?: number;
+  height?: number;
+  file: string;
+  url: string;
+}
+
 // 小组件尺寸配置（对应后端 sizeConfigs 字段）
 export interface WidgetSizeConfig {
   row: number;
@@ -97,6 +107,7 @@ export interface WidgetApiItem {
   packageName?: string;
   entryUrl?: string;
   iconUrl?: string;
+  screenshots?: WidgetScreenshot[];
   configSnapshot?: {
     sizeConfigs?: WidgetSizeConfig[];
     defaultSizeId?: string;
@@ -111,6 +122,7 @@ export interface WidgetApiItem {
     tags?: string[];
     version?: string;
     author?: string;
+    screenshots?: WidgetScreenshot[];
     [key: string]: unknown;
   };
   createdAt?: string;

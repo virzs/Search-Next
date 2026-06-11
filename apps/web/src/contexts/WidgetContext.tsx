@@ -25,6 +25,9 @@ type DesktopItemForWidget = {
   id: string | number;
   type: string;
   dataType?: string;
+  config?: {
+    sizeId?: string;
+  };
     data: {
       name: string;
       widgetConfig: {
@@ -62,13 +65,16 @@ type DesktopRefLike = LegacyDesktopRefLike | DesktopNextRefLike;
 
 type AddDesktopItem = (item: DesktopItemForWidget) => void;
 type RemoveDesktopItemsByType = (dataType: string) => void;
+type AddWidgetToDesktopOptions = {
+  sizeId?: string;
+};
 
 interface WidgetContextValue {
   widgets: WidgetApiItem[];
   loading: boolean;
   refresh: () => Promise<void>;
   /** 添加小组件到桌面（允许重复添加） */
-  addToDesktop: (widgetId: string) => void;
+  addToDesktop: (widgetId: string, options?: AddWidgetToDesktopOptions) => void;
   getWidgetById: (widgetId: string) => WidgetApiItem | undefined;
   getEntryUrl: (widget: WidgetApiItem) => string | null;
   getIconUrl: (widget: WidgetApiItem) => string | null;
@@ -162,7 +168,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
   );
 
   /** 根据 widgetId 构建桌面项数据 */
-  const buildDesktopItem = useCallback((widgetId: string) => {
+  const buildDesktopItem = useCallback((widgetId: string, options?: AddWidgetToDesktopOptions) => {
     const devMatch = devWidgetsRef.current.find((d) => d.id === widgetId);
     let entryUrl: string | null = null;
     let widgetName: string;
@@ -178,14 +184,14 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     if (devMatch) {
       entryUrl = devMatch.entry;
       widgetName = devMatch.name;
-      defaultSizeId = devMatch.defaultSizeId;
+      defaultSizeId = options?.sizeId || devMatch.defaultSizeId;
     } else {
       const widget = (widgetsRef.current ?? []).find((w) => w._id === widgetId);
       if (!widget) return null;
       entryUrl = buildWidgetEntryUrl(widget);
       widgetName = widget.name;
       settingsSchema = widget.configSnapshot?.settingsSchema || widget.settingsSchema;
-      defaultSizeId = widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2";
+      defaultSizeId = options?.sizeId || widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2";
       pagePaths = widget.configSnapshot?.pagePaths ?? widget.pagePaths;
       pages = widget.configSnapshot?.pages ?? widget.pages;
       settingsPagePath =
@@ -207,6 +213,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
       id: generateDesktopWidgetInstanceId(widgetId),
       type: widgetType,
       dataType: widgetType,
+      config: options?.sizeId ? { sizeId: options.sizeId } : undefined,
       data: {
         name: widgetName,
         widgetConfig: {
@@ -228,10 +235,10 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
   }, []);
 
   /** 直接添加小组件到桌面，允许重复添加 */
-  const addToDesktop = useCallback((widgetId: string) => {
+  const addToDesktop = useCallback((widgetId: string, options?: AddWidgetToDesktopOptions) => {
     const desktop = desktopRefInternal.current?.current;
     if (!desktop) return;
-    const desktopItem = buildDesktopItem(widgetId);
+    const desktopItem = buildDesktopItem(widgetId, options);
     if (!desktopItem) return;
 
     if (addDesktopItemRef.current) {

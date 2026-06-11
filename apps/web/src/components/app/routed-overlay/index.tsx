@@ -5,7 +5,9 @@ import {
   useOutlet,
   useOutletContext,
 } from "react-router";
-import AppRoutedContainer from "../routed-container";
+import AppRoutedContainer, {
+  type AppRoutedContainerProps,
+} from "../routed-container";
 import type {
   AppSidebarMenuItem,
   AppSidebarProps,
@@ -97,6 +99,7 @@ export interface AppRoutedOverlayProps<
   title?: ReactNode;
   closeTo?: string;
   wrapContent?: boolean;
+  overlayProps?: AppRoutedContainerProps["overlayProps"];
   sidebarProps?: AppRoutedOverlaySidebarProps;
   outletWrapperClassName?: string;
   suspenseFallback?: ReactNode;
@@ -143,6 +146,7 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
   title,
   closeTo = "/",
   wrapContent,
+  overlayProps,
   sidebarProps,
   outletWrapperClassName = "h-full w-full overflow-auto",
   suspenseFallback = (
@@ -225,6 +229,7 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
       onClose={() => navigate(closeTo)}
       title={title}
       wrapContent={wrapContent}
+      overlayProps={overlayProps}
       sidebarProps={resolvedSidebarProps}
     >
       <Suspense fallback={suspenseFallback}>

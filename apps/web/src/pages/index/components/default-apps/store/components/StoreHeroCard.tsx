@@ -14,24 +14,20 @@ const StoreHeroCard: FC<StoreHeroCardProps> = ({
   title,
   description,
   gradient,
-  circlePosition = "left",
+  circlePosition,
   className = "",
 }) => {
+  void circlePosition;
+
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border  ${gradient} px-6 py-6 text-white shadow-sm ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border border-white/60 ${gradient} px-7 py-7 text-white shadow-[0_18px_45px_rgba(15,23,42,0.16)] ${className}`}
     >
-      {circlePosition === "left" && (
-        <div className="absolute -left-14 -top-14 h-40 w-40 rounded-full bg-white/20 blur-2xl" />
-      )}
-      {circlePosition === "right" && (
-        <div className="absolute -right-14 -top-14 h-64 w-64 rounded-full bg-white/20 blur-3xl" />
-      )}
-
-      <div className="relative z-10">
-        <div className="text-xs font-bold uppercase tracking-wider opacity-80 mb-2">{subtitle}</div>
-        <div className="text-3xl font-bold tracking-tight mb-2">{title}</div>
-        <div className="text-base opacity-90 max-w-md">{description}</div>
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.24),rgba(255,255,255,0)_44%)]" />
+      <div className="relative z-10 max-w-2xl">
+        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/[0.78]">{subtitle}</div>
+        <div className="mb-2 text-[34px] font-bold leading-tight tracking-normal">{title}</div>
+        <div className="max-w-xl text-base leading-6 text-white/[0.88]">{description}</div>
       </div>
     </div>
   );
