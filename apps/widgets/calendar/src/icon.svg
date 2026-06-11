@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#f5f5f7" />
+  <rect x="8" y="8" width="48" height="48" rx="12" fill="#ffffff" stroke="#d2d2d7" />
+  <path d="M8 20h48" stroke="#ff3b30" stroke-width="8" />
+  <text x="32" y="45" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,SF Pro Display,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#1d1d1f">11</text>
+</svg>
