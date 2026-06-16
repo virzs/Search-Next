@@ -268,7 +268,7 @@ function Index() {
   }, [personalization.wallpaper]);
 
   const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
-  const [init, { toggle: toggleInit }] = useBoolean(true);
+  const [init, { setFalse: finishInit }] = useBoolean(true);
   const [fullWidget, setFullWidget] = useState<{
     entry: string;
     props?: any;
@@ -451,7 +451,7 @@ function Index() {
         setDockItems(nextDockItems);
         persistDesktopPages(nextPages, true);
       }
-      if (init) toggleInit();
+      if (init) finishInit();
     },
   });
 

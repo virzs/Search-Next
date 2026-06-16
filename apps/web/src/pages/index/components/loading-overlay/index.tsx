@@ -13,7 +13,7 @@ export interface LoadingOverlayProps {
 const LoadingOverlay: FC<LoadingOverlayProps> = ({
   open,
   text = "正在加载…",
-  delayMs = 150,
+  delayMs = 0,
   spinSize = "large",
   className,
 }) => {
@@ -21,11 +21,16 @@ const LoadingOverlay: FC<LoadingOverlayProps> = ({
     "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271280%27%20height%3D%271280%27%3E%3Cfilter%20id%3D%27t%27%20x%3D%270%27%20y%3D%270%27%20width%3D%27100%25%27%20height%3D%27100%25%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.010%27%20numOctaves%3D%275%27%20seed%3D%278%27%20stitchTiles%3D%27noStitch%27/%3E%3CfeColorMatrix%20type%3D%27matrix%27%20values%3D%271%200%200%200%200%200%201%200%200%200%200%200%201%200%200%200%200%200%200.22%200%27/%3E%3C/filter%3E%3Crect%20width%3D%271280%27%20height%3D%271280%27%20filter%3D%27url(%23t)%27/%3E%3C/svg%3E";
   const grainTextureDataUrl =
     "data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271024%27%20height%3D%271024%27%3E%3Cfilter%20id%3D%27g%27%20x%3D%270%27%20y%3D%270%27%20width%3D%27100%25%27%20height%3D%27100%25%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.65%27%20numOctaves%3D%273%27%20seed%3D%2711%27%20stitchTiles%3D%27noStitch%27/%3E%3CfeColorMatrix%20type%3D%27matrix%27%20values%3D%270%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.16%200%27/%3E%3C/filter%3E%3Crect%20width%3D%271024%27%20height%3D%271024%27%20filter%3D%27url(%23g)%27/%3E%3C/svg%3E";
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(open && delayMs <= 0);
 
   useEffect(() => {
     if (!open) {
       setVisible(false);
+      return;
+    }
+
+    if (delayMs <= 0) {
+      setVisible(true);
       return;
     }
 
@@ -34,12 +39,12 @@ const LoadingOverlay: FC<LoadingOverlayProps> = ({
   }, [delayMs, open]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {visible ? (
         <motion.div
           className={
             className ??
-            "fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
+            "fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden"
           }
           style={{
             backgroundImage:
