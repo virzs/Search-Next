@@ -3,7 +3,7 @@ import { Sender, Bubble, Conversations } from "@ant-design/x";
 import { Select, Space, Typography, Button, message, Drawer } from "antd";
 import { RiGlobalLine, RiRobot2Line, RiHistoryLine } from "@remixicon/react";
 import { css, cx } from "@emotion/css";
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import { performAISearch, isDeepSeekConfigured } from "../../services/ai-search";
 
 interface SearchEngine {
@@ -173,7 +173,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
   }, []);
 
   return (
-    <DesktopBaseModal visible={visible} onClose={handleModalClose} width={1000}>
+    <DesktopNextBaseModal visible={visible} onClose={handleModalClose} width={1000}>
         <div
           className={cx(
             "max-h-[50vh] h-screen overflow-hidden",
@@ -329,7 +329,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
             )}
           </Drawer>
         </div>
-      </DesktopBaseModal>
+      </DesktopNextBaseModal>
   );
 };
 

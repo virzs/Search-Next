@@ -6,7 +6,7 @@ import { useBoolean, useRequest } from "ahooks";
 import { Badge, Button, Empty, Tooltip } from "antd";
 import { format } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DesktopBaseModal, SimpleEditorViewer } from "zs_library";
+import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
 
 const Notice = () => {
   const [open, { setTrue: openModal, setFalse: closeModal }] =
@@ -93,7 +93,7 @@ const Notice = () => {
           ></Button>
         </Tooltip>
       </Badge>
-      <DesktopBaseModal
+      <DesktopNextBaseModal
         visible={open}
         onClose={() => {
           closeModal();
@@ -160,7 +160,7 @@ const Notice = () => {
             </div>
           </div>
         </div>
-      </DesktopBaseModal>
+      </DesktopNextBaseModal>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { Drawer } from "antd";
 import type { DrawerProps } from "antd";
 import { configResponsive, useResponsive } from "ahooks";
 import { CSSProperties, FC, ReactNode } from "react";
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import { cx } from "@emotion/css";
 
 export interface AppResponsiveOverlayProps {
@@ -11,7 +11,7 @@ export interface AppResponsiveOverlayProps {
   title?: ReactNode;
   isDesktop?: boolean;
   drawerProps?: Partial<DrawerProps>;
-  modalProps?: Partial<React.ComponentProps<typeof DesktopBaseModal>>;
+  modalProps?: Partial<React.ComponentProps<typeof DesktopNextBaseModal>>;
   wrapContent?: boolean;
   contentClassName?: string;
   desktopContentClassName?: string;
@@ -86,14 +86,14 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({
 
   if (resolvedIsDesktop) {
     return (
-      <DesktopBaseModal
+      <DesktopNextBaseModal
         {...modalProps}
         visible={modalProps?.visible ?? open}
         onClose={modalProps?.onClose ?? onClose}
         width={modalProps?.width ?? 1180}
       >
         {contentNode}
-      </DesktopBaseModal>
+      </DesktopNextBaseModal>
     );
   }
 

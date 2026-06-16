@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       '@types/react':
         specifier: ^19.0.10
         version: 19.2.7
@@ -19,7 +19,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       react:
         specifier: ^19.2.0
         version: 19.2.3
@@ -86,7 +86,7 @@ importers:
         version: 4.8.0(react@19.2.3)
       '@tailwindcss/vite':
         specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       ahooks:
         specifier: ^3.8.4
         version: 3.9.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -130,8 +130,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       zs_library:
-        specifier: ^0.9.4
-        version: 0.9.4(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76)
+        specifier: ^0.9.6
+        version: 0.9.6(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76)
     devDependencies:
       '@eslint/js':
         specifier: ^9.22.0
@@ -147,7 +147,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       dotenv-cli:
         specifier: ^7.4.3
         version: 7.4.4
@@ -202,7 +202,7 @@ importers:
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       '@types/react':
         specifier: ^19.0.10
         version: 19.2.7
@@ -211,7 +211,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.18
@@ -239,7 +239,7 @@ importers:
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       '@types/react':
         specifier: ^19.0.10
         version: 19.2.7
@@ -248,7 +248,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.18
@@ -270,7 +270,7 @@ importers:
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       '@types/react':
         specifier: ^19.0.10
         version: 19.2.7
@@ -279,7 +279,7 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.18
@@ -7196,8 +7196,8 @@ packages:
   zrender@5.6.1:
     resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
-  zs_library@0.9.4:
-    resolution: {integrity: sha512-/rkTiyp15ARuSbvzCsY76JoZqLOUwwQoQz8mimGLP5nL/eDq5Yr3ksHs5VJ72hyPx9BURt8ner/+CyELNVvdYQ==}
+  zs_library@0.9.6:
+    resolution: {integrity: sha512-rbVt1/6N3QaerVsbZmBlyDt2B7O+9UMVqMrNRgTaWzP3+eWvNbg/d1HxC3/wz7JM1/zVVH60FNsV7afuObZGRA==}
     peerDependencies:
       react: '>=18.0.0 <19.0.0'
       react-dom: '>=18.0.0 <19.0.0'
@@ -10359,7 +10359,7 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.1.18
 
-  '@tailwindcss/vite@4.1.18(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))':
+  '@tailwindcss/vite@4.1.18(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))':
     dependencies:
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
@@ -10916,7 +10916,7 @@ snapshots:
     optionalDependencies:
       maplibre-gl: 5.15.0
 
-  '@vitejs/plugin-react-swc@3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@18.19.130)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))':
+  '@vitejs/plugin-react-swc@3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@swc/core': 1.15.8(@swc/helpers@0.5.23)
@@ -15491,7 +15491,7 @@ snapshots:
     dependencies:
       tslib: 2.3.0
 
-  zs_library@0.9.4(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76):
+  zs_library@0.9.6(@codemirror/language@6.12.1)(@floating-ui/dom@1.7.4)(@lezer/highlight@1.2.3)(@mantine/hooks@7.17.8(react@19.2.3))(@tiptap/extension-code-block@3.14.0(@tiptap/core@3.14.0(@tiptap/pm@3.14.0))(@tiptap/pm@3.14.0))(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(@types/sortablejs@1.15.9)(framer-motion@12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(jquery@3.7.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.7.3)(yjs@13.6.29)(zod@3.25.76):
     dependencies:
       '@ai-sdk/react': 1.2.12(react@19.2.3)(zod@3.25.76)
       '@emotion/css': 11.13.5

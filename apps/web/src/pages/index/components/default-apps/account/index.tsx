@@ -1,4 +1,4 @@
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import useAuth from "@/hooks/useAuth";
 import { AccountInfo, UnloggedView } from "@/components/auth";
 
@@ -11,7 +11,7 @@ const AccountModal = ({ open, onClose }: AccountModalProps) => {
   const { user, isAuthenticated } = useAuth();
 
   return (
-    <DesktopBaseModal visible={open} onClose={onClose}>
+    <DesktopNextBaseModal visible={open} onClose={onClose}>
       {isAuthenticated && user ? (
         <AccountInfo user={user} showActions />
       ) : (
@@ -26,7 +26,7 @@ const AccountModal = ({ open, onClose }: AccountModalProps) => {
           />
         </div>
       )}
-    </DesktopBaseModal>
+    </DesktopNextBaseModal>
   );
 };
 

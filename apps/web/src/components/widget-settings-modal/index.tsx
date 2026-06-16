@@ -1,4 +1,4 @@
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import { Form, Input, InputNumber, Select, Switch, Button } from "antd";
 import { useEffect, useMemo, type FC } from "react";
 import type { WidgetSettingsField } from "@/types";
@@ -130,7 +130,7 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
 
   if (customSettingsConfig) {
     return (
-      <DesktopBaseModal
+      <DesktopNextBaseModal
         visible={visible}
         onClose={onClose}
         width={560}
@@ -148,12 +148,12 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
             />
           </div>
         </div>
-      </DesktopBaseModal>
+      </DesktopNextBaseModal>
     );
   }
 
   return (
-    <DesktopBaseModal
+    <DesktopNextBaseModal
       visible={visible}
       onClose={onClose}
       width={480}
@@ -189,7 +189,7 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
           </Button>
         </div>
       </div>
-    </DesktopBaseModal>
+    </DesktopNextBaseModal>
   );
 };
 

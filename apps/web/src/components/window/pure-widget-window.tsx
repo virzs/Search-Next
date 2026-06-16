@@ -1,4 +1,4 @@
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import PureWidget, { PureWidgetConfig } from "../micro-frontend/pure-widget";
 import type { WidgetSDK } from "@/sdk";
 
@@ -22,7 +22,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   sdk,
 }) => {
   return (
-    <DesktopBaseModal
+    <DesktopNextBaseModal
       visible={visible}
       onClose={onClose}
       width={typeof width === "number" ? width : undefined}
@@ -34,7 +34,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
           className="w-full h-full"
         />
       </div>
-    </DesktopBaseModal>
+    </DesktopNextBaseModal>
   );
 };
 
