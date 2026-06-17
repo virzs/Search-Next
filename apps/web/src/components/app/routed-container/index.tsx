@@ -1,4 +1,12 @@
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLocation, useNavigate, useNavigationType } from "react-router";
 import AppResponsiveOverlay, {
   AppResponsiveOverlayProps,
@@ -6,7 +14,8 @@ import AppResponsiveOverlay, {
 import AppSidebar, { AppSidebarProps } from "../sidebar";
 import { Button } from "antd";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
+import { AppRoutedHeaderContext } from "./header-context";
 
 export interface AppRoutedContainerProps {
   open: boolean;
@@ -120,12 +129,44 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
     navigate(stackRef.current[nextIndex], { replace: true });
   };
 
-  const showHistoryControls =
-    basePath && basePath !== "/" && location.pathname.startsWith(basePath);
+  const showHistoryControls = Boolean(
+    basePath && basePath !== "/" && location.pathname.startsWith(basePath),
+  );
+  const [viewHeader, setViewHeader] = useState<ReactNode | null>(null);
+  const activeHeaderIdRef = useRef<symbol | null>(null);
+
+  const setHeader = useCallback((id: symbol, header: ReactNode | null) => {
+    if (header) {
+      activeHeaderIdRef.current = id;
+      setViewHeader(header);
+      return;
+    }
+
+    if (activeHeaderIdRef.current === id) {
+      activeHeaderIdRef.current = null;
+      setViewHeader(null);
+    }
+  }, []);
+
+  const headerContextValue = useMemo(
+    () => ({
+      hasHistoryControls: showHistoryControls,
+      setHeader,
+    }),
+    [setHeader, showHistoryControls],
+  );
+
+  const showHeaderRow = showHistoryControls || Boolean(viewHeader);
 
   return (
     <AppResponsiveOverlay
       {...overlayProps}
+      contentClassName={cx(
+        overlayProps?.contentClassName,
+        css`
+          background: linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
+        `,
+      )}
       open={overlayProps?.open ?? open}
       onClose={overlayProps?.onClose ?? onClose}
       title={overlayProps?.title ?? title}
@@ -140,30 +181,43 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
     >
       <div className="flex h-full w-full overflow-hidden">
         {sidebarProps ? <AppSidebar {...sidebarProps} /> : null}
-        <div className="h-full w-0 grow overflow-hidden relative">
-          {showHistoryControls ? (
-            <div className={historyControlsClassName}>
-              <Button
-                type="text"
-                size="small"
-                aria-label="后退"
-                className="app-history-button"
-                icon={<RiArrowLeftLine size={16} />}
-                disabled={!canBack}
-                onClick={handleBack}
-              />
-              <Button
-                type="text"
-                size="small"
-                aria-label="前进"
-                className="app-history-button"
-                icon={<RiArrowRightLine size={16} />}
-                disabled={!canForward}
-                onClick={handleForward}
-              />
+        <div className="flex h-full w-0 grow flex-col overflow-hidden">
+          <AppRoutedHeaderContext.Provider value={headerContextValue}>
+            {showHeaderRow ? (
+              <div className={routedHeaderClassName}>
+                {showHistoryControls ? (
+                  <div className={historyControlsClassName}>
+                    <Button
+                      type="text"
+                      size="small"
+                      aria-label="后退"
+                      className="app-history-button"
+                      icon={<RiArrowLeftLine size={16} />}
+                      disabled={!canBack}
+                      onClick={handleBack}
+                    />
+                    <Button
+                      type="text"
+                      size="small"
+                      aria-label="前进"
+                      className="app-history-button"
+                      icon={<RiArrowRightLine size={16} />}
+                      disabled={!canForward}
+                      onClick={handleForward}
+                    />
+                  </div>
+                ) : null}
+                {viewHeader ? (
+                  <div className="min-w-0 flex-1">{viewHeader}</div>
+                ) : (
+                  <div className="min-w-0 flex-1" />
+                )}
+              </div>
+            ) : null}
+            <div className="relative min-h-0 flex-1 overflow-hidden">
+              {children}
             </div>
-          ) : null}
-          {children}
+          </AppRoutedHeaderContext.Provider>
         </div>
       </div>
     </AppResponsiveOverlay>
@@ -172,15 +226,21 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
 
 export default AppRoutedContainer;
 
-const historyControlsClassName = css`
-  position: absolute;
-  left: 0;
-  top: 0;
+const routedHeaderClassName = css`
+  position: relative;
   z-index: 20;
   display: flex;
+  width: 100%;
+  flex-shrink: 0;
+  align-items: center;
+`;
+
+const historyControlsClassName = css`
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 6px;
-  padding: 10px 12px;
+  padding: 10px 0 10px 12px;
 
   .app-history-button {
     width: 28px !important;

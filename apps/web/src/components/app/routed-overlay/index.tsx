@@ -1,4 +1,12 @@
-import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
+import {
+  ReactNode,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   useLocation,
   useNavigate,
@@ -8,6 +16,7 @@ import {
 import AppRoutedContainer, {
   type AppRoutedContainerProps,
 } from "../routed-container";
+import { AppRoutedPageActiveContext } from "../routed-container/header-context";
 import type {
   AppSidebarMenuItem,
   AppSidebarProps,
@@ -69,7 +78,9 @@ const KeepAliveOutlet = ({
               pointerEvents: isActive ? "auto" : "none",
             }}
           >
-            {isActive ? activeElement : p.element}
+            <AppRoutedPageActiveContext.Provider value={isActive}>
+              {isActive ? activeElement : p.element}
+            </AppRoutedPageActiveContext.Provider>
           </div>
         );
       })}
@@ -89,6 +100,8 @@ export interface AppRoutedOverlaySidebarProps extends Omit<
   menuItems?: AppRoutedOverlayMenuItem[];
   search?: Omit<AppSidebarSearchProps, "value" | "onChange"> & {
     initialValue?: string;
+    redirectPath?: string;
+    throttleWait?: number;
   };
 }
 
@@ -142,6 +155,49 @@ const resolveActiveMenuItem = (
   return scored[0]?.item ?? items[0] ?? null;
 };
 
+const useThrottledValue = <T,>(value: T, wait: number) => {
+  const [throttledValue, setThrottledValue] = useState(value);
+  const latestValueRef = useRef(value);
+  const lastRunAtRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    latestValueRef.current = value;
+
+    if (wait <= 0) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = null;
+      lastRunAtRef.current = Date.now();
+      setThrottledValue(value);
+      return;
+    }
+
+    const now = Date.now();
+    const elapsed = now - lastRunAtRef.current;
+
+    const run = () => {
+      timerRef.current = null;
+      lastRunAtRef.current = Date.now();
+      setThrottledValue(latestValueRef.current);
+    };
+
+    if (elapsed >= wait) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      run();
+      return;
+    }
+
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(run, wait - elapsed);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [value, wait]);
+
+  return throttledValue;
+};
+
 const AppRoutedOverlay = <ParentContext, RouteContext>({
   title,
   closeTo = "/",
@@ -163,11 +219,73 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
   const [searchValue, setSearchValue] = useState(
     sidebarProps?.search?.initialValue ?? "",
   );
-
-  const activeMenuItem = useMemo(
-    () => resolveActiveMenuItem(location.pathname, sidebarProps?.menuItems),
-    [location.pathname, sidebarProps?.menuItems],
+  const searchRedirectPath = sidebarProps?.search?.redirectPath;
+  const isSearchRoute = Boolean(
+    searchRedirectPath &&
+      (location.pathname === searchRedirectPath ||
+        location.pathname.startsWith(`${searchRedirectPath}/`)),
   );
+  const searchQueryValue = useMemo(() => {
+    if (!isSearchRoute) return "";
+    return new URLSearchParams(location.search).get("q") ?? "";
+  }, [isSearchRoute, location.search]);
+  const throttledSearchValue = useThrottledValue(
+    searchValue,
+    sidebarProps?.search?.throttleWait ?? 360,
+  );
+  const effectiveSearchValue = searchValue.trim() ? throttledSearchValue : "";
+  const routeSearchValue = isSearchRoute
+    ? searchQueryValue
+    : effectiveSearchValue;
+  const latestLocationRef = useRef(location);
+  const latestNavigateRef = useRef(navigate);
+
+  useEffect(() => {
+    latestLocationRef.current = location;
+  }, [location]);
+
+  useEffect(() => {
+    latestNavigateRef.current = navigate;
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!searchRedirectPath) return;
+
+    if (isSearchRoute) {
+      setSearchValue((current) =>
+        current === searchQueryValue ? current : searchQueryValue,
+      );
+      return;
+    }
+
+    setSearchValue("");
+  }, [isSearchRoute, searchQueryValue, searchRedirectPath]);
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchValue(value);
+      if (!value.trim() && searchRedirectPath && isSearchRoute) {
+        navigate(searchRedirectPath, { replace: true });
+      }
+    },
+    [isSearchRoute, navigate, searchRedirectPath],
+  );
+
+  const activeMenuItem = useMemo(() => {
+    if (
+      searchRedirectPath &&
+      (location.pathname === searchRedirectPath ||
+        location.pathname.startsWith(`${searchRedirectPath}/`))
+    ) {
+      return null;
+    }
+
+    return resolveActiveMenuItem(location.pathname, sidebarProps?.menuItems);
+  }, [
+    location.pathname,
+    sidebarProps?.menuItems,
+    searchRedirectPath,
+  ]);
 
   const activeMenuKey = activeMenuItem?.key;
 
@@ -185,17 +303,20 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
       activeMenuKey,
       onMenuSelect: (key) => {
         const item = (sidebarProps.menuItems ?? []).find((i) => i.key === key);
-        if (item) navigate(item.path);
+        if (item) {
+          setSearchValue("");
+          navigate(item.path);
+        }
       },
       search: sidebarProps.search
         ? {
             ...sidebarProps.search,
             value: searchValue,
-            onChange: setSearchValue,
+            onChange: handleSearchChange,
           }
         : undefined,
     };
-  }, [activeMenuKey, navigate, searchValue, sidebarProps]);
+  }, [activeMenuKey, handleSearchChange, navigate, searchValue, sidebarProps]);
 
   const keepAliveKey = useMemo(() => {
     if (!keepAlive?.enabled) return null;
@@ -210,10 +331,37 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
     return getRouteContext({
       parentContext,
       location,
-      search: { value: searchValue, setValue: setSearchValue },
+      search: { value: routeSearchValue, setValue: handleSearchChange },
       activeMenuItem,
     });
-  }, [activeMenuItem, getRouteContext, location, parentContext, searchValue]);
+  }, [
+    activeMenuItem,
+    handleSearchChange,
+    getRouteContext,
+    location,
+    parentContext,
+    routeSearchValue,
+  ]);
+
+  useEffect(() => {
+    const query = effectiveSearchValue.trim();
+    if (!searchRedirectPath || !query) return;
+
+    const currentLocation = latestLocationRef.current;
+    const currentIsSearchRoute =
+      currentLocation.pathname === searchRedirectPath ||
+      currentLocation.pathname.startsWith(`${searchRedirectPath}/`);
+    const nextSearchParams = new URLSearchParams(
+      currentIsSearchRoute ? currentLocation.search : "",
+    );
+    nextSearchParams.set("q", query);
+
+    const nextUrl = `${searchRedirectPath}?${nextSearchParams.toString()}`;
+    const currentUrl = `${currentLocation.pathname}${currentLocation.search}`;
+    if (currentUrl === nextUrl) return;
+
+    latestNavigateRef.current(nextUrl, { replace: currentIsSearchRoute });
+  }, [effectiveSearchValue, searchRedirectPath]);
 
   const content = children ? (
     children

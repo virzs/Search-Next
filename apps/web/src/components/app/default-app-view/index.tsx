@@ -1,5 +1,16 @@
 import { cx } from "@emotion/css";
-import type { FC, ReactNode } from "react";
+import {
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type FC,
+  type ReactNode,
+} from "react";
+import {
+  AppRoutedHeaderContext,
+  AppRoutedPageActiveContext,
+} from "../routed-container/header-context";
 
 export interface DefaultAppViewProps {
   className?: string;
@@ -11,6 +22,32 @@ export interface DefaultAppViewProps {
   headerRight?: ReactNode;
   children: ReactNode;
 }
+
+type DefaultAppViewHeaderProps = Pick<
+  DefaultAppViewProps,
+  "headerClassName" | "headerLeft" | "headerRight" | "title"
+>;
+
+const DefaultAppViewHeader: FC<DefaultAppViewHeaderProps> = ({
+  headerClassName,
+  title,
+  headerLeft,
+  headerRight,
+}) => {
+  return (
+    <div
+      className={cx("w-full shrink-0 flex items-center gap-3", headerClassName)}
+    >
+      <div className="min-w-0 flex-1">
+        {title && (
+          <div className="text-lg font-bold leading-8 ml-2">{title}</div>
+        )}
+        {headerLeft}
+      </div>
+      {headerRight ? <div className="shrink-0">{headerRight}</div> : null}
+    </div>
+  );
+};
 
 const DefaultAppView: FC<DefaultAppViewProps> = ({
   className,
@@ -24,6 +61,38 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
 }) => {
   const showHeader =
     Boolean(title) || Boolean(headerLeft) || Boolean(headerRight);
+  const routedHeaderContext = useContext(AppRoutedHeaderContext);
+  const isRoutedPageActive = useContext(AppRoutedPageActiveContext);
+  const headerIdRef = useRef(Symbol("DefaultAppViewHeader"));
+  const headerNode = useMemo(
+    () =>
+      showHeader ? (
+        <DefaultAppViewHeader
+          headerClassName={headerClassName}
+          title={title}
+          headerLeft={headerLeft}
+          headerRight={headerRight}
+        />
+      ) : null,
+    [headerClassName, headerLeft, headerRight, showHeader, title],
+  );
+  const useRoutedHeader = Boolean(
+    routedHeaderContext &&
+      (showHeader || routedHeaderContext.hasHistoryControls),
+  );
+
+  useLayoutEffect(() => {
+    if (!routedHeaderContext) return;
+
+    const headerId = headerIdRef.current;
+    if (!isRoutedPageActive || !headerNode) {
+      routedHeaderContext.setHeader(headerId, null);
+      return;
+    }
+
+    routedHeaderContext.setHeader(headerId, headerNode);
+    return () => routedHeaderContext.setHeader(headerId, null);
+  }, [headerNode, isRoutedPageActive, routedHeaderContext]);
 
   return (
     <div
@@ -35,16 +104,8 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
         className,
       )}
     >
-      {showHeader ? (
-        <div className={cx("shrink-0 flex items-start gap-3", headerClassName)}>
-          <div className="min-w-0 flex-1 ml-16">
-            {title && (
-              <div className="text-lg font-bold leading-8 ml-2">{title}</div>
-            )}
-            {headerLeft}
-          </div>
-          {headerRight ? <div className="shrink-0">{headerRight}</div> : null}
-        </div>
+      {useRoutedHeader ? null : showHeader ? (
+        headerNode
       ) : (
         <div className="min-h-8"></div>
       )}
