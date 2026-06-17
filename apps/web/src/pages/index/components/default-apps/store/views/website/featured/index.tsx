@@ -46,15 +46,13 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
   return (
     <div
       ref={featuredHomeScrollRef}
-      className="flex-1 overflow-y-auto pr-2 pl-1 pb-4"
+      className="flex-1 overflow-y-auto px-3 pb-6"
     >
       <StoreHeroCard
-        subtitle="今日推荐"
-        title="发现优质网站"
-        description="探索我们为您精选的实用工具、高效办公和创意设计资源。"
-        gradient="bg-linear-to-br from-blue-600 via-sky-500 to-indigo-500"
-        circlePosition="right"
-        className="mb-4"
+        title="高效工作网站精选"
+        description="集中浏览常用工具、文档与设计资源，进入详情后可直接获取到桌面。"
+        tone="website"
+        className="mb-5"
       />
 
       <div className="mt-2">
@@ -79,29 +77,29 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
             {collectionItems.length === 0 ? (
               <Empty className="mt-4" description="暂无合集" />
             ) : (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-5">
                 {collectionItems.map((c: any) => (
                   <div key={c._id}>
-                    <div className="flex items-end justify-between gap-3 mb-3 px-1">
+                    <div className="mb-3 flex items-end justify-between gap-3 px-1">
                       <div className="min-w-0">
-                        <div className="text-lg font-bold  line-clamp-1">
+                        <div className="line-clamp-1 text-xl font-bold tracking-normal text-gray-950 dark:text-gray-50">
                           {c.title}
                         </div>
-                        <div className="text-sm  mt-0.5 line-clamp-1">
+                        <div className="mt-1 line-clamp-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                           {c.description || " "}
                         </div>
                       </div>
                       <Button
                         type="link"
-                        className="px-0! ! hover:text-[rgb(250,84,28)]!"
+                        className="px-0! font-bold! text-[#0071e3]!"
                         onClick={() => onOpenCollection(c._id)}
                       >
                         查看更多
                       </Button>
                     </div>
-                    <div className="flex flex-nowrap gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1">
+                    <div className="-mx-1 flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
                       {(c.websites || []).map((item: any) => (
-                        <div key={getWebsiteId(item)} className="w-56 shrink-0">
+                        <div key={getWebsiteId(item)} className="w-64 shrink-0">
                           <WebsiteCard
                             item={item}
                             layout="grid"

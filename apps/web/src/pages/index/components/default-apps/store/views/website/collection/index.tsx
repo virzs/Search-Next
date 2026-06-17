@@ -17,10 +17,10 @@ type StoreOutletContext = {
 
 const SkeletonWebsiteGrid: React.FC<{ count: number }> = ({ count }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className="rounded-2xl overflow-hidden">
-          <Skeleton.Image active style={{ width: "100%", height: 140 }} />
+        <div key={idx} className="overflow-hidden rounded-2xl border border-black/[0.07] bg-white p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)]">
+          <Skeleton.Image active style={{ width: 52, height: 52, borderRadius: 12 }} />
           <div className="mt-2 px-2">
             <Skeleton
               active
@@ -85,11 +85,11 @@ const WebsiteCollectionRoute: FC = () => {
   );
 
   const titleNode = activeCollection?.title ? (
-    <div className="text-lg font-bold  line-clamp-1">
+    <div className="line-clamp-1 text-[30px] font-extrabold leading-9 tracking-normal text-gray-950 dark:text-gray-50">
       {activeCollection.title}
     </div>
   ) : (
-    <Skeleton.Input active size="small" style={{ width: 180 }} />
+    <Skeleton.Input active size="large" style={{ width: 180 }} />
   );
 
   const handleAddFromCard = (item: any) => {
@@ -107,14 +107,23 @@ const WebsiteCollectionRoute: FC = () => {
     <DefaultAppView
       className="h-full"
       animate
-      headerLeft={titleNode}
+      contentClassName="px-3 pb-6 pt-4"
     >
-      <div className="p-6 pt-0">
+      <div>
+        <div className="mb-4 px-1">
+          {titleNode}
+          {activeCollection?.description ? (
+            <div className="mt-1 line-clamp-2 text-sm font-semibold text-gray-500 dark:text-gray-400">
+              {activeCollection.description}
+            </div>
+          ) : null}
+        </div>
+
         {collectionWebsitesLoading ? (
           <SkeletonWebsiteGrid count={Math.min(6, pageSize)} />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {activeCollectionWebsites.map((item: any) => (
                 <WebsiteCard
                   key={getWebsiteId(item)}

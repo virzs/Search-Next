@@ -8,6 +8,7 @@ import { Navigate } from "react-router";
 import WidgetView from "./views/widget";
 import DevView from "./views/dev";
 import { storeRoute } from "./route-paths";
+import StoreSearchView from "./views/search";
 
 const WidgetRoute = () => {
   const { query, onAddWidget } = useAppRouteContext<StoreOutletContext>();
@@ -34,6 +35,7 @@ export const storeRoutes = {
         { path: storeRoute.segment.wildcard, element: <StoreNotFoundRoute /> },
       ],
     },
+    { path: storeRoute.segment.search, element: <StoreSearchView /> },
     { path: storeRoute.segment.widget, element: <WidgetRoute /> },
     { path: storeRoute.segment.dev, element: <DevView /> },
     { path: storeRoute.segment.wildcard, element: <StoreNotFoundRoute /> },

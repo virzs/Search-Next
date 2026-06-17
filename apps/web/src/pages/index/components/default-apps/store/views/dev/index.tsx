@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import {
   Button,
-  Card,
   Empty,
   Space,
   Tag,
-  Typography,
   App,
   Popconfirm,
-  Alert,
 } from "antd";
 import {
   RiAddLine,
@@ -22,8 +19,6 @@ import { useWidget } from "@/hooks/useWidget";
 import type { DevWidget } from "@/contexts/WidgetContext";
 import DevWidgetModal, { toSizeConfigs } from "./dev-widget-modal";
 import type { DevWidgetFormValues } from "./dev-widget-modal";
-
-const { Title } = Typography;
 
 const DevView: React.FC = () => {
   const { message } = App.useApp();
@@ -88,69 +83,53 @@ const DevView: React.FC = () => {
   };
 
   return (
-    <DefaultAppView contentClassName="flex flex-col overflow-hidden pt-5 px-1 pb-4">
-      {/* 顶部 Hero 卡片 */}
+    <DefaultAppView contentClassName="flex flex-col overflow-hidden px-3 pb-6 pt-4">
+      <div className="mb-4 flex shrink-0 items-end justify-between gap-3 px-1">
+        <div className="text-[34px] font-extrabold leading-[38px] tracking-normal text-gray-950 dark:text-gray-50">
+          开发者
+        </div>
+        <Button
+          type="primary"
+          icon={<RiAddLine size={16} />}
+          shape="round"
+          className="font-bold!"
+          onClick={openAddModal}
+        >
+          添加
+        </Button>
+      </div>
+
       <div className="shrink-0">
         <StoreHeroCard
-          subtitle="开发者"
-          title="自定义小组件测试"
-          description="推荐将 apps/widgets/<name> 打包为 .snwidget 上传后台；这里仅保留远程入口调试。"
-          gradient="bg-linear-to-br from-emerald-600 via-teal-600 to-cyan-600"
-          circlePosition="right"
+          title="调试自定义小组件"
+          description="维护 ESM 入口地址和尺寸配置，用于本地或后端解压入口的小组件调试。"
+          tone="dev"
         />
       </div>
 
-      {/* 标题栏 + 添加按钮 */}
-      <div className="mt-5 shrink-0 px-1">
-        <Alert
-          type="info"
-          showIcon
-          className="mb-3"
-          message="本地 public/widgets 已废弃"
-          description="请在 apps/widgets/<name> 编写源码，执行 pnpm widget:pack <name> 生成 .snwidget 后到后台导入，线上从后端 /static/widgets/... 地址加载。"
-        />
-        <div className="flex items-center justify-between mb-3">
-          <Title level={5} className="mb-0!">
-            自定义小组件
-          </Title>
-          <Space size={8}>
-            <Button
-              type="primary"
-              icon={<RiAddLine size={16} />}
-              className="rounded-full!"
-              onClick={openAddModal}
-            >
-              添加
-            </Button>
-          </Space>
-        </div>
-      </div>
-
-      {/* 空状态 */}
       {devWidgets.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <Empty description="暂无自定义小组件。建议通过后台导入 .snwidget；这里可手动填写后端解压后的 entryUrl 调试。" />
+          <Empty description="暂无自定义小组件" />
         </div>
       ) : (
-        // 小组件列表（可滚动区域）
-        <div className="grid gap-3 grid-cols-1 overflow-y-auto pr-1 flex-1 px-1">
+        <div className="mt-5 grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-1 pr-1">
           {devWidgets.map((dw) => {
             return (
-              <Card
+              <div
                 key={dw.id}
-                className="rounded-2xl! overflow-hidden"
+                className="rounded-2xl border border-black/[0.08] bg-white p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.08]"
               >
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 rounded-xl bg-emerald-500/10 p-2 w-10 h-10 flex items-center justify-center">
-                    <RiCodeSSlashLine className="text-emerald-600 dark:text-emerald-400" size={20} />
+                  <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#30d158,#00c7be)] text-white">
+                    <RiCodeSSlashLine size={22} />
                   </div>
                   <div className="min-w-0 grow">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="font-medium text-gray-800 dark:text-gray-100 line-clamp-1">
+                        <div className="line-clamp-1 font-bold text-gray-950 dark:text-gray-50">
                           {dw.name}
                         </div>
-                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-1 break-all">
+                        <div className="mt-1 line-clamp-1 break-all text-xs font-medium text-gray-500 dark:text-gray-400">
                           {dw.entry}
                         </div>
                       </div>
@@ -183,9 +162,6 @@ const DevView: React.FC = () => {
                     </div>
 
                     <div className="mt-3 flex items-center gap-2 text-xs flex-wrap">
-                      <Tag className="rounded-full! text-xs! m-0!" color="green">
-                        开发者
-                      </Tag>
                       {dw.sizeConfigs.map((sc) => (
                         <Tag key={sc.id} className="rounded-full! text-xs! m-0!">
                           {sc.name || sc.id}
@@ -197,13 +173,12 @@ const DevView: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* 添加/编辑弹窗 */}
       <DevWidgetModal
         open={modalOpen}
         onClose={closeModal}

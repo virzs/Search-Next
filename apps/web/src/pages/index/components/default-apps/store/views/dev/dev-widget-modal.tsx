@@ -1,4 +1,4 @@
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import { Button, Form, Input, InputNumber } from "antd";
 import { RiAddLine, RiCloseLine } from "@remixicon/react";
 import type { FC } from "react";
@@ -153,7 +153,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
   };
 
   return (
-    <DesktopBaseModal
+    <DesktopNextBaseModal
       visible={open}
       onClose={handleClose}
       width={520}
@@ -224,7 +224,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
           </div>
         </Form>
       </div>
-    </DesktopBaseModal>
+    </DesktopNextBaseModal>
   );
 };
 

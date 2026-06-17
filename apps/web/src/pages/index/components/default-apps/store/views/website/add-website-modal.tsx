@@ -1,4 +1,4 @@
-import { DesktopBaseModal } from "zs_library";
+import { DesktopNextBaseModal } from "zs_library";
 import { Button, Form, Input } from "antd";
 import type { FC } from "react";
 
@@ -28,7 +28,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
   const [form] = Form.useForm<AddWebsiteFormValues>();
 
   return (
-    <DesktopBaseModal visible={open} onClose={onClose} width={560}>
+    <DesktopNextBaseModal visible={open} onClose={onClose} width={560}>
       <div className="w-full h-full overflow-hidden">
         <div className="text-lg font-semibold tracking-tight pb-4">
           新增网站
@@ -79,7 +79,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
           </div>
         </Form>
       </div>
-    </DesktopBaseModal>
+    </DesktopNextBaseModal>
   );
 };
 

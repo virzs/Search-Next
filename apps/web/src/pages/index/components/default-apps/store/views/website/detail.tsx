@@ -1,9 +1,10 @@
-import { Button, Card, Image } from "antd";
+import { Button, Image } from "antd";
 import { FC, useEffect, useRef } from "react";
 import { RiExternalLinkLine } from "@remixicon/react";
 import { DefaultAppView, useAppRouteContext } from "@/components";
 import { useLocation, useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
+import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
 
 type StoreOutletContext = {
   onAddWebsite?: (site: any) => void;
@@ -24,58 +25,89 @@ const WebsiteDetailView: FC = () => {
 
   if (!item) return null;
 
-  const iconUrl = item.icon?.url;
+  const iconUrl = getWebsiteIconUrl(item);
+  const name = getWebsiteName(item);
+  const url = getWebsiteUrl(item);
+  const tags = Array.isArray(item?.tags) ? item.tags : [];
 
   return (
-    <DefaultAppView className="h-full" animate>
-      <Card className="min-h-full">
-        <div className="flex items-center text-center mb-8 gap-6">
-          <div className="shrink-0">
-            {iconUrl ? (
-              <Image
-                className="w-24! h-24! rounded-3xl shadow-xl border-4 border-black/10 bg-white dark:border-white/10 dark:bg-white/10"
-                src={iconUrl}
-                preview={false}
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-3xl shadow-xl border-4 border-black/10 bg-gray-100 flex items-center justify-center text-5xl font-bold text-gray-400 dark:border-white/10 dark:bg-white/10 dark:text-white/60">
-                {item.name}
-              </div>
-            )}
-          </div>
-          <div className="text-left">
-            <h1 className="text-2xl font-bold mb-1 line-clamp-1 overflow-hidden text-ellipsis">
-              {item.name}
+    <DefaultAppView
+      className="h-full"
+      animate
+      contentClassName="px-3 pb-6 pt-4"
+    >
+      <div className="min-h-full rounded-[20px] border border-black/[0.08] bg-white p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.08]">
+        <div className="mb-5 flex items-center gap-5 border-b border-black/[0.08] pb-5 dark:border-white/10">
+          {iconUrl ? (
+            <Image
+              className="h-[92px]! w-[92px]! rounded-[22px] bg-white object-cover shadow-sm dark:bg-white/10"
+              src={iconUrl}
+              preview={false}
+            />
+          ) : (
+            <div className="flex h-[92px] w-[92px] shrink-0 items-center justify-center rounded-[22px] bg-[linear-gradient(135deg,#f3f4f6,#e5e7eb)] text-[42px] font-extrabold text-gray-400 dark:bg-white/10 dark:text-white/60">
+              {name?.[0]?.toUpperCase()}
+            </div>
+          )}
+
+          <div className="min-w-0 flex-1 text-left">
+            <h1 className="m-0 line-clamp-1 text-[28px] font-extrabold leading-9 tracking-normal text-gray-950 dark:text-gray-50">
+              {name}
             </h1>
-            <p className="text-sm mb-3 max-w-md break-all">{item.url}</p>
-            <div className="flex gap-4 w-full max-w-xs">
-              <Button type="primary" onClick={() => onAddWebsite?.(item)}>
-                获取
-              </Button>
+            {url ? (
+              <p className="mt-1 max-w-md break-all text-sm font-medium text-gray-500 dark:text-gray-400">
+                {url}
+              </p>
+            ) : null}
+            {tags.length ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {tags.map((tag: any) => {
+                  const label =
+                    typeof tag === "string" ? tag : tag?.name || tag?.label;
+                  if (!label) return null;
+                  return (
+                    <span
+                      key={label}
+                      className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 dark:bg-white/10 dark:text-gray-300"
+                    >
+                      {label}
+                    </span>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              type="primary"
+              shape="round"
+              className="h-8! px-5! font-bold!"
+              onClick={() => onAddWebsite?.(item)}
+            >
+              获取
+            </Button>
+            {url ? (
               <Button
-                icon={<RiExternalLinkLine size={20} />}
-                onClick={() => window.open(item.url, "_blank")}
+                shape="circle"
+                icon={<RiExternalLinkLine size={18} />}
+                onClick={() => window.open(url, "_blank")}
               />
-            </div>
+            ) : null}
           </div>
         </div>
-        <div className="border-pt-4">
-          <h3 className="text-lg font-bold  mb-4">关于此应用</h3>
+
+        {item.description ? (
           <div>
-            <p className=" leading-relaxed">{item.description}</p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {item?.tags?.map((tag: any) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 text-xs"
-                >
-                  {typeof tag === "string" ? tag : tag.name || tag.label}
-                </span>
-              ))}
-            </div>
+            <h3 className="mb-3 text-lg font-bold tracking-normal text-gray-950 dark:text-gray-50">
+              关于此应用
+            </h3>
+            <p className="max-w-2xl leading-7 text-gray-600 dark:text-gray-300">
+              {item.description}
+            </p>
           </div>
-        </div>
-      </Card>
+        ) : null}
+      </div>
     </DefaultAppView>
   );
 };

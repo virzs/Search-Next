@@ -1,6 +1,7 @@
 export const storeRoute = {
   segment: {
     root: "store",
+    search: "search",
     website: "website",
     widget: "widget",
     dev: "dev",
@@ -10,6 +11,7 @@ export const storeRoute = {
   },
   path: {
     root: "/store",
+    search: "/store/search",
     website: {
       root: "/store/website",
       collection: (collectionId: string) =>
@@ -21,4 +23,3 @@ export const storeRoute = {
     dev: "/store/dev",
   },
 } as const;
-
