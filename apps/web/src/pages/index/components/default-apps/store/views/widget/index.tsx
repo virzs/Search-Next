@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { Button, Empty, Segmented, Spin, Tag } from "antd";
+import { Button, Empty, Spin, Tag } from "antd";
 import { RiApps2Line } from "@remixicon/react";
-import { DefaultAppView } from "@/components";
+import { AppSegmented, DefaultAppView } from "@/components";
 import { useWidget } from "@/hooks/useWidget";
 import type {
   WidgetApiItem,
@@ -20,21 +20,15 @@ const PREVIEW_THEME_OPTIONS = [
 ];
 
 const widgetViewClassName = css`
-  .ant-segmented {
-    border-radius: 999px;
-    background: rgba(118, 118, 128, 0.14);
-    padding: 3px;
+  .apple-store-get-button.ant-btn {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
   }
 
-  .ant-segmented-item {
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .ant-segmented-item-selected {
-    background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  .apple-store-get-link.ant-btn {
+    color: #007aff !important;
   }
 `;
 
@@ -182,7 +176,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
       className={widgetViewClassName}
       contentClassName="h-full overflow-hidden px-0 pt-0 pb-0"
       headerRight={
-        <Segmented
+        <AppSegmented
           size="small"
           options={PREVIEW_THEME_OPTIONS}
           value={previewTheme}
@@ -190,7 +184,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
         />
       }
     >
-      <div className="h-full overflow-y-auto px-3 pb-6 pt-4">
+      <div className="h-full overflow-y-auto px-4 pb-8 pt-4">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
           <StoreHeroCard
             title="桌面信息一眼可见"
@@ -224,10 +218,10 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
                 return (
                   <article
                     key={widget._id}
-                    className="overflow-hidden rounded-[18px] border border-black/[0.08] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.08]"
+                    className="overflow-hidden rounded-[22px] border border-white/80 bg-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]"
                   >
-                    <div className="flex items-start gap-3 px-4 pt-4">
-                      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100 shadow-inner dark:bg-white/10">
+                    <div className="flex items-start gap-3.5 px-5 pt-5">
+                      <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_1px_2px_rgba(0,0,0,0.08)] dark:bg-white/10">
                         {iconUrl ? (
                           <img
                             src={iconUrl}
@@ -256,7 +250,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
                             type="primary"
                             size="small"
                             shape="round"
-                            className="h-7! shrink-0 px-4! text-xs! font-extrabold!"
+                            className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
                             onClick={() =>
                               handleAdd(widget, widget.defaultSizeId)
                             }
@@ -265,18 +259,18 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
                           </Button>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#8e8e93]">
                           {widget.tags?.length ? (
                             widget.tags.slice(0, 4).map((tag) => (
                               <Tag
                                 key={tag}
-                                className="m-0! rounded-full! border-0! bg-gray-100! text-xs! text-gray-600! dark:bg-white/10! dark:text-gray-300!"
+                                className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!"
                               >
                                 {tag}
                               </Tag>
                             ))
                           ) : (
-                            <Tag className="m-0! rounded-full! border-0! bg-gray-100! text-xs! text-gray-600! dark:bg-white/10! dark:text-gray-300!">
+                            <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!">
                               小组件
                             </Tag>
                           )}
@@ -288,19 +282,16 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
                     </div>
 
                     {hasScreenshots ? (
-                      <div className="mt-4 overflow-x-auto pb-4">
-                        <div className="flex w-max gap-3 px-4">
+                      <div className="mt-4 overflow-x-auto pb-5">
+                        <div className="flex w-max gap-3 px-5">
                           {previewItems.map((item) => (
-                            <button
+                            <div
                               key={item.sizeId}
-                              type="button"
-                              aria-label={`添加 ${widget.name} ${item.label}`}
-                              onClick={() => handleAdd(widget, item.sizeId)}
-                              className="group shrink-0 rounded-[15px] border border-black/[0.12] bg-[#f5f5f7] p-2 text-left transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50 dark:border-white/10 dark:bg-white/[0.06] dark:hover:border-blue-400/80 dark:hover:bg-blue-950/30"
+                              className="group shrink-0 rounded-[18px] border border-white/80 bg-[#f5f5f7] p-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-white/[0.06] dark:hover:border-blue-400/80 dark:hover:bg-blue-950/30"
                               style={{ width: getPreviewTileWidth(item) }}
                             >
                               <div
-                                className="flex min-h-[78px] w-full items-center justify-center overflow-hidden rounded-[11px] bg-white p-2 dark:bg-black/20"
+                                className="flex min-h-[78px] w-full items-center justify-center overflow-hidden rounded-[14px] bg-white p-2 shadow-[0_1px_2px_rgba(0,0,0,0.045)] dark:bg-black/20"
                                 style={{
                                   aspectRatio: getPreviewAspectRatio(
                                     item.screenshot,
@@ -323,9 +314,15 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
                                 <span className="truncate text-xs font-semibold text-gray-800 dark:text-gray-100">
                                   {item.label}
                                 </span>
-                                <span className="text-[11px] font-bold text-[#0071e3] dark:text-blue-300">
+                                <Button
+                                  type="link"
+                                  size="small"
+                                  className="apple-store-get-link h-5! px-0! text-[11px]! font-bold!"
+                                  aria-label={`添加 ${widget.name} ${item.label}`}
+                                  onClick={() => handleAdd(widget, item.sizeId)}
+                                >
                                   获取
-                                </span>
+                                </Button>
                               </div>
                               {item.screenshot?.width &&
                               item.screenshot.height ? (
@@ -334,22 +331,24 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
                                   {item.screenshot.height}
                                 </div>
                               ) : null}
-                            </button>
+                            </div>
                           ))}
                         </div>
                       </div>
                     ) : (
-                      <div className="px-4 pb-4 pt-4">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleAdd(widget, widget.defaultSizeId)
-                          }
-                          className="flex h-24 w-full items-center justify-center rounded-[15px] border border-dashed border-gray-200 bg-[#f5f5f7] text-sm font-semibold text-gray-500 dark:border-white/10 dark:bg-white/[0.06]"
-                        >
+                      <div className="px-5 pb-5 pt-4">
+                        <div className="flex h-24 w-full items-center justify-center rounded-[18px] border border-dashed border-white bg-[#f5f5f7] text-sm font-semibold text-[#6e6e73] dark:border-white/10 dark:bg-white/[0.06]">
                           <span>{widget.defaultSizeId || "2x2"}</span>
-                          <span className="ml-3 text-[#0071e3]">获取</span>
-                        </button>
+                          <Button
+                            type="link"
+                            className="apple-store-get-link ml-2 px-0! font-bold!"
+                            onClick={() =>
+                              handleAdd(widget, widget.defaultSizeId)
+                            }
+                          >
+                            获取
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </article>

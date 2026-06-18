@@ -3,6 +3,8 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useOutlet } from "react-router";
 import { cx } from "@emotion/css";
 
+const MotionDiv = motion.div as any;
+
 type FadePage = {
   key: string;
   element: ReactNode;
@@ -93,7 +95,7 @@ const StackedFadeOutlet = ({
         const isVisible = isCurrent || isLeaving;
 
         return (
-          <motion.div
+          <MotionDiv
             key={p.key}
             className={cx("absolute inset-0", layerClassName)}
             style={{
@@ -113,7 +115,7 @@ const StackedFadeOutlet = ({
             }}
           >
             {p.element}
-          </motion.div>
+          </MotionDiv>
         );
       })}
     </div>

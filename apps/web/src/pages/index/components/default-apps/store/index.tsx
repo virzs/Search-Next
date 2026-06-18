@@ -73,6 +73,7 @@ const StoreModalRoute: FC = () => {
       closeTo="/"
       title="应用商店"
       wrapContent
+      componentSize="small"
       overlayProps={{
         modalProps: { width: 940 },
       }}
@@ -86,6 +87,8 @@ const StoreModalRoute: FC = () => {
         menuItems,
         menuStyles: {
           item: {
+            height: 32,
+            lineHeight: "32px",
             paddingLeft: 14,
           },
         },

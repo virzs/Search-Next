@@ -28,7 +28,7 @@ const WebsiteCard: FC<WebsiteCardProps> = ({
     <div
       className={cx(
         websiteCardClassName,
-        "group relative cursor-pointer bg-white transition-all duration-200 hover:-translate-y-0.5",
+        "group relative cursor-pointer bg-white/90 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5",
         layout === "grid"
           ? isSmall
             ? "flex min-h-[74px] flex-row items-center! gap-3 rounded-2xl p-3"
@@ -105,10 +105,11 @@ const WebsiteCard: FC<WebsiteCardProps> = ({
 export default WebsiteCard;
 
 const websiteCardClassName = css`
-  border: 1px solid rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.82);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    0 10px 26px rgba(15, 23, 42, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 16px 34px rgba(15, 23, 42, 0.055);
 
   &:hover {
     border-color: rgba(0, 113, 227, 0.18);
@@ -125,8 +126,11 @@ const websiteCardClassName = css`
   .store-get-button {
     height: 28px;
     border: 0;
+    background: #007aff !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
     padding: 0 14px;
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 700;
   }
 `;

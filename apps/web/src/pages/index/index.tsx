@@ -38,7 +38,6 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
 import { useWidget } from "@/hooks/useWidget";
-import AccountModal from "./components/default-apps/account";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
 import { createHostSDK, sharedEventBus } from "@/sdk";
@@ -51,10 +50,16 @@ import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
 import { storeRoute } from "./components/default-apps/store/route-paths";
-import { themeRoute } from "./components/default-apps/theme/route-paths";
+import { personalizationRoute } from "./components/default-apps/personalization/route-paths";
+import {
+  getMyThemeConfigs,
+  MY_THEMES_CHANGED_EVENT,
+} from "./components/default-apps/personalization/my-assets";
 import { settingsRoute } from "./components/default-apps/settings/route-paths";
 import Notice from "./components/notice";
 import Feedback from "./components/feedback";
+import { accountRoute } from "./components/default-apps/account/route-paths";
+import BoringAccountAvatar from "@/components/auth/BoringAccountAvatar";
 
 type DesktopItem = DndSortItem<DesktopItemData>;
 type DesktopPage = DndPageItem<DesktopItemData>;
@@ -214,16 +219,27 @@ function Index() {
   const ignoreDesktopChangeUntilRef = useRef(0);
 
   const { message } = App.useApp();
-  const { avatarSrc, coverGradientCss, user, isAuthenticated } = useAuth();
+  const { coverGradientCss, user, isAuthenticated } = useAuth();
   const { userLimit } = useConfig();
   const { activeThemeId, personalization } = useDesktopTheme();
   const navigate = useNavigate();
   const { widgets, devWidgets, getEntryUrl, registerDesktopRef } = useWidget();
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
+  const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
   const [preferDark, setPreferDark] = useState(() => {
     return window.document.documentElement.dataset.theme === "dark";
   });
+
+  useEffect(() => {
+    const reloadMyThemes = () => setMyThemeConfigs(getMyThemeConfigs());
+    window.addEventListener("storage", reloadMyThemes);
+    window.addEventListener(MY_THEMES_CHANGED_EVENT, reloadMyThemes);
+    return () => {
+      window.removeEventListener("storage", reloadMyThemes);
+      window.removeEventListener(MY_THEMES_CHANGED_EVENT, reloadMyThemes);
+    };
+  }, []);
 
   useEffect(() => {
     const el = window.document.documentElement;
@@ -235,11 +251,16 @@ function Index() {
   }, []);
 
   const desktopTheme = useMemo(() => {
+    const mergedThemeConfigs = [...(themeConfigs ?? []), ...myThemeConfigs];
     return (
-      resolveDesktopThemeFromConfigs(themeConfigs, activeThemeId, preferDark) ??
+      resolveDesktopThemeFromConfigs(
+        mergedThemeConfigs,
+        activeThemeId,
+        preferDark,
+      ) ??
       (preferDark ? desktopNextThemeDark : desktopNextThemeLight)
     );
-  }, [activeThemeId, preferDark, themeConfigs]);
+  }, [activeThemeId, myThemeConfigs, preferDark, themeConfigs]);
 
   const persistDesktopPages = useCallback(
     (pages: DesktopPage[], remountDesktop: boolean) => {
@@ -267,7 +288,6 @@ function Index() {
     return "background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);";
   }, [personalization.wallpaper]);
 
-  const [accountInfoOpen, { toggle: toggleAccountInfo }] = useBoolean(false);
   const [init, { setFalse: finishInit }] = useBoolean(true);
   const [fullWidget, setFullWidget] = useState<{
     entry: string;
@@ -540,29 +560,35 @@ function Index() {
         return createFixedItem({
           key: "my",
           name: "账号",
-          IconComponent: avatarSrc
+          IconComponent: isAuthenticated
             ? () => (
-                <img
-                  src={avatarSrc}
-                  alt="avatar"
-                  className="w-full h-full object-cover pointer-events-none"
+                <BoringAccountAvatar
+                  seed={user?.email || user?.username}
+                  className="h-full w-full pointer-events-none"
+                  aria-hidden
                 />
               )
             : RiUserLine,
           tintStyle:
             coverGradientCss ??
             "linear-gradient(135deg, rgba(255, 59, 48, 0.92) 0%, rgba(175, 82, 222, 0.9) 100%)",
-          onClick: () => toggleAccountInfo(),
+          onClick: () =>
+            navigate(
+              isAuthenticated
+                ? accountRoute.path.profile
+                : accountRoute.path.login,
+            ),
         });
+      case "*:personalization":
       case "*:theme":
         return createFixedItem({
-          key: "theme",
+          key: "personalization",
           name: "个性化",
           IconComponent: RiBrushLine,
           tintStyle:
             "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
           iconSize: 30,
-          onClick: () => navigate(themeRoute.path.root),
+          onClick: () => navigate(personalizationRoute.path.root),
         });
       case "*:store":
         return createFixedItem({
@@ -902,7 +928,7 @@ function Index() {
                 },
               },
               {
-                id: "*:theme",
+                id: "*:personalization",
                 type: "app",
                 data: {
                   name: "个性化",
@@ -936,7 +962,6 @@ function Index() {
         />
       </div>
       <Outlet context={{ onAddWebsite: handleAddWebsite }} />
-      <AccountModal open={accountInfoOpen} onClose={toggleAccountInfo} />
       {fullWidget && (
         <PureWidgetWindow
           visible={true}

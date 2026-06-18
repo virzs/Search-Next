@@ -8,43 +8,53 @@ import {
   RiUserFill,
   RiUserLine,
 } from "@remixicon/react";
-import { themeRoute } from "./route-paths";
+import { personalizationRoute } from "./route-paths";
 
-const ThemeModalRoute: FC = () => {
+const PersonalizationModalRoute: FC = () => {
   return (
     <AppRoutedOverlay
       closeTo="/"
       title="个性化"
       wrapContent
+      componentSize="small"
       keepAlive={{ enabled: true }}
+      overlayProps={{
+        modalProps: { width: 940 },
+      }}
       sidebarProps={{
-        header: <div className="text-2xl font-bold tracking-tight">个性化</div>,
         menuItems: [
           {
             key: "theme",
             label: "主题",
-            path: themeRoute.path.root,
+            path: personalizationRoute.path.root,
             icon: <RiTShirtLine size={16} />,
             activeIcon: <RiTShirtFill size={16} />,
           },
           {
             key: "wallpaper",
             label: "壁纸",
-            path: themeRoute.path.wallpaper,
+            path: personalizationRoute.path.wallpaper,
             icon: <RiLandscapeLine size={16} />,
             activeIcon: <RiLandscapeFill size={16} />,
           },
           {
             key: "my",
             label: "我的",
-            path: themeRoute.path.my,
+            path: personalizationRoute.path.my,
             icon: <RiUserLine size={16} />,
             activeIcon: <RiUserFill size={16} />,
           },
         ],
+        menuStyles: {
+          item: {
+            height: 32,
+            lineHeight: "32px",
+            paddingLeft: 14,
+          },
+        },
       }}
     />
   );
 };
 
-export default ThemeModalRoute;
+export default PersonalizationModalRoute;

@@ -11,8 +11,6 @@ import { postLogin, postRegister, postLogout } from "../services/auth";
 import { getToken, setToken, setRefreshToken } from "../utils/token";
 import { notification } from "../utils/globalNotification";
 import { emailToGradient } from "../utils/emailGradient";
-import { createAvatar } from "@dicebear/core";
-import { thumbs } from "@dicebear/collection";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -24,7 +22,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const [coverGradientCss, setCoverGradientCss] = useState<string | null>(null);
 
   // 初始化时检查本地存储的用户信息
@@ -54,28 +51,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  // 根据用户邮箱生成头像与封面；未登录时设为 null
+  // 根据用户邮箱生成封面；未登录时设为 null
   useEffect(() => {
     const email = user?.email?.trim().toLowerCase();
     if (email) {
       try {
         const cover = emailToGradient(email);
         setCoverGradientCss(cover.css);
-        const avatar = createAvatar(thumbs, {
-          seed: email,
-          size: 80,
-          backgroundColor: ["transparent"],
-        }).toDataUri();
-        setAvatarSrc(avatar);
       } catch (e) {
         console.log("🚀 ~ AuthProvider ~ e:", e);
         // 避免生成失败影响上下文使用
         setCoverGradientCss(null);
-        setAvatarSrc(null);
       }
     } else {
       setCoverGradientCss(null);
-      setAvatarSrc(null);
     }
   }, [user?.email]);
 
@@ -220,7 +209,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateUser,
     loginLoading,
     registerLoading,
-    avatarSrc,
     coverGradientCss,
   };
 

@@ -4,13 +4,18 @@ import {
   RiArrowRightUpLine,
   RiLinksLine,
 } from "@remixicon/react";
-import { Button, Empty, Tag } from "antd";
-import { useMemo, useState, type ReactNode } from "react";
+import { Button, Empty, Spin, Tag } from "antd";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import WebsiteCard from "../../components/WebsiteCard";
 import { storeRoute } from "../../route-paths";
 import type { StoreOutletContext } from "../../index";
 import { getWebsiteId } from "../../utils";
+import { useRequest } from "ahooks";
+import { getTabsWebsitePublic } from "@/services/website";
+import { useWidget } from "@/hooks/useWidget";
+import type { WidgetApiItem } from "@/types";
+import { css } from "@emotion/css";
 
 type SearchKind = "all" | "website" | "widget";
 
@@ -20,76 +25,55 @@ const SEARCH_KIND_OPTIONS = [
   { label: "小组件", value: "widget" },
 ];
 
-const STATIC_WEBSITES = [
-  {
-    _id: "static-site-fontawesome",
-    name: "Font Awesome",
-    url: "https://fontawesome.com",
-    description: "图标库和视觉素材资源。",
-    tags: ["设计", "图标"],
-  },
-  {
-    _id: "static-site-opencode",
-    name: "OpenCode",
-    url: "https://opencode.ai",
-    description: "开发者代码协作与 AI 工具入口。",
-    tags: ["开发", "AI"],
-  },
-  {
-    _id: "static-site-openrouter",
-    name: "OpenRouter",
-    url: "https://openrouter.ai",
-    description: "模型路由、API 调试和开发集成。",
-    tags: ["AI", "开发"],
-  },
-  {
-    _id: "static-site-dribbble",
-    name: "Dribbble",
-    url: "https://dribbble.com",
-    description: "产品设计灵感和作品集平台。",
-    tags: ["设计", "灵感"],
-  },
-];
+const SEARCH_PAGE_SIZE = 12;
 
-const STATIC_WIDGETS = [
-  {
-    _id: "static-widget-calendar",
-    name: "日历",
-    description: "查看月视图、今日日程和日期偏好。",
-    tags: ["工具", "日历", "iPadOS"],
-    size: "2×2",
-  },
-  {
-    _id: "static-widget-clock",
-    name: "时钟",
-    description: "常用城市时间和桌面时钟展示。",
-    tags: ["工具", "时间"],
-    size: "1×1",
-  },
-  {
-    _id: "static-widget-todo",
-    name: "待办",
-    description: "桌面快速查看任务状态和今日事项。",
-    tags: ["效率", "任务"],
-    size: "4×2",
-  },
-  {
-    _id: "static-widget-weather",
-    name: "天气",
-    description: "显示当前天气、温度和短期趋势。",
-    tags: ["生活", "天气"],
-    size: "2×1",
-  },
-];
+const storeSearchClassName = css`
+  .apple-store-get-button.ant-btn {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+
+  .apple-link.ant-btn-text {
+    color: #007aff !important;
+  }
+`;
+
+const toTagLabel = (tag: unknown) => {
+  if (typeof tag === "string") return tag;
+  if (tag && typeof tag === "object") {
+    const record = tag as Record<string, unknown>;
+    return String(record.name ?? record.title ?? record.label ?? "");
+  }
+  return "";
+};
+
+const getWidgetTags = (item: WidgetApiItem) => {
+  const tags = item.configSnapshot?.tags ?? item.tags ?? [];
+  return tags.map(toTagLabel).filter(Boolean);
+};
+
+const getWidgetDefaultSizeId = (item: WidgetApiItem) =>
+  item.configSnapshot?.defaultSizeId ??
+  item.defaultSizeId ??
+  item.sizeConfigs?.[0]?.id ??
+  "2x2";
 
 const matchesQuery = (item: any, query: string) => {
   const q = query.trim().toLowerCase();
-  if (!q) return true;
+  if (!q) return false;
   const haystack = [
     item.name,
     item.url,
     item.description,
-    ...(Array.isArray(item.tags) ? item.tags : []),
+    item.author,
+    item.version,
+    item.classify?.name,
+    ...(Array.isArray(item.tags) ? item.tags.map(toTagLabel) : []),
+    ...(Array.isArray(item.configSnapshot?.tags)
+      ? item.configSnapshot.tags.map(toTagLabel)
+      : []),
   ]
     .filter(Boolean)
     .join(" ")
@@ -126,14 +110,25 @@ const ResultSection = ({
 
 const WidgetResultCard = ({
   item,
+  iconUrl,
   onAdd,
 }: {
-  item: (typeof STATIC_WIDGETS)[number];
-  onAdd?: (widgetId: string) => void;
+  item: WidgetApiItem;
+  iconUrl?: string | null;
+  onAdd?: (widget: WidgetApiItem, sizeId?: string) => void;
 }) => (
-  <article className="flex min-h-[112px] items-start gap-3 rounded-2xl border border-black/[0.07] bg-white p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-blue-200 dark:border-white/10 dark:bg-white/[0.08]">
-    <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#eef6ff,#f7f2ff)] text-blue-500 shadow-inner">
-      <RiApps2Line size={22} />
+  <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
+    <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
+      {iconUrl ? (
+        <img
+          src={iconUrl}
+          alt={item.name}
+          className="h-full w-full object-contain p-2.5"
+          loading="lazy"
+        />
+      ) : (
+        <RiApps2Line size={22} />
+      )}
     </div>
     <div className="min-w-0 flex-1">
       <div className="truncate text-sm font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
@@ -143,25 +138,27 @@ const WidgetResultCard = ({
         {item.description}
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <Tag className="m-0! rounded-full! border-0! bg-gray-100! text-[11px]! font-semibold! text-gray-600!">
-          {item.size}
+        <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
+          {getWidgetDefaultSizeId(item)}
         </Tag>
-        {item.tags.slice(0, 3).map((tag) => (
-          <Tag
-            key={tag}
-            className="m-0! rounded-full! border-0! bg-gray-100! text-[11px]! font-semibold! text-gray-600!"
-          >
-            {tag}
-          </Tag>
-        ))}
+        {getWidgetTags(item)
+          .slice(0, 3)
+          .map((tag) => (
+            <Tag
+              key={tag}
+              className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!"
+            >
+              {tag}
+            </Tag>
+          ))}
       </div>
     </div>
     <Button
       type="primary"
       size="small"
       shape="round"
-      className="h-7! shrink-0 px-4! text-xs! font-extrabold!"
-      onClick={() => onAdd?.(item._id)}
+      className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
+      onClick={() => onAdd?.(item, getWidgetDefaultSizeId(item))}
     >
       获取
     </Button>
@@ -171,24 +168,83 @@ const WidgetResultCard = ({
 const StoreSearchView = () => {
   const { query, setQuery, onAddWebsite, onAddWidget } =
     useAppRouteContext<StoreOutletContext>();
+  const {
+    widgets,
+    devWidgets,
+    devModeEnabled,
+    loading: widgetLoading,
+    addToDesktop,
+    getIconUrl,
+  } = useWidget();
   const [kind, setKind] = useState<SearchKind>("all");
   const navigate = useNavigate();
   const normalizedQuery = query.trim();
-
-  const websiteResults = useMemo(
-    () => STATIC_WEBSITES.filter((item) => matchesQuery(item, normalizedQuery)),
-    [normalizedQuery],
-  );
-  const widgetResults = useMemo(
-    () => STATIC_WIDGETS.filter((item) => matchesQuery(item, normalizedQuery)),
-    [normalizedQuery],
-  );
-
   const showWebsites = kind === "all" || kind === "website";
   const showWidgets = kind === "all" || kind === "widget";
+  const shouldSearchWebsites = showWebsites && Boolean(normalizedQuery);
+
+  const {
+    data: websiteData,
+    loading: websiteLoading,
+    run: runWebsiteSearch,
+  } = useRequest(getTabsWebsitePublic, { manual: true });
+
+  useEffect(() => {
+    if (!shouldSearchWebsites) return;
+    runWebsiteSearch({
+      page: 1,
+      pageSize: SEARCH_PAGE_SIZE,
+      search: normalizedQuery,
+    });
+  }, [normalizedQuery, runWebsiteSearch, shouldSearchWebsites]);
+
+  const websiteResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    const data = websiteData as any;
+    if (Array.isArray(data)) return data;
+    return (data?.data as any[]) ?? [];
+  }, [normalizedQuery, websiteData]);
+
+  const websiteTotal = useMemo(() => {
+    const data = websiteData as any;
+    return data?.total ?? data?.count ?? websiteResults.length;
+  }, [websiteData, websiteResults.length]);
+
+  const searchableWidgets = useMemo<WidgetApiItem[]>(() => {
+    const backendWidgets = widgets ?? [];
+    const localDevWidgets = devModeEnabled
+      ? devWidgets.map(
+          (item) =>
+            ({
+              _id: item.id,
+              name: item.name,
+              description: item.entry,
+              entryFileName: "",
+              enable: true,
+              sizeConfigs: item.sizeConfigs,
+              defaultSizeId: item.defaultSizeId,
+              supportIconMode: false,
+              tags: ["开发者"],
+              sortOrder: 0,
+            }) as WidgetApiItem,
+        )
+      : [];
+    return [...backendWidgets, ...localDevWidgets];
+  }, [devModeEnabled, devWidgets, widgets]);
+
+  const widgetResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return searchableWidgets
+      .filter((item) => matchesQuery(item, normalizedQuery))
+      .slice(0, SEARCH_PAGE_SIZE);
+  }, [normalizedQuery, searchableWidgets]);
+
   const resultCount =
     (showWebsites ? websiteResults.length : 0) +
     (showWidgets ? widgetResults.length : 0);
+  const searching =
+    Boolean(normalizedQuery) &&
+    ((showWebsites && websiteLoading) || (showWidgets && widgetLoading));
 
   const openWebsiteDetail = (item: any) => {
     setQuery("");
@@ -202,8 +258,14 @@ const StoreSearchView = () => {
     navigate(path);
   };
 
+  const handleAddWidget = (item: WidgetApiItem, sizeId?: string) => {
+    addToDesktop(item._id, sizeId ? { sizeId } : undefined);
+    onAddWidget?.(item._id);
+  };
+
   return (
     <DefaultAppView
+      className={storeSearchClassName}
       title={normalizedQuery ? `搜索「${normalizedQuery}」` : "搜索"}
       headerClassName="items-center px-3 pt-3 pb-2"
       headerRight={
@@ -216,27 +278,36 @@ const StoreSearchView = () => {
       }
       contentClassName="h-full overflow-hidden px-0 pt-0 pb-0"
     >
-      <div className="h-full overflow-y-auto px-3 pb-6 pt-4">
+      <div className="h-full overflow-y-auto px-4 pb-8 pt-4">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-          {resultCount === 0 ? (
+          {!normalizedQuery ? (
             <div className="flex min-h-72 items-center justify-center">
-              <Empty
-                description={
-                  normalizedQuery ? "没有找到匹配内容" : "搜索结果会显示在这里"
-                }
-              />
+              <Empty description="输入关键词后会显示真实商店结果" />
+            </div>
+          ) : null}
+
+          {normalizedQuery && resultCount === 0 && !searching ? (
+            <div className="flex min-h-72 items-center justify-center">
+              <Empty description="没有找到匹配内容" />
+            </div>
+          ) : null}
+
+          {showWebsites && websiteLoading ? (
+            <div className="flex min-h-32 items-center justify-center">
+              <Spin />
             </div>
           ) : null}
 
           {showWebsites && websiteResults.length > 0 ? (
             <ResultSection
               title="网站"
-              count={websiteResults.length}
+              count={websiteTotal}
               action={
                 <Button
                   type="text"
                   size="small"
                   icon={<RiLinksLine size={15} />}
+                  className="apple-link"
                   onClick={() => navigateFromSearch(storeRoute.path.website.root)}
                 >
                   查看网站
@@ -246,7 +317,7 @@ const StoreSearchView = () => {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {websiteResults.map((item) => (
                   <WebsiteCard
-                    key={item._id}
+                    key={getWebsiteId(item)}
                     item={item}
                     layout="grid"
                     variant="small"
@@ -258,6 +329,12 @@ const StoreSearchView = () => {
             </ResultSection>
           ) : null}
 
+          {showWidgets && widgetLoading ? (
+            <div className="flex min-h-32 items-center justify-center">
+              <Spin />
+            </div>
+          ) : null}
+
           {showWidgets && widgetResults.length > 0 ? (
             <ResultSection
               title="小组件"
@@ -267,6 +344,7 @@ const StoreSearchView = () => {
                   type="text"
                   size="small"
                   icon={<RiArrowRightUpLine size={15} />}
+                  className="apple-link"
                   onClick={() => navigateFromSearch(storeRoute.path.widget)}
                 >
                   查看小组件
@@ -278,7 +356,8 @@ const StoreSearchView = () => {
                   <WidgetResultCard
                     key={item._id}
                     item={item}
-                    onAdd={onAddWidget}
+                    iconUrl={getIconUrl(item)}
+                    onAdd={handleAddWidget}
                   />
                 ))}
               </div>

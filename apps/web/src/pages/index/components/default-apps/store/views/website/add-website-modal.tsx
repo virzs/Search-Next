@@ -1,6 +1,7 @@
 import { DesktopNextBaseModal } from "zs_library";
 import { Button, Form, Input } from "antd";
 import type { FC } from "react";
+import { css } from "@emotion/css";
 
 export type AddWebsitePayload = {
   name: string;
@@ -28,9 +29,22 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
   const [form] = Form.useForm<AddWebsiteFormValues>();
 
   return (
-    <DesktopNextBaseModal visible={open} onClose={onClose} width={560}>
-      <div className="w-full h-full overflow-hidden">
-        <div className="text-lg font-semibold tracking-tight pb-4">
+    <DesktopNextBaseModal
+      visible={open}
+      onClose={onClose}
+      width={560}
+      styles={{
+        body: { padding: 0 },
+        inner: {
+          width: "100%",
+          maxHeight: "calc(100dvh - 64px)",
+          overflowY: "auto",
+          overscrollBehavior: "contain",
+        },
+      }}
+    >
+      <div className={`w-full min-h-full ${appleFormModalClassName}`}>
+        <div className="mb-4 text-[21px] font-semibold tracking-tight text-[#1d1d1f]">
           新增网站
         </div>
 
@@ -47,7 +61,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
             };
             onAddWebsite?.(site);
             onClose();
-            form.resetFields();
+            (form as any).resetFields();
           }}
         >
           <Form.Item name="name" label="名称" rules={[{ required: true }]}>
@@ -67,13 +81,18 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
             <Button
               shape="round"
               onClick={() => {
-                form.resetFields();
+                (form as any).resetFields();
                 onClose();
               }}
             >
               取消
             </Button>
-            <Button shape="round" type="primary" onClick={() => form.submit()}>
+            <Button
+              shape="round"
+              type="primary"
+              className="apple-primary"
+              onClick={() => (form as any).submit()}
+            >
               添加
             </Button>
           </div>
@@ -84,3 +103,34 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
 };
 
 export default AddWebsiteModal;
+
+const appleFormModalClassName = css`
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(245, 245, 247, 0.82)),
+    rgba(245, 245, 247, 0.72);
+  padding: 22px;
+  backdrop-filter: blur(28px) saturate(1.18);
+
+  .ant-form-item-label > label {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  .ant-input {
+    border-color: rgba(60, 60, 67, 0.16);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.74);
+  }
+
+  .ant-input:hover,
+  .ant-input:focus {
+    border-color: rgba(0, 122, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+  }
+
+  .apple-primary {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;

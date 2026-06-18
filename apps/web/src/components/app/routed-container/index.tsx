@@ -12,7 +12,8 @@ import AppResponsiveOverlay, {
   AppResponsiveOverlayProps,
 } from "../responsive-overlay";
 import AppSidebar, { AppSidebarProps } from "../sidebar";
-import { Button } from "antd";
+import { Button, ConfigProvider } from "antd";
+import type { ConfigProviderProps } from "antd";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { css, cx } from "@emotion/css";
 import { AppRoutedHeaderContext } from "./header-context";
@@ -22,6 +23,7 @@ export interface AppRoutedContainerProps {
   onClose: () => void;
   title?: ReactNode;
   wrapContent?: boolean;
+  componentSize?: ConfigProviderProps["componentSize"];
   overlayProps?: Partial<AppResponsiveOverlayProps>;
   sidebarProps?: AppSidebarProps;
   children: ReactNode;
@@ -32,6 +34,7 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
   onClose,
   title,
   wrapContent,
+  componentSize,
   overlayProps,
   sidebarProps,
   children,
@@ -164,7 +167,7 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
       contentClassName={cx(
         overlayProps?.contentClassName,
         css`
-          background: linear-gradient(180deg, #fafafa 0%, #f5f5f7 100%);
+          background: #f5f5f7;
         `,
       )}
       open={overlayProps?.open ?? open}
@@ -172,54 +175,69 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
       title={overlayProps?.title ?? title}
       wrapContent={overlayProps?.wrapContent ?? wrapContent}
       modalProps={{
+        ...overlayProps?.modalProps,
         classNames: {
+          ...overlayProps?.modalProps?.classNames,
           body: css`
             padding: 0;
           `,
         },
+        styles: {
+          ...overlayProps?.modalProps?.styles,
+          body: {
+            ...overlayProps?.modalProps?.styles?.body,
+            padding: 0,
+          },
+          inner: {
+            width: "100%",
+            ...overlayProps?.modalProps?.styles?.inner,
+          },
+        },
       }}
     >
-      <div className="flex h-full w-full overflow-hidden">
-        {sidebarProps ? <AppSidebar {...sidebarProps} /> : null}
-        <div className="flex h-full w-0 grow flex-col overflow-hidden">
-          <AppRoutedHeaderContext.Provider value={headerContextValue}>
-            {showHeaderRow ? (
-              <div className={routedHeaderClassName}>
-                {showHistoryControls ? (
-                  <div className={historyControlsClassName}>
-                    <Button
-                      type="text"
-                      size="small"
-                      aria-label="后退"
-                      className="app-history-button"
-                      icon={<RiArrowLeftLine size={16} />}
-                      disabled={!canBack}
-                      onClick={handleBack}
-                    />
-                    <Button
-                      type="text"
-                      size="small"
-                      aria-label="前进"
-                      className="app-history-button"
-                      icon={<RiArrowRightLine size={16} />}
-                      disabled={!canForward}
-                      onClick={handleForward}
-                    />
-                  </div>
-                ) : null}
-                {viewHeader ? (
-                  <div className="min-w-0 flex-1">{viewHeader}</div>
-                ) : (
-                  <div className="min-w-0 flex-1" />
-                )}
+      <ConfigProvider componentSize={componentSize}>
+        <div className="flex h-full w-full overflow-hidden">
+          {sidebarProps ? <AppSidebar {...sidebarProps} /> : null}
+          <div className="flex h-full w-0 grow flex-col overflow-hidden">
+            <AppRoutedHeaderContext.Provider value={headerContextValue}>
+              {showHeaderRow ? (
+                <div className={routedHeaderClassName}>
+                  {showHistoryControls ? (
+                    <div className={historyControlsClassName}>
+                      <Button
+                        type="text"
+                        size="small"
+                        aria-label="后退"
+                        className="app-history-button"
+                        icon={<RiArrowLeftLine size={16} />}
+                        disabled={!canBack}
+                        onClick={handleBack}
+                      />
+                      <Button
+                        type="text"
+                        size="small"
+                        aria-label="前进"
+                        className="app-history-button"
+                        icon={<RiArrowRightLine size={16} />}
+                        disabled={!canForward}
+                        onClick={handleForward}
+                      />
+                    </div>
+                  ) : null}
+                  {viewHeader ? (
+                    <div className="min-w-0 flex-1">{viewHeader}</div>
+                  ) : (
+                    <div className="min-w-0 flex-1" />
+                  )}
+                </div>
+              ) : null}
+              <div className="relative min-h-0 flex-1 overflow-hidden">
+                {children}
               </div>
-            ) : null}
-            <div className="relative min-h-0 flex-1 overflow-hidden">
-              {children}
-            </div>
-          </AppRoutedHeaderContext.Provider>
+            </AppRoutedHeaderContext.Provider>
+          </div>
         </div>
-      </div>
+      </ConfigProvider>
     </AppResponsiveOverlay>
   );
 };
@@ -233,6 +251,11 @@ const routedHeaderClassName = css`
   width: 100%;
   flex-shrink: 0;
   align-items: center;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  overflow: hidden;
+  background: transparent;
 `;
 
 const historyControlsClassName = css`
@@ -245,19 +268,15 @@ const historyControlsClassName = css`
   .app-history-button {
     width: 28px !important;
     height: 28px !important;
-    border: 1px solid rgba(60, 60, 67, 0.16) !important;
+    border: 0 !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.76) !important;
+    background: transparent !important;
     color: #5f6368 !important;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.72),
-      0 1px 2px rgba(15, 23, 42, 0.06);
-    backdrop-filter: blur(16px) saturate(1.1);
+    box-shadow: none !important;
   }
 
   .app-history-button:not(:disabled):not(.ant-btn-disabled):hover {
-    border-color: rgba(60, 60, 67, 0.22) !important;
-    background: rgba(255, 255, 255, 0.92) !important;
+    background: rgba(60, 60, 67, 0.08) !important;
     color: #1d1d1f !important;
   }
 
@@ -265,6 +284,6 @@ const historyControlsClassName = css`
   .app-history-button.ant-btn-disabled {
     opacity: 0.38;
     color: #6e6e73 !important;
-    background: rgba(255, 255, 255, 0.62) !important;
+    background: transparent !important;
   }
 `;

@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { cx } from "@emotion/css";
 
+const MotionDiv = motion.div as any;
+
 type FadeStackPage = {
   key: string;
   element: ReactNode;
@@ -94,7 +96,7 @@ const StackedFadeStack = ({
         const isVisible = isCurrent || isLeaving;
 
         return (
-          <motion.div
+          <MotionDiv
             key={p.key}
             className={cx("absolute inset-0", layerClassName)}
             style={{
@@ -114,7 +116,7 @@ const StackedFadeStack = ({
             }}
           >
             {p.element}
-          </motion.div>
+          </MotionDiv>
         );
       })}
     </div>

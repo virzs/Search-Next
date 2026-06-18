@@ -5,6 +5,7 @@ import type { WidgetSettingsField } from "@/types";
 import { sharedEventBus } from "@/sdk";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import type { PureWidgetConfig } from "@/components/micro-frontend/pure-widget";
+import { css } from "@emotion/css";
 
 interface WidgetSettingsModalProps {
   visible: boolean;
@@ -115,12 +116,12 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
 
   useEffect(() => {
     if (visible) {
-      form.setFieldsValue(loadStoredValues(widgetId, settingsSchema));
+      (form as any).setFieldsValue(loadStoredValues(widgetId, settingsSchema));
     }
   }, [visible, widgetId, settingsSchema, form]);
 
   const handleSave = () => {
-    form.validateFields().then((values) => {
+    (form as any).validateFields().then((values: Record<string, unknown>) => {
       saveValues(widgetId, settingsSchema, values);
       onClose();
     });
@@ -135,11 +136,10 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
         onClose={onClose}
         width={560}
         destroyOnClose
-        contentClassName="w-full overflow-hidden"
       >
-        <div className="w-full h-full overflow-hidden">
+        <div className={`w-full h-full overflow-hidden ${appleWidgetSettingsModalClassName}`}>
           <div
-            className="relative w-full overflow-hidden rounded-2xl"
+            className="relative w-full overflow-hidden rounded-[18px] border border-white/80 bg-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
             style={{ height: 520 }}
           >
             <PureWidget
@@ -158,10 +158,9 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
       onClose={onClose}
       width={480}
       destroyOnClose
-      contentClassName="w-full overflow-hidden"
     >
-      <div className="w-full h-full overflow-hidden">
-        <div className="text-lg font-semibold tracking-tight pb-4">
+      <div className={`w-full h-full overflow-hidden ${appleWidgetSettingsModalClassName}`}>
+        <div className="mb-4 text-[21px] font-semibold tracking-tight text-[#1d1d1f]">
           {widgetName ? `${widgetName} - 设置` : "小组件设置"}
         </div>
 
@@ -184,7 +183,12 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
           <Button shape="round" onClick={onClose}>
             取消
           </Button>
-          <Button shape="round" type="primary" onClick={handleSave}>
+          <Button
+            shape="round"
+            type="primary"
+            className="apple-primary"
+            onClick={handleSave}
+          >
             保存
           </Button>
         </div>
@@ -194,3 +198,44 @@ const WidgetSettingsModal: FC<WidgetSettingsModalProps> = ({
 };
 
 export default WidgetSettingsModal;
+
+const appleWidgetSettingsModalClassName = css`
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(245, 245, 247, 0.82)),
+    rgba(245, 245, 247, 0.72);
+  padding: 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 24px 70px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(28px) saturate(1.18);
+
+  .ant-form-item-label > label {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  .ant-input,
+  .ant-input-number,
+  .ant-select-selector {
+    border-color: rgba(60, 60, 67, 0.16) !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.74) !important;
+  }
+
+  .ant-input:hover,
+  .ant-input:focus,
+  .ant-input-number:hover,
+  .ant-input-number-focused,
+  .ant-select-focused .ant-select-selector {
+    border-color: rgba(0, 122, 255, 0.42) !important;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12) !important;
+  }
+
+  .apple-primary {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;

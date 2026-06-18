@@ -5,8 +5,9 @@ import { RiNotification3Fill } from "@remixicon/react";
 import { useBoolean, useRequest } from "ahooks";
 import { Badge, Button, Empty, Tooltip } from "antd";
 import { format } from "date-fns";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
+import { css } from "@emotion/css";
 
 const Notice = () => {
   const [open, { setTrue: openModal, setFalse: closeModal }] =
@@ -47,18 +48,16 @@ const Notice = () => {
     setActiveId(notices[0]._id);
   }, [activeId, notices, open]);
 
-  useEffect(() => {
-    if (!open) return;
-    if (!activeId) return;
+  const readIdSet = useMemo(() => new Set(readIds), [readIds]);
+
+  const markNoticeRead = useCallback((id: string) => {
     setReadIds((prev) => {
-      if (prev.includes(activeId)) return prev;
-      const next = [...prev, activeId];
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
       setNoticeReadIds(next);
       return next;
     });
-  }, [activeId, open]);
-
-  const readIdSet = useMemo(() => new Set(readIds), [readIds]);
+  }, []);
 
   const activeNotice = useMemo(() => {
     if (!activeId) return null;
@@ -100,12 +99,13 @@ const Notice = () => {
           setActiveId(null);
         }}
         width={800}
+        styles={{
+          body: { padding: 0 },
+          inner: { width: "100%" },
+        }}
       >
-        <div className="flex w-full overflow-hidden h-[50vh] min-h-full max-h-[500px]">
+        <div className={`flex w-full overflow-hidden h-[50vh] min-h-full max-h-[500px] ${noticeWindowClassName}`}>
           <AppSidebar
-            header={
-              <div className="text-2xl font-bold tracking-tight">通知</div>
-            }
             activeMenuKey={activeId || undefined}
             menuStyles={{
               item: {
@@ -123,23 +123,58 @@ const Notice = () => {
             menuItems={notices.map((i) => ({
               key: i._id,
               label: (
-                <div className="min-w-0 w-full">
-                  <div className="text-xs leading-4 text-gray-500">
-                    {format(i.effectiveStart, "yyyy-MM-dd")}
-                  </div>
-                  <div className="min-w-0 text-sm font-medium text-gray-900 leading-5 line-clamp-1 wrap-break-word">
-                    {i.title}
+                <div className="flex min-w-0 w-full items-center gap-2">
+                  {!readIdSet.has(i._id) ? (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-[#007aff]" />
+                  ) : (
+                    <span className="h-2 w-2 shrink-0" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs leading-4 text-gray-500">
+                      {format(i.effectiveStart, "yyyy-MM-dd")}
+                    </div>
+                    <div className="min-w-0 text-sm font-medium text-gray-900 leading-5 line-clamp-1 wrap-break-word">
+                      {i.title}
+                    </div>
                   </div>
                 </div>
               ),
             }))}
-            onMenuSelect={setActiveId}
+            onMenuSelect={(key) => {
+              setActiveId(key);
+              markNoticeRead(key);
+            }}
             className="w-44! pr-2!"
+            emptyText="暂无通知"
           />
-          <div className="flex-1 min-h-0 flex overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <div className="flex-1 min-w-0 overflow-y-auto p-4">
+          <div className="flex-1 min-h-0 flex overflow-hidden bg-[#f5f5f7]">
+            <div className="flex-1 min-w-0 overflow-y-auto p-5">
               {activeNotice ? (
-                <div className="min-w-0">
+                <div className="min-w-0 rounded-[18px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+                  <div className="mb-3 flex items-start justify-between gap-3 border-b border-[rgba(60,60,67,0.1)] pb-3">
+                    <div className="min-w-0">
+                      <div className="line-clamp-2 text-[17px] font-semibold text-[#1d1d1f]">
+                        {activeNotice.title}
+                      </div>
+                      <div className="mt-1 text-xs font-medium text-[#6e6e73]">
+                        {format(activeNotice.effectiveStart, "yyyy-MM-dd")}
+                      </div>
+                    </div>
+                    {!readIdSet.has(activeNotice._id) ? (
+                      <Button
+                        size="small"
+                        shape="round"
+                        style={{
+                          color: "#007aff",
+                          borderColor: "rgba(0,122,255,0.24)",
+                          background: "rgba(0,122,255,0.08)",
+                        }}
+                        onClick={() => markNoticeRead(activeNotice._id)}
+                      >
+                        标记已读
+                      </Button>
+                    ) : null}
+                  </div>
                   <SimpleEditorViewer
                     value={activeNotice.content ?? ""}
                     sanitize
@@ -166,3 +201,7 @@ const Notice = () => {
 };
 
 export default Notice;
+
+const noticeWindowClassName = css`
+  background: rgba(245, 245, 247, 0.92);
+`;

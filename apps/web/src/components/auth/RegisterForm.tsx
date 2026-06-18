@@ -1,5 +1,6 @@
 import { Form, Input, Button, Typography, message } from "antd";
 import { useState } from "react";
+import { cx } from "@emotion/css";
 import {
   RiUserFill,
   RiMailFill,
@@ -15,6 +16,7 @@ import {
 } from "../../types/auth";
 import { getEmailCaptcha } from "../../services/auth";
 import { useAuth } from "@/hooks/useAuth";
+import { appleAuthFormClassName } from "./apple-auth-styles";
 
 const { Text } = Typography;
 const { Item } = Form;
@@ -57,7 +59,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   // 获取验证码
   const handleGetCaptcha = async () => {
     try {
-      const email = form.getFieldValue("email");
+      const email = (form as any).getFieldValue("email");
       if (!email) {
         message.warning("请先输入邮箱地址");
         return;
@@ -102,7 +104,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
       if (result.success) {
         message.success(result.message || "注册成功");
-        form.resetFields();
+        (form as any).resetFields();
       } else {
         message.error(result.message || "注册失败");
       }
@@ -119,7 +121,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   return (
-    <div className={`register-form ${className}`}>
+    <div className={cx("register-form", appleAuthFormClassName, className)}>
       <Form
         form={form}
         layout="vertical"
@@ -141,7 +143,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           ]}
         >
           <Input
-            prefix={<RiUserFill size={16} className="text-gray-400" />}
+            prefix={<RiUserFill size={16} className="apple-auth-field-icon" />}
             placeholder="请输入用户名"
             autoComplete="username"
           />
@@ -157,7 +159,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           ]}
         >
           <Input
-            prefix={<RiMailFill size={16} className="text-gray-400" />}
+            prefix={<RiMailFill size={16} className="apple-auth-field-icon" />}
             placeholder="请输入邮箱地址"
             autoComplete="email"
           />
@@ -173,20 +175,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               { len: 6, message: "验证码为6位数字" },
             ]}
           >
-            <div className="flex gap-2">
+            <div className="apple-auth-captcha-row">
               <Input
                 prefix={
-                  <RiShieldCheckFill size={16} className="text-gray-400" />
+                  <RiShieldCheckFill
+                    size={16}
+                    className="apple-auth-field-icon"
+                  />
                 }
                 placeholder="请输入6位验证码"
                 maxLength={6}
-                className="flex-1"
               />
               <Button
                 onClick={handleGetCaptcha}
                 loading={captchaLoading}
                 disabled={captchaSent}
-                className="w-24 shrink-0"
+                className="apple-auth-code-button"
               >
                 {captchaSent ? `${countdown}s` : "获取验证码"}
               </Button>
@@ -208,7 +212,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           ]}
         >
           <Input
-            prefix={<RiLockFill size={16} className="text-gray-400" />}
+            prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showPassword ? "text" : "password"}
             placeholder="请输入密码（至少6位，包含字母和数字）"
             autoComplete="new-password"
@@ -224,7 +228,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   )
                 }
                 onClick={() => setShowPassword(!showPassword)}
-                className="p-0! border-0! text-gray-400 hover:text-gray-600"
+                className="apple-auth-icon-button"
               />
             }
           />
@@ -248,7 +252,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           ]}
         >
           <Input
-            prefix={<RiLockFill size={16} className="text-gray-400" />}
+            prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showConfirmPassword ? "text" : "password"}
             placeholder="请再次输入密码"
             autoComplete="new-password"
@@ -264,7 +268,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   )
                 }
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="p-0! border-0! text-gray-400 hover:text-gray-600"
+                className="apple-auth-icon-button"
               />
             }
           />
@@ -278,7 +282,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             loading={isLoading}
             block
             size="large"
-            className="h-12 font-medium"
+            className="apple-auth-primary-button"
           >
             {isLoading ? "注册中..." : "注册账号"}
           </Button>
@@ -286,14 +290,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       </Form>
 
       {/* 注册提示 */}
-      <div className="mt-4 text-center">
-        <Text type="secondary" className="text-sm">
+      <div className="apple-auth-terms">
+        <Text type="secondary">
           注册即表示您同意我们的
-          <a href="#" className="text-blue-500 hover:text-blue-600 mx-1">
+          <a href="#" className="apple-auth-link mx-1">
             服务条款
           </a>
           和
-          <a href="#" className="text-blue-500 hover:text-blue-600 mx-1">
+          <a href="#" className="apple-auth-link mx-1">
             隐私政策
           </a>
         </Text>

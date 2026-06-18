@@ -1,5 +1,6 @@
 import { Form, Input, Button, Checkbox, Typography, message } from "antd";
 import { useState } from "react";
+import { cx } from "@emotion/css";
 import {
   RiMailFill,
   RiLockFill,
@@ -8,6 +9,7 @@ import {
 } from "@remixicon/react";
 import { LoginFormProps, LoginFormData, LoginResponse } from "../../types/auth";
 import { useAuth } from "@/hooks/useAuth";
+import { appleAuthFormClassName } from "./apple-auth-styles";
 
 const { Link } = Typography;
 const { Item } = Form;
@@ -55,7 +57,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <div className={`login-form ${className}`}>
+    <div className={cx("login-form", appleAuthFormClassName, className)}>
       <Form
         form={form}
         layout="vertical"
@@ -76,7 +78,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           ]}
         >
           <Input
-            prefix={<RiMailFill size={16} className="text-gray-400" />}
+            prefix={<RiMailFill size={16} className="apple-auth-field-icon" />}
             placeholder="请输入邮箱地址"
             autoComplete="email"
           />
@@ -92,7 +94,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           ]}
         >
           <Input
-            prefix={<RiLockFill size={16} className="text-gray-400" />}
+            prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showPassword ? "text" : "password"}
             placeholder="请输入密码"
             autoComplete="current-password"
@@ -108,7 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   )
                 }
                 onClick={() => setShowPassword(!showPassword)}
-                className="p-0! border-0! text-gray-400 hover:text-gray-600"
+                className="apple-auth-icon-button"
               />
             }
           />
@@ -116,14 +118,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* 记住我和忘记密码 */}
         {(showRemember || showForgotPassword) && (
-          <div className="flex justify-between items-center mb-6">
+          <div className="apple-auth-form-options">
             {showRemember && (
               <Item name="remember" valuePropName="checked" className="mb-0!">
                 <Checkbox>记住我</Checkbox>
               </Item>
             )}
             {showForgotPassword && (
-              <Link href="#" className="text-sm">
+              <Link href="#" className="apple-auth-link">
                 忘记密码？
               </Link>
             )}
@@ -135,12 +137,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
           <Button
             type="primary"
             htmlType="submit"
+            autoInsertSpace={false}
             loading={isLoading}
             block
             size="large"
-            className="h-12 font-medium"
+            className="apple-auth-primary-button"
           >
-            {isLoading ? "登录中..." : "登录"}
+            <span>{isLoading ? "登录中..." : "登录"}</span>
           </Button>
         </Item>
       </Form>

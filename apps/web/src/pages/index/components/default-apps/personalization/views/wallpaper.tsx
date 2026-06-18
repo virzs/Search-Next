@@ -1,6 +1,6 @@
 import { AppSegmented, DefaultAppView } from "@/components";
 import { useRequest } from "ahooks";
-import { Button, Empty, Image, Pagination, Skeleton } from "antd";
+import { Button, Empty, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
@@ -11,12 +11,25 @@ import {
   WallpaperApiItem,
   WallpaperCategoryApiItem,
 } from "@/services/desktop";
-import { themeRoute } from "../route-paths";
+import { personalizationRoute } from "../route-paths";
 import {
   GradientWallpaperPreset,
   gradientWallpaperPresets,
 } from "./wallpaper-gradients";
 import PreviewCard from "../components/PreviewCard";
+import { css } from "@emotion/css";
+
+const wallpaperViewClassName = css`
+  .apple-theme-action.ant-btn-primary:not(:disabled) {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+
+  .apple-link.ant-btn-link {
+    color: #007aff !important;
+  }
+`;
 
 const WallpaperView: FC = () => {
   const navigate = useNavigate();
@@ -172,7 +185,7 @@ const WallpaperView: FC = () => {
   };
 
   const openCategory = (categoryId: string) => {
-    navigate(themeRoute.path.wallpaperCategory(categoryId));
+    navigate(personalizationRoute.path.wallpaperCategory(categoryId));
   };
 
   const renderWallpaperCard = (w: WallpaperApiItem) => {
@@ -185,25 +198,33 @@ const WallpaperView: FC = () => {
         active={active}
         disabled={disabled}
         title={w.name}
-        description={w.description}
-        onClick={() => (url ? handleSelectImage(w) : null)}
+        description={
+          active ? "当前使用" : w.description || (url ? "图片壁纸" : "资源不可用")
+        }
+        status={
+          active ? (
+            <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
+              当前
+            </span>
+          ) : null
+        }
+        action={
+          url ? (
+            <Button
+              size="small"
+              type={active ? "default" : "primary"}
+              shape="round"
+              disabled={active}
+              className={active ? undefined : "apple-theme-action"}
+              onClick={() => handleSelectImage(w)}
+            >
+              {active ? "已应用" : "应用"}
+            </Button>
+          ) : null
+        }
         cover={
           url ? (
-            <Image
-              styles={{
-                root: {
-                  aspectRatio: "16 / 9",
-                  width: "100%",
-                  height: "100%",
-                },
-                image: {
-                  height: "100%",
-                  objectFit: "cover",
-                },
-              }}
-              src={url}
-              preview={false}
-            />
+            <img className="h-full w-full object-cover" src={url} alt={w.name} />
           ) : (
             <div className="h-full w-full bg-black/5" />
           )
@@ -214,6 +235,8 @@ const WallpaperView: FC = () => {
 
   return (
     <DefaultAppView
+      className={wallpaperViewClassName}
+      headerClassName="items-center px-3 pt-3 pb-2"
       title={
         activeType === "image" && imageViewMode === "category"
           ? activeCategoryName
@@ -230,10 +253,19 @@ const WallpaperView: FC = () => {
           className="max-w-full overflow-auto"
         />
       }
-      contentClassName="overflow-y-auto px-1 pb-4"
+      contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="mb-5">
+          <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
+            壁纸
+          </div>
+          <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
+            选择渐变或图片背景，应用到当前桌面。
+          </div>
+        </div>
       {activeType === "gradient" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {gradientWallpaperPresets.map((w) => {
             const active = isGradientActive(w.css);
             const coverBackground =
@@ -243,15 +275,37 @@ const WallpaperView: FC = () => {
                 key={w.id}
                 active={active}
                 title={w.name}
-                description={w.id === "none" ? "使用默认背景" : "渐变背景"}
-                onClick={() => handleSelectGradient(w)}
+                description={
+                  active
+                    ? "当前使用"
+                    : w.id === "none"
+                      ? "使用默认背景"
+                      : "渐变背景"
+                }
+                status={
+                  active ? (
+                    <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
+                      当前
+                    </span>
+                  ) : null
+                }
+                action={
+                  <Button
+                    size="small"
+                    type={active ? "default" : "primary"}
+                    shape="round"
+                    disabled={active}
+                    className={active ? undefined : "apple-theme-action"}
+                    onClick={() => handleSelectGradient(w)}
+                  >
+                    {active ? "已应用" : "应用"}
+                  </Button>
+                }
                 cover={
-                  <div className="aspect-video">
-                    <div
-                      className="h-full w-full"
-                      style={{ background: coverBackground }}
-                    />
-                  </div>
+                  <div
+                    className="h-full w-full"
+                    style={{ background: coverBackground }}
+                  />
                 }
               />
             );
@@ -299,19 +353,19 @@ const WallpaperView: FC = () => {
                 <div key={c._id}>
                   <div className="flex items-end justify-between gap-3 mb-3 px-1">
                     <div className="min-w-0">
-                      <div className="text-lg font-bold line-clamp-1">
+                      <div className="line-clamp-1 text-[13px] font-extrabold text-[#6e6e73]">
                         {c.name}
                       </div>
                     </div>
                     <Button
                       type="link"
-                      className="px-0!"
+                      className="apple-link px-0!"
                       onClick={() => openCategory(c._id)}
                     >
                       查看更多
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {items.map((item) => renderWallpaperCard(item))}
                     {items.length === 0 ? (
                       <Empty className="mt-2" description="暂无壁纸" />
@@ -332,7 +386,7 @@ const WallpaperView: FC = () => {
         </div>
       ) : visibleWallpapers.length ? (
         <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visibleWallpapers.map((w) => renderWallpaperCard(w))}
           </div>
 
@@ -357,6 +411,7 @@ const WallpaperView: FC = () => {
           />
         </div>
       )}
+      </div>
     </DefaultAppView>
   );
 };

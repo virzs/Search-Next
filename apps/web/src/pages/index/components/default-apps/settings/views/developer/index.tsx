@@ -1,35 +1,50 @@
-import { Card, Switch, Typography } from "antd";
-import { RiCodeSSlashLine } from "@remixicon/react";
-import { DefaultAppView } from "@/components";
+import { Switch } from "antd";
+import { RiCodeSSlashLine, RiStore2Line } from "@remixicon/react";
 import { useWidget } from "@/hooks/useWidget";
-
-const { Text } = Typography;
+import {
+  MacSettingsHero,
+  MacSettingsRow,
+  MacSettingsSection,
+  MacSettingsValue,
+  MacSettingsView,
+} from "../../components/macos-settings";
 
 const DeveloperView = () => {
   const { devModeEnabled, toggleDevMode } = useWidget();
 
   return (
-    <DefaultAppView>
-      <Card>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="shrink-0 rounded-xl bg-emerald-500/10 p-2 w-10 h-10 flex items-center justify-center">
-              <RiCodeSSlashLine
-                className="text-emerald-600 dark:text-emerald-400"
-                size={20}
-              />
-            </div>
-            <div>
-              <div className="font-medium">开发者模式</div>
-              <Text type="secondary" className="text-xs">
-                开启后可在应用商店侧边栏看到「开发者」入口，用于测试自定义小组件
-              </Text>
-            </div>
-          </div>
-          <Switch checked={devModeEnabled} onChange={toggleDevMode} />
-        </div>
-      </Card>
-    </DefaultAppView>
+    <MacSettingsView
+      title="开发者"
+      description="调试自定义小组件与本地开发入口。"
+    >
+      <MacSettingsHero
+        icon={<RiCodeSSlashLine size={24} />}
+        tone="green"
+        title="开发者工具"
+        description="开启后可在应用商店侧边栏看到「开发者」入口。"
+      />
+
+      <MacSettingsSection title="小组件开发">
+        <MacSettingsRow
+          icon={<RiCodeSSlashLine size={16} />}
+          iconTone="green"
+          title="开发者模式"
+          description="用于测试自定义小组件和本地 ESM 入口。"
+          extra={<Switch checked={devModeEnabled} onChange={toggleDevMode} />}
+        />
+        <MacSettingsRow
+          icon={<RiStore2Line size={16} />}
+          iconTone="blue"
+          title="应用商店入口"
+          description="开发者模式开启后显示「开发者」导航项"
+          extra={
+            <MacSettingsValue>
+              {devModeEnabled ? "已启用" : "未启用"}
+            </MacSettingsValue>
+          }
+        />
+      </MacSettingsSection>
+    </MacSettingsView>
   );
 };
 

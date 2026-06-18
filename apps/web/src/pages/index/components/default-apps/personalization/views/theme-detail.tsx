@@ -9,7 +9,7 @@ import {
   ThemeConfigApiItem,
 } from "@/services/desktop";
 import { useLocation, useNavigate, useParams } from "react-router";
-import { themeRoute } from "../route-paths";
+import { personalizationRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
 
 const ThemeDetailView: FC = () => {
@@ -31,12 +31,12 @@ const ThemeDetailView: FC = () => {
   }, [themes, themeId]);
 
   useEffect(() => {
-    if (!themeId) navigate(themeRoute.path.root, { replace: true });
+    if (!themeId) navigate(personalizationRoute.path.root, { replace: true });
   }, [navigate, themeId]);
 
   useEffect(() => {
     if (loading) return;
-    if (themeId && !theme) navigate(themeRoute.path.root, { replace: true });
+    if (themeId && !theme) navigate(personalizationRoute.path.root, { replace: true });
   }, [loading, navigate, theme, themeId]);
 
   if (!theme) return null;

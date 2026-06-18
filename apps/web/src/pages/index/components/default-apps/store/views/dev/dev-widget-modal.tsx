@@ -4,6 +4,7 @@ import { RiAddLine, RiCloseLine } from "@remixicon/react";
 import type { FC } from "react";
 import type { DevWidget } from "@/contexts/WidgetContext";
 import type { WidgetSizeConfig } from "@/types";
+import { css } from "@emotion/css";
 
 // ====== 表单数据类型 ======
 
@@ -135,20 +136,20 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
   /** 弹窗打开时，若为编辑模式则回填表单 */
   const handleAfterOpen = () => {
     if (editingWidget) {
-      form.setFieldsValue({
+      (form as any).setFieldsValue({
         name: editingWidget.name,
         entry: editingWidget.entry,
         sizes: fromSizeConfigs(editingWidget.sizeConfigs),
       });
     } else {
-      form.resetFields();
-      form.setFieldsValue({ sizes: [{ ...defaultSize }] });
+      (form as any).resetFields();
+      (form as any).setFieldsValue({ sizes: [{ ...defaultSize }] });
     }
   };
 
   /** 关闭时重置表单 */
   const handleClose = () => {
-    form.resetFields();
+    (form as any).resetFields();
     onClose();
   };
 
@@ -158,15 +159,24 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
       onClose={handleClose}
       width={520}
       destroyOnClose
+      styles={{
+        body: { padding: 0 },
+        inner: {
+          width: "100%",
+          maxHeight: "calc(100dvh - 64px)",
+          overflowY: "auto",
+          overscrollBehavior: "contain",
+        },
+      }}
     >
       <div
-        className="w-full h-full overflow-hidden"
+        className={`w-full min-h-full ${appleDevWidgetModalClassName}`}
         // 弹窗渲染完成后回填表单
         ref={(el) => {
           if (el && open) handleAfterOpen();
         }}
       >
-        <div className="text-lg font-semibold tracking-tight pb-4">
+        <div className="mb-4 text-[21px] font-semibold tracking-tight text-[#1d1d1f]">
           {editingWidget ? "编辑小组件" : "添加小组件"}
         </div>
 
@@ -218,7 +228,12 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
             <Button shape="round" onClick={handleClose}>
               取消
             </Button>
-            <Button shape="round" type="primary" onClick={() => form.submit()}>
+            <Button
+              shape="round"
+              type="primary"
+              className="apple-primary"
+              onClick={() => (form as any).submit()}
+            >
               {editingWidget ? "保存" : "添加到桌面"}
             </Button>
           </div>
@@ -229,3 +244,48 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
 };
 
 export default DevWidgetModal;
+
+const appleDevWidgetModalClassName = css`
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(245, 245, 247, 0.82)),
+    rgba(245, 245, 247, 0.72);
+  padding: 22px;
+  backdrop-filter: blur(28px) saturate(1.18);
+
+  .ant-form-item-label > label {
+    color: #1d1d1f;
+    font-weight: 600;
+  }
+
+  .ant-input,
+  .ant-input-number,
+  .ant-input-number-input {
+    border-radius: 10px;
+  }
+
+  .ant-input,
+  .ant-input-number {
+    border-color: rgba(60, 60, 67, 0.16);
+    background: rgba(255, 255, 255, 0.74);
+  }
+
+  .ant-input:hover,
+  .ant-input:focus,
+  .ant-input-number:hover,
+  .ant-input-number-focused {
+    border-color: rgba(0, 122, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+  }
+
+  .ant-btn-dashed {
+    border-color: rgba(0, 122, 255, 0.24);
+    background: rgba(0, 122, 255, 0.06);
+    color: #007aff;
+  }
+
+  .apple-primary {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;

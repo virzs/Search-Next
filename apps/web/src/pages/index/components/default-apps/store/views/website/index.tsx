@@ -18,21 +18,11 @@ import { storeRoute } from "../../route-paths";
 import { css } from "@emotion/css";
 
 const websiteViewClassName = css`
-  .ant-segmented {
-    border-radius: 999px;
-    background: rgba(118, 118, 128, 0.14);
-    padding: 3px;
-  }
-
-  .ant-segmented-item {
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .ant-segmented-item-selected {
-    background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  .apple-store-action.ant-btn-primary {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
   }
 `;
 
@@ -184,6 +174,12 @@ const WebsiteView: React.FC = () => {
           icon={<RiAddLine size={16} />}
           shape="round"
           size="small"
+          className="apple-store-action"
+          style={{
+            background: "#007aff",
+            borderColor: "#007aff",
+            boxShadow: "0 8px 18px rgba(0,122,255,0.2)",
+          }}
         >
           自定义
         </Button>
@@ -200,7 +196,7 @@ const WebsiteView: React.FC = () => {
         />
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="flex-1 overflow-y-auto px-3 pb-4 pt-4">
+          <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
             <div className="mb-4 px-1">
               <div className="text-[30px] font-extrabold leading-9 tracking-normal text-gray-950 dark:text-gray-50">
                 {activeCategory?.label ?? "全部网站"}

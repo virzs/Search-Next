@@ -1,10 +1,13 @@
-import { Typography, Radio, List, Card } from "antd";
+import { Button } from "antd";
 import { useState } from "react";
-import { RiCheckLine } from "@remixicon/react";
-import { SettingsActions } from "@/components/settings";
-import { DefaultAppView } from "@/components";
-
-const { Text, Paragraph } = Typography;
+import { RiCheckLine, RiTranslate } from "@remixicon/react";
+import {
+  MacSettingsHero,
+  MacSettingsRow,
+  MacSettingsSection,
+  MacSettingsValue,
+  MacSettingsView,
+} from "../../components/macos-settings";
 
 interface LanguageOption {
   code: string;
@@ -47,63 +50,68 @@ const LanguageView = () => {
   };
 
   return (
-    <DefaultAppView>
-      {isChanged && (
-        <Card>
-          <SettingsActions
-            align="center"
-            actions={[
-              {
-                key: "save",
-                label: "保存设置",
-                type: "primary",
-                onClick: handleSaveLanguage,
-              },
-              {
-                key: "reset",
-                label: "重置",
-                onClick: handleResetLanguage,
-              },
-            ]}
-          />
-        </Card>
-      )}
+    <MacSettingsView
+      title="语言"
+      description="查看当前界面语言和后续可用语言。"
+      action={
+        isChanged ? (
+          <div className="flex gap-2">
+            <Button size="small" onClick={handleResetLanguage}>
+              重置
+            </Button>
+            <Button
+              size="small"
+              type="primary"
+              style={{
+                background: "#007aff",
+                borderColor: "#007aff",
+                boxShadow: "0 8px 18px rgba(0,122,255,0.18)",
+              }}
+              onClick={handleSaveLanguage}
+            >
+              保存设置
+            </Button>
+          </div>
+        ) : null
+      }
+    >
+      <MacSettingsHero
+        icon={<RiTranslate size={24} />}
+        tone="green"
+        title="首选语言"
+        description="当前仅支持简体中文；更多语言接入后可在这里切换。"
+      />
 
-      {/* 语言选择列表 */}
-      <Card title="选择语言">
-        <Paragraph type="secondary" className="mb-4">
-          选择您希望使用的界面语言。更改语言后，界面将立即切换到所选语言。
-        </Paragraph>
-
-        <Radio.Group
-          value={selectedLanguage}
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          className="w-full"
-        >
-          <List
-            dataSource={languages}
-            renderItem={(language) => (
-              <List.Item className="!px-0">
-                <Radio value={language.code} className="w-full">
-                  <div className="flex items-center gap-3 py-2">
-                    <span className="text-xl">{language.flag}</span>
-                    <div className="flex-1">
-                      <div className="font-medium">{language.nativeName}</div>
-                      <Text type="secondary" className="text-sm">
-                        {language.description}
-                      </Text>
-                    </div>
-                    {selectedLanguage === language.code && (
-                      <RiCheckLine className="text-green-500" />
-                    )}
-                  </div>
-                </Radio>
-              </List.Item>
-            )}
-          />
-        </Radio.Group>
-      </Card>
-    </DefaultAppView>
+      <MacSettingsSection title="语言">
+        {languages.map((language) => {
+          const checked = selectedLanguage === language.code;
+          return (
+            <MacSettingsRow
+              key={language.code}
+              icon={<span className="text-base">{language.flag}</span>}
+              iconTone="red"
+              title={language.nativeName}
+              description={language.description}
+              onClick={() => handleLanguageChange(language.code)}
+              extra={
+                checked ? (
+                  <span className="grid h-[22px] w-[22px] place-items-center rounded-full bg-[#007aff] text-white">
+                    <RiCheckLine size={14} />
+                  </span>
+                ) : null
+              }
+            />
+          );
+        })}
+        <MacSettingsRow
+          icon={<span className="text-xs font-black">A</span>}
+          iconTone="gray"
+          title="English"
+          description="Coming soon"
+          extra={<MacSettingsValue>未启用</MacSettingsValue>}
+        />
+      </MacSettingsSection>
+    </MacSettingsView>
   );
 };
 

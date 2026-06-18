@@ -1,6 +1,7 @@
 import {
   ReactNode,
   Suspense,
+  isValidElement,
   useCallback,
   useEffect,
   useMemo,
@@ -102,6 +103,7 @@ export interface AppRoutedOverlaySidebarProps extends Omit<
     initialValue?: string;
     redirectPath?: string;
     throttleWait?: number;
+    emptyText?: ReactNode;
   };
 }
 
@@ -112,6 +114,7 @@ export interface AppRoutedOverlayProps<
   title?: ReactNode;
   closeTo?: string;
   wrapContent?: boolean;
+  componentSize?: AppRoutedContainerProps["componentSize"];
   overlayProps?: AppRoutedContainerProps["overlayProps"];
   sidebarProps?: AppRoutedOverlaySidebarProps;
   outletWrapperClassName?: string;
@@ -153,6 +156,17 @@ const resolveActiveMenuItem = (
   if (!scored.length) return items[0] ?? null;
   scored.sort((a, b) => b.score - a.score);
   return scored[0]?.item ?? items[0] ?? null;
+};
+
+const getSearchableText = (node: ReactNode): string => {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(getSearchableText).join(" ");
+  if (isValidElement(node)) {
+    const props = node.props as { children?: ReactNode; title?: ReactNode };
+    return [props.title, props.children].map(getSearchableText).join(" ");
+  }
+  return "";
 };
 
 const useThrottledValue = <T,>(value: T, wait: number) => {
@@ -202,6 +216,7 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
   title,
   closeTo = "/",
   wrapContent,
+  componentSize,
   overlayProps,
   sidebarProps,
   outletWrapperClassName = "h-full w-full overflow-auto",
@@ -291,7 +306,19 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
 
   const resolvedSidebarProps = useMemo<AppSidebarProps | undefined>(() => {
     if (!sidebarProps) return undefined;
-    const menuItems = (sidebarProps.menuItems ?? []).map((item) => {
+    const filterQuery =
+      sidebarProps.search && !sidebarProps.search.redirectPath
+        ? searchValue.trim().toLowerCase()
+        : "";
+    const filteredMenuItems = filterQuery
+      ? (sidebarProps.menuItems ?? []).filter((item) =>
+          [item.key, getSearchableText(item.label)]
+            .join(" ")
+            .toLowerCase()
+            .includes(filterQuery),
+        )
+      : (sidebarProps.menuItems ?? []);
+    const menuItems = filteredMenuItems.map((item) => {
       const { path, match, ...rest } = item;
       void path;
       void match;
@@ -300,6 +327,10 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
     return {
       ...sidebarProps,
       menuItems,
+      emptyText:
+        filterQuery && sidebarProps.search?.emptyText
+          ? sidebarProps.search.emptyText
+          : sidebarProps.emptyText,
       activeMenuKey,
       onMenuSelect: (key) => {
         const item = (sidebarProps.menuItems ?? []).find((i) => i.key === key);
@@ -377,6 +408,7 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
       onClose={() => navigate(closeTo)}
       title={title}
       wrapContent={wrapContent}
+      componentSize={componentSize}
       overlayProps={overlayProps}
       sidebarProps={resolvedSidebarProps}
     >

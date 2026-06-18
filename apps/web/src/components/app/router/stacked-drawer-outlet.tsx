@@ -3,6 +3,8 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigationType, useOutlet } from "react-router";
 import { cx } from "@emotion/css";
 
+const MotionDiv = motion.div as any;
+
 type DrawerTransitionPhase = "idle" | "forward" | "back";
 
 type DrawerPage = {
@@ -129,7 +131,7 @@ const StackedDrawerOutlet = ({
       ) : null}
 
       {frontLayer ? (
-        <motion.div
+        <MotionDiv
           key={frontLayer.key}
           className={cx("absolute inset-0", layerClassName)}
           initial={
@@ -159,7 +161,7 @@ const StackedDrawerOutlet = ({
           }}
         >
           {frontLayer.element}
-        </motion.div>
+        </MotionDiv>
       ) : null}
     </div>
   );

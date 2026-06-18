@@ -26,6 +26,7 @@ export interface AppSidebarProps {
   menuItems?: AppSidebarMenuItem[];
   activeMenuKey?: string;
   onMenuSelect?: (key: string) => void;
+  emptyText?: ReactNode;
   footer?: ReactNode;
   className?: string;
   menuStyles?: MenuProps["styles"];
@@ -37,6 +38,7 @@ const AppSidebar: FC<AppSidebarProps> = ({
   menuItems,
   activeMenuKey,
   onMenuSelect,
+  emptyText = "没有匹配项",
   footer,
   className,
   menuStyles,
@@ -91,7 +93,9 @@ const AppSidebar: FC<AppSidebarProps> = ({
           />
         </div>
       ) : (
-        <div className="flex-1" />
+        <div className="flex-1 px-4 py-5 text-center text-xs font-semibold text-[rgba(60,60,67,0.54)]">
+          {emptyText}
+        </div>
       )}
 
       {footer ? (
@@ -104,18 +108,18 @@ const AppSidebar: FC<AppSidebarProps> = ({
 export default AppSidebar;
 
 const appSidebarClassName = css`
-  padding: 18px 10px 16px;
+  padding: 14px 10px 16px;
   background:
     linear-gradient(
       180deg,
-      rgba(246, 245, 243, 0.96),
-      rgba(237, 235, 232, 0.94)
+      rgba(246, 245, 243, 0.88),
+      rgba(235, 233, 230, 0.82)
     ),
-    rgba(242, 240, 237, 0.94);
+    rgba(242, 240, 237, 0.78);
   border-right: 1px solid rgba(60, 60, 67, 0.12);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.54);
   color: #1d1d1f;
-  backdrop-filter: blur(22px) saturate(1.12);
+  backdrop-filter: blur(30px) saturate(1.18);
 
   .app-sidebar-header,
   .app-sidebar-header [class*="text-gray-950"],
@@ -131,8 +135,8 @@ const appSidebarClassName = css`
   .ant-input-affix-wrapper {
     height: 30px;
     border-radius: 999px;
-    border-color: rgba(60, 60, 67, 0.18);
-    background: rgba(255, 255, 255, 0.62);
+    border-color: rgba(60, 60, 67, 0.14);
+    background: rgba(255, 255, 255, 0.58);
     box-shadow:
       inset 0 1px 1px rgba(0, 0, 0, 0.06),
       0 1px 0 rgba(255, 255, 255, 0.66);
@@ -183,9 +187,12 @@ const appSidebarClassName = css`
   }
 
   .ant-menu-item-selected {
-    background: rgba(60, 60, 67, 0.09) !important;
+    background: rgba(255, 255, 255, 0.62) !important;
     color: #1d1d1f !important;
     font-weight: 700;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 1px 2px rgba(0, 0, 0, 0.06);
   }
 
   .ant-menu-item-selected::after {

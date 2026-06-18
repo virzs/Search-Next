@@ -1,12 +1,20 @@
 import React from "react";
-import { Avatar, Button, Card, Typography, Space } from "antd";
+import { Avatar, Button } from "antd";
 import { motion } from "framer-motion";
-import { RiLogoutBoxRLine, RiShieldCheckLine } from "@remixicon/react";
+import { cx } from "@emotion/css";
+import {
+  RiLogoutBoxRLine,
+  RiMailLine,
+  RiShieldCheckLine,
+  RiTimeLine,
+} from "@remixicon/react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserInfo } from "../../types/auth";
 import { format } from "date-fns";
+import { appleAccountInfoClassName } from "./apple-auth-styles";
+import BoringAccountAvatar from "./BoringAccountAvatar";
 
-const { Title, Text } = Typography;
+const MotionDiv = motion.div as any;
 
 interface AccountInfoProps {
   user?: UserInfo;
@@ -19,78 +27,81 @@ const AccountInfo: React.FC<AccountInfoProps> = ({
   showActions = true,
   className = "",
 }) => {
-  const { user: contextUser, logout, avatarSrc, coverGradientCss } = useAuth();
+  const { user: contextUser, logout, coverGradientCss } = useAuth();
   const user = propUser || contextUser;
 
   const handleLogout = () => {
     logout();
   };
 
-  // 头像与封面由 AuthContext 生成；未登录时为 null
+  // 头像由邮箱稳定生成；封面由 AuthContext 生成。
+  const joinedAt = user?.createdAt
+    ? format(user.createdAt, "yyyy-MM-dd")
+    : "未知";
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`account-info h-full flex flex-col gap-12 ${className}`}
+      className={cx("account-info", appleAccountInfoClassName, className)}
     >
-      <Card
-        className="overflow-hidden grow"
-        bodyStyle={{ padding: 0 }}
-        variant="borderless"
-      >
-        {/* 背景封面 */}
-        <div
-          className="h-32 relative"
-          style={{ backgroundImage: coverGradientCss || undefined }}
-        >
-          {/* 头像 */}
-          <div className="absolute -bottom-8 left-6">
-            <Avatar
-              size={80}
-              src={avatarSrc ?? undefined}
-              style={{
-                border: "4px solid white",
-                backgroundImage: coverGradientCss || undefined,
-              }}
-            />
-          </div>
-        </div>
+      <div className="apple-account-card">
+        <div className="apple-account-header">
+          <Avatar
+            className="apple-account-avatar"
+            size={84}
+            src={
+              <BoringAccountAvatar
+                seed={user?.email || user?.username}
+                aria-label={user?.username || "账号头像"}
+              />
+            }
+            style={{
+              backgroundImage:
+                coverGradientCss ||
+                "linear-gradient(135deg, #0a84ff, #30d158)",
+            }}
+          />
 
-        {/* 用户信息内容 */}
-        <div className="pt-12 pb-6 px-6">
-          <div className="mb-4 flex justify-between items-start">
-            <div>
-              <Title level={3} className="mb-1!">
-                {user?.username}
-              </Title>
-              <Text type="secondary" className="block">
-                {user?.email}
-              </Text>
+          <div className="min-w-0">
+            <div className="apple-account-name">{user?.username}</div>
+            <div className="apple-account-email">{user?.email}</div>
+            <div className="apple-account-badge">
+              <RiShieldCheckLine size={14} />
+              <span>已登录</span>
             </div>
           </div>
-          <div className="flex items-center space-x-1 text-xs text-gray-500 mb-4">
-            <RiShieldCheckLine size={14} />
-            <span>
-              加入于 {user?.createdAt && format(user.createdAt, "yyyy-MM-dd")}
-            </span>
+
+          {showActions && (
+            <Button
+              type="text"
+              icon={<RiLogoutBoxRLine size={16} />}
+              onClick={handleLogout}
+              className="apple-account-logout"
+            >
+              退出登录
+            </Button>
+          )}
+        </div>
+
+        <div className="apple-account-meta-grid">
+          <div className="apple-account-meta">
+            <div className="apple-account-meta-label">邮箱</div>
+            <div className="apple-account-meta-value">
+              <RiMailLine size={14} className="mr-1 inline-block align-[-2px]" />
+              {user?.email}
+            </div>
+          </div>
+          <div className="apple-account-meta">
+            <div className="apple-account-meta-label">加入时间</div>
+            <div className="apple-account-meta-value">
+              <RiTimeLine size={14} className="mr-1 inline-block align-[-2px]" />
+              {joinedAt}
+            </div>
           </div>
         </div>
-      </Card>
-      {showActions && (
-        <Space direction="vertical" className="w-full shrink-0">
-          <Button
-            type="primary"
-            danger
-            icon={<RiLogoutBoxRLine size={16} />}
-            onClick={handleLogout}
-            block
-          >
-            退出登录
-          </Button>
-        </Space>
-      )}
-    </motion.div>
+      </div>
+    </MotionDiv>
   );
 };
 

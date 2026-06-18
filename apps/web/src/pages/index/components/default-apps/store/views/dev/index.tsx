@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Button,
   Empty,
-  Space,
   Tag,
   App,
   Popconfirm,
@@ -19,6 +18,16 @@ import { useWidget } from "@/hooks/useWidget";
 import type { DevWidget } from "@/contexts/WidgetContext";
 import DevWidgetModal, { toSizeConfigs } from "./dev-widget-modal";
 import type { DevWidgetFormValues } from "./dev-widget-modal";
+import { css } from "@emotion/css";
+
+const devViewClassName = css`
+  .apple-store-action.ant-btn-primary:not(:disabled) {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;
 
 const DevView: React.FC = () => {
   const { message } = App.useApp();
@@ -83,7 +92,10 @@ const DevView: React.FC = () => {
   };
 
   return (
-    <DefaultAppView contentClassName="flex flex-col overflow-hidden px-3 pb-6 pt-4">
+    <DefaultAppView
+      className={devViewClassName}
+      contentClassName="flex flex-col overflow-hidden px-4 pb-8 pt-4"
+    >
       <div className="mb-4 flex shrink-0 items-end justify-between gap-3 px-1">
         <div className="text-[34px] font-extrabold leading-[38px] tracking-normal text-gray-950 dark:text-gray-50">
           开发者
@@ -92,7 +104,7 @@ const DevView: React.FC = () => {
           type="primary"
           icon={<RiAddLine size={16} />}
           shape="round"
-          className="font-bold!"
+          className="apple-store-action font-bold!"
           onClick={openAddModal}
         >
           添加
@@ -117,7 +129,7 @@ const DevView: React.FC = () => {
             return (
               <div
                 key={dw.id}
-                className="rounded-2xl border border-black/[0.08] bg-white p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.08]"
+                className="rounded-[22px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]"
               >
                 <div className="flex items-start gap-3">
                   <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#30d158,#00c7be)] text-white">
@@ -133,15 +145,19 @@ const DevView: React.FC = () => {
                           {dw.entry}
                         </div>
                       </div>
-                      <Space size={4}>
+                      <div className="flex shrink-0 flex-wrap justify-end gap-2">
                         <Button
-                          className="rounded-full!"
+                          size="small"
+                          shape="circle"
                           icon={<RiEditLine size={14} />}
+                          aria-label="编辑"
                           onClick={() => openEditModal(dw)}
                         />
                         <Button
                           type="primary"
-                          className="rounded-full!"
+                          size="small"
+                          shape="round"
+                          className="apple-store-action font-bold!"
                           onClick={() => addToDesktop(dw.id)}
                         >
                           添加到桌面
@@ -154,11 +170,13 @@ const DevView: React.FC = () => {
                         >
                           <Button
                             danger
-                            className="rounded-full!"
+                            size="small"
+                            shape="circle"
                             icon={<RiDeleteBinLine size={14} />}
+                            aria-label="删除"
                           />
                         </Popconfirm>
-                      </Space>
+                      </div>
                     </div>
 
                     <div className="mt-3 flex items-center gap-2 text-xs flex-wrap">

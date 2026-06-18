@@ -1,22 +1,18 @@
-import { Button, Card } from "antd";
-import { useMemo, useState, type CSSProperties } from "react";
+import { Button } from "antd";
+import { useMemo, type CSSProperties } from "react";
 import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
-import {
-  RiArrowDownSLine,
-  RiLandscapeLine,
-  RiTShirtLine,
-} from "@remixicon/react";
-import { cx } from "@emotion/css";
+import { RiLandscapeLine, RiPaletteLine, RiTShirtLine } from "@remixicon/react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
+import { getActiveThemeConfigs } from "@/services/desktop";
+import { getMyThemeConfigs } from "../../../personalization/my-assets";
+import { personalizationRoute } from "../../../personalization/route-paths";
 import {
-  getActiveThemeConfigs,
-  getThemePreviewImageUrl,
-} from "@/services/desktop";
-import { themeRoute } from "../../../theme/route-paths";
-import { ThemeDesktopPreview } from "../../../theme/views/theme-preview";
-import { DefaultAppView } from "@/components";
-import PreviewCard from "../../../theme/components/PreviewCard";
+  MacSettingsRow,
+  MacSettingsSection,
+  MacSettingsValue,
+  MacSettingsView,
+} from "../../components/macos-settings";
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
@@ -27,18 +23,28 @@ const resolveWallpaperName = (
   return "渐变";
 };
 
+const resolveThemeName = (themeName: string | null | undefined, themeId: string) => {
+  if (themeName) return themeName;
+  if (themeId === "light") return "默认";
+  if (themeId === "dark") return "深色";
+  return themeId;
+};
+
 const PersonalizationView = () => {
   const navigate = useNavigate();
   const { personalization } = useDesktopTheme();
   const { data: themes } = useRequest(getActiveThemeConfigs);
-  const [openKey, setOpenKey] = useState<"theme" | "wallpaper" | null>(null);
 
   const activeTheme = useMemo(() => {
     const id = personalization.themeId;
-    return (themes ?? []).find((t) => t._id === id) ?? null;
+    return (
+      [...(themes ?? []), ...getMyThemeConfigs()].find((t) => t._id === id) ??
+      null
+    );
   }, [personalization.themeId, themes]);
 
   const wallpaperName = resolveWallpaperName(personalization.wallpaper);
+  const themeName = resolveThemeName(activeTheme?.name, personalization.themeId);
 
   const wallpaperPreviewStyle = useMemo<CSSProperties>(() => {
     const wallpaper = personalization.wallpaper;
@@ -51,175 +57,129 @@ const PersonalizationView = () => {
         backgroundPosition: "center",
       };
     }
-    return { background: "rgba(0,0,0,0.06)" };
+    return {
+      background: "linear-gradient(135deg, #e7f5ff, #fff3ea 57%, #f5f0ff)",
+    };
   }, [personalization.wallpaper]);
 
-  const itemHeaderClassName =
-    "flex items-center justify-between transition select-none hover:bg-white/85 active:bg-white";
-
-  const panelClassName =
-    "mt-2 rounded-2xl border border-black/5 bg-white/60 p-3";
-
-  const activeRingColor = "rgba(22, 119, 255, 0.45)";
-
-  const themePreviewUrl = useMemo(() => {
-    return getThemePreviewImageUrl(activeTheme, 0);
-  }, [activeTheme]);
-
-  const toggle = (key: "theme" | "wallpaper") => {
-    setOpenKey((prev) => (prev === key ? null : key));
-  };
-
   return (
-    <DefaultAppView>
-      <Card>
-        <div className="grid gap-3">
-          <div>
-            <div
-              role="button"
-              tabIndex={0}
-              className={itemHeaderClassName}
-              onClick={() => toggle("theme")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") toggle("theme");
-              }}
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <RiTShirtLine size={16} className="opacity-70" />
-                  <div className="font-medium">主题</div>
-                </div>
-                <div className="mt-1 text-sm text-black/60 truncate">
-                  {activeTheme ? activeTheme.name : personalization.themeId}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  type="text"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(themeRoute.path.root);
-                  }}
-                >
-                  管理
-                </Button>
-                <RiArrowDownSLine
-                  size={18}
-                  className={cx(
-                    "opacity-60 transition-transform",
-                    openKey === "theme" ? "rotate-180" : "rotate-0",
-                  )}
-                />
-              </div>
-            </div>
-
-            {openKey === "theme" ? (
-              <div className={panelClassName}>
-                <PreviewCard
-                  active
-                  title={
-                    activeTheme ? activeTheme.name : personalization.themeId
-                  }
-                  description={activeTheme?.description}
-                  style={{
-                    boxShadow: `0 0 0 2px ${activeRingColor}`,
-                  }}
-                  cover={
-                    <div className="aspect-video rounded-xl border overflow-hidden">
-                      {themePreviewUrl ? (
-                        <img
-                          className="h-full w-full object-cover"
-                          src={themePreviewUrl}
-                          alt=""
-                        />
-                      ) : activeTheme ? (
-                        <ThemeDesktopPreview theme={activeTheme} />
-                      ) : (
-                        <div className="h-full w-full bg-black/5" />
-                      )}
-                    </div>
-                  }
-                />
-              </div>
-            ) : null}
+    <MacSettingsView
+      title="个性化"
+      description="控制主题、背景与桌面视觉风格。"
+      action={
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button size="small" onClick={() => navigate(personalizationRoute.path.root)}>
+            管理主题
+          </Button>
+          <Button
+            size="small"
+            type="primary"
+            style={{
+              background: "#007aff",
+              borderColor: "#007aff",
+              boxShadow: "0 8px 18px rgba(0,122,255,0.18)",
+            }}
+            onClick={() => navigate(personalizationRoute.path.my)}
+          >
+            我的外观
+          </Button>
+        </div>
+      }
+    >
+      <section className="rounded-[20px] border border-white/80 bg-white/80 p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="text-[13px] font-bold text-[#6e6e73]">
+            桌面预览
           </div>
-
-          <div>
-            <div
-              role="button"
-              tabIndex={0}
-              className={itemHeaderClassName}
-              onClick={() => toggle("wallpaper")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") toggle("wallpaper");
-              }}
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <RiLandscapeLine size={16} className="opacity-70" />
-                  <div className="font-medium">背景</div>
-                </div>
-                <div className="mt-1 text-sm text-black/60 truncate">
-                  {wallpaperName}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  type="text"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(themeRoute.path.wallpaper);
-                  }}
-                >
-                  管理
-                </Button>
-                <Button
-                  type="text"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(themeRoute.path.my);
-                  }}
-                >
-                  我的
-                </Button>
-                <RiArrowDownSLine
-                  size={18}
-                  className={cx(
-                    "opacity-60 transition-transform",
-                    openKey === "wallpaper" ? "rotate-180" : "rotate-0",
-                  )}
-                />
-              </div>
-            </div>
-
-            {openKey === "wallpaper" ? (
-              <div className={panelClassName}>
-                <PreviewCard
-                  active
-                  title={wallpaperName}
-                  style={{
-                    boxShadow: `0 0 0 2px ${activeRingColor}`,
-                  }}
-                  cover={
-                    <div className="aspect-video">
-                      <div
-                        className="h-full w-full"
-                        style={wallpaperPreviewStyle}
-                      />
-                    </div>
-                  }
-                />
-              </div>
-            ) : null}
+          <div className="rounded-full bg-[#f2f2f7] px-2.5 py-1 text-xs font-bold text-[#6e6e73]">
+            {themeName} · {wallpaperName}
           </div>
         </div>
-      </Card>
-    </DefaultAppView>
+        <div
+          className="relative h-32 overflow-hidden rounded-[15px] border border-[rgba(60,60,67,0.13)] p-3"
+          style={wallpaperPreviewStyle}
+        >
+          <div className="mx-auto mt-1 grid h-[62%] w-[54%] grid-rows-[22px_1fr] overflow-hidden rounded-xl border border-white/75 bg-white/90 shadow-[0_12px_24px_rgba(0,0,0,0.1)]">
+            <div className="flex items-center gap-1.5 border-b border-[rgba(60,60,67,0.1)] pl-3">
+              <span className="h-2 w-2 rounded-full bg-[#d1d1d6]" />
+              <span className="h-2 w-2 rounded-full bg-[#d1d1d6]" />
+              <span className="h-2 w-2 rounded-full bg-[#d1d1d6]" />
+            </div>
+            <div className="grid grid-cols-[1fr_1.15fr]">
+              <div className="border-r border-[rgba(60,60,67,0.08)]" />
+              <div />
+            </div>
+          </div>
+          <div className="absolute bottom-2.5 left-1/2 flex h-5 w-[144px] -translate-x-1/2 items-center justify-center gap-1.5 rounded-xl border border-white/70 bg-white/60 shadow-[0_8px_18px_rgba(0,0,0,0.08)]">
+            {["#0a84ff", "#ff9500", "#34c759", "#af52de", "#8e8e93"].map(
+              (color) => (
+                <span
+                  key={color}
+                  className="h-2.5 w-2.5 rounded-[4px]"
+                  style={{ background: color }}
+                />
+              ),
+            )}
+          </div>
+        </div>
+      </section>
+
+      <MacSettingsSection title="外观">
+        <MacSettingsRow
+          icon={<RiTShirtLine size={16} />}
+          iconTone="orange"
+          title="主题"
+          description={themeName}
+          extra={
+            <Button size="small" onClick={() => navigate(personalizationRoute.path.root)}>
+              管理
+            </Button>
+          }
+        />
+
+        <MacSettingsRow
+          icon={<RiLandscapeLine size={16} />}
+          iconTone="purple"
+          title="背景"
+          description={wallpaperName}
+          extra={
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                onClick={() => navigate(personalizationRoute.path.wallpaper)}
+              >
+                管理
+              </Button>
+              <Button size="small" onClick={() => navigate(personalizationRoute.path.my)}>
+                我的
+              </Button>
+            </div>
+          }
+        />
+      </MacSettingsSection>
+
+      <MacSettingsSection title="强调色">
+        <MacSettingsRow
+          icon={<RiPaletteLine size={16} />}
+          iconTone="blue"
+          title="颜色"
+          description="用于按钮、选中状态和高亮描边"
+          extra={<MacSettingsValue>蓝色</MacSettingsValue>}
+        />
+        <MacSettingsRow
+          title={
+            <div className="flex gap-2.5 py-1">
+              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#0a84ff] shadow-[0_0_0_2px_rgba(0,122,255,0.42)]" />
+              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#ff9500] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
+              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#34c759] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
+              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#af52de] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
+              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#d1d1d6] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
+            </div>
+          }
+          extra={<MacSettingsValue>系统推荐</MacSettingsValue>}
+        />
+      </MacSettingsSection>
+    </MacSettingsView>
   );
 };
 

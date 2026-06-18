@@ -1,17 +1,17 @@
 import {
   Button,
   Typography,
-  Progress,
   Alert,
-  Switch,
-  Card,
   message,
   Flex,
   Modal,
 } from "antd";
-import { RiDownloadLine, RiUploadLine } from "@remixicon/react";
-import { useState } from "react";
-import { DefaultAppView } from "@/components";
+import {
+  RiCloudLine,
+  RiDownloadLine,
+  RiErrorWarningLine,
+  RiUploadLine,
+} from "@remixicon/react";
 import useAuth from "@/hooks/useAuth";
 import {
   SEARCH_NEXT_STORAGE_KEYS,
@@ -20,30 +20,18 @@ import {
   applyStorageBackup,
   stringifyStorageBackup,
 } from "@/utils/storage";
+import {
+  MacSettingsHero,
+  MacSettingsRow,
+  MacSettingsSection,
+  MacSettingsValue,
+  MacSettingsView,
+} from "../../components/macos-settings";
 
 const { Text } = Typography;
 
-interface SyncStatus {
-  isEnabled: boolean;
-  lastSyncTime: Date | null;
-  syncProgress: number;
-  isSyncing: boolean;
-}
-
 const BackupView = () => {
   const { isAuthenticated } = useAuth();
-
-  // 同步状态
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
-    isEnabled: true,
-    lastSyncTime: new Date(),
-    syncProgress: 0,
-    isSyncing: false,
-  });
-
-  const handleToggleSync = (enabled: boolean) => {
-    setSyncStatus((prev) => ({ ...prev, isEnabled: enabled }));
-  };
 
   const handleExportData = () => {
     const backup = createStorageBackup(SEARCH_NEXT_STORAGE_KEYS);
@@ -155,85 +143,80 @@ const BackupView = () => {
     input.click();
   };
 
-  const renderLocalBackupCard = () => (
-    <Card title="本地备份" styles={{ root: { marginBottom: 16 } }}>
-      <Flex vertical gap="middle">
-        <Button icon={<RiUploadLine size={16} />} onClick={handleExportData}>
-          导出数据
-        </Button>
-        <Button icon={<RiDownloadLine size={16} />} onClick={handleImportData}>
-          导入数据
-        </Button>
-        <Alert
-          title="注意"
-          description="导入数据将覆盖当前所有设置，请谨慎操作。建议先导出当前数据作为备份。"
-          type="warning"
-        />
-      </Flex>
-    </Card>
+  const renderLocalBackupSection = () => (
+    <MacSettingsSection title="本地备份">
+      <MacSettingsRow
+        icon={<RiDownloadLine size={16} />}
+        iconTone="orange"
+        title="导出数据"
+        description="保存为 .snbak 备份文件"
+        extra={
+          <Button size="small" onClick={handleExportData}>
+            导出
+          </Button>
+        }
+      />
+      <MacSettingsRow
+        icon={<RiUploadLine size={16} />}
+        iconTone="purple"
+        title="导入数据"
+        description="导入会覆盖当前本地设置"
+        extra={
+          <Button size="small" onClick={handleImportData}>
+            导入
+          </Button>
+        }
+      />
+      <MacSettingsRow
+        icon={<RiErrorWarningLine size={16} />}
+        iconTone="orange"
+        title="导入前建议先导出当前数据"
+        description="导入数据将覆盖当前所有设置。"
+      />
+    </MacSettingsSection>
   );
 
-  // 未登录视图
-  const renderUnloggedView = () => <>{renderLocalBackupCard()}</>;
+  const renderUnloggedView = () => <>{renderLocalBackupSection()}</>;
 
-  // 已登录视图
   const renderLoggedView = () => (
     <>
-      {/* 云端同步 */}
-      <Card
-        title="同步"
-        extra={
-          <Switch
-            checked={syncStatus.isEnabled}
-            onChange={handleToggleSync}
-            checkedChildren="开启"
-            unCheckedChildren="关闭"
-          />
-        }
-        styles={{ root: { marginBottom: 16 } }}
-      >
-        {syncStatus.isEnabled ? (
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <Text>同步状态：</Text>
-              <Text type={syncStatus.isSyncing ? "warning" : "success"}>
-                {syncStatus.isSyncing ? "同步中..." : "已同步"}
-              </Text>
-            </div>
-            {syncStatus.isSyncing && (
-              <Progress
-                percent={syncStatus.syncProgress}
-                status="active"
-                className="mb-3"
-              />
-            )}
-            {syncStatus.lastSyncTime && (
-              <div className="flex justify-between items-center mb-4">
-                <Text>上次同步：</Text>
-                <Text type="secondary">
-                  {syncStatus.lastSyncTime.toLocaleString()}
-                </Text>
-              </div>
-            )}
-          </div>
-        ) : (
+      <MacSettingsSection title="云端同步">
+        <MacSettingsRow
+          icon={<RiCloudLine size={16} />}
+          iconTone="green"
+          title="同步桌面数据"
+          description="云端多设备同步尚未接入，当前不会模拟同步状态。"
+          extra={<MacSettingsValue>即将推出</MacSettingsValue>}
+        >
           <Alert
-            message="云端同步已关闭"
-            description="开启后可以在多个设备间同步您的数据和设置。"
-            type="warning"
+            message="当前仅使用本地数据"
+            description="你仍然可以通过下方导出和导入 .snbak 文件迁移设置。"
+            type="info"
             showIcon
           />
-        )}
-      </Card>
-      {/* 本地备份 */}
-      {renderLocalBackupCard()}
+        </MacSettingsRow>
+      </MacSettingsSection>
+      {renderLocalBackupSection()}
     </>
   );
 
   return (
-    <DefaultAppView>
+    <MacSettingsView
+      title="备份与恢复"
+      description="导出本地数据，或在登录后开启云端同步。"
+    >
+      <MacSettingsHero
+        icon={<RiCloudLine size={24} />}
+        tone="purple"
+        title={isAuthenticated ? "同步与备份" : "本地备份"}
+        description={
+          isAuthenticated
+            ? "当前可导出本地备份；云端同步能力准备中。"
+            : "当前可导出和导入本地备份；云端同步能力准备中。"
+        }
+      />
       {isAuthenticated ? renderLoggedView() : renderUnloggedView()}
-    </DefaultAppView>
+    </MacSettingsView>
   );
 };
 

@@ -3,7 +3,7 @@ import type { DrawerProps } from "antd";
 import { configResponsive, useResponsive } from "ahooks";
 import { CSSProperties, FC, ReactNode } from "react";
 import { DesktopNextBaseModal } from "zs_library";
-import { cx } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 
 export interface AppResponsiveOverlayProps {
   open: boolean;
@@ -63,6 +63,7 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({
     resolvedIsDesktop
       ? (desktopContentClassName ?? defaultDesktopContentClassName)
       : (mobileContentClassName ?? defaultMobileContentClassName),
+    resolvedIsDesktop ? appResponsiveDesktopWindowClassName : null,
     contentClassName,
   );
 
@@ -114,3 +115,7 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({
 };
 
 export default AppResponsiveOverlay;
+
+const appResponsiveDesktopWindowClassName = css`
+  background: transparent;
+`;

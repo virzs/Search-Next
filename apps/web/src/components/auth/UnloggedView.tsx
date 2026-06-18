@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { Button, Typography, Tabs, message, Alert } from "antd";
+import { Alert, message } from "antd";
+import { cx } from "@emotion/css";
 import {
   UnloggedViewProps,
   AuthAction,
@@ -12,21 +13,40 @@ import { useAuth } from "@/hooks/useAuth";
 import useConfig from "@/hooks/useConfig";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import { appleAuthPanelClassName } from "./apple-auth-styles";
+import { AppSegmented } from "@/components";
 
-const { Title, Text } = Typography;
-const { TabPane } = Tabs;
+const authActions: AuthAction[] = ["login", "register"];
+const authActionLabel: Record<AuthAction, string> = {
+  login: "登录",
+  register: "注册",
+};
 
 const UnloggedView: React.FC<UnloggedViewProps> = ({
   mode = "inline",
   defaultAction = "login",
+  activeAction,
+  onActionChange,
   showToggle = true,
   onLoginSuccess = "show-toast",
   onRegisterSuccess = "show-toast",
   title,
   description,
+  className,
   modalProps = {},
 }) => {
-  const [currentAction, setCurrentAction] = useState<AuthAction>(defaultAction);
+  const [internalAction, setInternalAction] =
+    useState<AuthAction>(defaultAction);
+  const currentAction = activeAction ?? internalAction;
+  const setCurrentAction = useCallback(
+    (action: AuthAction) => {
+      if (activeAction === undefined) {
+        setInternalAction(action);
+      }
+      onActionChange?.(action);
+    },
+    [activeAction, onActionChange],
+  );
   // 使用 AuthContext 提供的登录/注册与加载状态
   const { login, register, loginLoading, registerLoading } = useAuth();
   // 使用 ConfigContext 提供的项目公共信息（用于控制注册提示）
@@ -152,83 +172,75 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
       ? "登录后可以同步您的数据和设置"
       : "注册账号以享受完整功能";
 
+  const renderRegisterForm = () =>
+    allowRegister ? (
+      <RegisterForm onSubmit={handleRegister} loading={registerLoading} />
+    ) : (
+      <Alert
+        className="apple-auth-alert"
+        description={registerDisabledTip}
+        type="warning"
+        showIcon
+      />
+    );
+
+  const renderForm = () =>
+    currentAction === "login" ? (
+      <LoginForm
+        onSubmit={handleLogin}
+        loading={loginLoading}
+        showRemember={true}
+        showForgotPassword={true}
+      />
+    ) : (
+      renderRegisterForm()
+    );
+
   return (
-    <div className="unlogged-view-content">
+    <div
+      className={cx(
+        "unlogged-view-content",
+        appleAuthPanelClassName,
+        className,
+      )}
+    >
       {/* 头部信息 */}
-      <div className="text-center mb-8">
-        <Title level={3} className="mb-2">
-          {title || defaultTitle}
-        </Title>
-        <Text type="secondary" className="block">
+      <div className="apple-auth-copy">
+        <div className="apple-auth-title">{title || defaultTitle}</div>
+        <div className="apple-auth-description">
           {description || defaultDescription}
-        </Text>
+        </div>
       </div>
       {/* 表单区域 */}
       {showToggle ? (
-        <Tabs
-          activeKey={currentAction}
-          onChange={(key) => setCurrentAction(key as AuthAction)}
-          centered
-          size="large"
-          className="auth-tabs"
-        >
-          <TabPane tab="登录" key="login">
-            <LoginForm
-              onSubmit={handleLogin}
-              loading={loginLoading}
-              showRemember={true}
-              showForgotPassword={true}
-            />
-          </TabPane>
-          <TabPane tab="注册" key="register">
-            {allowRegister ? (
-              <RegisterForm
-                onSubmit={handleRegister}
-                loading={registerLoading}
-              />
-            ) : (
-              <Alert
-                description={registerDisabledTip}
-                type="warning"
-                showIcon
-              />
-            )}
-          </TabPane>
-        </Tabs>
+        <>
+          <AppSegmented<AuthAction>
+            block
+            className="apple-auth-segmented"
+            options={authActions.map((action) => ({
+              label: authActionLabel[action],
+              value: action,
+            }))}
+            value={currentAction}
+            onChange={setCurrentAction}
+          />
+          {renderForm()}
+        </>
       ) : (
-        <div>
-          {currentAction === "login" ? (
-            <LoginForm
-              onSubmit={handleLogin}
-              loading={loginLoading}
-              showRemember={true}
-              showForgotPassword={true}
-            />
-          ) : allowRegister ? (
-            <RegisterForm onSubmit={handleRegister} loading={registerLoading} />
-          ) : (
-            <Alert description={registerDisabledTip} type="warning" showIcon />
-          )}
-        </div>
+        renderForm()
       )}
       {/* 切换提示（当不显示Tab时） */}
       {!showToggle && (
-        <div className="text-center mt-6">
-          <Text type="secondary" className="text-sm">
-            {currentAction === "login" ? "还没有账号？" : "已有账号？"}
-            <Button
-              type="link"
-              size="small"
-              onClick={() =>
-                setCurrentAction(
-                  currentAction === "login" ? "register" : "login",
-                )
-              }
-              className="p-0! h-auto! ml-1"
-            >
-              {currentAction === "login" ? "立即注册" : "立即登录"}
-            </Button>
-          </Text>
+        <div className="apple-auth-switch-row">
+          {currentAction === "login" ? "还没有账号？" : "已有账号？"}
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentAction(currentAction === "login" ? "register" : "login")
+            }
+          >
+            {currentAction === "login" ? "立即注册" : "立即登录"}
+          </button>
         </div>
       )}
     </div>

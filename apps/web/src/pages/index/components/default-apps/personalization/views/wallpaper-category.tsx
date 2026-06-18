@@ -1,7 +1,6 @@
 import { DefaultAppView } from "@/components";
-import { cx } from "@emotion/css";
 import { useRequest } from "ahooks";
-import { Empty, Image, Pagination, Skeleton } from "antd";
+import { Button, Empty, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
@@ -12,6 +11,16 @@ import {
   type WallpaperApiItem,
   type WallpaperCategoryApiItem,
 } from "@/services/desktop";
+import PreviewCard from "../components/PreviewCard";
+import { css } from "@emotion/css";
+
+const wallpaperCategoryClassName = css`
+  .apple-theme-action.ant-btn-primary:not(:disabled) {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;
 
 const WallpaperCategoryView: FC = () => {
   const { id } = useParams();
@@ -59,15 +68,9 @@ const WallpaperCategoryView: FC = () => {
     setWallpaper({ type: "image", url, name: wallpaper.name });
   };
 
-  const cardClassName = cx(
-    "rounded-2xl border p-4 transition select-none",
-    "hover:opacity-95 active:opacity-90",
-    "cursor-pointer",
-  );
-
   return (
     <DefaultAppView
-      className="h-full"
+      className={`h-full ${wallpaperCategoryClassName}`}
       animate
       title={
         activeCategory?.name ? (
@@ -76,7 +79,7 @@ const WallpaperCategoryView: FC = () => {
           <Skeleton.Input active size="small" style={{ width: 180 }} />
         )
       }
-      contentClassName="overflow-y-auto px-1 pb-4"
+      contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
       {categoryLoading || wallpaperLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
@@ -84,63 +87,54 @@ const WallpaperCategoryView: FC = () => {
         </div>
       ) : visibleWallpapers.length ? (
         <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visibleWallpapers.map((w) => {
               const url = getWallpaperImageUrl(w);
               const active = url ? isImageActive(url) : false;
-              const ringColor = active
-                ? "rgba(22, 119, 255, 0.45)"
-                : "transparent";
               return (
-                <div
+                <PreviewCard
                   key={w._id}
-                  role="button"
-                  tabIndex={0}
-                  className={cardClassName}
-                  style={{
-                    background: "rgba(255,255,255,0.18)",
-                    borderColor: "rgba(0,0,0,0.08)",
-                    boxShadow: `0 0 0 2px ${ringColor}`,
-                    cursor: url ? "pointer" : "not-allowed",
-                    opacity: url ? 1 : 0.55,
-                  }}
-                  onClick={() => (url ? handleSelectImage(w) : null)}
-                  onKeyDown={(e) => {
-                    if (!url) return;
-                    if (e.key === "Enter" || e.key === " ")
-                      handleSelectImage(w);
-                  }}
-                >
-                  <div
-                    className="h-28 rounded-xl border overflow-hidden"
-                    style={{ borderColor: "rgba(0,0,0,0.08)" }}
-                  >
-                    {url ? (
-                      <Image
-                        className="w-full! h-full! object-cover"
+                  active={active}
+                  disabled={!url}
+                  title={w.name}
+                  description={
+                    active
+                      ? "当前使用"
+                      : w.description || (url ? "图片壁纸" : "资源不可用")
+                  }
+                  status={
+                    active ? (
+                      <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
+                        当前
+                      </span>
+                    ) : null
+                  }
+                  action={
+                    url ? (
+                      <Button
+                        size="small"
+                        type={active ? "default" : "primary"}
+                        shape="round"
+                        disabled={active}
+                        className={active ? undefined : "apple-theme-action"}
+                        onClick={() => handleSelectImage(w)}
+                      >
+                        {active ? "已应用" : "应用"}
+                      </Button>
+                    ) : null
+                  }
+                  cover={
+                    url ? (
+                      <img
+                        className="h-full w-full object-cover"
                         src={url}
-                        preview={false}
+                        alt={w.name}
                       />
                     ) : (
                       <div className="h-full w-full bg-black/5" />
-                    )}
-                  </div>
-
-                  <div className="mt-3 min-w-0">
-                    <div className="font-semibold truncate">{w.name}</div>
-                    {w.description ? (
-                      <div className="text-xs opacity-70 mt-1 line-clamp-2">
-                        {w.description}
-                      </div>
-                    ) : (
-                      <div className="text-xs opacity-50 mt-1">暂无描述</div>
-                    )}
-                  </div>
-
-                  <div className="text-xs opacity-70 mt-2">
-                    {active ? "已应用" : url ? "点击应用到桌面" : "资源不可用"}
-                  </div>
-                </div>
+                    )
+                  }
+                />
               );
             })}
           </div>

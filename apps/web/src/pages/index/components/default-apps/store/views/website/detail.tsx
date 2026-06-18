@@ -5,10 +5,20 @@ import { DefaultAppView, useAppRouteContext } from "@/components";
 import { useLocation, useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
+import { css } from "@emotion/css";
 
 type StoreOutletContext = {
   onAddWebsite?: (site: any) => void;
 };
+
+const websiteDetailClassName = css`
+  .apple-store-action.ant-btn-primary {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;
 
 const WebsiteDetailView: FC = () => {
   const navigate = useNavigate();
@@ -32,11 +42,11 @@ const WebsiteDetailView: FC = () => {
 
   return (
     <DefaultAppView
-      className="h-full"
+      className={`h-full ${websiteDetailClassName}`}
       animate
-      contentClassName="px-3 pb-6 pt-4"
+      contentClassName="px-4 pb-8 pt-4"
     >
-      <div className="min-h-full rounded-[20px] border border-black/[0.08] bg-white p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_10px_26px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.08]">
+      <div className="min-h-full rounded-[22px] border border-white/80 bg-white/90 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
         <div className="mb-5 flex items-center gap-5 border-b border-black/[0.08] pb-5 dark:border-white/10">
           {iconUrl ? (
             <Image
@@ -82,7 +92,7 @@ const WebsiteDetailView: FC = () => {
             <Button
               type="primary"
               shape="round"
-              className="h-8! px-5! font-bold!"
+              className="apple-store-action h-8! px-5! font-bold!"
               onClick={() => onAddWebsite?.(item)}
             >
               获取

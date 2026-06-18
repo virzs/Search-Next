@@ -60,6 +60,12 @@ export interface UnloggedViewProps {
   // 默认显示的操作（登录或注册）
   defaultAction?: AuthAction;
 
+  // 受控显示的操作（用于路由驱动登录/注册页）
+  activeAction?: AuthAction;
+
+  // 操作切换回调
+  onActionChange?: (action: AuthAction) => void;
+
   // 是否显示切换按钮（登录/注册切换）
   showToggle?: boolean;
 
@@ -166,9 +172,6 @@ export interface AuthContextValue extends AuthState {
   // 操作加载状态（由 AuthContext 管理）
   loginLoading: boolean;
   registerLoading: boolean;
-
-  // 基于固定文本（邮箱）生成的头像 Data URI，未登录为 null
-  avatarSrc: string | null;
 
   // 基于固定文本（邮箱）生成的封面 CSS（backgroundImage），未登录为 null
   coverGradientCss: string | null;

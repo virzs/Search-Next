@@ -4,45 +4,21 @@ import { App, Button, Card, ColorPicker, Form, Input, Slider, Space } from "antd
 import { useNavigate, useParams } from "react-router";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
-import { MY_WALLPAPERS_STORAGE_KEY } from "@/utils/storage";
-import { themeRoute } from "../route-paths";
+import { personalizationRoute } from "../route-paths";
+import {
+  readMyWallpapers,
+  writeMyWallpapers,
+  type MyWallpaperItem,
+} from "../my-assets";
+import { css } from "@emotion/css";
 
-type MyWallpaperItem =
-  | {
-      id: string;
-      type: "gradient";
-      name: string;
-      css: string;
-      createdAt: string;
-    }
-  | {
-      id: string;
-      type: "image";
-      name: string;
-      url: string;
-      createdAt: string;
-    };
-
-type MyWallpapersStorageV1 = {
-  version: 1;
-  items: MyWallpaperItem[];
-};
-
-const parseMyWallpapersStorage = (raw: string | null): MyWallpaperItem[] => {
-  if (!raw) return [];
-  const parsed = JSON.parse(raw) as unknown;
-  if (!parsed || typeof parsed !== "object") return [];
-  const record = parsed as Record<string, unknown>;
-  if (record.version !== 1) return [];
-  const items = record.items;
-  if (!Array.isArray(items)) return [];
-  return items.filter(Boolean) as MyWallpaperItem[];
-};
-
-const stringifyMyWallpapersStorage = (items: MyWallpaperItem[]): string => {
-  const payload: MyWallpapersStorageV1 = { version: 1, items };
-  return JSON.stringify(payload);
-};
+const wallpaperEditorClassName = css`
+  .apple-theme-action.ant-btn-primary:not(:disabled) {
+    border-color: #007aff !important;
+    background: #007aff !important;
+    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+  }
+`;
 
 const isValidUrl = (value: string) => {
   try {
@@ -77,6 +53,9 @@ const colorToHex = (color: any, hex?: string) => {
   return String(color ?? "");
 };
 
+const getThemeOverlayContainer = () =>
+  document.querySelector<HTMLElement>(".base-modal-panel") ?? document.body;
+
 const ThemeMyEditorView = () => {
   const { message, modal } = App.useApp();
   const navigate = useNavigate();
@@ -98,7 +77,7 @@ const ThemeMyEditorView = () => {
 
   useEffect(() => {
     try {
-      setItems(parseMyWallpapersStorage(localStorage.getItem(MY_WALLPAPERS_STORAGE_KEY)));
+      setItems(readMyWallpapers());
     } catch {
       setItems([]);
     } finally {
@@ -114,13 +93,13 @@ const ThemeMyEditorView = () => {
   useEffect(() => {
     if (!hydrated) return;
     if (!isEdit) return;
-    if (!currentItem) navigate(themeRoute.path.my, { replace: true });
+    if (!currentItem) navigate(personalizationRoute.path.my, { replace: true });
   }, [currentItem, hydrated, isEdit, navigate]);
 
   useEffect(() => {
     if (!currentItem) return;
     setType(currentItem.type);
-    form.setFieldsValue({
+    (form as any).setFieldsValue({
       name: currentItem.name,
       url: currentItem.type === "image" ? currentItem.url : undefined,
     });
@@ -140,12 +119,7 @@ const ThemeMyEditorView = () => {
 
   const persist = (nextItems: MyWallpaperItem[]) => {
     setItems(nextItems);
-    try {
-      localStorage.setItem(MY_WALLPAPERS_STORAGE_KEY, stringifyMyWallpapersStorage(nextItems));
-    } catch {
-      void 0;
-    }
-    window.dispatchEvent(new Event("search-next:my-wallpapers-changed"));
+    writeMyWallpapers(nextItems);
   };
 
   const isReadyToApply = useMemo(() => {
@@ -186,7 +160,7 @@ const ThemeMyEditorView = () => {
 
   const handleSave = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await (form as any).validateFields();
       const name = String(values.name ?? "").trim();
       if (!name) return;
 
@@ -227,7 +201,7 @@ const ThemeMyEditorView = () => {
       }
 
       message.success("已保存");
-      navigate(themeRoute.path.my, { replace: true });
+      navigate(personalizationRoute.path.my, { replace: true });
     } catch {
       void 0;
     }
@@ -235,7 +209,7 @@ const ThemeMyEditorView = () => {
 
   const handleApply = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await (form as any).validateFields();
       const name = String(values.name ?? "").trim();
       if (!name) return;
 
@@ -264,6 +238,7 @@ const ThemeMyEditorView = () => {
       okText: "删除",
       okButtonProps: { danger: true },
       cancelText: "取消",
+      getContainer: getThemeOverlayContainer,
       onOk: () => {
         const wallpaper = personalization.wallpaper;
         if (currentItem.type === "gradient") {
@@ -280,7 +255,7 @@ const ThemeMyEditorView = () => {
         }
 
         persist(items.filter((i) => i.id !== currentItem.id));
-        navigate(themeRoute.path.my, { replace: true });
+        navigate(personalizationRoute.path.my, { replace: true });
       },
     });
   };
@@ -316,9 +291,9 @@ const ThemeMyEditorView = () => {
 
   return (
     <DefaultAppView
-      className="h-full"
+      className={`h-full ${wallpaperEditorClassName}`}
       animate
-      title={isEdit ? "编辑" : "新增"}
+      title={isEdit ? "编辑壁纸" : "添加壁纸"}
       headerRight={
         <Space size={8}>
           {isEdit ? (
@@ -331,14 +306,25 @@ const ThemeMyEditorView = () => {
             type="primary"
             shape="round"
             disabled={!isEdit || !isReadyToApply || isDirty || applied}
+            className="apple-theme-action"
             onClick={handleApply}
           >
             {applied ? "已应用" : "应用"}
           </Button>
         </Space>
       }
+      contentClassName="px-4 pb-8 pt-4"
     >
-      <Card styles={{ body: { padding: 16 } }}>
+      <Card
+        className="rounded-[20px]"
+        styles={{ body: { padding: 16 } }}
+        style={{
+          background: "rgba(255,255,255,0.9)",
+          borderColor: "rgba(255,255,255,0.82)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px rgba(15,23,42,0.06)",
+        }}
+      >
         <div className="flex items-center justify-between gap-3">
           <div className="font-medium">类型</div>
           <AppSegmented

@@ -8,11 +8,13 @@ import {
   RiInbox2Fill,
   RiInbox2Line,
   RiInformationLine,
+  RiSearchLine,
   RiUserFill,
   RiUserLine,
   RiGlobalLine,
   RiInformationFill,
 } from "@remixicon/react";
+import { css } from "@emotion/css";
 import { AppRoutedOverlay } from "@/components";
 import { settingsRoute } from "./route-paths";
 
@@ -22,8 +24,16 @@ const SettingsModalRoute: FC = () => {
       closeTo="/"
       title="设置"
       wrapContent
+      overlayProps={{
+        modalProps: { width: 940 },
+      }}
       sidebarProps={{
-        header: <div className="text-2xl font-bold tracking-tight">设置</div>,
+        search: {
+          placeholder: "搜索",
+          prefix: <RiSearchLine size={16} className="text-gray-400" />,
+          emptyText: "没有匹配设置",
+        },
+        className: settingsSidebarClassName,
         menuItems: [
           {
             key: "account",
@@ -68,9 +78,23 @@ const SettingsModalRoute: FC = () => {
             activeIcon: <RiCodeSSlashFill size={16} />,
           },
         ],
+        menuStyles: {
+          item: {
+            paddingLeft: 14,
+          },
+        },
+        footer: "Search Next Settings",
       }}
+      keepAlive={{ enabled: true }}
     />
   );
 };
 
 export default SettingsModalRoute;
+
+const settingsSidebarClassName = css`
+  .ant-menu:focus,
+  .ant-menu:focus-visible {
+    outline: none !important;
+  }
+`;

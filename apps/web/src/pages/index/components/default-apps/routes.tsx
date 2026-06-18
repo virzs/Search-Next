@@ -1,7 +1,13 @@
+import { accountRoutes } from "./account/routes";
+import { personalizationRoutes } from "./personalization/routes";
 import { settingsRoutes } from "./settings/routes";
 import { storeRoutes } from "./store/routes";
-import { themeRoutes } from "./theme/routes";
 
-const defaultAppRoutes = [storeRoutes, themeRoutes, settingsRoutes];
+const defaultAppRoutes = [
+  accountRoutes,
+  storeRoutes,
+  personalizationRoutes,
+  settingsRoutes,
+];
 
 export default defaultAppRoutes;

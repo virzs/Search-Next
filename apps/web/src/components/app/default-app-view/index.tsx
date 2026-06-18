@@ -36,11 +36,14 @@ const DefaultAppViewHeader: FC<DefaultAppViewHeaderProps> = ({
 }) => {
   return (
     <div
-      className={cx("w-full shrink-0 flex items-center gap-3", headerClassName)}
+      className={cx(
+        "h-12 max-h-12 min-h-12 w-full shrink-0 flex items-center gap-3 overflow-hidden",
+        headerClassName,
+      )}
     >
       <div className="min-w-0 flex-1">
         {title && (
-          <div className="text-lg font-bold leading-8 ml-2">{title}</div>
+          <div className="ml-2 text-base font-bold leading-6">{title}</div>
         )}
         {headerLeft}
       </div>
@@ -107,7 +110,7 @@ const DefaultAppView: FC<DefaultAppViewProps> = ({
       {useRoutedHeader ? null : showHeader ? (
         headerNode
       ) : (
-        <div className="min-h-8"></div>
+        <div className="h-12 min-h-12 shrink-0"></div>
       )}
 
       <div className={cx("flex-1 overflow-y-auto pt-4", contentClassName)}>
