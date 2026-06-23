@@ -1,0 +1,75 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { SearchEngineService } from './search-engine.service';
+import {
+  CreateSearchEngineDto,
+  UpdateSearchEngineDto,
+} from './dto/search-engine.dto';
+import { PageDto } from 'src/public/dto/page';
+import { User } from 'src/public/decorator/route-user.decoratpr';
+
+@ApiTags('新标签页/搜索引擎')
+@Controller('tabs/search-engine')
+export class SearchEngineController {
+  constructor(private readonly searchEngineService: SearchEngineService) {}
+
+  @Get('/')
+  @ApiOperation({ summary: '搜索引擎分页' })
+  @ApiParam({ name: 'page', description: '页码', example: 1 })
+  @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
+  getPage(@Query() query: PageDto) {
+    return this.searchEngineService.page(query);
+  }
+
+  @Get('/enabled')
+  @ApiOperation({ summary: '获取全部启用的搜索引擎' })
+  getEnabledList() {
+    return this.searchEngineService.listEnabled();
+  }
+
+  @Post('/')
+  @ApiOperation({ summary: '创建搜索引擎' })
+  create(@Body() body: CreateSearchEngineDto, @User('_id') user: string) {
+    return this.searchEngineService.create(body, user);
+  }
+
+  @Put('/:id')
+  @ApiOperation({ summary: '更新搜索引擎' })
+  update(
+    @Param('id') id: string,
+    @Body() body: UpdateSearchEngineDto,
+    @User('_id') user: string,
+  ) {
+    return this.searchEngineService.update(id, body, user);
+  }
+
+  @Put('/:id/enable')
+  @ApiOperation({ summary: '切换启用状态（当前启用则改为禁用，反之亦然）' })
+  toggleEnable(
+    @Param('id') id: string,
+    @User('_id') user: string,
+  ) {
+    return this.searchEngineService.toggleEnable(id, user);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({ summary: '删除搜索引擎' })
+  delete(@Param('id') id: string) {
+    return this.searchEngineService.delete(id);
+  }
+
+  @Get('/:id')
+  @ApiOperation({ summary: '搜索引擎详情' })
+  detail(@Param('id') id: string) {
+    return this.searchEngineService.detail(id);
+  }
+}

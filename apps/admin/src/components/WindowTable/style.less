@@ -1,0 +1,196 @@
+.window-table {
+  width: 100%;
+  font-size: 14px;
+  table-layout: fixed;
+
+  &-header {
+    width: 100%;
+    color: var(--ant-table-header-color);
+    background: var(--ant-table-header-bg);
+
+    &-cell {
+      padding: 0 8px;
+      text-align: left;
+      font-weight: normal;
+
+      &-title {
+        flex: 1;
+        overflow: hidden;
+        word-break: break-all;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      &-content {
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      &-sorter {
+        display: flex;
+        flex-direction: column;
+        font-size: 11px;
+        color: #bfbfbf;
+      }
+    }
+
+    .window-table-fixed-right-cell-first,
+    .window-table-fixed-right-cell,
+    .window-table-fixed-left-cell-last,
+    .window-table-fixed-left-cell {
+      position: sticky;
+      z-index: 2;
+    }
+  }
+
+  &-row {
+    border-bottom: var(--ant-line-width) var(--ant-line-type) var(--ant-table-border-color);
+    transition: background var(--ant-motion-duration-mid), border-color var(--ant-motion-duration-mid);
+
+    &:hover {
+      background-color: var(--ant-table-row-hover-bg);
+
+      .window-table-fixed-right-cell-first,
+      .window-table-fixed-right-cell,
+      .window-table-fixed-left-cell-last,
+      .window-table-fixed-left-cell {
+        background-color: var(--ant-table-row-hover-bg) !important;
+      }
+    }
+
+    &-disabled {
+      cursor: not-allowed !important;
+      background-color: rgba(153, 153, 153, 0.08);
+      color: rgba(32, 32, 32, 0.5);
+      cursor: not-allowed;
+
+
+      .window-table-fixed-right-cell-first,
+      .window-table-fixed-right-cell,
+      .window-table-fixed-left-cell-last,
+      .window-table-fixed-left-cell {
+        background-color: #f7f7f7 !important;
+      }
+
+      &:hover {
+        background-color: rgba(153, 153, 153, 0.16);
+
+        .window-table-fixed-right-cell-first,
+        .window-table-fixed-right-cell,
+        .window-table-fixed-left-cell-last,
+        .window-table-fixed-left-cell {
+          background-color: #efefef !important;
+        }
+      }
+    }
+  }
+
+  &-cell {
+    padding: 0 8px;
+    height: 100%;
+
+    &-content {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    // 树状数据展开/折叠控件样式
+    &-tree-expand {
+      display: inline-flex;
+      align-items: center;
+
+      &-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+        cursor: pointer;
+        border-radius: 2px;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .anticon {
+          font-size: 10px;
+          color: #666;
+          transition: transform 0.2s;
+        }
+
+        &-placeholder {
+          cursor: default;
+
+          &:hover {
+            background-color: transparent;
+          }
+        }
+      }
+
+      &-content {
+        flex: 1;
+        overflow: hidden;
+      }
+    }
+  }
+
+  &-selection-column {
+    width: 35px;
+    max-width: 35px;
+  }
+
+  &-filter-checkbox {
+    >span:not(.ant-checkbox) {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &-fixed {
+
+    &-left-cell,
+    &-right-cell,
+    &-left-cell-last,
+    &-right-cell-first {
+      position: sticky;
+      z-index: 0;
+    }
+
+    &-left-cell-last,
+    &-right-cell-first {
+      &::after {
+        position: absolute;
+        top: 0;
+        bottom: -1px;
+        width: 30px;
+        transition: box-shadow .3s;
+        content: "";
+        pointer-events: none;
+      }
+    }
+
+    &-left-cell-last {
+
+      &::after {
+        box-shadow: inset 10px 0 8px -8px rgba(5, 5, 5, .06);
+        right: 0;
+        transform: translateX(100%);
+      }
+    }
+
+    &-right-cell-first {
+
+      &::after {
+        box-shadow: inset -10px 0 8px -8px rgba(5, 5, 5, .06);
+        left: 0;
+        transform: translateX(-100%);
+      }
+    }
+  }
+}

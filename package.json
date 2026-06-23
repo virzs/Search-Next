@@ -6,9 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter search-next-web dev",
+    "dev:admin": "pnpm --filter search-next-admin dev",
+    "dev:api": "pnpm --filter search-next-api start:dev",
     "dev:local": "pnpm --filter search-next-web dev:local",
     "dev:prod": "pnpm --filter search-next-web dev:prod",
     "build": "pnpm --filter search-next-web build",
+    "build:admin": "pnpm --filter search-next-admin build",
+    "build:api": "pnpm --filter search-next-api build",
     "build:local": "pnpm --filter search-next-web build:local",
     "build:prod": "pnpm --filter search-next-web build:prod",
     "preview": "pnpm --filter search-next-web preview",

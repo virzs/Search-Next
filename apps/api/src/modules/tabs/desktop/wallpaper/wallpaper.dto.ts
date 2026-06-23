@@ -1,0 +1,91 @@
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import {
+  IsBoolean,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
+import { PageDto } from 'src/public/dto/page';
+
+export class CreateWallpaperDto {
+  @ApiProperty({ description: '资源ID（先通过 /resource 上传）' })
+  @IsMongoId()
+  @IsNotEmpty()
+  @Expose()
+  image: string;
+
+  @ApiPropertyOptional({ description: '壁纸名称' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  @Expose()
+  name?: string;
+
+  @ApiPropertyOptional({ description: '描述' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  @Expose()
+  description?: string;
+
+  @ApiPropertyOptional({ description: '分类ID（仅自行上传壁纸支持）' })
+  @IsOptional()
+  @IsMongoId()
+  @Expose()
+  categoryId?: string;
+
+  @ApiPropertyOptional({ description: '是否启用', example: true })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  isActive?: boolean;
+
+  @ApiPropertyOptional({ description: '排序', example: 0 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Expose()
+  sortOrder?: number;
+}
+
+export class UpdateWallpaperDto extends PartialType(CreateWallpaperDto) {}
+
+export class WallpaperQueryDto {
+  @ApiPropertyOptional({ description: '关键词搜索', example: '海边' })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  q?: string;
+
+  @ApiPropertyOptional({ description: '是否启用', example: true })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  isActive?: boolean;
+
+  @ApiPropertyOptional({ description: '分类ID' })
+  @IsOptional()
+  @IsMongoId()
+  @Expose()
+  categoryId?: string;
+}
+
+export class WallpaperGroupQueryDto extends PageDto {
+  @ApiPropertyOptional({ description: '分类ID（只返回该分类分组）' })
+  @IsOptional()
+  @IsMongoId()
+  @Expose()
+  categoryId?: string;
+
+  @ApiPropertyOptional({ description: '每个分组返回的壁纸数量', default: 8 })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Expose()
+  groupSize?: number;
+}
