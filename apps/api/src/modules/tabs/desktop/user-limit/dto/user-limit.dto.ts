@@ -35,6 +35,13 @@ export class RoleConfigDto {
   @Max(100)
   @Expose()
   maxPages: number;
+
+  @ApiProperty({ description: '该角色最大云备份版本数量', example: 3 })
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  @Expose()
+  maxSyncBackups: number;
 }
 
 // 用户配置限制相关DTO
@@ -53,11 +60,28 @@ export class CreateUserConfigLimitDto {
   @Expose()
   defaultMaxPages: number;
 
+  @ApiProperty({ description: '默认最大云备份版本数量', example: 1 })
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  @Expose()
+  defaultMaxSyncBackups: number;
+
   @ApiPropertyOptional({
     description: '针对不同角色的配置限制',
     example: [
-      { role: '507f1f77bcf86cd799439011', maxConfigs: 10, maxPages: 10 },
-      { role: '507f1f77bcf86cd799439012', maxConfigs: 20, maxPages: 15 },
+      {
+        role: '507f1f77bcf86cd799439011',
+        maxConfigs: 10,
+        maxPages: 10,
+        maxSyncBackups: 3,
+      },
+      {
+        role: '507f1f77bcf86cd799439012',
+        maxConfigs: 20,
+        maxPages: 15,
+        maxSyncBackups: 5,
+      },
     ],
   })
   @IsOptional()

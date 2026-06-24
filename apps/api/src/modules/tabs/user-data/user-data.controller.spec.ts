@@ -8,7 +8,17 @@ describe('UserDataController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserDataController],
-      providers: [UserDataService],
+      providers: [
+        {
+          provide: UserDataService,
+          useValue: {
+            getSync: jest.fn(),
+            saveSync: jest.fn(),
+            renameSyncBackup: jest.fn(),
+            getAdminSyncList: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<UserDataController>(UserDataController);

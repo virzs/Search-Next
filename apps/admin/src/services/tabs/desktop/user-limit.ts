@@ -3,10 +3,12 @@ import { baseGetRequest, basePostRequest, basePutRequestNoId } from "@/utils/axi
 export interface DesktopUserLimit {
   defaultMaxConfigs: number;
   defaultMaxPages: number;
+  defaultMaxSyncBackups: number;
   roleConfigs: {
     role: string;
     maxConfigs: number;
     maxPages: number;
+    maxSyncBackups: number;
   }[];
   description?: string;
 }
@@ -19,6 +21,7 @@ export interface DesktopUserLimitResponse extends Omit<DesktopUserLimit, "roleCo
     };
     maxConfigs: number;
     maxPages: number;
+    maxSyncBackups: number;
   }[];
 }
 

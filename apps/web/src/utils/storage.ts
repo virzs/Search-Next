@@ -1,3 +1,9 @@
+import {
+  isWidgetStorageKey,
+  listWidgetStorageKeys,
+  migrateAllLegacyWidgetStorage,
+} from "./widget-storage";
+
 /**
  * 本地存储桌面配置 key
  */
@@ -55,6 +61,18 @@ export const SEARCH_NEXT_STORAGE_KEYS = [
   DEV_WIDGETS_STORAGE_KEY,
 ] as const;
 
+export const isSearchNextBackupKey = (key: string) =>
+  SEARCH_NEXT_STORAGE_KEYS.includes(
+    key as (typeof SEARCH_NEXT_STORAGE_KEYS)[number],
+  ) || isWidgetStorageKey(key);
+
+export const getSearchNextStorageKeys = (
+  storage: Storage = localStorage,
+): string[] => {
+  migrateAllLegacyWidgetStorage(storage);
+  return [...SEARCH_NEXT_STORAGE_KEYS, ...listWidgetStorageKeys(storage)];
+};
+
 export const SEARCH_NEXT_BACKUP_FILE_MAGIC = "SEARCH_NEXT_BACKUP_V1";
 
 export type StorageBackupV1 = {
@@ -85,6 +103,10 @@ export const createStorageBackup = (
     items,
   };
 };
+
+export const createSearchNextStorageBackup = (
+  storage: Storage = localStorage,
+) => createStorageBackup(getSearchNextStorageKeys(storage), storage);
 
 const base64EncodeUtf8 = (text: string) => {
   const bytes = new TextEncoder().encode(text);
@@ -170,4 +192,18 @@ export const applyStorageBackup = (
     }
     storage.setItem(key, value);
   }
+};
+
+export const applySearchNextStorageBackup = (
+  backup: StorageBackupV1,
+  storage: Storage = localStorage,
+  options?: { mode?: "strict" | "merge" },
+) => {
+  migrateAllLegacyWidgetStorage(storage);
+  const backupWidgetKeys = Object.keys(backup.items).filter(isWidgetStorageKey);
+  const keys = [
+    ...SEARCH_NEXT_STORAGE_KEYS,
+    ...new Set([...listWidgetStorageKeys(storage), ...backupWidgetKeys]),
+  ];
+  applyStorageBackup(backup, keys, storage, options);
 };

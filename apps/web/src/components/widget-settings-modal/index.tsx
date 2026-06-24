@@ -6,6 +6,11 @@ import { sharedEventBus } from "@/sdk";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import type { PureWidgetConfig } from "@/components/micro-frontend/pure-widget";
 import { css } from "@emotion/css";
+import {
+  getWidgetStorageItem,
+  removeWidgetStorageItem,
+  setWidgetStorageItem,
+} from "@/utils/widget-storage";
 
 interface WidgetSettingsModalProps {
   visible: boolean;
@@ -24,7 +29,7 @@ const loadStoredValues = (
 ): Record<string, any> => {
   const values: Record<string, any> = {};
   for (const field of schema) {
-    const raw = localStorage.getItem(`widget:${widgetId}:${field.key}`);
+    const raw = getWidgetStorageItem(widgetId, field.key);
     if (raw !== null) {
       if (field.type === "switch") {
         values[field.key] = raw === "true";
@@ -50,9 +55,9 @@ const saveValues = (
   for (const field of schema) {
     const val = values[field.key];
     if (val !== undefined && val !== null) {
-      localStorage.setItem(`widget:${widgetId}:${field.key}`, String(val));
+      setWidgetStorageItem(widgetId, field.key, String(val));
     } else {
-      localStorage.removeItem(`widget:${widgetId}:${field.key}`);
+      removeWidgetStorageItem(widgetId, field.key);
     }
     sharedEventBus.emit("storage:changed", {
       widgetId,

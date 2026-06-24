@@ -41,6 +41,7 @@ const DesktopUserLimitConfig: FC = () => {
       const defaultValues: DesktopUserLimitResponse = {
         defaultMaxConfigs: 10,
         defaultMaxPages: 50,
+        defaultMaxSyncBackups: 1,
         roleConfigs: [],
         description: "",
       };
@@ -55,8 +56,13 @@ const DesktopUserLimitConfig: FC = () => {
         detailValues.roleConfigs?.map((item) => ({
           ...item,
           role: item.role?._id || item.role,
+          maxSyncBackups: item.maxSyncBackups || 1,
         })) || [];
-      ref.current.setFieldsValue({ ...detailValues, roleConfigs });
+      ref.current.setFieldsValue({
+        ...detailValues,
+        defaultMaxSyncBackups: detailValues.defaultMaxSyncBackups || 1,
+        roleConfigs,
+      });
     }
   }, [detailValues]);
 
@@ -83,6 +89,7 @@ const DesktopUserLimitConfig: FC = () => {
           initialValues={{
             defaultMaxConfigs: 10,
             defaultMaxPages: 50,
+            defaultMaxSyncBackups: 1,
             roleConfigs: [],
             description: "",
           }}
@@ -95,7 +102,11 @@ const DesktopUserLimitConfig: FC = () => {
             const payload: DesktopUserLimit = {
               defaultMaxConfigs: values.defaultMaxConfigs || 10,
               defaultMaxPages: values.defaultMaxPages || 50,
-              roleConfigs: values.roleConfigs || [],
+              defaultMaxSyncBackups: values.defaultMaxSyncBackups || 1,
+              roleConfigs: (values.roleConfigs || []).map((item: any) => ({
+                ...item,
+                maxSyncBackups: item.maxSyncBackups || 1,
+              })),
               description: values.description || "",
             };
             try {
@@ -130,6 +141,20 @@ const DesktopUserLimitConfig: FC = () => {
             max={100}
             rules={[
               { required: true, message: "请输入默认最大页面数" },
+              { type: "number", min: 1, message: "最小值为1" },
+              { type: "number", max: 100, message: "最大值为100" },
+            ]}
+          />
+
+          <ProFormDigit
+            name="defaultMaxSyncBackups"
+            label="默认最大云备份数"
+            tooltip="用户默认可以保存的云备份版本数量"
+            placeholder="请输入默认最大云备份数"
+            min={1}
+            max={100}
+            rules={[
+              { required: true, message: "请输入默认最大云备份数" },
               { type: "number", min: 1, message: "最小值为1" },
               { type: "number", max: 100, message: "最大值为100" },
             ]}
@@ -189,6 +214,20 @@ const DesktopUserLimitConfig: FC = () => {
               max={100}
               rules={[
                 { required: true, message: "请输入最大页面数" },
+                { type: "number", min: 1, message: "最小值为1" },
+                { type: "number", max: 100, message: "最大值为100" },
+              ]}
+            />
+            <ProFormDigit
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+              name="maxSyncBackups"
+              label="最大云备份数"
+              placeholder="请输入该角色的最大云备份数"
+              min={1}
+              max={100}
+              rules={[
+                { required: true, message: "请输入最大云备份数" },
                 { type: "number", min: 1, message: "最小值为1" },
                 { type: "number", max: 100, message: "最大值为100" },
               ]}

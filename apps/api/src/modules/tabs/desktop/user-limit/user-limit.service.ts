@@ -28,6 +28,7 @@ export class UserLimitService {
       config = await this.userConfigLimitModel.create({
         defaultMaxConfigs: 5,
         defaultMaxPages: 10,
+        defaultMaxSyncBackups: 1,
         roleConfigs: [],
         description: '默认用户桌面配置数量限制',
       });
@@ -42,6 +43,10 @@ export class UserLimitService {
 
     let maxConfigs = config.defaultMaxConfigs;
     let maxPages = config.defaultMaxPages;
+    let maxSyncBackups =
+      typeof config.defaultMaxSyncBackups === 'number'
+        ? config.defaultMaxSyncBackups
+        : 1;
     let source: 'default' | 'role' = 'default';
 
     const roleIds = Array.isArray(userRoles)
@@ -58,6 +63,10 @@ export class UserLimitService {
         maxConfigs = matched.maxConfigs;
         maxPages =
           typeof matched.maxPages === 'number' ? matched.maxPages : maxPages;
+        maxSyncBackups =
+          typeof matched.maxSyncBackups === 'number'
+            ? matched.maxSyncBackups
+            : maxSyncBackups;
         source = 'role';
       }
     }
@@ -65,6 +74,7 @@ export class UserLimitService {
     return {
       maxConfigs,
       maxPages,
+      maxSyncBackups,
       source,
     };
   }
@@ -171,5 +181,20 @@ export class UserLimitService {
     }
 
     return maxPages;
+  }
+
+  async checkUserSyncBackupLimit(
+    userRoleIds: string[] = [],
+    currentCount: number,
+  ) {
+    const { maxSyncBackups } = await this.getUserLimitForRoles(userRoleIds);
+
+    if (currentCount >= maxSyncBackups) {
+      throw new BadRequestException(
+        `云备份最多只能保存 ${maxSyncBackups} 个版本，请选择已有版本覆盖`,
+      );
+    }
+
+    return maxSyncBackups;
   }
 }

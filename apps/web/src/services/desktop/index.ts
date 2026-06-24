@@ -21,6 +21,7 @@ export const getDefaultUserConfig = () => {
 export interface UserLimit {
   maxConfigs: number;
   maxPages: number;
+  maxSyncBackups: number;
   source: string;
 }
 

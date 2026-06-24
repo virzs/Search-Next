@@ -6,6 +6,7 @@ import WebsiteTag from "./website/tag";
 import DesktopConfig from "./desktop/desktop-config";
 import DesktopConfigHandle from "./desktop/desktop-config/handle";
 import DesktopUserLimitConfig from "./desktop/user-limit";
+import DesktopUserDataSync from "./desktop/user-data-sync";
 import { RiNavigationLine } from "@remixicon/react";
 import SearchEngine from "./search/engine";
 import SearchEngineHandle from "./search/engine/handle";
@@ -39,6 +40,7 @@ export const TabsPaths = {
   desktopConfigHandle: "/tabs/desktop/desktop-config/handle",
   desktopConfigPreview: "/tabs/desktop/desktop-config/preview",
   desktopUserLimit: "/tabs/desktop/user-limit",
+  desktopUserDataSync: "/tabs/desktop/user-data-sync",
   desktopThemeConfig: "/tabs/desktop/theme-config",
   desktopThemeConfigTheme: "/tabs/desktop/theme-config/theme",
   desktopThemeConfigCategory: "/tabs/desktop/theme-config/category",
@@ -110,6 +112,10 @@ const TabsRouter: RouteObject = {
     {
       path: TabsPaths.desktopUserLimit,
       element: <DesktopUserLimitConfig />,
+    },
+    {
+      path: TabsPaths.desktopUserDataSync,
+      element: <DesktopUserDataSync />,
     },
     {
       path: TabsPaths.desktopThemeConfig,
@@ -324,6 +330,11 @@ export const TabsMenu: Menu = {
         {
           name: "用户限制",
           path: TabsPaths.desktopUserLimit,
+          hideChildrenInMenu: true,
+        },
+        {
+          name: "云同步",
+          path: TabsPaths.desktopUserDataSync,
           hideChildrenInMenu: true,
         },
         {

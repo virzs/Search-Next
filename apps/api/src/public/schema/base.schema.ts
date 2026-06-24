@@ -1,6 +1,6 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { UsersName } from 'src/modules/users/schemas/ref-names';
+import { UsersName } from '../../modules/users/schemas/ref-names';
 
 // 扩展 mongoose 的 QueryOptions 接口
 declare module 'mongoose' {

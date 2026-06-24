@@ -6,6 +6,11 @@ import type {
   WidgetThemeInfo,
   WidgetToast,
 } from './types';
+import {
+  getWidgetStorageItem,
+  removeWidgetStorageItem,
+  setWidgetStorageItem,
+} from '@/utils/widget-storage';
 
 /**
  * 创建宿主侧 SDK：将主题、用户、配置、通知、API、导航与事件能力统一注入给小组件。
@@ -13,17 +18,17 @@ import type {
 export function createHostSDK(options: CreateHostSDKOptions): WidgetSDK {
   /** 基于 widgetId 的命名空间存储，避免不同小组件键冲突。 */
   const storage: WidgetStorage = {
-    getItem: (key) => localStorage.getItem(`widget:${options.widgetId}:${key}`),
-    setItem: (key, value) => localStorage.setItem(`widget:${options.widgetId}:${key}`, value),
-    removeItem: (key) => localStorage.removeItem(`widget:${options.widgetId}:${key}`),
-    get: (key) => Promise.resolve(localStorage.getItem(`widget:${options.widgetId}:${key}`)),
+    getItem: (key) => getWidgetStorageItem(options.widgetId, key),
+    setItem: (key, value) => setWidgetStorageItem(options.widgetId, key, value),
+    removeItem: (key) => removeWidgetStorageItem(options.widgetId, key),
+    get: (key) => Promise.resolve(getWidgetStorageItem(options.widgetId, key)),
     set: (key, value) => {
-      localStorage.setItem(`widget:${options.widgetId}:${key}`, value);
+      setWidgetStorageItem(options.widgetId, key, value);
       options.eventBus.emit('storage:changed', { widgetId: options.widgetId, key, value });
       return Promise.resolve();
     },
     remove: (key) => {
-      localStorage.removeItem(`widget:${options.widgetId}:${key}`);
+      removeWidgetStorageItem(options.widgetId, key);
       options.eventBus.emit('storage:changed', { widgetId: options.widgetId, key, value: null });
       return Promise.resolve();
     },
