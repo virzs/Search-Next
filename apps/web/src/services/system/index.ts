@@ -8,6 +8,10 @@ export interface ProjectPublicInfo {
     allowRegister: boolean;
     registerDisabledTip?: string;
   };
+  turnstile?: {
+    enabled?: boolean;
+    siteKey?: string;
+  };
 }
 
 /**

@@ -23,6 +23,10 @@ const DEFAULT_PUBLIC_PROJECT: Partial<Project> = {
     allowRegister: true,
     registerDisabledTip: '当前不允许注册',
   },
+  turnstile: {
+    enabled: false,
+    siteKey: '',
+  },
 };
 
 @Injectable()
@@ -73,7 +77,16 @@ export class ProjectService {
       return DEFAULT_PUBLIC_PROJECT;
     }
     const json = doc.toJSON();
-    const { name, description, login, register } = json;
-    return { name, description, login, register } as Partial<Project>;
+    const { name, description, login, register, turnstile } = json;
+    return {
+      name,
+      description,
+      login,
+      register,
+      turnstile: {
+        enabled: turnstile?.enabled ?? false,
+        siteKey: turnstile?.siteKey ?? '',
+      },
+    } as Partial<Project>;
   }
 }

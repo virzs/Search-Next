@@ -33,6 +33,20 @@ class RegisterPage extends SubObject {
   registerDisabledTip: string;
 }
 
+class TurnstileConfig {
+  // 是否启用 Cloudflare Turnstile 人机验证
+  @Prop({ type: Boolean, default: false })
+  enabled: boolean;
+
+  // 前端渲染用 site key，可公开
+  @Prop({ type: String })
+  siteKey?: string;
+
+  // 服务端校验用 secret key，不应通过公共接口返回
+  @Prop({ type: String })
+  secretKey?: string;
+}
+
 @Schema({ timestamps: true })
 export class Project extends BaseSchema {
   @Prop({ type: String, required: true })
@@ -56,6 +70,10 @@ export class Project extends BaseSchema {
   // 注册页设置
   @Prop({ type: SubObject })
   register: RegisterPage;
+
+  // Cloudflare Turnstile 人机验证设置
+  @Prop({ type: TurnstileConfig, default: () => ({ enabled: false }) })
+  turnstile: TurnstileConfig;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

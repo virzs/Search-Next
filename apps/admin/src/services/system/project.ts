@@ -19,6 +19,11 @@ export interface ProjectData {
     forceInvitationCode?: boolean;
     forceEmailCaptcha?: boolean;
   };
+  turnstile?: {
+    enabled?: boolean;
+    siteKey?: string;
+    secretKey?: string;
+  };
 }
 
 // detail

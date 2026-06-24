@@ -10,6 +10,8 @@ import {
 import { LoginFormProps, LoginFormData, LoginResponse } from "../../types/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { appleAuthFormClassName } from "./apple-auth-styles";
+import useConfig from "@/hooks/useConfig";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 const { Link } = Typography;
 const { Item } = Form;
@@ -24,9 +26,20 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const [form] = Form.useForm<LoginFormData>();
   const { login, loginLoading: contextLoginLoading } = useAuth();
+  const { projectInfo } = useConfig();
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  const turnstileEnabled = projectInfo?.turnstile?.enabled ?? false;
+  const turnstileSiteKey = projectInfo?.turnstile?.siteKey ?? "";
 
   const isLoading = externalLoading || contextLoginLoading;
+
+  const resetTurnstile = () => {
+    setTurnstileToken("");
+    setTurnstileResetKey((value) => value + 1);
+  };
 
   // 默认登录处理
   const defaultLogin = async (data: LoginFormData): Promise<LoginResponse> => {
@@ -36,19 +49,34 @@ const LoginForm: React.FC<LoginFormProps> = ({
   // 表单提交处理
   const handleSubmit = async (values: LoginFormData) => {
     try {
+      if (turnstileEnabled && !turnstileSiteKey) {
+        message.error("人机验证未配置完整，请联系管理员");
+        return { success: false, message: "人机验证未配置完整" };
+      }
+
+      if (turnstileEnabled && !turnstileToken) {
+        message.error("请完成人机验证");
+        return { success: false, message: "请完成人机验证" };
+      }
+
       const submitHandler = onSubmit || defaultLogin;
-      const result = await submitHandler(values);
+      const result = await submitHandler({
+        ...values,
+        ...(turnstileEnabled ? { turnstileToken } : {}),
+      });
 
       if (result.success) {
         message.success(result.message || "登录成功");
       } else {
         message.error(result.message || "登录失败");
+        resetTurnstile();
       }
 
       return result;
     } catch (error: any) {
       const errorMessage = error.message || "登录过程中发生错误";
       message.error(errorMessage);
+      resetTurnstile();
       return {
         success: false,
         message: errorMessage,
@@ -130,6 +158,24 @@ const LoginForm: React.FC<LoginFormProps> = ({
               </Link>
             )}
           </div>
+        )}
+
+        {turnstileEnabled && (
+          <Item className="mb-4!">
+            {turnstileSiteKey ? (
+              <CloudflareTurnstile
+                siteKey={turnstileSiteKey}
+                resetKey={turnstileResetKey}
+                onVerify={setTurnstileToken}
+                onExpire={() => setTurnstileToken("")}
+                onError={() => setTurnstileToken("")}
+              />
+            ) : (
+              <div className="text-sm text-red-500">
+                人机验证未配置完整，请联系管理员
+              </div>
+            )}
+          </Item>
         )}
 
         {/* 登录按钮 */}

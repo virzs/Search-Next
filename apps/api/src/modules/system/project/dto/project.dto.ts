@@ -54,6 +54,26 @@ class RegisterPageDto extends SubObjectDto {
   registerDisabledTip: string;
 }
 
+class TurnstileConfigDto {
+  @ApiProperty({ description: '是否启用 Cloudflare Turnstile 人机验证' })
+  @IsBoolean()
+  @IsOptional()
+  @Expose()
+  enabled?: boolean;
+
+  @ApiProperty({ description: 'Cloudflare Turnstile site key' })
+  @IsString()
+  @IsOptional()
+  @Expose()
+  siteKey?: string;
+
+  @ApiProperty({ description: 'Cloudflare Turnstile secret key' })
+  @IsString()
+  @IsOptional()
+  @Expose()
+  secretKey?: string;
+}
+
 export class ProjectDto {
   @ApiProperty({ description: '项目名称' })
   @IsString()
@@ -81,4 +101,12 @@ export class ProjectDto {
   @Type(() => RegisterPageDto)
   @Transform(({ value }) => (value == null ? undefined : value))
   register?: RegisterPageDto;
+
+  @ApiProperty({ description: 'Cloudflare Turnstile 人机验证设置', type: TurnstileConfigDto })
+  @ValidateNested()
+  @IsOptional()
+  @Expose()
+  @Type(() => TurnstileConfigDto)
+  @Transform(({ value }) => (value == null ? undefined : value))
+  turnstile?: TurnstileConfigDto;
 }

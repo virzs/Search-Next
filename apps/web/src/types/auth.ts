@@ -14,6 +14,7 @@ export interface LoginFormData {
   email: string;
   password: string;
   remember?: boolean;
+  turnstileToken?: string;
 }
 
 // 注册表单数据
@@ -23,6 +24,7 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
   captcha?: string;
+  turnstileToken?: string;
 }
 
 // 登录响应

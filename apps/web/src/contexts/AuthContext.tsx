@@ -71,7 +71,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 使用 useRequest 封装登录
   const { loading: loginLoading, runAsync: runLogin } = useRequest(
     async (data: LoginFormData) => {
-      return await postLogin({ email: data.email, password: data.password });
+      return await postLogin({
+        email: data.email,
+        password: data.password,
+        turnstileToken: data.turnstileToken,
+      });
     },
     { manual: true },
   );
@@ -113,10 +117,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { loading: registerLoading, runAsync: runRegister } = useRequest(
     async (data: RegisterFormData) => {
       return await postRegister({
+        username: data.username,
         email: data.email,
         password: data.password,
         captcha: Number(data.captcha) || undefined,
         invitationCode: "",
+        turnstileToken: data.turnstileToken,
       });
     },
     { manual: true },

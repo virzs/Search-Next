@@ -1,6 +1,7 @@
 export interface LoginRequest {
   email: string;
   password: string;
+  turnstileToken?: string;
 }
 
 export interface LoginResponse {
@@ -14,8 +15,10 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
+  username: string;
   email: string;
   password: string;
   captcha: number | undefined;
   invitationCode: string;
+  turnstileToken?: string;
 }

@@ -17,6 +17,8 @@ import {
 import { getEmailCaptcha } from "../../services/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { appleAuthFormClassName } from "./apple-auth-styles";
+import useConfig from "@/hooks/useConfig";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 const { Text } = Typography;
 const { Item } = Form;
@@ -31,13 +33,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 }) => {
   const [form] = Form.useForm<RegisterFormData>();
   const { register, registerLoading: contextRegisterLoading } = useAuth();
+  const { projectInfo } = useConfig();
   const [captchaLoading, setCaptchaLoading] = useState(false);
   const [captchaSent, setCaptchaSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  const turnstileEnabled = projectInfo?.turnstile?.enabled ?? false;
+  const turnstileSiteKey = projectInfo?.turnstile?.siteKey ?? "";
 
   const isLoading = externalLoading || contextRegisterLoading;
+
+  const resetTurnstile = () => {
+    setTurnstileToken("");
+    setTurnstileResetKey((value) => value + 1);
+  };
 
   // 默认注册处理
   const defaultRegister = async (
@@ -99,20 +112,35 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   // 表单提交处理
   const handleSubmit = async (values: RegisterFormData) => {
     try {
+      if (turnstileEnabled && !turnstileSiteKey) {
+        message.error("人机验证未配置完整，请联系管理员");
+        return { success: false, message: "人机验证未配置完整" };
+      }
+
+      if (turnstileEnabled && !turnstileToken) {
+        message.error("请完成人机验证");
+        return { success: false, message: "请完成人机验证" };
+      }
+
       const submitHandler = onSubmit || defaultRegister;
-      const result = await submitHandler(values);
+      const result = await submitHandler({
+        ...values,
+        ...(turnstileEnabled ? { turnstileToken } : {}),
+      });
 
       if (result.success) {
         message.success(result.message || "注册成功");
         (form as any).resetFields();
       } else {
         message.error(result.message || "注册失败");
+        resetTurnstile();
       }
 
       return result;
     } catch (error: any) {
       const errorMessage = error.message || "注册过程中发生错误";
       message.error(errorMessage);
+      resetTurnstile();
       return {
         success: false,
         message: errorMessage,
@@ -273,6 +301,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             }
           />
         </Item>
+
+        {turnstileEnabled && (
+          <Item className="mb-0! mt-6!">
+            {turnstileSiteKey ? (
+              <CloudflareTurnstile
+                siteKey={turnstileSiteKey}
+                resetKey={turnstileResetKey}
+                onVerify={setTurnstileToken}
+                onExpire={() => setTurnstileToken("")}
+                onError={() => setTurnstileToken("")}
+              />
+            ) : (
+              <div className="text-sm text-red-500">
+                人机验证未配置完整，请联系管理员
+              </div>
+            )}
+          </Item>
+        )}
 
         {/* 注册按钮 */}
         <Item className="mb-0! mt-6!">

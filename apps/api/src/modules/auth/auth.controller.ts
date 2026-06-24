@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Request } from '@nestjs/common';
+import { Body, Controller, Headers, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dtos/register.dto';
@@ -17,8 +17,8 @@ export class AuthController {
   @ApiBody({ type: RegisterDto })
   @Post('register')
   @RequireLogin()
-  register(@Body() body: RegisterDto, @Request() headers) {
-    return this.authService.register(body);
+  register(@Body() body: RegisterDto, @Headers() headers) {
+    return this.authService.register(body, headers);
   }
 
   @ApiOperation({ summary: '发送注册验证码' })

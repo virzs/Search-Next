@@ -22,9 +22,15 @@ import { SendEmailDto } from '../system/email/dtos/send.dto';
 import { EmailService } from '../system/email/email.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { MessageService } from '../system/message/message.service';
+import axios from 'axios';
 
 interface RedisTokenCache {
   [key: string]: string;
+}
+
+interface TurnstileVerifyResponse {
+  success: boolean;
+  'error-codes'?: string[];
 }
 
 @Injectable()
@@ -40,6 +46,72 @@ export class AuthService {
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {}
+
+  private getClientIp(headers?: Record<string, any>) {
+    const forwarded =
+      headers?.['cf-connecting-ip'] ?? headers?.['x-forwarded-for'];
+
+    if (Array.isArray(forwarded)) {
+      return forwarded[0];
+    }
+
+    if (typeof forwarded === 'string') {
+      return forwarded.split(',')[0]?.trim();
+    }
+
+    return undefined;
+  }
+
+  private async verifyTurnstileIfEnabled(
+    token?: string,
+    headers?: Record<string, any>,
+    project?: any,
+  ) {
+    const currentProject = project ?? (await this.projectService.detail());
+    const turnstile = currentProject?.turnstile;
+
+    if (!turnstile?.enabled) {
+      return;
+    }
+
+    if (!turnstile.siteKey || !turnstile.secretKey) {
+      throw new BadRequestException('人机验证配置不完整');
+    }
+
+    if (!token) {
+      throw new BadRequestException('请完成人机验证');
+    }
+
+    const payload = new URLSearchParams();
+    payload.append('secret', turnstile.secretKey);
+    payload.append('response', token);
+
+    const remoteIp = this.getClientIp(headers);
+    if (remoteIp) {
+      payload.append('remoteip', remoteIp);
+    }
+
+    try {
+      const { data } = await axios.post<TurnstileVerifyResponse>(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        payload.toString(),
+        {
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
+
+      if (!data.success) {
+        throw new BadRequestException('人机验证失败，请重试');
+      }
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('人机验证失败，请重试');
+    }
+  }
 
   // 验证用户密码
   async validateUser(email: string, password: string): Promise<any> {
@@ -65,8 +137,9 @@ export class AuthService {
     return rest;
   }
 
-  async register(body: RegisterDto) {
-    const { password, email, captcha, invitationCode, ...rest } = body;
+  async register(body: RegisterDto, headers?: Record<string, any>) {
+    const { password, email, captcha, invitationCode, turnstileToken, ...rest } =
+      body;
 
     const project = await this.projectService.detail();
 
@@ -74,6 +147,8 @@ export class AuthService {
       throw new BadRequestException(
         project?.register?.registerDisabledTip || '当前不允许注册',
       );
+
+    await this.verifyTurnstileIfEnabled(turnstileToken, headers, project);
 
     if (project?.register?.forceEmailCaptcha) {
       if (!captcha) throw new BadRequestException('验证码错误');
@@ -146,7 +221,9 @@ export class AuthService {
   }
 
   async login(body: LoginDto, headers) {
-    const { password, email } = body;
+    const { password, email, turnstileToken } = body;
+    await this.verifyTurnstileIfEnabled(turnstileToken, headers);
+
     const userAgent = headers['user-agent'];
     const user = await this.validateUser(email, password);
 

@@ -6,6 +6,7 @@ import {
   MinLength,
   MaxLength,
   IsEmail,
+  IsOptional,
 } from 'class-validator';
 
 export class LoginDto {
@@ -22,4 +23,10 @@ export class LoginDto {
   @IsNotEmpty({ message: '密码不能为空' })
   @Expose()
   password: string;
+
+  @ApiProperty({ description: 'Cloudflare Turnstile 校验 token', required: false })
+  @IsString()
+  @IsOptional()
+  @Expose()
+  turnstileToken?: string;
 }

@@ -5,13 +5,14 @@ import {
   ProFormInstance,
   ProFormText,
 } from "@ant-design/pro-components";
-import { Space, Spin, message } from "antd";
+import { Alert, Space, Spin, message } from "antd";
 import { AuthPaths } from "./router";
 import { useNavigate } from "react-router";
 import { RegisterRequest } from "@/services/auth/interface";
 import { useRequest } from "ahooks";
 import { getPublicProject } from "@/services/system/project";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 const RegisterView = () => {
   const navigate = useNavigate();
@@ -21,6 +22,24 @@ const RegisterView = () => {
 
   const { data, loading } = useRequest(getPublicProject);
   const forceEmailCaptcha = data?.register?.forceEmailCaptcha ?? false;
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  const turnstileEnabled = data?.turnstile?.enabled ?? false;
+  const turnstileSiteKey = data?.turnstile?.siteKey ?? "";
+
+  const clearTurnstileToken = useCallback(() => {
+    setTurnstileToken("");
+  }, []);
+
+  const resetTurnstile = useCallback(() => {
+    setTurnstileToken("");
+    setTurnstileResetKey((value) => value + 1);
+  }, []);
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
 
   const hideAutoComplete = {};
 
@@ -40,13 +59,29 @@ const RegisterView = () => {
             formRef={ref}
             onFinish={(values) => {
               return new Promise((resolve) => {
-                postRegister(values)
+                if (turnstileEnabled && !turnstileSiteKey) {
+                  message.error("人机验证未配置完整，请联系管理员");
+                  resolve(false);
+                  return;
+                }
+
+                if (turnstileEnabled && !turnstileToken) {
+                  message.error("请完成人机验证");
+                  resolve(false);
+                  return;
+                }
+
+                postRegister({
+                  ...values,
+                  ...(turnstileEnabled ? { turnstileToken } : {}),
+                })
                   .then(() => {
                     message.success("注册成功");
                     navigate(AuthPaths.login);
                     resolve(true);
                   })
                   .catch(() => {
+                    resetTurnstile();
                     resolve(false);
                   });
               });
@@ -154,6 +189,21 @@ const RegisterView = () => {
               ]}
               fieldProps={hideAutoComplete}
             />
+            {turnstileEnabled ? (
+              turnstileSiteKey ? (
+                <div className="mb-4">
+                  <CloudflareTurnstile
+                    siteKey={turnstileSiteKey}
+                    resetKey={turnstileResetKey}
+                    onVerify={handleTurnstileVerify}
+                    onExpire={clearTurnstileToken}
+                    onError={clearTurnstileToken}
+                  />
+                </div>
+              ) : (
+                <Alert className="mb-4" type="error" showIcon message="人机验证未配置完整，请联系管理员" />
+              )
+            ) : null}
             <ProFormText
               name="invitationCode"
               placeholder="邀请码"

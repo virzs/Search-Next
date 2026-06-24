@@ -124,6 +124,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         email: data.email,
         password: data.password,
         remember: data.remember,
+        turnstileToken: data.turnstileToken,
       });
 
       if (response.success && response.user) {
@@ -150,6 +151,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         password: data.password,
         confirmPassword: data.confirmPassword,
         captcha: data.captcha,
+        turnstileToken: data.turnstileToken,
       });
 
       if (response.success && response.user) {

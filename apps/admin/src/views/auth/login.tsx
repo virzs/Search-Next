@@ -7,13 +7,33 @@ import { LoginForm, ProFormText } from "@ant-design/pro-components";
 import { LoginRequest } from "@/services/auth/interface";
 import { useRequest } from "ahooks";
 import { getPublicProject } from "@/services/system/project";
-import { Image, Space, Spin } from "antd";
+import { Alert, Image, Space, Spin, message } from "antd";
 import { AuthPaths } from "./router";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
+import { useCallback, useState } from "react";
 
 const LoginView = () => {
   const navigate = useNavigate();
 
   const { data, loading } = useRequest(getPublicProject);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  const turnstileEnabled = data?.turnstile?.enabled ?? false;
+  const turnstileSiteKey = data?.turnstile?.siteKey ?? "";
+
+  const clearTurnstileToken = useCallback(() => {
+    setTurnstileToken("");
+  }, []);
+
+  const resetTurnstile = useCallback(() => {
+    setTurnstileToken("");
+    setTurnstileResetKey((value) => value + 1);
+  }, []);
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
 
   return (
     <div className="w-screen h-screen flex justify-center items-center overflow-hidden relative">
@@ -31,7 +51,22 @@ const LoginView = () => {
             subTitle={data?.login?.subTitle}
             onFinish={(values) => {
               return new Promise((resolve) => {
-                postLogin(values)
+                if (turnstileEnabled && !turnstileSiteKey) {
+                  message.error("人机验证未配置完整，请联系管理员");
+                  resolve(false);
+                  return;
+                }
+
+                if (turnstileEnabled && !turnstileToken) {
+                  message.error("请完成人机验证");
+                  resolve(false);
+                  return;
+                }
+
+                postLogin({
+                  ...values,
+                  ...(turnstileEnabled ? { turnstileToken } : {}),
+                })
                   .then((res) => {
                     const { access_token, refresh_token, ...rest } = res;
                     setUserInfo(rest);
@@ -41,6 +76,7 @@ const LoginView = () => {
                     resolve(true);
                   })
                   .catch(() => {
+                    resetTurnstile();
                     resolve(false);
                   });
               });
@@ -66,6 +102,21 @@ const LoginView = () => {
                 },
               ]}
             />
+            {turnstileEnabled ? (
+              turnstileSiteKey ? (
+                <div className="mb-4">
+                  <CloudflareTurnstile
+                    siteKey={turnstileSiteKey}
+                    resetKey={turnstileResetKey}
+                    onVerify={handleTurnstileVerify}
+                    onExpire={clearTurnstileToken}
+                    onError={clearTurnstileToken}
+                  />
+                </div>
+              ) : (
+                <Alert className="mb-4" type="error" showIcon message="人机验证未配置完整，请联系管理员" />
+              )
+            ) : null}
             <Space className="justify-between mb-6 w-full">
               <a
                 onClick={() => {
