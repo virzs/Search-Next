@@ -23,7 +23,10 @@ const resolveWallpaperName = (
   return "渐变";
 };
 
-const resolveThemeName = (themeName: string | null | undefined, themeId: string) => {
+const resolveThemeName = (
+  themeName: string | null | undefined,
+  themeId: string,
+) => {
   if (themeName) return themeName;
   if (themeId === "light") return "默认";
   if (themeId === "dark") return "深色";
@@ -44,7 +47,10 @@ const PersonalizationView = () => {
   }, [personalization.themeId, themes]);
 
   const wallpaperName = resolveWallpaperName(personalization.wallpaper);
-  const themeName = resolveThemeName(activeTheme?.name, personalization.themeId);
+  const themeName = resolveThemeName(
+    activeTheme?.name,
+    personalization.themeId,
+  );
 
   const wallpaperPreviewStyle = useMemo<CSSProperties>(() => {
     const wallpaper = personalization.wallpaper;
@@ -63,34 +69,10 @@ const PersonalizationView = () => {
   }, [personalization.wallpaper]);
 
   return (
-    <MacSettingsView
-      title="个性化"
-      description="控制主题、背景与桌面视觉风格。"
-      action={
-        <div className="flex flex-wrap justify-end gap-2">
-          <Button size="small" onClick={() => navigate(personalizationRoute.path.root)}>
-            管理主题
-          </Button>
-          <Button
-            size="small"
-            type="primary"
-            style={{
-              background: "#007aff",
-              borderColor: "#007aff",
-              boxShadow: "0 8px 18px rgba(0,122,255,0.18)",
-            }}
-            onClick={() => navigate(personalizationRoute.path.my)}
-          >
-            我的外观
-          </Button>
-        </div>
-      }
-    >
+    <MacSettingsView>
       <section className="rounded-[20px] border border-white/80 bg-white/80 p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <div className="text-[13px] font-bold text-[#6e6e73]">
-            桌面预览
-          </div>
+          <div className="text-[13px] font-bold text-[#6e6e73]">桌面预览</div>
           <div className="rounded-full bg-[#f2f2f7] px-2.5 py-1 text-xs font-bold text-[#6e6e73]">
             {themeName} · {wallpaperName}
           </div>
@@ -131,7 +113,10 @@ const PersonalizationView = () => {
           title="主题"
           description={themeName}
           extra={
-            <Button size="small" onClick={() => navigate(personalizationRoute.path.root)}>
+            <Button
+              size="small"
+              onClick={() => navigate(personalizationRoute.path.root)}
+            >
               管理
             </Button>
           }
@@ -150,7 +135,10 @@ const PersonalizationView = () => {
               >
                 管理
               </Button>
-              <Button size="small" onClick={() => navigate(personalizationRoute.path.my)}>
+              <Button
+                size="small"
+                onClick={() => navigate(personalizationRoute.path.my)}
+              >
                 我的
               </Button>
             </div>

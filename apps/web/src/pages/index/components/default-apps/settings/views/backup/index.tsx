@@ -1,12 +1,4 @@
-import {
-  Button,
-  Typography,
-  message,
-  Flex,
-  Input,
-  Modal,
-  Select,
-} from "antd";
+import { Button, Typography, message, Flex, Input, Modal, Select } from "antd";
 import { useEffect, useRef } from "react";
 import { useRequest } from "ahooks";
 import {
@@ -258,7 +250,9 @@ const BackupView = () => {
           message.warning("请选择要覆盖的云备份");
           return Promise.reject();
         }
-        const target = backups.find((backup) => backup._id === selectedBackupId);
+        const target = backups.find(
+          (backup) => backup._id === selectedBackupId,
+        );
         if (!target) {
           message.warning("未找到所选云备份");
           return Promise.reject();
@@ -310,9 +304,7 @@ const BackupView = () => {
       title: "确认从云端恢复？",
       content: (
         <Flex vertical gap={8}>
-          <Text type="secondary">
-            版本：{backup.name || "未命名备份"}
-          </Text>
+          <Text type="secondary">版本：{backup.name || "未命名备份"}</Text>
           <Text type="secondary">
             同步时间：{formatDateTime(backup.lastSyncedAt)}，大小：
             {formatBytes(backup.byteSize)}
@@ -345,9 +337,7 @@ const BackupView = () => {
       title: "确认覆盖云备份？",
       content: (
         <Flex vertical gap={8}>
-          <Text type="secondary">
-            目标版本：{target.name || "未命名备份"}
-          </Text>
+          <Text type="secondary">目标版本：{target.name || "未命名备份"}</Text>
           <Text type="secondary">
             原同步时间：{formatDateTime(target.lastSyncedAt)}
           </Text>
@@ -559,10 +549,7 @@ const BackupView = () => {
 
   return (
     <div ref={modalRootRef} className="h-full">
-      <MacSettingsView
-        title="备份与恢复"
-        description="导出本地数据，或在登录后开启云端同步。"
-      >
+      <MacSettingsView>
         <MacSettingsHero
           icon={<RiCloudLine size={24} />}
           tone="purple"

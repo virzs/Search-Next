@@ -23,10 +23,7 @@ const AboutView = () => {
   };
 
   return (
-    <MacSettingsView
-      title="关于"
-      description="版本、许可证和项目链接。"
-    >
+    <MacSettingsView>
       <div className="rounded-[20px] border border-white/80 bg-white/80 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
         <div className="flex items-center gap-4">
           <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[17px] bg-linear-to-br from-[#0a84ff] to-[#30d158] text-3xl font-black text-white shadow-[0_8px_18px_rgba(0,122,255,0.16)]">

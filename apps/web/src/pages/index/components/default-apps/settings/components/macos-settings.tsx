@@ -1,42 +1,24 @@
 import { cx } from "@emotion/css";
 import type { FC, KeyboardEvent, ReactNode } from "react";
 
-type SettingsIconTone =
-  | "blue"
-  | "green"
-  | "orange"
-  | "red"
-  | "purple"
-  | "gray";
+type SettingsIconTone = "blue" | "green" | "orange" | "red" | "purple" | "gray";
 
 export interface MacSettingsViewProps {
-  title: ReactNode;
-  description?: ReactNode;
   action?: ReactNode;
   children: ReactNode;
 }
 
 export const MacSettingsView: FC<MacSettingsViewProps> = ({
-  title,
-  description,
   action,
   children,
 }) => (
   <div className="h-full overflow-y-auto bg-[#f5f5f7] px-6 pb-8 pt-1">
     <div className="mx-auto w-full max-w-[700px]">
-      <div className="mb-5 flex items-end justify-between gap-4 pt-1">
-        <div className="min-w-0">
-          <div className="truncate text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
-            {title}
-          </div>
-          {description ? (
-            <div className="mt-1 max-w-[560px] text-[13px] leading-5 text-[#6e6e73]">
-              {description}
-            </div>
-          ) : null}
+      {action && (
+        <div className="mb-5 flex items-end justify-between gap-4 pt-1">
+          <div className="shrink-0">{action}</div>
         </div>
-        {action ? <div className="shrink-0">{action}</div> : null}
-      </div>
+      )}
       <div className="grid gap-[18px]">{children}</div>
     </div>
   </div>
@@ -138,7 +120,9 @@ export const MacSettingsRow: FC<MacSettingsRowProps> = ({
     >
       <div className="grid min-h-[50px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-3">
-          {icon ? <MacSettingsIcon tone={iconTone}>{icon}</MacSettingsIcon> : null}
+          {icon ? (
+            <MacSettingsIcon tone={iconTone}>{icon}</MacSettingsIcon>
+          ) : null}
           <div className="min-w-0">
             <div className="truncate text-sm font-semibold text-[#1d1d1f]">
               {title}
@@ -197,9 +181,7 @@ export const MacSettingsInfoGrid: FC<{
   <div className="grid grid-cols-2 gap-3 max-[640px]:grid-cols-1">
     {items.map((item, index) => (
       <div key={index} className="rounded-[12px] bg-[#f2f2f7] p-3">
-        <div className="text-[11px] font-bold text-[#6e6e73]">
-          {item.label}
-        </div>
+        <div className="text-[11px] font-bold text-[#6e6e73]">{item.label}</div>
         <div className="mt-1 truncate text-sm font-bold text-[#1d1d1f]">
           {item.value}
         </div>

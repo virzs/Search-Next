@@ -13,10 +13,7 @@ const DeveloperView = () => {
   const { devModeEnabled, toggleDevMode } = useWidget();
 
   return (
-    <MacSettingsView
-      title="开发者"
-      description="调试自定义小组件与本地开发入口。"
-    >
+    <MacSettingsView>
       <MacSettingsHero
         icon={<RiCodeSSlashLine size={24} />}
         tone="green"

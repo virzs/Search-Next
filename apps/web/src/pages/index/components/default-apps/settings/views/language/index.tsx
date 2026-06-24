@@ -51,8 +51,6 @@ const LanguageView = () => {
 
   return (
     <MacSettingsView
-      title="语言"
-      description="查看当前界面语言和后续可用语言。"
       action={
         isChanged ? (
           <div className="flex gap-2">
