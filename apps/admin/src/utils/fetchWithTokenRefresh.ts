@@ -85,17 +85,10 @@ export const fetchWithTokenRefresh = async (
   }
 };
 
-/**
- * 创建一个带有token刷新功能的OpenAI客户端fetch函数
- * @param getProviderId 获取提供商ID的回调函数
- * @returns fetch函数
- */
-export const createOpenAIFetchWithTokenRefresh = (getProviderId: () => string) => {
+export const createOpenAIFetchWithTokenRefresh = () => {
   return async (_: string | URL | Request, options?: RequestInit) => {
-    const providerId = getProviderId(); // 每次请求时动态获取最新的providerId
     const headers = {
       ...options?.headers,
-      "x-provider-id": providerId,
     };
 
     return fetchWithTokenRefresh("/api/ai/playground", {

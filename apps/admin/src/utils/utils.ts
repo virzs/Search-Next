@@ -82,16 +82,21 @@ export const findChildren = (
   return treeData;
 };
 
-export const formatDateString = (value?: string, format = "YYYY-MM-DD HH:mm:ss") => {
+export const formatDateString = (value?: string | Date, format = "YYYY-MM-DD HH:mm:ss") => {
+  const dateFormat = typeof format === "string" ? format : "YYYY-MM-DD HH:mm:ss";
+  if (isDate(value)) {
+    return dayjs(value).format(dateFormat);
+  }
+
   if (!value || !isDateString(value)) {
     return "-";
   }
 
-  return dayjs(value).format(format);
+  return dayjs(value).format(dateFormat);
 };
 
-export const isDateString = (value: string | number) => {
-  if (typeof value === "number") {
+export const isDateString = (value: unknown) => {
+  if (typeof value !== "string") {
     return false;
   }
   const reg = /^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})/;

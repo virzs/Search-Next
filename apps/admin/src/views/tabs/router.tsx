@@ -24,8 +24,6 @@ import WidgetClassify from "./widget/classify";
 import WebsiteCollection from "./website/collection";
 import WebsiteCollectionHandle from "./website/collection/handle";
 import WebsiteCollectionDetail from "./website/collection/detail";
-import Providers from "@/views/ai/providers";
-import Preset from "@/views/ai/preset";
 
 export const TabsPaths = {
   index: "/tabs",
@@ -48,9 +46,6 @@ export const TabsPaths = {
   // 普通搜索相关路径
   searchEngine: "/tabs/search/engine",
   searchEngineHandle: "/tabs/search/engine/handle",
-  // AI搜索相关路径
-  aiProvider: "/tabs/ai/provider",
-  aiPrompt: "/tabs/ai/prompt",
   // 壁纸相关路径
   wallpaper: "/tabs/wallpaper",
   wallpaperHandle: "/tabs/wallpaper/handle",
@@ -192,15 +187,6 @@ const TabsRouter: RouteObject = {
       path: TabsPaths.widgetClassify,
       element: <WidgetClassify />,
     },
-    // AI搜索路由
-    {
-      path: TabsPaths.aiProvider,
-      element: <Providers />,
-    },
-    {
-      path: TabsPaths.aiPrompt,
-      element: <Preset />,
-    },
   ],
 };
 
@@ -221,19 +207,6 @@ export const TabsMenu: Menu = {
         {
           name: "编辑",
           path: TabsPaths.searchEngineHandle + "/:id",
-        },
-      ],
-    },
-    {
-      name: "AI搜索",
-      children: [
-        {
-          name: "提示词模板",
-          path: TabsPaths.aiPrompt,
-        },
-        {
-          name: "搜索服务商",
-          path: TabsPaths.aiProvider,
         },
       ],
     },

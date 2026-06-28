@@ -37,12 +37,7 @@ export class AiSearchDto {
   @Expose()
   @IsOptional()
   @IsString()
-  aiProvider?: string; // AI服务商，可选
-
-  @Expose()
-  @IsOptional()
-  @IsString()
-  aiModel?: string; // AI模型，可选
+  aiModel?: string; // 公共模型名，可选
 }
 
 export class AiSearchResponseDto {
@@ -56,7 +51,7 @@ export class AiSearchResponseDto {
   aiAnalysis: string; // AI分析结果
 
   @Expose()
-  aiProvider: string; // 使用的AI服务商
+  aiProvider: string; // AI网关标识
 
   @Expose()
   aiModel: string; // 使用的AI模型

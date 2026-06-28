@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AiModelName, AiModelSchema } from '../models/ai-model.schema';
+import { ProviderModelName, ProviderModelSchema } from '../models/provider-model.schema';
+import { AiSecretModule } from '../secret/ai-secret.module';
 import { ProviderController } from './provider.controller';
 import { ProviderService } from './provider.service';
 import { AiProviderName, AiProviderSchema } from './provider.schema';
-import {
-  UserApiKeyName,
-  UserApiKeySchema,
-} from '../user-api-key/user-api-key.schema';
 
 @Module({
   imports: [
@@ -15,14 +14,13 @@ import {
         name: AiProviderName,
         schema: AiProviderSchema,
       },
-      {
-        name: UserApiKeyName,
-        schema: UserApiKeySchema,
-      },
+      { name: AiModelName, schema: AiModelSchema },
+      { name: ProviderModelName, schema: ProviderModelSchema },
     ]),
+    AiSecretModule,
   ],
   controllers: [ProviderController],
   providers: [ProviderService],
-  exports: [ProviderService],
+  exports: [ProviderService, MongooseModule],
 })
 export class ProviderModule {}

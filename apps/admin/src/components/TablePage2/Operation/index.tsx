@@ -12,7 +12,7 @@ const PrivOperation: FC<OperationProps> = (props) => {
   const { columns } = props;
 
   return (
-    <Space onClick={(e) => e.stopPropagation()}>
+    <Space className="whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
       {columns
         // TODO 过滤权限
         .filter((i) => [null, undefined, true].includes(i.show))

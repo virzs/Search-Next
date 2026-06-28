@@ -11,28 +11,47 @@ export type AiProviderDocument = AiProvider & Document;
 @Schema({ timestamps: true })
 export class AiProvider extends BaseSchema {
   @Prop({ required: true, unique: true, type: String })
-  name: string; // 服务商标识，如 openai, azure, anthropic
+  name: string;
 
   @Prop({ required: true, type: String })
-  displayName: string; // 显示名称，如 OpenAI, Azure OpenAI
+  displayName: string;
 
-  @Prop({ required: true, type: String })
-  baseUrl: string; // API基础地址
-
-  @Prop({ type: String })
-  apiKey?: string; // 全局API密钥（可选）
-
-  @Prop({ required: true, type: String })
-  defaultModel: string; // 默认模型
+  @Prop({ default: 'openai-compatible', type: String })
+  type: string;
 
   @Prop({ default: true, type: Boolean })
-  enabled: boolean; // 是否启用
-
-  @Prop({ type: [String], default: [] })
-  supportedModels: string[]; // 支持的模型列表
+  enabled: boolean;
 
   @Prop({ type: String })
-  description?: string; // 描述信息
+  description?: string;
+
+  @Prop({ required: false, type: String })
+  baseUrl?: string;
+
+  @Prop({ type: String })
+  encryptedApiKey?: string;
+
+  @Prop({ type: String })
+  apiKeyPreview?: string;
+
+  @Prop({ type: String })
+  testModel?: string;
+
+  @Prop({ default: 100, type: Number })
+  priority: number;
+
+  @Prop({ default: 60000, type: Number })
+  timeoutMs: number;
+
+  @Prop({ type: Date })
+  lastTestedAt?: Date;
+
+  @Prop({ type: String })
+  lastTestStatus?: string;
+
+  @Prop({ type: String })
+  lastTestMessage?: string;
+
 }
 
 export const AiProviderSchema = SchemaFactory.createForClass(AiProvider);

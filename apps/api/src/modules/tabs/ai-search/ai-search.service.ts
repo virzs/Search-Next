@@ -30,7 +30,7 @@ export class AiSearchService {
     const startTime = Date.now();
     let searchResults: any = null;
     let aiAnalysis = '';
-    let aiProvider = '';
+    let aiProvider = 'search-next';
     let aiModel = '';
     let tokensUsed = 0;
     let status = 'error';
@@ -44,7 +44,6 @@ export class AiSearchService {
       const aiResult = await this.analyzeWithAi(
         searchResults,
         searchDto.q,
-        searchDto.aiProvider,
         searchDto.aiModel,
       );
 
@@ -132,7 +131,6 @@ export class AiSearchService {
   private async analyzeWithAi(
     searchResults: any,
     query: string,
-    aiProvider?: string,
     aiModel?: string,
   ): Promise<{
     analysis: string;
@@ -145,7 +143,6 @@ export class AiSearchService {
 
     // 调用AI服务进行分析
     const openaiRequest = {
-      providerId: aiProvider || 'openai', // 默认使用OpenAI
       model: aiModel || 'gpt-3.5-turbo', // 默认模型
       messages: [
         {
@@ -162,7 +159,7 @@ export class AiSearchService {
       const aiResponse = await this.aiServiceService.callOpenAI(openaiRequest);
       return {
         analysis: aiResponse.choices[0]?.message?.content || '',
-        provider: aiProvider || 'openai',
+        provider: 'search-next',
         model: aiModel || 'gpt-3.5-turbo',
         tokensUsed: aiResponse.usage?.total_tokens || 0,
       };

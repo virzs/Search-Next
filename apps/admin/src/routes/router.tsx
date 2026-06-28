@@ -6,6 +6,7 @@ import SystemRouter from "@/views/system/router";
 import UserRouter, { UserPaths } from "@/views/user/router";
 import TabsRouter from "@/views/tabs/router";
 import ResourceRouter from "@/views/resource/router";
+import AIRouter from "@/views/ai/router";
 import NotFound from "../views/error/NotFound";
 import UserCenter from "@/views/user/center";
 
@@ -14,6 +15,7 @@ export interface MyRouteObject {}
 const enabledRouters = [
   SystemRouter,
   ResourceRouter,
+  AIRouter,
   UserRouter,
   TabsRouter,
   // 与用户模块区分开

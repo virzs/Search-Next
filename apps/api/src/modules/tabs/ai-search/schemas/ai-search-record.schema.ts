@@ -32,7 +32,7 @@ export class AiSearchRecord extends BaseSchema {
   aiAnalysis: string; // AI分析结果
 
   @Prop({ required: true, type: String })
-  aiProvider: string; // 使用的AI服务商
+  aiProvider: string; // AI网关标识
 
   @Prop({ required: true, type: String })
   aiModel: string; // 使用的AI模型

@@ -13,10 +13,6 @@ import {
 export class AiServiceCallDto {
   @Expose()
   @IsString()
-  providerId: string; // 服务商ID
-
-  @Expose()
-  @IsString()
   model: string; // 模型名称
 
   @Expose()
@@ -27,11 +23,6 @@ export class AiServiceCallDto {
   @IsOptional()
   @IsString()
   presetId?: string; // 预设ID（可选）
-
-  @Expose()
-  @IsOptional()
-  @IsString()
-  apiKey?: string; // API密钥（可选，优先使用此密钥）
 
   @Expose()
   @IsOptional()
@@ -85,10 +76,6 @@ export class AiServiceCallResponseDto {
 export class AiServiceStreamConfigDto {
   @Expose()
   @IsString()
-  providerId: string; // 服务商ID
-
-  @Expose()
-  @IsString()
   model: string; // 模型名称
 
   @Expose()
@@ -99,11 +86,6 @@ export class AiServiceStreamConfigDto {
   @IsOptional()
   @IsString()
   presetId?: string; // 预设ID（可选）
-
-  @Expose()
-  @IsOptional()
-  @IsString()
-  apiKey?: string; // API密钥（可选）
 
   @Expose()
   @IsOptional()
