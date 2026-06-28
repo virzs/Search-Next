@@ -9,6 +9,7 @@ import {
   IsNumber,
   ValidateNested,
   IsBoolean,
+  IsObject,
 } from 'class-validator';
 import { PageDto } from 'src/public/dto/page';
 
@@ -120,6 +121,36 @@ export class WidgetDto {
   @IsBoolean()
   @Expose()
   supportIconMode?: boolean;
+
+  @ApiPropertyOptional({ description: '是否支持应用模式' })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  supportAppMode?: boolean;
+
+  @ApiPropertyOptional({
+    description: '应用图标配置',
+    example: { type: 'image', src: 'icon.svg' },
+  })
+  @IsOptional()
+  @IsObject()
+  @Expose()
+  appIcon?: { type: 'image' | 'custom'; src?: string };
+
+  @ApiPropertyOptional({ description: '应用图标URL' })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  appIconUrl?: string;
+
+  @ApiPropertyOptional({
+    description: '组件页面路由',
+    example: { settings: '/settings' },
+  })
+  @IsOptional()
+  @IsObject()
+  @Expose()
+  pagePaths?: { settings?: string };
 
   // 标签列表
   @ApiPropertyOptional({ description: '标签列表', type: [String] })

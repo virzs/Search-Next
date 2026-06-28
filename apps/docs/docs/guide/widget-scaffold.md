@@ -51,7 +51,8 @@ pnpm widget:pack <name>
 - React 模板默认接入 Tailwind CSS utilities 和 shadcn/ui 风格的本地组件，使用 `tw:` 前缀类名；模板只导入 theme/utilities，不导入全局 preflight/base，打包后的样式会随小组件注入到容器内。
 - React 模板内置 `components.json`、`src/lib/utils.ts` 和 `src/components/ui/button.tsx`，新增 UI 组件时优先沿用 `src/components/ui` 目录。
 - React、Vue 和 Solid 模板都会把各自运行时打进小组件产物，不要求宿主暴露全局变量，避免不同框架或不同版本依赖互相冲突。
-- 三种模板都支持 `props.mode` 的 `icon` / `full` / `settings` 模式，以及 `props.sdk` 注入的宿主能力。
+- 三种模板都支持 `props.mode` 的 `icon` / `appIcon` / `full` / `settings` 模式，以及 `props.sdk` 注入的宿主能力。
+- `widget.config.json` 可通过 `supportAppMode: true` 显式进入应用菜单；`appIcon` 支持 `{ "type": "image", "src": "icon.svg" }` 或 `{ "type": "custom" }`，后者会由宿主用 `mode: "appIcon"` 渲染入口。
 
 ## 接入宿主
 

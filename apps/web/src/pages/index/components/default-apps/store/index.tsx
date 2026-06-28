@@ -1,6 +1,8 @@
 import { FC } from "react";
 import {
   RiAppsFill,
+  RiApps2Fill,
+  RiApps2Line,
   RiAppsLine,
   RiCodeSSlashFill,
   RiCodeSSlashLine,
@@ -47,6 +49,13 @@ const StoreModalRoute: FC = () => {
       path: storeRoute.path.website.root,
       icon: <RiLinksLine size={16} />,
       activeIcon: <RiLinksFill size={16} />,
+    },
+    {
+      key: "app",
+      label: "应用",
+      path: storeRoute.path.app,
+      icon: <RiApps2Line size={16} />,
+      activeIcon: <RiApps2Fill size={16} />,
     },
     {
       key: "widget",

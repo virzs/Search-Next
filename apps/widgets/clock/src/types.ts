@@ -1,4 +1,4 @@
-export type WidgetMode = "icon" | "full" | "settings";
+export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 export type TimeFormat = "24h" | "12h";
 
 export interface ClockSettings {

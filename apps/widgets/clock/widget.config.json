@@ -16,6 +16,8 @@
   ],
   "defaultSizeId": "2x2",
   "supportIconMode": true,
+  "supportAppMode": true,
+  "appIcon": { "type": "image", "src": "icon.svg" },
   "pagePaths": {
     "settings": "/settings"
   },

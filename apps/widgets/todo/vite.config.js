@@ -1,9 +1,30 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "@tailwindcss/vite";
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = dirname(fileURLToPath(import.meta.url));
+const outDir = resolve(root, "../../../dist/widget-build/todo");
+
+function copyWidgetAssets() {
+  return {
+    name: "copy-widget-assets",
+    closeBundle() {
+      if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+      const assets = [
+        { src: resolve(root, "src/icon.svg"), dest: resolve(outDir, "icon.svg") },
+      ];
+      for (const { src, dest } of assets) {
+        if (existsSync(src)) copyFileSync(src, dest);
+      }
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react({ reactRefreshHost: "http://localhost:8132" }), tailwindcss()],
+  plugins: [react({ reactRefreshHost: "http://localhost:8132" }), tailwindcss(), copyWidgetAssets()],
   server: {
     port: 3003,
     host: true,
@@ -20,7 +41,7 @@ export default defineConfig({
       formats: ["esm"],
       fileName: () => "index.js",
     },
-    outDir: "../../../dist/widget-build/todo",
+    outDir,
     emptyOutDir: true,
     rollupOptions: {
       output: {

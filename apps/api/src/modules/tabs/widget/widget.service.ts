@@ -20,6 +20,8 @@ import {
 type WidgetSizeConfig = { row: number; col: number; name: string; id: string };
 type WidgetSettingsType = 'input' | 'select' | 'switch' | 'textarea' | 'number';
 type PopulatedResource = { name?: string; url?: string };
+type WidgetAppIcon = { type: 'image' | 'custom'; src?: string };
+type WidgetPagePaths = { settings?: string };
 type WidgetScreenshot = {
   mode?: string;
   themeId: string;
@@ -46,10 +48,14 @@ type WidgetPackageConfig = {
   author?: string;
   entry: string;
   icon?: string;
+  appIcon?: WidgetAppIcon;
   tags?: string[];
   sizeConfigs: WidgetSizeConfig[];
   defaultSizeId: string;
   supportIconMode?: boolean;
+  supportAppMode?: boolean;
+  appIconUrl?: string;
+  pagePaths?: WidgetPagePaths;
   hasCustomSettings?: boolean;
   settingsEntry?: string;
   settingsSchema?: Record<string, unknown>[];
@@ -59,6 +65,8 @@ type WidgetConfigPayload = {
   files?: unknown;
   sizeConfigs?: Partial<WidgetSizeConfig>[];
   defaultSizeId?: unknown;
+  appIcon?: unknown;
+  pagePaths?: unknown;
   settingsSchema?: unknown;
 };
 type WidgetListQuery = WidgetQueryDto & {
@@ -76,12 +84,17 @@ type WidgetPublicResponse = Record<string, unknown> & {
   sizeConfigs?: WidgetSizeConfig[];
   defaultSizeId?: string;
   supportIconMode?: boolean;
+  supportAppMode?: boolean;
+  appIcon?: WidgetAppIcon;
+  appIconUrl?: string;
+  pagePaths?: WidgetPagePaths;
   settingsSchema?: Record<string, unknown>[];
   tags?: string[];
   version?: string;
   author?: string;
   screenshots?: WidgetScreenshot[];
   packageSourceName?: string;
+  packageName?: string;
   entryUrl?: string;
   iconUrl?: string;
   configSnapshot?: Record<string, unknown>;
@@ -192,15 +205,33 @@ export class WidgetService {
         throw new BadRequestException(`小组件包缺少图标文件: ${config.icon}`);
       }
     }
+    const appIconPath = this.getPackageAppIconPath(config);
+    if (appIconPath) {
+      this.assertSafeRelativePath(appIconPath);
+      const appIconFile = entries.find(
+        (entry) => this.normalizeZipPath(entry.entryName) === appIconPath,
+      );
+      if (!appIconFile) {
+        throw new BadRequestException(`小组件包缺少应用图标文件: ${appIconPath}`);
+      }
+    }
 
     const baseKey = `widgets/${config.name}/${config.version}`;
     await this.writePackageEntries(entries, baseKey);
 
     const screenshots = this.parsePackageScreenshots(entries, baseKey);
-    const configSnapshot = this.buildConfigSnapshot(config, screenshots);
+    const appIconUrl = this.getPackageAppIconUrl(config, baseKey);
+    const configSnapshot = this.buildConfigSnapshot(
+      config,
+      screenshots,
+      appIconUrl,
+    );
     const widget = await this.upsertPackageWidget(
       config,
       screenshots,
+      appIconUrl,
+      `/static/${baseKey}/${entryName}`,
+      config.icon ? `/static/${baseKey}/${this.normalizeZipPath(config.icon)}` : undefined,
       user,
       widgetId,
     );
@@ -215,6 +246,8 @@ export class WidgetService {
       entryFileName: config.entry,
       entryUrl: `/static/${baseKey}/${entryName}`,
       iconUrl: config.icon ? `/static/${baseKey}/${this.normalizeZipPath(config.icon)}` : undefined,
+      appIcon: config.appIcon,
+      appIconUrl,
       screenshots,
       configSnapshot,
       active: false,
@@ -262,6 +295,10 @@ export class WidgetService {
         entryFileName: version.entryFileName,
         entryUrl: version.entryUrl,
         iconUrl: version.iconUrl,
+        supportAppMode: snapshot.supportAppMode ?? false,
+        appIcon: snapshot.appIcon,
+        appIconUrl: snapshot.appIconUrl ?? version.appIconUrl,
+        pagePaths: snapshot.pagePaths ?? null,
         configSnapshot: version.configSnapshot,
         sizeConfigs: snapshot.sizeConfigs,
         defaultSizeId: snapshot.defaultSizeId,
@@ -409,6 +446,14 @@ export class WidgetService {
       }
     }
 
+    if (dto.appIcon !== undefined) {
+      this.normalizeAppIcon(dto.appIcon);
+    }
+
+    if (dto.pagePaths !== undefined) {
+      this.normalizePagePaths(dto.pagePaths);
+    }
+
     if (dto.settingsSchema !== undefined) {
       this.validateSettingsSchema(dto.settingsSchema);
     }
@@ -468,6 +513,76 @@ export class WidgetService {
     });
   }
 
+  private normalizeAppIcon(
+    appIcon: unknown,
+    supportAppMode = false,
+  ): WidgetAppIcon | undefined {
+    if (appIcon == null) {
+      return supportAppMode ? { type: 'image' } : undefined;
+    }
+    if (!this.isRecord(appIcon)) {
+      throw new BadRequestException('应用图标配置必须为对象');
+    }
+    if (appIcon.type === 'custom') {
+      return { type: 'custom' };
+    }
+    if (appIcon.type === 'image') {
+      const src = this.isNonEmptyString(appIcon.src)
+        ? this.normalizeZipPath(appIcon.src)
+        : undefined;
+      return src ? { type: 'image', src } : { type: 'image' };
+    }
+    throw new BadRequestException('应用图标类型仅支持image或custom');
+  }
+
+  private normalizePagePaths(pagePaths: unknown): WidgetPagePaths | undefined {
+    if (pagePaths == null) return undefined;
+    if (!this.isRecord(pagePaths)) {
+      throw new BadRequestException('页面路径配置必须为对象');
+    }
+
+    const normalized: WidgetPagePaths = {};
+    if (pagePaths.settings !== undefined) {
+      if (!this.isNonEmptyString(pagePaths.settings)) {
+        throw new BadRequestException('设置页面路径不能为空');
+      }
+      normalized.settings = this.normalizeRoutePath(pagePaths.settings);
+    }
+
+    return Object.keys(normalized).length ? normalized : undefined;
+  }
+
+  private normalizeRoutePath(value: string) {
+    const routePath = value.trim();
+    if (
+      routePath !== value ||
+      !routePath.startsWith('/') ||
+      routePath.startsWith('//') ||
+      routePath.includes('\\') ||
+      routePath.includes('..') ||
+      /[\s]/.test(routePath) ||
+      /^[a-z][a-z0-9+.-]*:/i.test(routePath)
+    ) {
+      throw new BadRequestException('页面路径必须是安全的站内路由');
+    }
+    return routePath;
+  }
+
+  private getPackageAppIconPath(config: WidgetPackageConfig) {
+    if (config.appIcon?.type !== 'image') return undefined;
+    const appIconSrc = this.isNonEmptyString(config.appIcon.src)
+      ? config.appIcon.src
+      : config.icon;
+    return this.isNonEmptyString(appIconSrc)
+      ? this.normalizeZipPath(appIconSrc)
+      : undefined;
+  }
+
+  private getPackageAppIconUrl(config: WidgetPackageConfig, baseKey: string) {
+    const appIconPath = this.getPackageAppIconPath(config);
+    return appIconPath ? `/static/${baseKey}/${appIconPath}` : undefined;
+  }
+
   private parsePackageConfig(buffer: Buffer): WidgetPackageConfig {
     let raw: unknown;
     try {
@@ -492,6 +607,12 @@ export class WidgetService {
     this.assertSafeRelativePath(config.entry);
     if (config.icon) this.assertSafeRelativePath(config.icon);
     if (config.settingsEntry) this.assertSafeRelativePath(config.settingsEntry);
+    const pagePaths = this.normalizePagePaths(config.pagePaths);
+    const supportAppMode = config.supportAppMode === true;
+    const appIcon = this.normalizeAppIcon(config.appIcon, supportAppMode);
+    if (appIcon?.type === 'image' && appIcon.src) {
+      this.assertSafeRelativePath(appIcon.src);
+    }
 
     this.validateWidgetConfig(
       {
@@ -516,6 +637,9 @@ export class WidgetService {
       sizeConfigs: config.sizeConfigs ?? [],
       defaultSizeId: config.defaultSizeId ?? '',
       supportIconMode: config.supportIconMode ?? false,
+      supportAppMode,
+      appIcon,
+      pagePaths,
       hasCustomSettings: config.hasCustomSettings ?? false,
       settingsEntry: config.settingsEntry,
       settingsSchema: config.settingsSchema ?? [],
@@ -525,6 +649,7 @@ export class WidgetService {
   private buildConfigSnapshot(
     config: WidgetPackageConfig,
     screenshots: WidgetScreenshot[] = [],
+    appIconUrl?: string,
   ) {
     return {
       schemaVersion: config.schemaVersion,
@@ -539,6 +664,10 @@ export class WidgetService {
       sizeConfigs: config.sizeConfigs,
       defaultSizeId: config.defaultSizeId,
       supportIconMode: config.supportIconMode ?? false,
+      supportAppMode: config.supportAppMode ?? false,
+      appIcon: config.appIcon,
+      appIconUrl,
+      pagePaths: config.pagePaths ?? null,
       hasCustomSettings: config.hasCustomSettings ?? false,
       settingsEntry: config.settingsEntry,
       settingsSchema: config.settingsSchema ?? [],
@@ -549,6 +678,9 @@ export class WidgetService {
   private async upsertPackageWidget(
     config: WidgetPackageConfig,
     screenshots: WidgetScreenshot[],
+    appIconUrl: string | undefined,
+    entryUrl: string,
+    iconUrl: string | undefined,
     user?: string,
     widgetId?: string,
   ) {
@@ -564,13 +696,19 @@ export class WidgetService {
       sourceType: 'snwidget',
       packageSourceName: config.name,
       packageName: `${config.name}-${config.version}${SNWIDGET_EXT}`,
+      entryUrl,
+      iconUrl,
       sizeConfigs: config.sizeConfigs,
       defaultSizeId: config.defaultSizeId,
       supportIconMode: config.supportIconMode ?? false,
+      supportAppMode: config.supportAppMode ?? false,
+      appIcon: config.appIcon,
+      appIconUrl,
+      pagePaths: config.pagePaths ?? null,
       tags: config.tags ?? [],
       settingsSchema: config.settingsSchema ?? [],
       screenshots,
-      configSnapshot: this.buildConfigSnapshot(config, screenshots),
+      configSnapshot: this.buildConfigSnapshot(config, screenshots, appIconUrl),
     };
     if (existing) {
       const updated = await this.widgetModel.findByIdAndUpdate(
@@ -762,6 +900,9 @@ export class WidgetService {
   private async withPublicResponseFields(
     item: WidgetPublicResponse,
   ): Promise<WidgetPublicResponse> {
+    const snapshot = this.isRecord(item.configSnapshot)
+      ? item.configSnapshot
+      : {};
     const entryFile = item.files?.find(
       (file) =>
         file.name === item.entryFileName && this.isNonEmptyString(file.url),
@@ -771,23 +912,58 @@ export class WidgetService {
       this.isNonEmptyString(item.entryFileName)
         ? `/uploads/${item.dir}/${item.entryFileName}`
         : undefined;
+    const packageVersion = this.resolvePackageVersion(item, snapshot);
+    const packageBaseKey = this.resolveSnapshotPackageBaseKey(item, snapshot);
+    const snapshotEntryUrl =
+      packageBaseKey && this.isNonEmptyString(snapshot.entry)
+        ? `/static/${packageBaseKey}/${this.normalizeZipPath(snapshot.entry)}`
+        : undefined;
+    const snapshotIconUrl =
+      packageBaseKey && this.isNonEmptyString(snapshot.icon)
+        ? `/static/${packageBaseKey}/${this.normalizeZipPath(snapshot.icon)}`
+        : undefined;
     const screenshots = item.screenshots?.length
       ? item.screenshots
       : await this.loadStoredPackageScreenshots(item);
+    const appIcon =
+      item.appIcon ??
+      (this.isRecord(snapshot.appIcon)
+        ? (snapshot.appIcon as WidgetAppIcon)
+        : undefined);
+    const iconUrl = snapshotIconUrl ?? item.iconUrl ?? item.icon?.url;
+    const appIconUrl =
+      item.appIconUrl ??
+      (this.isNonEmptyString(snapshot.appIconUrl)
+        ? snapshot.appIconUrl
+        : undefined) ??
+      (appIcon?.type === 'image' ? iconUrl : undefined);
+    const pagePaths =
+      item.pagePaths ??
+      (this.isRecord(snapshot.pagePaths)
+        ? (snapshot.pagePaths as WidgetPagePaths)
+        : undefined);
 
     return {
       ...item,
+      version: packageVersion ?? item.version,
       screenshots,
-      entryUrl: item.entryUrl ?? entryFile?.url ?? fallbackEntryUrl,
-      iconUrl: item.iconUrl ?? item.icon?.url,
+      entryUrl: snapshotEntryUrl ?? item.entryUrl ?? entryFile?.url ?? fallbackEntryUrl,
+      iconUrl,
+      appIcon,
+      appIconUrl,
+      pagePaths,
       configSnapshot: {
         ...(item.configSnapshot ?? {}),
         sizeConfigs: item.sizeConfigs,
         defaultSizeId: item.defaultSizeId,
         supportIconMode: item.supportIconMode,
+        supportAppMode: item.supportAppMode,
+        appIcon,
+        appIconUrl,
+        pagePaths,
         settingsSchema: item.settingsSchema,
         tags: item.tags,
-        version: item.version,
+        version: packageVersion ?? item.version,
         author: item.author,
         screenshots,
       },
@@ -844,6 +1020,49 @@ export class WidgetService {
         : undefined;
 
     return sourceName && version ? `widgets/${sourceName}/${version}` : undefined;
+  }
+
+  private resolveSnapshotPackageBaseKey(
+    item: WidgetPublicResponse,
+    snapshot: Record<string, unknown>,
+  ) {
+    const name = this.isNonEmptyString(snapshot.name)
+      ? snapshot.name
+      : item.packageSourceName;
+    const version = this.resolvePackageVersion(item, snapshot);
+    if (
+      this.isNonEmptyString(name) &&
+      this.isNonEmptyString(version)
+    ) {
+      return `widgets/${name}/${version}`;
+    }
+    return undefined;
+  }
+
+  private resolvePackageVersion(
+    item: WidgetPublicResponse,
+    snapshot: Record<string, unknown>,
+  ) {
+    const name = this.isNonEmptyString(snapshot.name)
+      ? snapshot.name
+      : item.packageSourceName;
+    if (
+      this.isNonEmptyString(name) &&
+      this.isNonEmptyString(item.packageName)
+    ) {
+      const prefix = `${name}-`;
+      if (item.packageName.startsWith(prefix) && item.packageName.endsWith(SNWIDGET_EXT)) {
+        const version = item.packageName.slice(
+          prefix.length,
+          -SNWIDGET_EXT.length,
+        );
+        if (this.isNonEmptyString(version)) return version;
+      }
+    }
+
+    return this.isNonEmptyString(snapshot.version)
+      ? snapshot.version
+      : item.version;
   }
 
   private isNonEmptyString(value: unknown): value is string {

@@ -3,8 +3,46 @@
 @import "tailwindcss/theme" layer(theme) prefix(tw);
 @import "tailwindcss/utilities" layer(utilities) prefix(tw);
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :host {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+}
+
+.todo-scroll-area {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(60, 60, 67, 0.36) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.todo-scroll-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.todo-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.todo-scroll-area::-webkit-scrollbar-thumb {
+  min-height: 32px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: rgba(60, 60, 67, 0.28);
+  background-clip: padding-box;
+}
+
+.todo-scroll-area:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(60, 60, 67, 0.46);
 }

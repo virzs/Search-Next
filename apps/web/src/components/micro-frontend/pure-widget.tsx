@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import type { WidgetSDK } from "@/sdk";
+import type { WidgetMode, WidgetSDK } from "@/sdk";
 
 export interface PureWidgetConfig {
   entry: string;
   props?: Record<string, unknown>;
-  mode?: "icon" | "full" | "settings";
+  mode?: WidgetMode;
   /** 小组件 SDK 实例（由宿主创建并注入） */
   sdk?: WidgetSDK;
 }

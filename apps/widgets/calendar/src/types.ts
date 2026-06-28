@@ -1,4 +1,4 @@
-export type WidgetMode = "icon" | "full" | "settings";
+export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 export type WeekStart = "sun" | "mon";
 export type EventDensity = "compact" | "normal" | "detailed";
 

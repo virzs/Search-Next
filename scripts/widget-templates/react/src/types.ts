@@ -1,4 +1,4 @@
-export type WidgetMode = "icon" | "full" | "settings";
+export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 
 export interface WidgetThemeInfo {
   activeThemeId: string;

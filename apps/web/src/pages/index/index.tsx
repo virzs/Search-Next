@@ -18,12 +18,12 @@ import type { ReactNode } from "react";
 import {
   RiStore2Line,
   RiSettingsLine,
+  RiInformationLine,
   RiBrushLine,
   RemixiconComponentType,
   RiUserLine,
 } from "@remixicon/react";
 import type { DesktopItemData } from "../../types";
-import type { WidgetSettingsField } from "../../types";
 // import SearchWithAI from "../../components/ai-search";
 import { App } from "antd";
 import {
@@ -41,11 +41,11 @@ import { useWidget } from "@/hooks/useWidget";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import PureWidgetWindow from "@/components/window/pure-widget-window";
 import { createHostSDK, sharedEventBus } from "@/sdk";
-import type { WidgetSDK, WidgetThemeInfo } from "@/sdk";
+import type { WidgetMode, WidgetSDK, WidgetThemeInfo } from "@/sdk";
 import { notification } from "@/utils/globalNotification";
 import axiosInstance from "@/utils/axios";
 import LoadingOverlay from "./components/loading-overlay";
-import WidgetSettingsModal from "@/components/widget-settings-modal";
+import WidgetInfoModal from "@/components/widget-info-modal";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
@@ -60,6 +60,8 @@ import Notice from "./components/notice";
 import Feedback from "./components/feedback";
 import { accountRoute } from "./components/default-apps/account/route-paths";
 import BoringAccountAvatar from "@/components/auth/BoringAccountAvatar";
+import { getPublicWidgetDetail } from "@/services/widget";
+import type { WidgetApiItem } from "@/types";
 
 type DesktopItem = DndSortItem<DesktopItemData>;
 type DesktopPage = DndPageItem<DesktopItemData>;
@@ -92,6 +94,23 @@ const getWidgetDesktopType = (item: Pick<DesktopItem, "type" | "dataType">) => {
   return null;
 };
 
+const getWidgetAppDesktopType = (
+  item: Pick<DesktopItem, "type" | "dataType" | "data">,
+) => {
+  if (
+    item.type === "app" &&
+    typeof item.dataType === "string" &&
+    item.dataType.startsWith("widget-app:")
+  ) {
+    return item.dataType;
+  }
+  const widgetId = item.data?.widgetConfig?.id;
+  if (item.type === "app" && typeof widgetId === "string" && widgetId) {
+    return `widget-app:${widgetId}`;
+  }
+  return null;
+};
+
 const normalizeWidgetDesktopItem = (
   item: DesktopStorageItem,
 ): DesktopStorageItem => {
@@ -112,29 +131,21 @@ const normalizeWidgetDesktopList = (list: DesktopRootItem[]): DesktopPage[] =>
       children: root.children?.map(normalizeWidgetDesktopItem) ?? [],
     }));
 
+const hasDesktopChildren = (
+  items: Array<{ children?: DesktopStorageItem[] }> | undefined,
+): boolean => {
+  return Boolean(items?.length);
+};
+
+const hasDesktopPagesContent = (pages: DesktopPage[]): boolean =>
+  pages.some((page) => hasDesktopChildren(page.children));
+
+const hasDesktopRootsContent = (roots: DesktopRootItem[]): boolean =>
+  roots.some((root) => hasDesktopChildren(root.children));
+
 const createEmptyDesktopPages = (): DesktopPage[] => [
   { id: "page-1", children: [] },
 ];
-
-const resolveWidgetSettingsPagePath = (
-  config: DesktopItemData["widgetConfig"] | undefined,
-  fallbackConfig?: DesktopItemData["widgetConfig"],
-) => {
-  const value =
-    config?.pagePaths?.settings ??
-    config?.pages?.settings ??
-    config?.settingsPagePath ??
-    config?.settingsPath ??
-    config?.settingsPage ??
-    fallbackConfig?.pagePaths?.settings ??
-    fallbackConfig?.pages?.settings ??
-    fallbackConfig?.settingsPagePath ??
-    fallbackConfig?.settingsPath ??
-    fallbackConfig?.settingsPage;
-  if (typeof value === "string" && value.trim()) return value;
-  if (config?.customSettings || fallbackConfig?.customSettings) return "/settings";
-  return undefined;
-};
 
 const normalizeHttpUrl = (rawUrl: string | undefined) => {
   if (!rawUrl) return null;
@@ -177,6 +188,18 @@ const persistDesktopStorage = (
   dockItems: DesktopItem[],
 ) => {
   const nextPages = pages.length ? pages : createEmptyDesktopPages();
+  const existingRoots = readStoredDesktopRoots();
+  const nextHasContent =
+    hasDesktopPagesContent(nextPages) || Boolean(dockItems.length);
+  const existingHasContent = hasDesktopRootsContent(existingRoots);
+
+  if (!nextHasContent && existingHasContent) {
+    console.warn(
+      "Skip persisting empty desktop config over existing local desktop",
+    );
+    return;
+  }
+
   const roots: DesktopRootItem[] = [
     { id: "dock", children: dockItems },
     ...nextPages,
@@ -223,7 +246,13 @@ function Index() {
   const { userLimit } = useConfig();
   const { activeThemeId, personalization } = useDesktopTheme();
   const navigate = useNavigate();
-  const { widgets, devWidgets, getEntryUrl, registerDesktopRef } = useWidget();
+  const {
+    widgets,
+    devWidgets,
+    getEntryUrl,
+    getAppIconUrl,
+    registerDesktopRef,
+  } = useWidget();
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
   const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
@@ -268,7 +297,13 @@ function Index() {
       desktopPagesRef.current = nextPages;
       persistDesktopStorage(nextPages, dockItemsRef.current);
       setDesktopPages(nextPages);
-      if (remountDesktop) setDesktopMountKey((key) => key + 1);
+      if (remountDesktop) {
+        ignoreDesktopChangeUntilRef.current = Math.max(
+          ignoreDesktopChangeUntilRef.current,
+          Date.now() + 2000,
+        );
+        setDesktopMountKey((key) => key + 1);
+      }
     },
     [],
   );
@@ -294,16 +329,14 @@ function Index() {
     props?: any;
     title?: string;
     widgetId?: string;
+    widgetConfig?: DesktopItemData["widgetConfig"];
   } | null>(null);
 
-  // 小组件设置弹窗状态
-  const [settingsTarget, setSettingsTarget] = useState<{
+  // 应用信息弹窗状态
+  const [infoTarget, setInfoTarget] = useState<{
     widgetId: string;
     widgetName: string;
-    entry?: string;
-    props?: Record<string, unknown>;
-    settingsPagePath?: string;
-    settingsSchema: WidgetSettingsField[];
+    widgetConfig?: DesktopItemData["widgetConfig"];
   } | null>(null);
 
   /** 为指定小组件创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
@@ -326,7 +359,7 @@ function Index() {
     (
       widgetId: string,
       sizeId: string,
-      mode: "icon" | "full" | "settings",
+      mode: WidgetMode,
     ): WidgetSDK => {
       const deps = sdkDepsRef.current;
       return createHostSDK({
@@ -351,6 +384,187 @@ function Index() {
     },
     [],
   );
+
+  const createWidgetConfigFromApi = useCallback(
+    (
+      widget: WidgetApiItem,
+      fallback?: DesktopItemData["widgetConfig"],
+    ): DesktopItemData["widgetConfig"] | undefined => {
+      const entry = getEntryUrl(widget) || fallback?.entry;
+      if (!entry) return fallback;
+
+      return {
+        ...(fallback ?? {}),
+        id: widget._id,
+        name: widget.name,
+        entry,
+        props: {
+          ...(fallback?.props ?? {}),
+          title: widget.name,
+        },
+        settingsSchema:
+          widget.configSnapshot?.settingsSchema || widget.settingsSchema,
+        defaultSizeId:
+          widget.configSnapshot?.defaultSizeId ||
+          widget.defaultSizeId ||
+          fallback?.defaultSizeId,
+        pagePaths: widget.configSnapshot?.pagePaths ?? widget.pagePaths,
+        pages: widget.configSnapshot?.pages ?? widget.pages,
+        settingsPagePath:
+          widget.configSnapshot?.settingsPagePath ??
+          widget.configSnapshot?.settingsPath ??
+          widget.configSnapshot?.settingsPage ??
+          widget.settingsPagePath ??
+          widget.settingsPath ??
+          widget.settingsPage,
+        settingsPath: widget.configSnapshot?.settingsPath ?? widget.settingsPath,
+        settingsPage: widget.configSnapshot?.settingsPage ?? widget.settingsPage,
+        customSettings: Boolean(
+          widget.configSnapshot?.customSettings ?? widget.customSettings,
+        ),
+        supportAppMode: Boolean(
+          widget.configSnapshot?.supportAppMode ?? widget.supportAppMode,
+        ),
+        appIcon: widget.configSnapshot?.appIcon ?? widget.appIcon,
+        appIconUrl:
+          getAppIconUrl(widget) ??
+          widget.configSnapshot?.appIconUrl ??
+          widget.appIconUrl,
+        sourceType: widget.sourceType,
+        version: widget.configSnapshot?.version ?? widget.version,
+        author: widget.configSnapshot?.author ?? widget.author,
+        description: widget.description,
+      };
+    },
+    [getAppIconUrl, getEntryUrl],
+  );
+
+  const resolveWidgetConfig = useCallback(
+    (
+      widgetId: string,
+      fallback?: DesktopItemData["widgetConfig"],
+    ): DesktopItemData["widgetConfig"] | undefined => {
+      const widget = widgets.find((item) => item._id === widgetId);
+      return widget ? createWidgetConfigFromApi(widget, fallback) : fallback;
+    },
+    [createWidgetConfigFromApi, widgets],
+  );
+
+  const resolveWidgetConfigFresh = useCallback(
+    async (
+      widgetId: string,
+      fallback?: DesktopItemData["widgetConfig"],
+    ): Promise<DesktopItemData["widgetConfig"] | undefined> => {
+      try {
+        const detail = await getPublicWidgetDetail(widgetId);
+        const widget = ((detail as any)?.data ?? detail) as WidgetApiItem;
+        if (widget?._id) return createWidgetConfigFromApi(widget, fallback);
+      } catch (error) {
+        console.warn("Failed to refresh widget detail before opening", error);
+      }
+      return resolveWidgetConfig(widgetId, fallback);
+    },
+    [createWidgetConfigFromApi, resolveWidgetConfig],
+  );
+
+  const refreshStoredWidgetSnapshots = useCallback(() => {
+    if (!widgets.length) return;
+    const widgetMap = new Map(widgets.map((widget) => [widget._id, widget]));
+    let changed = false;
+
+    const refreshItem = (item: DesktopItem): DesktopItem => {
+      const widgetAppDesktopType = getWidgetAppDesktopType(item);
+      const widgetDesktopType = getWidgetDesktopType(item);
+      const widgetId =
+        widgetAppDesktopType?.replace("widget-app:", "") ??
+        widgetDesktopType?.replace("widget:", "");
+      if (!widgetId) return item;
+
+      const widget = widgetMap.get(widgetId);
+      if (!widget) return item;
+
+      const currentConfig = item.data?.widgetConfig;
+      const nextConfig = createWidgetConfigFromApi(widget, currentConfig);
+      if (!nextConfig) return item;
+
+      const appIconUrl =
+        nextConfig.appIconUrl ?? getAppIconUrl(widget) ?? undefined;
+      const nextWidgetConfig = {
+        ...nextConfig,
+        ...(appIconUrl ? { appIconUrl } : {}),
+      };
+      const nextData: DesktopItem["data"] = {
+        ...(item.data ?? { name: nextWidgetConfig.name }),
+        name: nextWidgetConfig.name || item.data?.name || "小组件",
+        widgetConfig: nextWidgetConfig,
+      };
+
+      if (widgetAppDesktopType && appIconUrl) {
+        nextData.icon = appIconUrl;
+      }
+
+      const nextItem: DesktopItem = {
+        ...item,
+        ...(widgetAppDesktopType
+          ? { type: "app", dataType: widgetAppDesktopType }
+          : {}),
+        ...(widgetDesktopType
+          ? { type: widgetDesktopType, dataType: widgetDesktopType }
+          : {}),
+        data: nextData,
+      };
+
+      if (JSON.stringify(nextItem) !== JSON.stringify(item)) {
+        changed = true;
+      }
+      return nextItem;
+    };
+
+    const nextPages = desktopPagesRef.current.map((page) => ({
+      ...page,
+      children: page.children.map(refreshItem),
+    }));
+    const nextDockItems = dockItemsRef.current.map(refreshItem);
+
+    if (!changed) return;
+
+    desktopPagesRef.current = nextPages;
+    dockItemsRef.current = nextDockItems;
+    setDesktopPages(nextPages);
+    setDockItems(nextDockItems);
+    persistDesktopStorage(nextPages, nextDockItems);
+  }, [createWidgetConfigFromApi, getAppIconUrl, widgets]);
+
+  const openWidgetWindow = useCallback(
+    async ({
+      widgetId,
+      widgetConfig,
+      fallbackTitle,
+    }: {
+      widgetId: string;
+      widgetConfig: DesktopItemData["widgetConfig"];
+      fallbackTitle: string;
+    }) => {
+      const resolvedWidgetConfig = await resolveWidgetConfigFresh(
+        widgetId,
+        widgetConfig,
+      );
+      const nextConfig = resolvedWidgetConfig || widgetConfig;
+      if (!nextConfig?.entry) return;
+      setFullWidget({
+        entry: nextConfig.entry,
+        props: nextConfig.props,
+        title: nextConfig.name || fallbackTitle,
+        widgetId,
+        widgetConfig: nextConfig,
+      });
+    },
+    [resolveWidgetConfigFresh],
+  );
+
+  useEffect(() => {
+    refreshStoredWidgetSnapshots();
+  }, [refreshStoredWidgetSnapshots]);
 
   /** 当主题变化时通过事件总线广播，让所有小组件收到通知 */
   useEffect(() => {
@@ -395,50 +609,18 @@ function Index() {
 
   const dataTypeMenuConfigMap = useMemo((): DataTypeMenuConfigMap => {
     const map: DataTypeMenuConfigMap = {};
-    const addSettingsItem = (widgetType: string) => {
+    const addInfoItem = (widgetType: string) => {
       map[widgetType] = [
         {
-          text: "设置",
-          icon: <RiSettingsLine size={18} />,
+          text: "应用信息",
+          icon: <RiInformationLine size={18} />,
         },
       ];
     };
 
     for (const widget of widgets) {
-      const schema =
-        widget.configSnapshot?.settingsSchema || widget.settingsSchema;
-      const settingsPagePath = resolveWidgetSettingsPagePath(
-        widget.configSnapshot
-          ? {
-              id: widget._id,
-              name: widget.name,
-              entry: widget.entryFileName,
-              pagePaths: widget.configSnapshot.pagePaths ?? widget.pagePaths,
-              pages: widget.configSnapshot.pages ?? widget.pages,
-              settingsPagePath: widget.configSnapshot.settingsPagePath ?? widget.settingsPagePath,
-              settingsPath: widget.configSnapshot.settingsPath ?? widget.settingsPath,
-              settingsPage: widget.configSnapshot.settingsPage ?? widget.settingsPage,
-              customSettings: Boolean(widget.configSnapshot.customSettings ?? widget.customSettings),
-            }
-          : widget.pagePaths || widget.pages || widget.settingsPagePath || widget.settingsPath || widget.settingsPage || widget.customSettings
-            ? {
-                id: widget._id,
-                name: widget.name,
-                entry: widget.entryFileName,
-                pagePaths: widget.pagePaths,
-                pages: widget.pages,
-                settingsPagePath: widget.settingsPagePath,
-                settingsPath: widget.settingsPath,
-                settingsPage: widget.settingsPage,
-                customSettings: Boolean(widget.customSettings),
-              }
-            : undefined,
-      );
-      if (
-        settingsPagePath ||
-        (Array.isArray(schema) && schema.length > 0)
-      ) {
-        addSettingsItem(`widget:${widget._id}`);
+      if (widget.configSnapshot?.supportAppMode ?? widget.supportAppMode) {
+        addInfoItem(`widget-app:${widget._id}`);
       }
     }
 
@@ -450,18 +632,28 @@ function Index() {
   const { run: runDefaultDesktop } = useRequest(getDefaultUserConfig, {
     manual: true,
     onSuccess: (res) => {
-      const {
-        config: { list = [] },
-      } = res;
+      const list = Array.isArray(res?.config?.list) ? res.config.list : [];
 
       const isModified =
         localStorage.getItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY) === "true";
       if (!isModified) {
+        const storedRoots = readStoredDesktopRoots();
+        const hasStoredContent = hasDesktopRootsContent(storedRoots);
+        const roots = list as DesktopRootItem[];
+        const hasRemoteContent = hasDesktopRootsContent(roots);
+
+        if (!hasRemoteContent && hasStoredContent) {
+          console.warn(
+            "Skip empty remote desktop config to avoid clearing local desktop",
+          );
+          if (init) finishInit();
+          return;
+        }
+
         ignoreDesktopChangeUntilRef.current = Math.max(
           ignoreDesktopChangeUntilRef.current,
-          Date.now() + 500,
+          Date.now() + 2000,
         );
-        const roots = list as DesktopRootItem[];
         const nextPages = toDesktopNextPages(roots);
         const storedDockItems = dockItemsRef.current;
         const nextDockItems = storedDockItems.length
@@ -471,6 +663,9 @@ function Index() {
         setDockItems(nextDockItems);
         persistDesktopPages(nextPages, true);
       }
+      if (init) finishInit();
+    },
+    onError: () => {
       if (init) finishInit();
     },
   });
@@ -674,12 +869,29 @@ function Index() {
   const handleDesktopPagesChange = useCallback(
     (pages: DesktopPage[]) => {
       const nextPages = pages.length ? pages : createEmptyDesktopPages();
+      const previousPages = desktopPagesRef.current.length
+        ? desktopPagesRef.current
+        : createEmptyDesktopPages();
+      const nextHasContent = hasDesktopPagesContent(nextPages);
+      const previousHasContent = hasDesktopPagesContent(previousPages);
+      const shouldIgnoreSuspiciousEmptyChange =
+        !nextHasContent &&
+        previousHasContent &&
+        (init || Date.now() < ignoreDesktopChangeUntilRef.current);
+
+      if (shouldIgnoreSuspiciousEmptyChange) {
+        console.warn(
+          "Skip empty desktop pages change during initialization/remount",
+        );
+        return;
+      }
+
       desktopPagesRef.current = nextPages;
-      persistDesktopStorage(nextPages, dockItemsRef.current);
       setDesktopPages(nextPages);
-      if (!pages.length) return;
       if (init) return;
       if (Date.now() < ignoreDesktopChangeUntilRef.current) return;
+      if (!pages.length) return;
+      persistDesktopStorage(nextPages, dockItemsRef.current);
       localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
     },
     [init],
@@ -700,7 +912,7 @@ function Index() {
           ? { ...page, children: [...page.children, item] }
           : page,
       );
-      persistDesktopPages(nextPages, true);
+      persistDesktopPages(nextPages, false);
       localStorage.setItem(DESKTOP_LIST_MODIFIED_STORAGE_KEY, "true");
     },
     [persistDesktopPages],
@@ -796,19 +1008,17 @@ function Index() {
   const handleContextMenuItemClick = useCallback(
     (item: DesktopItem, payload: ContextMenuActionPayload) => {
       if (payload.actionType !== "custom") return;
-      const widgetDesktopType = getWidgetDesktopType(item);
-      if (!widgetDesktopType) return;
+      const widgetAppDesktopType = getWidgetAppDesktopType(item);
+      if (!widgetAppDesktopType) return;
 
       const widgetConfig = item.data?.widgetConfig;
       const widgetId =
-        widgetConfig?.id ?? widgetDesktopType.replace("widget:", "");
+        widgetConfig?.id ??
+        widgetAppDesktopType?.replace("widget-app:", "");
+      if (!widgetId) return;
       const latestWidget = widgets.find((widget) => widget._id === widgetId);
       const latestDevWidget = devWidgets.find((widget) => widget.id === widgetId);
-      const latestSchema = latestWidget
-        ? latestWidget.configSnapshot?.settingsSchema ?? latestWidget.settingsSchema
-        : undefined;
-      const schema = latestSchema ?? widgetConfig?.settingsSchema;
-      const latestWidgetConfig = latestWidget
+      const latestConfig: DesktopItemData["widgetConfig"] | undefined = latestWidget
         ? {
             id: latestWidget._id,
             name: latestWidget.name,
@@ -819,32 +1029,36 @@ function Index() {
             settingsPath: latestWidget.configSnapshot?.settingsPath ?? latestWidget.settingsPath,
             settingsPage: latestWidget.configSnapshot?.settingsPage ?? latestWidget.settingsPage,
             customSettings: Boolean(latestWidget.configSnapshot?.customSettings ?? latestWidget.customSettings),
+            supportAppMode: Boolean(latestWidget.configSnapshot?.supportAppMode ?? latestWidget.supportAppMode),
+            appIcon: latestWidget.configSnapshot?.appIcon ?? latestWidget.appIcon,
+            appIconUrl:
+              (typeof latestWidget.configSnapshot?.appIconUrl === "string"
+                ? latestWidget.configSnapshot.appIconUrl
+                : undefined) ??
+              latestWidget.appIconUrl ??
+              widgetConfig?.appIconUrl,
+            sourceType: latestWidget.sourceType,
+            version: (latestWidget.configSnapshot?.version as string | undefined) ?? latestWidget.version,
+            author: (latestWidget.configSnapshot?.author as string | undefined) ?? latestWidget.author,
+            description: latestWidget.description,
           }
         : undefined;
-      const settingsPagePath = resolveWidgetSettingsPagePath(
-        latestWidgetConfig,
-        widgetConfig,
-      );
-      const entry = latestWidget
-        ? getEntryUrl(latestWidget) ?? widgetConfig?.entry
-        : latestDevWidget?.entry ?? widgetConfig?.entry;
-      const effectiveSettingsPagePath = settingsPagePath ?? (entry ? "/settings" : undefined);
-      if (
-        !effectiveSettingsPagePath &&
-        (!Array.isArray(schema) || schema.length === 0)
-      ) return;
 
-      setSettingsTarget({
+      setInfoTarget({
         widgetId,
         widgetName:
           latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
-        entry,
-        props: {
-          title: latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
-          ...(widgetConfig?.props ?? {}),
+        widgetConfig: {
+          ...(widgetConfig ?? {}),
+          ...(latestConfig ?? {}),
+          id: widgetId,
+          name: latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
+          entry:
+            latestConfig?.entry ??
+            latestDevWidget?.entry ??
+            widgetConfig?.entry ??
+            "",
         },
-        settingsPagePath: effectiveSettingsPagePath,
-        settingsSchema: Array.isArray(schema) ? schema : [],
       });
     },
     [devWidgets, getEntryUrl, widgets],
@@ -879,6 +1093,32 @@ function Index() {
           dataTypeMenuConfigMap={dataTypeMenuConfigMap}
           onContextMenuItemClick={handleContextMenuItemClick}
           itemIconBuilder={(item) => {
+            const widgetAppDesktopType = getWidgetAppDesktopType(item);
+            const appWidgetConfig = item.data?.widgetConfig;
+            if (
+              widgetAppDesktopType &&
+              appWidgetConfig?.entry &&
+              appWidgetConfig.appIcon?.type === "custom"
+            ) {
+              const widgetId =
+                appWidgetConfig.id || widgetAppDesktopType.replace("widget-app:", "");
+              const sdk = buildSDK(widgetId, "appIcon", "appIcon");
+              return (
+                <PureWidget
+                  config={{
+                    entry: appWidgetConfig.entry,
+                    props: appWidgetConfig.props,
+                    mode: "appIcon",
+                    sdk,
+                  }}
+                  className={css`
+                    width: 100%;
+                    height: 100%;
+                  `}
+                />
+              );
+            }
+
             const widgetDesktopType = getWidgetDesktopType(item);
             // 动态匹配所有 widget: 前缀的桌面项，渲染对应小组件（icon 模式）
             const widgetConfig = item.data?.widgetConfig;
@@ -902,14 +1142,13 @@ function Index() {
                     width: 100%;
                     height: 100%;
                   `}
-                  onClick={() =>
-                    setFullWidget({
-                      entry: widgetConfig.entry,
-                      props: widgetConfig.props,
-                      title: item.data?.name || "小组件",
+                  onClick={() => {
+                    void openWidgetWindow({
                       widgetId,
-                    })
-                  }
+                      widgetConfig,
+                      fallbackTitle: item.data?.name || "小组件",
+                    });
+                  }}
                 />
               );
             }
@@ -953,6 +1192,18 @@ function Index() {
           }}
           onItemClick={(item) => {
             syncDockItemFromDesktopClick(item);
+            const widgetAppDesktopType = getWidgetAppDesktopType(item);
+            const widgetConfig = item.data?.widgetConfig;
+            if (widgetAppDesktopType && widgetConfig?.entry) {
+              const widgetId =
+                widgetConfig.id || widgetAppDesktopType.replace("widget-app:", "");
+              void openWidgetWindow({
+                widgetId,
+                widgetConfig,
+                fallbackTitle: item.data?.name || widgetConfig.name || "应用",
+              });
+              return;
+            }
             if (item.type === "app" && item.data?.url) {
               const url = normalizeHttpUrl(item.data.url);
               if (!url) return;
@@ -967,36 +1218,24 @@ function Index() {
           visible={true}
           onClose={() => setFullWidget(null)}
           config={{ entry: fullWidget.entry, props: fullWidget.props }}
+          title={fullWidget.title}
+          widgetConfig={fullWidget.widgetConfig}
           width={600}
           height={400}
-          sdk={
+          createSdk={(mode, sizeId) =>
             fullWidget.widgetId
-              ? buildSDK(fullWidget.widgetId, "full", "full")
+              ? buildSDK(fullWidget.widgetId, sizeId, mode)
               : undefined
           }
         />
       )}
-      {settingsTarget && (
-        <WidgetSettingsModal
+      {infoTarget && (
+        <WidgetInfoModal
           visible={true}
-          onClose={() => setSettingsTarget(null)}
-          widgetId={settingsTarget.widgetId}
-          widgetName={settingsTarget.widgetName}
-          settingsSchema={settingsTarget.settingsSchema}
-          settingsPagePath={settingsTarget.settingsPagePath}
-          customConfig={
-            settingsTarget.entry
-              ? {
-                  entry: settingsTarget.entry,
-                  props: {
-                    ...(settingsTarget.props ?? {}),
-                    pagePath: settingsTarget.settingsPagePath ?? "/settings",
-                  },
-                  mode: "settings",
-                  sdk: buildSDK(settingsTarget.widgetId, "settings", "settings"),
-                }
-              : undefined
-          }
+          onClose={() => setInfoTarget(null)}
+          widgetId={infoTarget.widgetId}
+          widgetName={infoTarget.widgetName}
+          widgetConfig={infoTarget.widgetConfig}
         />
       )}
       {init && <LoadingOverlay open text="正在加载配置…" />}

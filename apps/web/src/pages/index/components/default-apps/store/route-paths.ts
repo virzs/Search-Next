@@ -3,6 +3,7 @@ export const storeRoute = {
     root: "store",
     search: "search",
     website: "website",
+    app: "app",
     widget: "widget",
     dev: "dev",
     websiteCollection: "collection/:id",
@@ -19,6 +20,7 @@ export const storeRoute = {
       detail: (websiteId: string) =>
         `/store/website/detail/${encodeURIComponent(websiteId)}`,
     },
+    app: "/store/app",
     widget: "/store/widget",
     dev: "/store/dev",
   },

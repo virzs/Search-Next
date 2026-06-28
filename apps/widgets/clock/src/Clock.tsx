@@ -9,7 +9,7 @@ import type { ClockProps } from "./types";
 const Clock = ({ mode = "icon", pagePath, title, sdk }: ClockProps) => {
   const { now, themeId, settings, saving, saveSettings } = useClockState(sdk);
   const sizeId = sdk?.sizeId || "2x2";
-  const isIcon = mode === "icon";
+  const isIcon = mode === "icon" || mode === "appIcon";
   const isSettings = mode === "settings";
   const themeKey = themeId === "dark" ? "dark" : "light";
   const shellClassName = cn(

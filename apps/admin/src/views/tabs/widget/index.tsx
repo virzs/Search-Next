@@ -69,6 +69,12 @@ const WidgetIndex = () => {
       width: 90,
       render: (val: boolean) => val ? "支持" : "不支持",
     },
+    {
+      title: "应用模式",
+      dataIndex: "supportAppMode",
+      width: 90,
+      render: (val: boolean) => val ? "支持" : "不支持",
+    },
     // 标签展示列
     {
       title: "标签",

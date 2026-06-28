@@ -153,8 +153,12 @@ interface WidgetViewProps {
 }
 
 const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
-  const { widgets, loading, addToDesktop, getIconUrl } = useWidget();
+  const { widgets, loading, refresh, addToDesktop, getIconUrl } = useWidget();
   const [previewTheme, setPreviewTheme] = React.useState<PreviewTheme>("light");
+
+  React.useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   const filteredWidgets = useMemo(() => {
     const q = (query || "").trim().toLowerCase();

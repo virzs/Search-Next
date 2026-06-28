@@ -346,7 +346,7 @@ const Widget = ({ mode = "icon", sdk, initialDate, events }: WidgetProps) => {
     todayEvents,
     upcomingEvents,
   } = useCalendarState({ sdk, initialDate, events });
-  const isIcon = mode === "icon";
+  const isIcon = mode === "icon" || mode === "appIcon";
   const sizeId = sdk?.sizeId || "2x2";
   const themeVars = getThemeVars(themeId === "dark" ? "dark" : "light", settings.accentColor);
   const shellClassName = cn(

@@ -1,5 +1,6 @@
 /** 小组件 SDK 统一出口：类型定义、工厂函数及共享事件总线 */
 export type {
+  WidgetMode,
   WidgetSDK,
   WidgetEventBus,
   WidgetThemeInfo,

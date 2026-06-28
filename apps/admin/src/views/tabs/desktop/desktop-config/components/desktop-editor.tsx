@@ -8,6 +8,8 @@ import { RemixiconComponentType, RiBrush2Fill, RiSettingsFill, RiStore2Fill, RiU
 import { css, cx } from "@emotion/css";
 import WebsiteSelectModal from "./website-select-modal";
 import type { Website } from "@/services/tabs/website_classifty";
+import WidgetAppSelectModal, { toBackendAssetUrl } from "./widget-app-select-modal";
+import type { WidgetItem } from "@/services/tabs/widget";
 
 export interface DesktopEditorProps {
   value?: any;
@@ -18,6 +20,7 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
   const desktopRef = useRef<DesktopHandle>(null);
   const initializedRef = useRef<boolean>(false);
   const [websiteModalOpen, setWebsiteModalOpen] = useState<boolean>(false);
+  const [widgetAppModalOpen, setWidgetAppModalOpen] = useState<boolean>(false);
 
   const [list, setlist] = useState<DesktopListItem[]>([
     {
@@ -139,6 +142,39 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
     }
   };
 
+  const getWidgetEntryUrl = (widget: WidgetItem) => {
+    const snapshotEntry =
+      typeof widget.configSnapshot?.entryUrl === "string"
+        ? widget.configSnapshot.entryUrl
+        : undefined;
+    const entry =
+      widget.entryUrl ||
+      snapshotEntry ||
+      (widget.dir && widget.entryFileName
+        ? `/uploads/${widget.dir}/${widget.entryFileName}`
+        : "");
+    return toBackendAssetUrl(entry);
+  };
+
+  const getWidgetAppIconUrl = (widget: WidgetItem) => {
+    const snapshotIconUrl =
+      typeof widget.configSnapshot?.appIconUrl === "string"
+        ? widget.configSnapshot.appIconUrl
+        : undefined;
+    const appIcon =
+      (widget.appIcon || widget.configSnapshot?.appIcon) as
+        | WidgetItem["appIcon"]
+        | undefined;
+    if (appIcon?.type === "custom") return "";
+    return toBackendAssetUrl(
+      widget.appIconUrl ||
+        snapshotIconUrl ||
+        widget.iconUrl ||
+        widget.icon?.url ||
+        "",
+    );
+  };
+
   return (
     <div className="flex w-full h-full">
       <div className="w-64 border-r pr-4">
@@ -218,6 +254,11 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
             选择网站并添加
           </Button>
         </div>
+        <div className="flex mb-2">
+          <Button className="w-full" onClick={() => setWidgetAppModalOpen(true)}>
+            选择应用并添加
+          </Button>
+        </div>
       </div>
       <Desktop
         ref={desktopRef}
@@ -292,6 +333,64 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
             });
           }
           setWebsiteModalOpen(false);
+        }}
+      />
+      <WidgetAppSelectModal
+        open={widgetAppModalOpen}
+        onCancel={() => setWidgetAppModalOpen(false)}
+        onOk={(widgets: WidgetItem[]) => {
+          if (!widgets || !widgets.length) {
+            setWidgetAppModalOpen(false);
+            return;
+          }
+          const firstGroup = list.filter((item) => item.type === "page")[0];
+          const items = widgets.map((widget) => {
+            const appIcon =
+              (widget.appIcon || widget.configSnapshot?.appIcon) as
+                | WidgetItem["appIcon"]
+                | undefined;
+            const appIconUrl = getWidgetAppIconUrl(widget);
+            return {
+              id: uuidv4(),
+              type: "app" as const,
+              dataType: `widget-app:${widget._id}`,
+              data: {
+                name: widget.name,
+                ...(appIconUrl ? { icon: appIconUrl } : {}),
+                widgetConfig: {
+                  id: widget._id || "",
+                  name: widget.name,
+                  entry: getWidgetEntryUrl(widget),
+                  props: { title: widget.name },
+                  defaultSizeId: widget.defaultSizeId,
+                  supportAppMode: Boolean(
+                    (widget.configSnapshot?.supportAppMode as boolean | undefined) ??
+                      widget.supportAppMode,
+                  ),
+                  appIcon,
+                  appIconUrl,
+                  sourceType: widget.sourceType,
+                  version:
+                    (widget.configSnapshot?.version as string | undefined) ??
+                    widget.version,
+                  author:
+                    (widget.configSnapshot?.author as string | undefined) ??
+                    widget.author,
+                  description: widget.description,
+                },
+              },
+            };
+          });
+          if (firstGroup) {
+            items.forEach((item) => desktopRef.current?.state.addItem(item, [firstGroup.id]));
+          } else {
+            desktopRef.current?.state?.addRootItem({
+              id: uuidv4(),
+              type: "page",
+              children: items,
+            });
+          }
+          setWidgetAppModalOpen(false);
         }}
       />
     </div>

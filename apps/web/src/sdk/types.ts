@@ -1,4 +1,6 @@
 /** 小组件 SDK 事件总线接口 */
+export type WidgetMode = 'icon' | 'full' | 'settings' | 'appIcon';
+
 export interface WidgetEventBus {
   on(event: string, handler: (...args: any[]) => void): void;
   off(event: string, handler: (...args: any[]) => void): void;
@@ -52,7 +54,7 @@ export interface WidgetSDK {
   /** 当前尺寸 ID */
   sizeId: string;
   /** 显示模式 */
-  mode: 'icon' | 'full' | 'settings';
+  mode: WidgetMode;
   /** 主题信息 */
   theme: WidgetThemeInfo;
   /** 监听主题变化 */
@@ -79,7 +81,7 @@ export interface WidgetSDK {
 export interface CreateHostSDKOptions {
   widgetId: string;
   sizeId: string;
-  mode: 'icon' | 'full' | 'settings';
+  mode: WidgetMode;
   /** 当前主题 */
   theme: WidgetThemeInfo;
   /** 用户信息 */

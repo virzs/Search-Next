@@ -199,6 +199,7 @@ export function Actions() {
 - `sizeConfigs` 决定需要截图的尺寸。
 - `supportIconMode: false` 时跳过。
 - 每个尺寸会分别生成 `light` 与 `dark` 主题截图。
+- `supportAppMode: true` 会让包进入应用菜单；`appIcon.type: "custom"` 由宿主以 `mode: "appIcon"` 渲染，不要求生成额外截图。
 
 输出示例：
 

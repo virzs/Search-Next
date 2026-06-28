@@ -40,6 +40,14 @@ export interface WidgetScreenshot {
   url: string;
 }
 
+export type WidgetAppIcon =
+  | { type: "image"; src?: string }
+  | { type: "custom" };
+
+export interface WidgetPagePaths {
+  settings?: string;
+}
+
 export interface WidgetItem {
   _id?: string;
   name: string;
@@ -57,6 +65,10 @@ export interface WidgetItem {
   sizeConfigs?: WidgetSizeConfig[];
   defaultSizeId?: string;
   supportIconMode?: boolean;
+  supportAppMode?: boolean;
+  appIcon?: WidgetAppIcon;
+  appIconUrl?: string;
+  pagePaths?: WidgetPagePaths;
   tags?: string[];
   sortOrder?: number;
   settingsSchema?: WidgetSettingsField[]; // 设置表单Schema
@@ -84,6 +96,9 @@ export interface WidgetVersionItem {
   entryFileName: string;
   entryUrl: string;
   iconUrl?: string;
+  appIcon?: WidgetAppIcon;
+  appIconUrl?: string;
+  pagePaths?: WidgetPagePaths;
   screenshots?: WidgetScreenshot[];
   active: boolean;
   configSnapshot: Record<string, unknown>;
@@ -136,7 +151,7 @@ export async function uploadWidgetPackage(file: File, widgetId?: string): Promis
   if (!response.ok) {
     throw new Error(data?.message || data?.msg || "小组件包上传失败");
   }
-  return data;
+  return data?.data ?? data;
 }
 
 export async function getWidgetVersions(id: string) {

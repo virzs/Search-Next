@@ -45,6 +45,10 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     const originalRequest = error.config;
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+    const requestUrl = String(error.config?.url ?? "");
     if (error.response.status === 400) {
       const errMsg = error.response.data.message;
       notification.error({
@@ -52,10 +56,15 @@ axiosInstance.interceptors.response.use(
         description: errMsg,
       });
     }
-    if (error.response.status === 500 && error.config.url.includes("/auth/refresh-token")) {
+    if (error.response.status === 500 && requestUrl.includes("/auth/refresh-token")) {
       // TODO: 处理刷新token失败的情况
     }
-    if (error.response.status === 401 && !error.config.url.includes("/auth/refresh-token")) {
+    if (
+      error.response.status === 401 &&
+      !requestUrl.includes("/auth/refresh-token") &&
+      originalRequest &&
+      !originalRequest?._retry
+    ) {
       const refreshToken = getRefreshToken();
       if ([null, undefined, ""].includes(refreshToken)) {
         // TODO: 处理刷新token为空的情况

@@ -14,11 +14,11 @@ const Widget = (props) => {
     <div class={`widget-shell ${themeId() === "dark" ? "is-dark" : ""}`}>
       <div class="widget-kicker">Solid Widget</div>
       <div class="widget-title">__WIDGET_DISPLAY_NAME__</div>
-      {props.mode !== "icon" && (
+      {props.mode !== "icon" && props.mode !== "appIcon" && (
         <p class="widget-copy">
           {props.mode === "settings"
             ? "这是由小组件自行渲染的设置页。"
-            : "通过 props.sdk 获取宿主能力，支持 icon/full/settings 三种模式。"}
+            : "通过 props.sdk 获取宿主能力，支持 icon/appIcon/full/settings 模式。"}
         </p>
       )}
     </div>

@@ -61,10 +61,14 @@ const isAllowedSettingsType = (type: unknown): type is WidgetSettingsField["type
 const normalizeWidgetPayload = (values: WidgetItem): WidgetItem => {
   const sizeConfigs = values.sizeConfigs?.length ? values.sizeConfigs : [{ ...DEFAULT_SIZE_CONFIG }];
   const defaultSizeId = values.defaultSizeId || DEFAULT_SIZE_CONFIG.id;
+  const supportAppMode = values.supportAppMode ?? false;
   return {
     ...values,
     enable: values.enable ?? true,
     supportIconMode: values.supportIconMode ?? true,
+    supportAppMode,
+    appIcon: supportAppMode ? (values.appIcon ?? { type: "image" }) : values.appIcon,
+    appIconUrl: values.appIconUrl || undefined,
     sortOrder: values.sortOrder ?? 0,
     sizeConfigs,
     defaultSizeId,
@@ -164,10 +168,18 @@ const buildFormValuesFromWidget = (widget: WidgetItem): Partial<WidgetItem> => (
   sizeConfigs: widget.sizeConfigs,
   defaultSizeId: widget.defaultSizeId,
   supportIconMode: widget.supportIconMode,
+  supportAppMode: widget.supportAppMode,
+  appIcon: widget.appIcon || getConfigValue(widget, "appIcon") as WidgetItem["appIcon"],
+  appIconUrl: widget.appIconUrl || String(getConfigValue(widget, "appIconUrl") || ""),
   tags: widget.tags,
   settingsSchema: widget.settingsSchema,
 });
 
+const getClassifyValue = (classify: WidgetItem["classify"] | any) => {
+  if (!classify) return undefined;
+  if (typeof classify === "string") return classify;
+  return classify._id ?? classify.id;
+};
 
 const inferEntry = (names: string[]): string | undefined => {
   const lower = names.map((n) => n.toLowerCase());
@@ -210,6 +222,12 @@ const WidgetHandle: FC = () => {
       const names = (data?.files || []).map((f: any) => f?.name).filter(Boolean);
       setFileNames(names);
       setPackageMeta(data);
+      ref.current?.setFieldsValue({
+        ...buildFormValuesFromWidget(data),
+        enable: data.enable ?? true,
+        sortOrder: data.sortOrder ?? 0,
+        classify: getClassifyValue(data.classify),
+      });
     },
   });
 
@@ -251,15 +269,24 @@ const WidgetHandle: FC = () => {
 
   const { runAsync: uploadPackageRun, loading: uploadPackageLoading } = useRequest(uploadWidgetPackage, {
     manual: true,
-    onSuccess: ({ widget }) => {
-      setPackageWidgetId(widget._id);
-      setPackageMeta(widget);
-      ref.current?.setFieldsValue({
+    onSuccess: (result) => {
+      const widget = result?.widget;
+      if (!widget) {
+        message.error("小组件包上传成功，但响应中缺少组件数据");
+        return;
+      }
+      const nextValues = {
         ...buildFormValuesFromWidget(widget),
         enable: widget.enable ?? true,
         sortOrder: widget.sortOrder ?? 0,
-        classify: widget.classify,
-      });
+        classify: getClassifyValue(widget.classify),
+      };
+      setPackageWidgetId(widget._id);
+      setPackageMeta(widget);
+      setFileNames([]);
+      ref.current?.resetFields();
+      ref.current?.setFieldsValue(nextValues);
+      if (widget._id) detailRun(widget._id);
       message.success("已读取 .snwidget 配置并回填表单");
     },
   });
@@ -275,6 +302,8 @@ const WidgetHandle: FC = () => {
           initialValues={{
             enable: true,
             supportIconMode: true,
+            supportAppMode: false,
+            appIcon: { type: "image" },
             sortOrder: 0,
             sizeConfigs: [{ ...DEFAULT_SIZE_CONFIG }],
             defaultSizeId: DEFAULT_SIZE_CONFIG.id,
@@ -315,7 +344,7 @@ const WidgetHandle: FC = () => {
                 type="info"
                 showIcon
                 message="推荐使用组件包配置"
-                description="上传 .snwidget 后，名称、简介、入口、版本、作者、尺寸、图标模式、标签和设置 Schema 会从包内 widget.config.json 自动读取。表单中仅建议维护分类、启用状态、排序等运营字段。"
+                description="上传 .snwidget 后，名称、简介、入口、版本、作者、尺寸、图标模式、应用模式、标签和设置 Schema 会从包内 widget.config.json 自动读取。表单中仅建议维护分类、启用状态、排序等运营字段。"
               />
               {packageMode ? (
                 <div className="flex flex-wrap gap-2 text-sm">
@@ -445,6 +474,37 @@ const WidgetHandle: FC = () => {
           <Form.Item label="支持图标模式" name="supportIconMode" valuePropName="checked" tooltip="是否支持在桌面上以小图标形式显示">
             <Switch disabled={packageMode} />
           </Form.Item>
+
+          <Form.Item label="支持应用模式" name="supportAppMode" valuePropName="checked" tooltip="开启后会出现在前台 Store 的应用菜单中">
+            <Switch disabled={packageMode} />
+          </Form.Item>
+
+          <ProFormDependency name={["supportAppMode", "appIcon"]}>
+            {({ supportAppMode, appIcon }) =>
+              supportAppMode ? (
+                <>
+                  <Form.Item label="应用图标类型" name={["appIcon", "type"]} tooltip="图片图标使用 appIconUrl， 自定义元素会以前台 appIcon 模式渲染入口">
+                    <Select
+                      disabled={packageMode}
+                      options={[
+                        { label: "图片", value: "image" },
+                        { label: "自定义元素", value: "custom" },
+                      ]}
+                    />
+                  </Form.Item>
+                  {(appIcon?.type ?? "image") === "image" ? (
+                    <ProFormText
+                      name="appIconUrl"
+                      label="应用图标URL"
+                      placeholder="留空则回退小组件图标"
+                      disabled={packageMode}
+                      tooltip="手动配置时可填完整URL；组件包会自动回填包内静态资源URL"
+                    />
+                  ) : null}
+                </>
+              ) : null
+            }
+          </ProFormDependency>
 
           {/* 排序权重 */}
           <ProFormDigit

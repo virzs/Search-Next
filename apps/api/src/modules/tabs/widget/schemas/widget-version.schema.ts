@@ -9,6 +9,11 @@ export type WidgetVersionDocument = WidgetVersion & Document;
 
 export const WidgetVersionName = 'WidgetVersion';
 
+const WidgetAppIconSchema = {
+  type: { type: String, enum: ['image', 'custom'], required: true },
+  src: { type: String },
+};
+
 const WidgetScreenshotSchema = {
   mode: { type: String },
   themeId: { type: String, required: true },
@@ -47,6 +52,12 @@ export class WidgetVersion extends BaseSchema {
 
   @Prop({ type: String })
   iconUrl?: string;
+
+  @Prop({ type: WidgetAppIconSchema })
+  appIcon?: { type: 'image' | 'custom'; src?: string };
+
+  @Prop({ type: String })
+  appIconUrl?: string;
 
   @Prop({ type: [WidgetScreenshotSchema], default: [] })
   screenshots: Array<{

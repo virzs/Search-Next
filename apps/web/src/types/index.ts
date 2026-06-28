@@ -2,6 +2,12 @@
 export type ItemType = "group" | "app" | "widget";
 
 // 小组件配置接口
+export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
+
+export type WidgetAppIcon =
+  | { type: "image"; src?: string }
+  | { type: "custom" };
+
 export interface WidgetConfig {
   id: string;
   name: string;
@@ -18,6 +24,13 @@ export interface WidgetConfig {
   settingsPath?: string;
   settingsPage?: string;
   customSettings?: boolean;
+  supportAppMode?: boolean;
+  appIcon?: WidgetAppIcon;
+  appIconUrl?: string | null;
+  sourceType?: "legacy" | "snwidget";
+  version?: string;
+  author?: string;
+  description?: string;
 }
 
 // 桌面项目数据接口
@@ -94,6 +107,9 @@ export interface WidgetApiItem {
   sizeConfigs: WidgetSizeConfig[];
   defaultSizeId: string;
   supportIconMode: boolean;
+  supportAppMode?: boolean;
+  appIcon?: WidgetAppIcon;
+  appIconUrl?: string | null;
   tags: string[];
   sortOrder: number;
   settingsSchema?: WidgetSettingsField[]; // 设置表单Schema
@@ -112,6 +128,9 @@ export interface WidgetApiItem {
     sizeConfigs?: WidgetSizeConfig[];
     defaultSizeId?: string;
     supportIconMode?: boolean;
+    supportAppMode?: boolean;
+    appIcon?: WidgetAppIcon;
+    appIconUrl?: string | null;
     settingsSchema?: WidgetSettingsField[];
     pagePaths?: WidgetPagePaths;
     pages?: WidgetPagePaths;

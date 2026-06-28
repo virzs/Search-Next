@@ -4,18 +4,36 @@ import type { FC, KeyboardEvent, ReactNode } from "react";
 type SettingsIconTone = "blue" | "green" | "orange" | "red" | "purple" | "gray";
 
 export interface MacSettingsViewProps {
+  title?: ReactNode;
+  description?: ReactNode;
   action?: ReactNode;
   children: ReactNode;
 }
 
 export const MacSettingsView: FC<MacSettingsViewProps> = ({
+  title,
+  description,
   action,
   children,
 }) => (
   <div className="h-full overflow-y-auto bg-[#f5f5f7] px-6 pb-8 pt-1">
     <div className="mx-auto w-full max-w-[700px]">
-      {action && (
+      {(title || description || action) && (
         <div className="mb-5 flex items-end justify-between gap-4 pt-1">
+          {title || description ? (
+            <div className="min-w-0">
+              {title ? (
+                <div className="truncate text-[28px] font-bold tracking-normal text-[#1d1d1f]">
+                  {title}
+                </div>
+              ) : null}
+              {description ? (
+                <div className="mt-1 text-sm font-medium leading-5 text-[#6e6e73]">
+                  {description}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <div className="shrink-0">{action}</div>
         </div>
       )}

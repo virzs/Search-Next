@@ -39,6 +39,8 @@ const writeWidgetStorageMap = (
   }
 };
 
+const getUtf8ByteSize = (value: string) => new TextEncoder().encode(value).length;
+
 export const migrateLegacyWidgetStorage = (
   widgetId: string,
   storage: Storage = localStorage,
@@ -97,6 +99,41 @@ export const readWidgetStorageMap = (
 ) => {
   migrateLegacyWidgetStorage(widgetId, storage);
   return safeParseMap(storage.getItem(getWidgetStorageKey(widgetId)));
+};
+
+export const getWidgetStorageStats = (
+  widgetId: string,
+  storage: Storage = localStorage,
+) => {
+  const values = readWidgetStorageMap(widgetId, storage);
+  const serialized = JSON.stringify(values);
+  const valueBytes = Object.values(values).reduce(
+    (sum, value) => sum + getUtf8ByteSize(value),
+    0,
+  );
+  return {
+    key: getWidgetStorageKey(widgetId),
+    keyCount: Object.keys(values).length,
+    byteSize: getUtf8ByteSize(serialized),
+    valueBytes,
+    values,
+  };
+};
+
+export const formatWidgetStorageSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+};
+
+export const clearWidgetStorage = (
+  widgetId: string,
+  storage: Storage = localStorage,
+) => {
+  migrateLegacyWidgetStorage(widgetId, storage);
+  const values = readWidgetStorageMap(widgetId, storage);
+  storage.removeItem(getWidgetStorageKey(widgetId));
+  return Object.keys(values);
 };
 
 export const getWidgetStorageItem = (

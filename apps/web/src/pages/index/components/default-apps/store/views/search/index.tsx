@@ -17,11 +17,12 @@ import { useWidget } from "@/hooks/useWidget";
 import type { WidgetApiItem } from "@/types";
 import { css } from "@emotion/css";
 
-type SearchKind = "all" | "website" | "widget";
+type SearchKind = "all" | "website" | "app" | "widget";
 
 const SEARCH_KIND_OPTIONS = [
   { label: "全部", value: "all" },
   { label: "网站", value: "website" },
+  { label: "应用", value: "app" },
   { label: "小组件", value: "widget" },
 ];
 
@@ -59,6 +60,9 @@ const getWidgetDefaultSizeId = (item: WidgetApiItem) =>
   item.defaultSizeId ??
   item.sizeConfigs?.[0]?.id ??
   "2x2";
+
+const supportsAppMode = (item: WidgetApiItem) =>
+  Boolean(item.configSnapshot?.supportAppMode ?? item.supportAppMode);
 
 const matchesQuery = (item: any, query: string) => {
   const q = query.trim().toLowerCase();
@@ -165,6 +169,63 @@ const WidgetResultCard = ({
   </article>
 );
 
+const AppResultCard = ({
+  item,
+  iconUrl,
+  onAdd,
+}: {
+  item: WidgetApiItem;
+  iconUrl?: string | null;
+  onAdd?: (widget: WidgetApiItem) => void;
+}) => (
+  <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
+    <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
+      {iconUrl ? (
+        <img
+          src={iconUrl}
+          alt={item.name}
+          className="h-full w-full object-contain p-2.5"
+          loading="lazy"
+        />
+      ) : (
+        <RiApps2Line size={22} />
+      )}
+    </div>
+    <div className="min-w-0 flex-1">
+      <div className="truncate text-sm font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
+        {item.name}
+      </div>
+      <div className="mt-1 line-clamp-2 text-xs font-medium leading-5 text-gray-500 dark:text-gray-400">
+        {item.description}
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
+          应用
+        </Tag>
+        {getWidgetTags(item)
+          .slice(0, 3)
+          .map((tag) => (
+            <Tag
+              key={tag}
+              className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!"
+            >
+              {tag}
+            </Tag>
+          ))}
+      </div>
+    </div>
+    <Button
+      type="primary"
+      size="small"
+      shape="round"
+      className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
+      onClick={() => onAdd?.(item)}
+    >
+      获取
+    </Button>
+  </article>
+);
+
 const StoreSearchView = () => {
   const { query, setQuery, onAddWebsite, onAddWidget } =
     useAppRouteContext<StoreOutletContext>();
@@ -174,12 +235,15 @@ const StoreSearchView = () => {
     devModeEnabled,
     loading: widgetLoading,
     addToDesktop,
+    addAppToDesktop,
     getIconUrl,
+    getAppIconUrl,
   } = useWidget();
   const [kind, setKind] = useState<SearchKind>("all");
   const navigate = useNavigate();
   const normalizedQuery = query.trim();
   const showWebsites = kind === "all" || kind === "website";
+  const showApps = kind === "all" || kind === "app";
   const showWidgets = kind === "all" || kind === "widget";
   const shouldSearchWebsites = showWebsites && Boolean(normalizedQuery);
 
@@ -224,6 +288,7 @@ const StoreSearchView = () => {
               sizeConfigs: item.sizeConfigs,
               defaultSizeId: item.defaultSizeId,
               supportIconMode: false,
+              supportAppMode: false,
               tags: ["开发者"],
               sortOrder: 0,
             }) as WidgetApiItem,
@@ -239,12 +304,22 @@ const StoreSearchView = () => {
       .slice(0, SEARCH_PAGE_SIZE);
   }, [normalizedQuery, searchableWidgets]);
 
+  const appResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return (widgets ?? [])
+      .filter(supportsAppMode)
+      .filter((item) => matchesQuery(item, normalizedQuery))
+      .slice(0, SEARCH_PAGE_SIZE);
+  }, [normalizedQuery, widgets]);
+
   const resultCount =
     (showWebsites ? websiteResults.length : 0) +
+    (showApps ? appResults.length : 0) +
     (showWidgets ? widgetResults.length : 0);
   const searching =
     Boolean(normalizedQuery) &&
-    ((showWebsites && websiteLoading) || (showWidgets && widgetLoading));
+    ((showWebsites && websiteLoading) ||
+      ((showApps || showWidgets) && widgetLoading));
 
   const openWebsiteDetail = (item: any) => {
     setQuery("");
@@ -260,6 +335,11 @@ const StoreSearchView = () => {
 
   const handleAddWidget = (item: WidgetApiItem, sizeId?: string) => {
     addToDesktop(item._id, sizeId ? { sizeId } : undefined);
+    onAddWidget?.(item._id);
+  };
+
+  const handleAddApp = (item: WidgetApiItem) => {
+    addAppToDesktop(item._id);
     onAddWidget?.(item._id);
   };
 
@@ -329,10 +409,39 @@ const StoreSearchView = () => {
             </ResultSection>
           ) : null}
 
-          {showWidgets && widgetLoading ? (
+          {(showApps || showWidgets) && widgetLoading ? (
             <div className="flex min-h-32 items-center justify-center">
               <Spin />
             </div>
+          ) : null}
+
+          {showApps && appResults.length > 0 ? (
+            <ResultSection
+              title="应用"
+              count={appResults.length}
+              action={
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<RiArrowRightUpLine size={15} />}
+                  className="apple-link"
+                  onClick={() => navigateFromSearch(storeRoute.path.app)}
+                >
+                  查看应用
+                </Button>
+              }
+            >
+              <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                {appResults.map((item) => (
+                  <AppResultCard
+                    key={item._id}
+                    item={item}
+                    iconUrl={getAppIconUrl(item)}
+                    onAdd={handleAddApp}
+                  />
+                ))}
+              </div>
+            </ResultSection>
           ) : null}
 
           {showWidgets && widgetResults.length > 0 ? (

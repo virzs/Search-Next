@@ -10,6 +10,16 @@ export type WidgetDocument = Widget & Document;
 
 export const WidgetName = 'Widget';
 
+const WidgetAppIconSchema = {
+  type: { type: String, enum: ['image', 'custom'], required: true },
+  src: { type: String },
+};
+
+const WidgetPagePathsSchema = {
+  _id: false,
+  settings: { type: String },
+};
+
 const WidgetScreenshotSchema = {
   mode: { type: String },
   themeId: { type: String, required: true },
@@ -116,6 +126,20 @@ export class Widget extends BaseSchema {
   // 是否支持图标模式（在桌面上显示为小图标）
   @Prop({ type: Boolean, default: false })
   supportIconMode: boolean;
+
+  // 是否支持作为应用添加到桌面
+  @Prop({ type: Boolean, default: false })
+  supportAppMode: boolean;
+
+  // 应用图标配置。image 使用 appIconUrl/custom 使用入口 appIcon 模式渲染
+  @Prop({ type: WidgetAppIconSchema })
+  appIcon?: { type: 'image' | 'custom'; src?: string };
+
+  @Prop({ type: String })
+  appIconUrl?: string;
+
+  @Prop({ type: WidgetPagePathsSchema })
+  pagePaths?: { settings?: string };
 
   // 标签列表，用于搜索和分类
   @Prop({ type: [String], default: [] })

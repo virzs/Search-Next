@@ -1,11 +1,12 @@
-import React, { createContext, ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRequest } from "ahooks";
 import {
   getPublicWidgets,
   buildWidgetEntryUrl,
   getWidgetIconUrl,
+  getWidgetAppIconUrl,
 } from "@/services/widget";
-import type { WidgetApiItem, WidgetPagePaths, WidgetSettingsField, WidgetSizeConfig } from "@/types";
+import type { WidgetApiItem, WidgetAppIcon, WidgetPagePaths, WidgetSettingsField, WidgetSizeConfig } from "@/types";
 import {
   DEV_MODE_STORAGE_KEY,
   DEV_WIDGETS_STORAGE_KEY,
@@ -28,24 +29,32 @@ type DesktopItemForWidget = {
   config?: {
     sizeId?: string;
   };
-    data: {
+  data: {
+    name: string;
+    icon?: string;
+    widgetConfig?: {
+      id: string;
       name: string;
-      widgetConfig: {
-        id: string;
-        name: string;
-        entry: string;
-        props: { title: string };
-        settingsSchema?: WidgetSettingsField[];
-        defaultSizeId?: string;
-        pagePaths?: WidgetPagePaths;
-        pages?: WidgetPagePaths;
-        settingsPagePath?: string;
-        settingsPath?: string;
-        settingsPage?: string;
-        customSettings?: boolean;
-      };
+      entry: string;
+      props: { title: string };
+      settingsSchema?: WidgetSettingsField[];
+      defaultSizeId?: string;
+      pagePaths?: WidgetPagePaths;
+      pages?: WidgetPagePaths;
+      settingsPagePath?: string;
+      settingsPath?: string;
+      settingsPage?: string;
+      customSettings?: boolean;
+      supportAppMode?: boolean;
+      appIcon?: WidgetAppIcon;
+      appIconUrl?: string | null;
+      sourceType?: "legacy" | "snwidget";
+      version?: string;
+      author?: string;
+      description?: string;
     };
   };
+};
 
 interface LegacyDesktopRefLike {
   state: {
@@ -75,9 +84,12 @@ interface WidgetContextValue {
   refresh: () => Promise<void>;
   /** 添加小组件到桌面（允许重复添加） */
   addToDesktop: (widgetId: string, options?: AddWidgetToDesktopOptions) => void;
+  /** 以应用图标形式添加到桌面（固定1x1，点击打开full模式） */
+  addAppToDesktop: (widgetId: string) => void;
   getWidgetById: (widgetId: string) => WidgetApiItem | undefined;
   getEntryUrl: (widget: WidgetApiItem) => string | null;
   getIconUrl: (widget: WidgetApiItem) => string | null;
+  getAppIconUrl: (widget: WidgetApiItem) => string | null;
   /** 注册 Desktop ref，使 addToDesktop 可直接操控桌面 */
   registerDesktopRef: (
     ref: React.RefObject<DesktopRefLike | null>,
@@ -142,7 +154,11 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     data: widgets,
     loading,
     runAsync: runWidgets,
-  } = useRequest(getPublicWidgets, { manual: false });
+  } = useRequest(getPublicWidgets, { manual: true });
+
+  useEffect(() => {
+    void runWidgets();
+  }, [runWidgets]);
 
   const refresh = useCallback(async () => {
     await runWidgets();
@@ -172,6 +188,10 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     const devMatch = devWidgetsRef.current.find((d) => d.id === widgetId);
     let entryUrl: string | null = null;
     let widgetName: string;
+    let description: string | undefined;
+    let version: string | undefined;
+    let author: string | undefined;
+    let sourceType: "legacy" | "snwidget" | undefined;
     let settingsSchema: WidgetSettingsField[] | undefined;
     let defaultSizeId = "2x2";
     let pagePaths: WidgetPagePaths | undefined;
@@ -180,6 +200,9 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     let settingsPath: string | undefined;
     let settingsPage: string | undefined;
     let customSettings = false;
+    let supportAppMode = false;
+    let appIcon: WidgetAppIcon | undefined;
+    let appIconUrl: string | null = null;
 
     if (devMatch) {
       entryUrl = devMatch.entry;
@@ -190,6 +213,10 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
       if (!widget) return null;
       entryUrl = buildWidgetEntryUrl(widget);
       widgetName = widget.name;
+      description = widget.description;
+      version = (widget.configSnapshot?.version as string | undefined) ?? widget.version;
+      author = (widget.configSnapshot?.author as string | undefined) ?? widget.author;
+      sourceType = widget.sourceType;
       settingsSchema = widget.configSnapshot?.settingsSchema || widget.settingsSchema;
       defaultSizeId = options?.sizeId || widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2";
       pagePaths = widget.configSnapshot?.pagePaths ?? widget.pagePaths;
@@ -204,6 +231,9 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
       settingsPath = widget.configSnapshot?.settingsPath ?? widget.settingsPath;
       settingsPage = widget.configSnapshot?.settingsPage ?? widget.settingsPage;
       customSettings = Boolean(widget.configSnapshot?.customSettings ?? widget.customSettings);
+      supportAppMode = Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode);
+      appIcon = widget.configSnapshot?.appIcon ?? widget.appIcon;
+      appIconUrl = getWidgetAppIconUrl(widget);
     }
 
     if (!entryUrl) return null;
@@ -229,6 +259,61 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
           settingsPath,
           settingsPage,
           customSettings,
+          supportAppMode,
+          appIcon,
+          appIconUrl,
+          sourceType,
+          version,
+          author,
+          description,
+        },
+      },
+    };
+  }, []);
+
+  const buildDesktopAppItem = useCallback((widgetId: string) => {
+    const widget = (widgetsRef.current ?? []).find((w) => w._id === widgetId);
+    if (!widget) return null;
+    const entryUrl = buildWidgetEntryUrl(widget);
+    if (!entryUrl) return null;
+
+    const widgetName = widget.name;
+    const appIcon = widget.configSnapshot?.appIcon ?? widget.appIcon;
+    const appIconUrl = getWidgetAppIconUrl(widget);
+    const widgetType = `widget-app:${widgetId}`;
+    return {
+      id: generateDesktopWidgetInstanceId(`app:${widgetId}`),
+      type: "app",
+      dataType: widgetType,
+      data: {
+        name: widgetName,
+        ...(appIconUrl ? { icon: appIconUrl } : {}),
+        widgetConfig: {
+          id: widgetId,
+          name: widgetName,
+          entry: entryUrl,
+          props: { title: widgetName },
+          settingsSchema: widget.configSnapshot?.settingsSchema || widget.settingsSchema,
+          defaultSizeId: widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2",
+          pagePaths: widget.configSnapshot?.pagePaths ?? widget.pagePaths,
+          pages: widget.configSnapshot?.pages ?? widget.pages,
+          settingsPagePath:
+            widget.configSnapshot?.settingsPagePath ??
+            widget.configSnapshot?.settingsPath ??
+            widget.configSnapshot?.settingsPage ??
+            widget.settingsPagePath ??
+            widget.settingsPath ??
+            widget.settingsPage,
+          settingsPath: widget.configSnapshot?.settingsPath ?? widget.settingsPath,
+          settingsPage: widget.configSnapshot?.settingsPage ?? widget.settingsPage,
+          customSettings: Boolean(widget.configSnapshot?.customSettings ?? widget.customSettings),
+          supportAppMode: Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode),
+          appIcon,
+          appIconUrl,
+          sourceType: widget.sourceType,
+          version: (widget.configSnapshot?.version as string | undefined) ?? widget.version,
+          author: (widget.configSnapshot?.author as string | undefined) ?? widget.author,
+          description: widget.description,
         },
       },
     };
@@ -251,6 +336,22 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     }
   }, [buildDesktopItem]);
 
+  const addAppToDesktop = useCallback((widgetId: string) => {
+    const desktop = desktopRefInternal.current?.current;
+    if (!desktop) return;
+    const desktopItem = buildDesktopAppItem(widgetId);
+    if (!desktopItem) return;
+
+    if (addDesktopItemRef.current) {
+      addDesktopItemRef.current?.(desktopItem);
+      return;
+    }
+
+    if ("state" in desktop) {
+      desktop.state.addItem(desktopItem, []);
+    }
+  }, [buildDesktopAppItem]);
+
   const getWidgetById = useCallback(
     (widgetId: string): WidgetApiItem | undefined => {
       const backendMatch = (widgetsRef.current ?? []).find((w) => w._id === widgetId);
@@ -266,6 +367,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
           sizeConfigs: devMatch.sizeConfigs,
           defaultSizeId: devMatch.defaultSizeId,
           supportIconMode: false,
+          supportAppMode: false,
           tags: ["开发者"],
           sortOrder: 0,
         } as WidgetApiItem;
@@ -348,9 +450,11 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
       loading,
       refresh,
       addToDesktop,
+      addAppToDesktop,
       getWidgetById,
       getEntryUrl: buildWidgetEntryUrl,
       getIconUrl: getWidgetIconUrl,
+      getAppIconUrl: getWidgetAppIconUrl,
       registerDesktopRef,
 
       devModeEnabled,
@@ -362,7 +466,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
       getDevWidgetById,
     }),
     [
-      widgetList, loading, refresh, addToDesktop, getWidgetById,
+      widgetList, loading, refresh, addToDesktop, addAppToDesktop, getWidgetById,
       registerDesktopRef,
       devModeEnabled, toggleDevMode, devWidgets,
       addDevWidget, updateDevWidget, removeDevWidget, getDevWidgetById,

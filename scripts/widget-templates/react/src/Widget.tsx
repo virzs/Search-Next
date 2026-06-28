@@ -11,7 +11,7 @@ const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
     return sdk.onThemeChange((theme) => setThemeId(theme.activeThemeId));
   }, [sdk]);
 
-  const isIcon = mode === "icon";
+  const isIcon = mode === "icon" || mode === "appIcon";
   const isSettings = mode === "settings";
   const shellClassName = cn(
     "tw:box-border tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-center tw:gap-2 tw:overflow-hidden tw:rounded-2xl tw:p-[14px]",
@@ -30,7 +30,7 @@ const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
         <p className="tw:m-0 tw:text-[13px] tw:leading-normal tw:opacity-80">
           {isSettings
             ? "这是由小组件自行渲染的设置页。可通过 props.sdk.storage 保存偏好。"
-            : "通过 props.sdk 获取宿主能力，支持 icon/full/settings 三种模式。"}
+            : "通过 props.sdk 获取宿主能力，支持 icon/appIcon/full/settings 模式。"}
         </p>
       )}
       {!isIcon && (
