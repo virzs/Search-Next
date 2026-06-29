@@ -30,14 +30,32 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   createSdk,
 }) => {
   const [viewMode, setViewMode] = useState<"full" | "settings">("full");
+  const [widgetBackVisible, setWidgetBackVisible] = useState(false);
 
   useEffect(() => {
-    if (visible) setViewMode("full");
+    if (visible) {
+      setViewMode("full");
+      setWidgetBackVisible(false);
+    }
   }, [config.entry, visible]);
 
   const settingsRoutePath = widgetConfig?.pagePaths?.settings;
-  const hasSettings = Boolean(widgetConfig?.id && settingsRoutePath);
   const widgetTitle = title || widgetConfig?.name || "小组件";
+  const isPipeLinkWidget = [
+    widgetTitle,
+    widgetConfig?.name,
+    widgetConfig?.entry,
+    config.entry,
+  ]
+    .filter(Boolean)
+    .some(
+      (value) =>
+        String(value).includes("pipe-link") ||
+        String(value).includes("管道连线"),
+    );
+  const hasSettings = Boolean(
+    widgetConfig?.id && settingsRoutePath && !isPipeLinkWidget,
+  );
   const contentHeight = typeof height === "number" ? height : undefined;
   const windowHeight = typeof height === "number" ? height + 46 : height;
   const currentSdk = useMemo(() => {
@@ -72,23 +90,62 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
     [config, currentSdk, settingsRoutePath, widgetTitle],
   );
 
+  useEffect(() => {
+    if (
+      !visible ||
+      !isPipeLinkWidget ||
+      viewMode !== "full" ||
+      !currentSdk?.events
+    ) {
+      setWidgetBackVisible(false);
+      return undefined;
+    }
+
+    const handler = (payload: unknown) => {
+      if (!payload || typeof payload !== "object") return;
+      const data = payload as { widgetId?: string; backVisible?: unknown };
+      if (data.widgetId && data.widgetId !== currentSdk.widgetId) return;
+      if (typeof data.backVisible === "boolean") {
+        setWidgetBackVisible(data.backVisible);
+      }
+    };
+
+    currentSdk.events.on("widget:chrome", handler);
+    return () => currentSdk.events.off("widget:chrome", handler);
+  }, [currentSdk, isPipeLinkWidget, viewMode, visible]);
+
+  const showBackButton =
+    viewMode === "settings" || (isPipeLinkWidget && widgetBackVisible);
+  const handleHeaderBack = () => {
+    if (viewMode === "settings") {
+      setViewMode("full");
+      return;
+    }
+    currentSdk?.events.emit("widget:title-back", {
+      widgetId: currentSdk.widgetId,
+    });
+  };
+
   return (
     <DesktopNextBaseModal
       visible={visible}
       onClose={onClose}
       width={typeof width === "number" ? width : undefined}
       destroyOnClose
+      styles={{
+        body: { padding: 0 },
+      }}
     >
       <div
-        className="flex w-full flex-col overflow-hidden rounded-[18px] bg-white/95 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.72)] backdrop-blur-xl"
+        className="flex w-full flex-col overflow-hidden bg-white/95 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.72)] backdrop-blur-xl"
         style={{ height: windowHeight }}
       >
-        <div className="grid h-[46px] flex-none grid-cols-[92px_1fr_92px] items-center border-b border-black/5 bg-white/90 px-3">
+        <div className="grid h-[42px] flex-none grid-cols-[92px_1fr_92px] items-center border-b border-black/5 bg-white/90 px-2">
           <div className="flex items-center justify-start">
-            {viewMode === "settings" && (
+            {showBackButton && (
               <button
                 type="button"
-                onClick={() => setViewMode("full")}
+                onClick={handleHeaderBack}
                 className="inline-flex h-8 cursor-pointer items-center gap-0.5 rounded-full border-0 bg-transparent px-2 text-[13px] font-medium text-[#007aff] hover:bg-[#f2f2f7]"
               >
                 <RiArrowLeftSLine size={18} />
