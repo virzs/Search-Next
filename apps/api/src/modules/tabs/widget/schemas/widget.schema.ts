@@ -10,10 +10,13 @@ export type WidgetDocument = Widget & Document;
 
 export const WidgetName = 'Widget';
 
-const WidgetAppIconSchema = {
-  type: { type: String, enum: ['image', 'custom'], required: true },
-  src: { type: String },
-};
+const WidgetAppIconSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ['image', 'custom'], required: true },
+    src: { type: String },
+  },
+  { _id: false },
+);
 
 const WidgetPagePathsSchema = {
   _id: false,

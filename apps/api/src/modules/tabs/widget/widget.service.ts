@@ -265,7 +265,13 @@ export class WidgetService {
       user,
     );
 
-    return { widget: publishedWidget, version: versionDoc };
+    const responseWidget = await this.withPublicResponseFields(
+      (typeof (publishedWidget as any).toObject === 'function'
+        ? (publishedWidget as any).toObject()
+        : publishedWidget) as WidgetPublicResponse,
+    );
+
+    return { widget: responseWidget, version: versionDoc };
   }
 
   async publishVersion(widgetId: string, versionId: string, user?: string) {

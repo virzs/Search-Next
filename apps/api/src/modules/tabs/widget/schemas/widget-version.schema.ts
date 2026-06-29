@@ -9,10 +9,13 @@ export type WidgetVersionDocument = WidgetVersion & Document;
 
 export const WidgetVersionName = 'WidgetVersion';
 
-const WidgetAppIconSchema = {
-  type: { type: String, enum: ['image', 'custom'], required: true },
-  src: { type: String },
-};
+const WidgetAppIconSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ['image', 'custom'], required: true },
+    src: { type: String },
+  },
+  { _id: false },
+);
 
 const WidgetScreenshotSchema = {
   mode: { type: String },

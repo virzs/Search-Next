@@ -158,21 +158,36 @@ const WidgetScreenshotPreview: FC<{ screenshots?: WidgetScreenshot[] }> = ({ scr
   );
 };
 
+const getConfigStringValue = (data: WidgetItem | undefined, key: string) => {
+  const value = getConfigValue(data, key);
+  return typeof value === "string" ? value : "";
+};
+
+const getConfigArrayValue = <T,>(data: WidgetItem | undefined, key: string): T[] | undefined => {
+  const value = getConfigValue(data, key);
+  return Array.isArray(value) ? value as T[] : undefined;
+};
+
+const getConfigBooleanValue = (data: WidgetItem | undefined, key: string) => {
+  const value = getConfigValue(data, key);
+  return typeof value === "boolean" ? value : undefined;
+};
+
 const buildFormValuesFromWidget = (widget: WidgetItem): Partial<WidgetItem> => ({
   ...widget,
-  name: widget.name,
-  description: widget.description,
-  version: widget.version || String(getConfigValue(widget, "version") || ""),
-  author: widget.author || String(getConfigValue(widget, "author") || ""),
-  entryFileName: widget.entryFileName || String(getConfigValue(widget, "entry") || ""),
-  sizeConfigs: widget.sizeConfigs,
-  defaultSizeId: widget.defaultSizeId,
-  supportIconMode: widget.supportIconMode,
-  supportAppMode: widget.supportAppMode,
+  name: widget.name || getConfigStringValue(widget, "displayName") || getConfigStringValue(widget, "name"),
+  description: widget.description || getConfigStringValue(widget, "description"),
+  version: widget.version || getConfigStringValue(widget, "version"),
+  author: widget.author || getConfigStringValue(widget, "author"),
+  entryFileName: widget.entryFileName || getConfigStringValue(widget, "entry"),
+  sizeConfigs: widget.sizeConfigs?.length ? widget.sizeConfigs : getConfigArrayValue(widget, "sizeConfigs"),
+  defaultSizeId: widget.defaultSizeId || getConfigStringValue(widget, "defaultSizeId"),
+  supportIconMode: widget.supportIconMode ?? getConfigBooleanValue(widget, "supportIconMode"),
+  supportAppMode: widget.supportAppMode ?? getConfigBooleanValue(widget, "supportAppMode"),
   appIcon: widget.appIcon || getConfigValue(widget, "appIcon") as WidgetItem["appIcon"],
-  appIconUrl: widget.appIconUrl || String(getConfigValue(widget, "appIconUrl") || ""),
-  tags: widget.tags,
-  settingsSchema: widget.settingsSchema,
+  appIconUrl: widget.appIconUrl || getConfigStringValue(widget, "appIconUrl"),
+  tags: widget.tags?.length ? widget.tags : getConfigArrayValue<string>(widget, "tags"),
+  settingsSchema: widget.settingsSchema?.length ? widget.settingsSchema : getConfigArrayValue<WidgetSettingsField>(widget, "settingsSchema"),
 });
 
 const getClassifyValue = (classify: WidgetItem["classify"] | any) => {
@@ -285,8 +300,9 @@ const WidgetHandle: FC = () => {
       setPackageMeta(widget);
       setFileNames([]);
       ref.current?.resetFields();
-      ref.current?.setFieldsValue(nextValues);
-      if (widget._id) detailRun(widget._id);
+      window.setTimeout(() => {
+        ref.current?.setFieldsValue(nextValues);
+      }, 0);
       message.success("已读取 .snwidget 配置并回填表单");
     },
   });
