@@ -603,6 +603,52 @@ importers:
         specifier: ^7.1.12
         version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
 
+  apps/widgets/pipe-link:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      kontra:
+        specifier: 10.0.2
+        version: 10.0.2
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
   apps/widgets/todo:
     dependencies:
       react:
@@ -7607,6 +7653,10 @@ packages:
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
+
+  kontra@10.0.2:
+    resolution: {integrity: sha512-NJfxmWtwDi1rWjj/fhOVwW4txjEVsDNgNNHNzc87YnsN7qZlZlkLQ0mWt7SN6WEAMH2KmX4evgL3Cmc2zVOXvQ==}
+    engines: {node: '>=14.0.0'}
 
   langium@3.3.1:
     resolution: {integrity: sha512-QJv/h939gDpvT+9SiLVlY7tZC3xB2qK57v0J04Sh9wpMb6MP1q8gB21L3WIo8T5P1MSMg3Ep14L7KkDCFG3y4w==}
@@ -19290,6 +19340,8 @@ snapshots:
   kind-of@6.0.3: {}
 
   kleur@4.1.5: {}
+
+  kontra@10.0.2: {}
 
   langium@3.3.1:
     dependencies:

@@ -1,0 +1,41 @@
+{
+  "name": "pipe-link",
+  "displayName": "管道连线",
+  "version": "0.1.0",
+  "description": "从起点穿过所有橙色节点并连接到终点的 2D 管道解谜游戏",
+  "author": "Search-Next",
+  "entry": "index.js",
+  "icon": "icon.svg",
+  "tags": ["游戏", "解谜", "管道", "键盘"],
+  "sizeConfigs": [
+    { "row": 4, "col": 4, "name": "4x4", "id": "4x4" },
+    { "row": 3, "col": 4, "name": "4x3", "id": "4x3" },
+    { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
+    { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
+  ],
+  "defaultSizeId": "4x4",
+  "supportIconMode": true,
+  "supportAppMode": true,
+  "appIcon": { "type": "image", "src": "icon.svg" },
+  "settingsSchema": [
+    {
+      "key": "showHints",
+      "label": "显示键盘提示",
+      "type": "switch",
+      "default": true,
+      "description": "在设置页显示 WASD / 方向键说明"
+    },
+    {
+      "key": "animation",
+      "label": "动画强度",
+      "type": "select",
+      "default": "normal",
+      "description": "控制路径高亮和管道脉冲动画",
+      "options": [
+        { "label": "低", "value": "low" },
+        { "label": "标准", "value": "normal" },
+        { "label": "高", "value": "high" }
+      ]
+    }
+  ]
+}

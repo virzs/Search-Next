@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0b4153"/>
+      <stop offset=".55" stop-color="#071a24"/>
+      <stop offset="1" stop-color="#051017"/>
+    </linearGradient>
+    <linearGradient id="tile" x1="0" y1="10" x2="0" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#55e6f5"/>
+      <stop offset="1" stop-color="#1497b6"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <rect x="8" y="8" width="48" height="48" rx="9" fill="#06202b" stroke="#2bcce5" stroke-opacity=".55" stroke-width="2"/>
+  <rect x="13" y="13" width="11" height="11" rx="3" fill="#3dffd2"/>
+  <rect x="26.5" y="13" width="11" height="11" rx="3" fill="url(#tile)"/>
+  <rect x="40" y="13" width="11" height="11" rx="3" fill="#f0a332"/>
+  <rect x="13" y="26.5" width="11" height="11" rx="3" fill="url(#tile)"/>
+  <rect x="26.5" y="26.5" width="11" height="11" rx="3" fill="#28363d"/>
+  <rect x="40" y="26.5" width="11" height="11" rx="3" fill="url(#tile)"/>
+  <rect x="13" y="40" width="11" height="11" rx="3" fill="#f0a332"/>
+  <rect x="26.5" y="40" width="11" height="11" rx="3" fill="url(#tile)"/>
+  <rect x="40" y="40" width="11" height="11" rx="3" fill="#36dfad"/>
+  <path d="M18.5 18.5H32V45.5H45.5" fill="none" stroke="#eaffff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 18.5V32" fill="none" stroke="#06202b" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M43.4 16.6l5 5M48.4 16.6l-5 5M15.6 43.4l5 5M20.6 43.4l-5 5" stroke="#261606" stroke-width="2.4" stroke-linecap="round"/>
+</svg>
