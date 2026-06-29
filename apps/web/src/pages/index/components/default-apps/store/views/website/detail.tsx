@@ -6,10 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
 import { css } from "@emotion/css";
-
-type StoreOutletContext = {
-  onAddWebsite?: (site: any) => void;
-};
+import type { StoreOutletContext } from "../../index";
 
 const websiteDetailClassName = css`
   .apple-store-action.ant-btn-primary {
@@ -23,7 +20,7 @@ const websiteDetailClassName = css`
 const WebsiteDetailView: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
+  const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
   const stateItem = (location.state as any)?.item ?? null;
   const itemRef = useRef<any>(stateItem);
   if (!itemRef.current && stateItem) itemRef.current = stateItem;
@@ -93,7 +90,7 @@ const WebsiteDetailView: FC = () => {
               type="primary"
               shape="round"
               className="apple-store-action h-8! px-5! font-bold!"
-              onClick={() => onAddWebsite?.(item)}
+              onClick={() => onAddStoreItem?.({ kind: "website", site: item })}
             >
               获取
             </Button>

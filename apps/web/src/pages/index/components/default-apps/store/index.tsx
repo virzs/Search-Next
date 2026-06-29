@@ -14,16 +14,26 @@ import { AppRoutedOverlay } from "@/components";
 import { storeRoute } from "./route-paths";
 import { useWidget } from "@/hooks/useWidget";
 
+export type StoreWebsitePayload = {
+  name?: string;
+  url?: string;
+  iconEdited?: { url?: string };
+  icon?: { url?: string };
+};
+
+export type StoreAddPayload =
+  | { kind: "website"; site: StoreWebsitePayload }
+  | { kind: "widget"; widgetId: string; sizeId?: string }
+  | { kind: "app"; widgetId: string };
+
 export type DesktopOutletContext = {
-  onAddWidget?: (widgetId: string) => void;
-  onAddWebsite?: (site: any) => void;
+  onAddStoreItem?: (payload: StoreAddPayload) => void;
 };
 
 export type StoreOutletContext = {
   query: string;
   setQuery: (value: string) => void;
-  onAddWidget?: (widgetId: string) => void;
-  onAddWebsite?: (site: any) => void;
+  onAddStoreItem?: (payload: StoreAddPayload) => void;
 };
 
 const buildStoreRouteContext = ({
@@ -35,8 +45,7 @@ const buildStoreRouteContext = ({
 }): StoreOutletContext => ({
   query: search.value,
   setQuery: search.setValue,
-  onAddWebsite: parentContext?.onAddWebsite,
-  onAddWidget: parentContext?.onAddWidget,
+  onAddStoreItem: parentContext?.onAddStoreItem,
 });
 
 const StoreModalRoute: FC = () => {

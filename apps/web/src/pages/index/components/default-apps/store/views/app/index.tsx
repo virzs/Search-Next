@@ -4,6 +4,7 @@ import { RiApps2Line } from "@remixicon/react";
 import { DefaultAppView } from "@/components";
 import { useWidget } from "@/hooks/useWidget";
 import type { WidgetApiItem } from "@/types";
+import type { StoreAddPayload } from "../../index";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import { css } from "@emotion/css";
@@ -63,16 +64,15 @@ const AppIconPreview: React.FC<AppIconPreviewProps> = ({
 };
 
 interface AppViewProps {
-  onAddWidget?: (widgetId: string) => void;
+  onAddStoreItem?: (payload: StoreAddPayload) => void;
   query?: string;
 }
 
-const AppView: React.FC<AppViewProps> = ({ onAddWidget, query }) => {
+const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
   const {
     widgets,
     loading,
     refresh,
-    addAppToDesktop,
     getAppIconUrl,
     getEntryUrl,
   } = useWidget();
@@ -94,8 +94,7 @@ const AppView: React.FC<AppViewProps> = ({ onAddWidget, query }) => {
   }, [query, widgets]);
 
   const handleAdd = (widget: WidgetApiItem) => {
-    addAppToDesktop(widget._id);
-    onAddWidget?.(widget._id);
+    onAddStoreItem?.({ kind: "app", widgetId: widget._id });
   };
 
   return (

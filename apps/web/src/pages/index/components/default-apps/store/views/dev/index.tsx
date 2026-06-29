@@ -13,11 +13,12 @@ import {
   RiEditLine,
 } from "@remixicon/react";
 import StoreHeroCard from "../../components/StoreHeroCard";
-import { DefaultAppView } from "@/components";
+import { DefaultAppView, useAppRouteContext } from "@/components";
 import { useWidget } from "@/hooks/useWidget";
 import type { DevWidget } from "@/contexts/WidgetContext";
 import DevWidgetModal, { toSizeConfigs } from "./dev-widget-modal";
 import type { DevWidgetFormValues } from "./dev-widget-modal";
+import type { StoreOutletContext } from "../../index";
 import { css } from "@emotion/css";
 
 const devViewClassName = css`
@@ -36,8 +37,8 @@ const DevView: React.FC = () => {
     addDevWidget,
     updateDevWidget,
     removeDevWidget,
-    addToDesktop,
   } = useWidget();
+  const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
 
   // 弹窗状态
   const [modalOpen, setModalOpen] = useState(false);
@@ -81,7 +82,7 @@ const DevView: React.FC = () => {
         message.warning("该入口地址已存在，请勿重复添加");
         return;
       }
-      addToDesktop(created.id);
+      onAddStoreItem?.({ kind: "widget", widgetId: created.id });
       message.success("已添加到桌面");
     }
   };
@@ -158,7 +159,9 @@ const DevView: React.FC = () => {
                           size="small"
                           shape="round"
                           className="apple-store-action font-bold!"
-                          onClick={() => addToDesktop(dw.id)}
+                          onClick={() =>
+                            onAddStoreItem?.({ kind: "widget", widgetId: dw.id })
+                          }
                         >
                           添加到桌面
                         </Button>

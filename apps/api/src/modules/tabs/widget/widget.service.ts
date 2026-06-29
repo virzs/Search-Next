@@ -56,7 +56,6 @@ type WidgetPackageConfig = {
   supportAppMode?: boolean;
   appIconUrl?: string;
   pagePaths?: WidgetPagePaths;
-  hasCustomSettings?: boolean;
   settingsEntry?: string;
   settingsSchema?: Record<string, unknown>[];
 };
@@ -646,7 +645,6 @@ export class WidgetService {
       supportAppMode,
       appIcon,
       pagePaths,
-      hasCustomSettings: config.hasCustomSettings ?? false,
       settingsEntry: config.settingsEntry,
       settingsSchema: config.settingsSchema ?? [],
     };
@@ -674,7 +672,6 @@ export class WidgetService {
       appIcon: config.appIcon,
       appIconUrl,
       pagePaths: config.pagePaths ?? null,
-      hasCustomSettings: config.hasCustomSettings ?? false,
       settingsEntry: config.settingsEntry,
       settingsSchema: config.settingsSchema ?? [],
       screenshots,
@@ -948,7 +945,6 @@ export class WidgetService {
       (this.isRecord(snapshot.pagePaths)
         ? (snapshot.pagePaths as WidgetPagePaths)
         : undefined);
-
     return {
       ...item,
       version: packageVersion ?? item.version,

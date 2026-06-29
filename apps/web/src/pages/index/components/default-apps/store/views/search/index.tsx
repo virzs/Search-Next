@@ -227,15 +227,13 @@ const AppResultCard = ({
 );
 
 const StoreSearchView = () => {
-  const { query, setQuery, onAddWebsite, onAddWidget } =
+  const { query, setQuery, onAddStoreItem } =
     useAppRouteContext<StoreOutletContext>();
   const {
     widgets,
     devWidgets,
     devModeEnabled,
     loading: widgetLoading,
-    addToDesktop,
-    addAppToDesktop,
     getIconUrl,
     getAppIconUrl,
   } = useWidget();
@@ -334,13 +332,11 @@ const StoreSearchView = () => {
   };
 
   const handleAddWidget = (item: WidgetApiItem, sizeId?: string) => {
-    addToDesktop(item._id, sizeId ? { sizeId } : undefined);
-    onAddWidget?.(item._id);
+    onAddStoreItem?.({ kind: "widget", widgetId: item._id, sizeId });
   };
 
   const handleAddApp = (item: WidgetApiItem) => {
-    addAppToDesktop(item._id);
-    onAddWidget?.(item._id);
+    onAddStoreItem?.({ kind: "app", widgetId: item._id });
   };
 
   return (
@@ -401,7 +397,9 @@ const StoreSearchView = () => {
                     item={item}
                     layout="grid"
                     variant="small"
-                    onAdd={onAddWebsite ?? (() => undefined)}
+                    onAdd={(site) =>
+                      onAddStoreItem?.({ kind: "website", site })
+                    }
                     onClick={openWebsiteDetail}
                   />
                 ))}

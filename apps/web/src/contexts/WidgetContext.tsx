@@ -40,11 +40,6 @@ type DesktopItemForWidget = {
       settingsSchema?: WidgetSettingsField[];
       defaultSizeId?: string;
       pagePaths?: WidgetPagePaths;
-      pages?: WidgetPagePaths;
-      settingsPagePath?: string;
-      settingsPath?: string;
-      settingsPage?: string;
-      customSettings?: boolean;
       supportAppMode?: boolean;
       appIcon?: WidgetAppIcon;
       appIconUrl?: string | null;
@@ -195,11 +190,6 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     let settingsSchema: WidgetSettingsField[] | undefined;
     let defaultSizeId = "2x2";
     let pagePaths: WidgetPagePaths | undefined;
-    let pages: WidgetPagePaths | undefined;
-    let settingsPagePath: string | undefined;
-    let settingsPath: string | undefined;
-    let settingsPage: string | undefined;
-    let customSettings = false;
     let supportAppMode = false;
     let appIcon: WidgetAppIcon | undefined;
     let appIconUrl: string | null = null;
@@ -220,17 +210,6 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
       settingsSchema = widget.configSnapshot?.settingsSchema || widget.settingsSchema;
       defaultSizeId = options?.sizeId || widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2";
       pagePaths = widget.configSnapshot?.pagePaths ?? widget.pagePaths;
-      pages = widget.configSnapshot?.pages ?? widget.pages;
-      settingsPagePath =
-        widget.configSnapshot?.settingsPagePath ??
-        widget.configSnapshot?.settingsPath ??
-        widget.configSnapshot?.settingsPage ??
-        widget.settingsPagePath ??
-        widget.settingsPath ??
-        widget.settingsPage;
-      settingsPath = widget.configSnapshot?.settingsPath ?? widget.settingsPath;
-      settingsPage = widget.configSnapshot?.settingsPage ?? widget.settingsPage;
-      customSettings = Boolean(widget.configSnapshot?.customSettings ?? widget.customSettings);
       supportAppMode = Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode);
       appIcon = widget.configSnapshot?.appIcon ?? widget.appIcon;
       appIconUrl = getWidgetAppIconUrl(widget);
@@ -254,11 +233,6 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
           settingsSchema,
           defaultSizeId,
           pagePaths,
-          pages,
-          settingsPagePath,
-          settingsPath,
-          settingsPage,
-          customSettings,
           supportAppMode,
           appIcon,
           appIconUrl,
@@ -296,17 +270,6 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
           settingsSchema: widget.configSnapshot?.settingsSchema || widget.settingsSchema,
           defaultSizeId: widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2",
           pagePaths: widget.configSnapshot?.pagePaths ?? widget.pagePaths,
-          pages: widget.configSnapshot?.pages ?? widget.pages,
-          settingsPagePath:
-            widget.configSnapshot?.settingsPagePath ??
-            widget.configSnapshot?.settingsPath ??
-            widget.configSnapshot?.settingsPage ??
-            widget.settingsPagePath ??
-            widget.settingsPath ??
-            widget.settingsPage,
-          settingsPath: widget.configSnapshot?.settingsPath ?? widget.settingsPath,
-          settingsPage: widget.configSnapshot?.settingsPage ?? widget.settingsPage,
-          customSettings: Boolean(widget.configSnapshot?.customSettings ?? widget.customSettings),
           supportAppMode: Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode),
           appIcon,
           appIconUrl,

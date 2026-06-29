@@ -10,10 +10,7 @@ import { DefaultAppView, useAppRouteContext } from "@/components";
 import WebsiteCard from "../../../components/WebsiteCard";
 import { getWebsiteId } from "../../../utils";
 import { storeRoute } from "../../../route-paths";
-
-type StoreOutletContext = {
-  onAddWebsite?: (site: any) => void;
-};
+import type { StoreOutletContext } from "../../../index";
 
 const SkeletonWebsiteGrid: React.FC<{ count: number }> = ({ count }) => {
   return (
@@ -38,7 +35,7 @@ const WebsiteCollectionRoute: FC = () => {
   const { id } = useParams();
   const collectionId = id ? decodeURIComponent(id) : "";
   const navigate = useNavigate();
-  const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
+  const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
 
@@ -93,7 +90,7 @@ const WebsiteCollectionRoute: FC = () => {
   );
 
   const handleAddFromCard = (item: any) => {
-    onAddWebsite?.(item);
+    onAddStoreItem?.({ kind: "website", site: item });
   };
 
   const handleOpenWebsiteDetail = (item: any) => {

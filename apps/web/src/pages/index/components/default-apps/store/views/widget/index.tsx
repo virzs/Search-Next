@@ -8,6 +8,7 @@ import type {
   WidgetScreenshot,
   WidgetSizeConfig,
 } from "@/types";
+import type { StoreAddPayload } from "../../index";
 import { toBackendAssetUrl } from "@/utils/utils";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import { css } from "@emotion/css";
@@ -148,12 +149,12 @@ const getScreenshotUrl = (screenshot?: WidgetScreenshot) =>
   screenshot?.url ? toBackendAssetUrl(screenshot.url) : "";
 
 interface WidgetViewProps {
-  onAddWidget?: (widgetId: string) => void;
+  onAddStoreItem?: (payload: StoreAddPayload) => void;
   query?: string;
 }
 
-const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
-  const { widgets, loading, refresh, addToDesktop, getIconUrl } = useWidget();
+const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
+  const { widgets, loading, refresh, getIconUrl } = useWidget();
   const [previewTheme, setPreviewTheme] = React.useState<PreviewTheme>("light");
 
   React.useEffect(() => {
@@ -171,8 +172,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddWidget, query }) => {
   }, [query, widgets]);
 
   const handleAdd = (widget: WidgetApiItem, sizeId?: string) => {
-    addToDesktop(widget._id, sizeId ? { sizeId } : undefined);
-    onAddWidget?.(widget._id);
+    onAddStoreItem?.({ kind: "widget", widgetId: widget._id, sizeId });
   };
 
   return (

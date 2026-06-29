@@ -46,7 +46,7 @@ const WebsiteGridSkeleton: React.FC<{ count: number }> = ({ count }) => (
 );
 
 const WebsiteView: React.FC = () => {
-  const { onAddWebsite } = useAppRouteContext<StoreOutletContext>();
+  const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
@@ -140,7 +140,7 @@ const WebsiteView: React.FC = () => {
   };
 
   const handleAddFromCard = (item: any) => {
-    onAddWebsite?.(item);
+    onAddStoreItem?.({ kind: "website", site: item });
   };
 
   const openCollection = (collectionId: string) => {
@@ -250,7 +250,7 @@ const WebsiteView: React.FC = () => {
       <AddWebsiteModal
         open={addVisible}
         onClose={() => setAddVisible(false)}
-        onAddWebsite={onAddWebsite}
+        onAdd={(site) => onAddStoreItem?.({ kind: "website", site })}
       />
     </DefaultAppView>
   );

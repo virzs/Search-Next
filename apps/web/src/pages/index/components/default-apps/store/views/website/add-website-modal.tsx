@@ -12,7 +12,7 @@ export type AddWebsitePayload = {
 export interface AddWebsiteModalProps {
   open: boolean;
   onClose: () => void;
-  onAddWebsite?: (site: AddWebsitePayload) => void;
+  onAdd?: (site: AddWebsitePayload) => void;
 }
 
 type AddWebsiteFormValues = {
@@ -24,7 +24,7 @@ type AddWebsiteFormValues = {
 const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
   open,
   onClose,
-  onAddWebsite,
+  onAdd,
 }) => {
   const [form] = Form.useForm<AddWebsiteFormValues>();
 
@@ -59,7 +59,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
               url: values.url,
               icon: values.iconUrl ? { url: values.iconUrl } : undefined,
             };
-            onAddWebsite?.(site);
+            onAdd?.(site);
             onClose();
             (form as any).resetFields();
           }}

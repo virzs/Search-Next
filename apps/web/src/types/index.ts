@@ -19,11 +19,6 @@ export interface WidgetConfig {
   settingsSchema?: WidgetSettingsField[];
   defaultSizeId?: string;
   pagePaths?: WidgetPagePaths;
-  pages?: WidgetPagePaths;
-  settingsPagePath?: string;
-  settingsPath?: string;
-  settingsPage?: string;
-  customSettings?: boolean;
   supportAppMode?: boolean;
   appIcon?: WidgetAppIcon;
   appIconUrl?: string | null;
@@ -114,11 +109,6 @@ export interface WidgetApiItem {
   sortOrder: number;
   settingsSchema?: WidgetSettingsField[]; // 设置表单Schema
   pagePaths?: WidgetPagePaths;
-  pages?: WidgetPagePaths;
-  settingsPagePath?: string;
-  settingsPath?: string;
-  settingsPage?: string;
-  customSettings?: boolean;
   sourceType?: 'legacy' | 'snwidget';
   packageName?: string;
   entryUrl?: string;
@@ -133,11 +123,6 @@ export interface WidgetApiItem {
     appIconUrl?: string | null;
     settingsSchema?: WidgetSettingsField[];
     pagePaths?: WidgetPagePaths;
-    pages?: WidgetPagePaths;
-    settingsPagePath?: string;
-    settingsPath?: string;
-    settingsPage?: string;
-    customSettings?: boolean;
     tags?: string[];
     version?: string;
     author?: string;

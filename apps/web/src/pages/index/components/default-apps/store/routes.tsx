@@ -12,13 +12,13 @@ import { storeRoute } from "./route-paths";
 import StoreSearchView from "./views/search";
 
 const WidgetRoute = () => {
-  const { query, onAddWidget } = useAppRouteContext<StoreOutletContext>();
-  return <WidgetView query={query} onAddWidget={onAddWidget} />;
+  const { query, onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
+  return <WidgetView query={query} onAddStoreItem={onAddStoreItem} />;
 };
 
 const AppRoute = () => {
-  const { query, onAddWidget } = useAppRouteContext<StoreOutletContext>();
-  return <AppView query={query} onAddWidget={onAddWidget} />;
+  const { query, onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
+  return <AppView query={query} onAddStoreItem={onAddStoreItem} />;
 };
 
 export const storeRoutes = {

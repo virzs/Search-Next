@@ -50,6 +50,7 @@ import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
 import { storeRoute } from "./components/default-apps/store/route-paths";
+import type { StoreAddPayload } from "./components/default-apps/store";
 import { personalizationRoute } from "./components/default-apps/personalization/route-paths";
 import {
   getMyThemeConfigs,
@@ -64,7 +65,11 @@ import { getPublicWidgetDetail } from "@/services/widget";
 import type { WidgetApiItem } from "@/types";
 
 type DesktopItem = DndSortItem<DesktopItemData>;
-type DesktopPage = DndPageItem<DesktopItemData>;
+type DesktopPage = DndPageItem<DesktopItemData> & {
+  type?: string;
+  config?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+};
 type DesktopNextHandleRef = {
   pages: DesktopPage[];
   currentPage: number;
@@ -74,6 +79,8 @@ type DesktopNextHandleRef = {
 type DesktopRootItem = {
   id: string | number;
   type?: string;
+  config?: Record<string, unknown>;
+  data?: Record<string, unknown>;
   children?: DesktopStorageItem[];
 };
 
@@ -126,8 +133,10 @@ const normalizeWidgetDesktopItem = (
 const normalizeWidgetDesktopList = (list: DesktopRootItem[]): DesktopPage[] =>
   list
     .filter((root) => root.id !== "dock")
-    .map((root) => ({
+    .map((root, index) => ({
       ...root,
+      id: root.id ?? `page-${index + 1}`,
+      type: root.type ?? "page",
       children: root.children?.map(normalizeWidgetDesktopItem) ?? [],
     }));
 
@@ -144,8 +153,35 @@ const hasDesktopRootsContent = (roots: DesktopRootItem[]): boolean =>
   roots.some((root) => hasDesktopChildren(root.children));
 
 const createEmptyDesktopPages = (): DesktopPage[] => [
-  { id: "page-1", children: [] },
+  { id: "page-1", type: "page", children: [] },
 ];
+
+const preserveDesktopPageMetadata = (
+  pages: DesktopPage[],
+  previousPages: DesktopPage[],
+): DesktopPage[] =>
+  pages.map((page, index) => {
+    const previous = previousPages[index];
+    return {
+      ...previous,
+      ...page,
+      id: previous?.id ?? page.id ?? `page-${index + 1}`,
+      type: page.type ?? previous?.type ?? "page",
+      config: page.config ?? previous?.config,
+      data: page.data ?? previous?.data,
+      children: page.children ?? [],
+    };
+  });
+
+const firstDefined = <T,>(...values: Array<T | null | undefined>) =>
+  values.find((value): value is T => value !== undefined && value !== null);
+
+const definedProps = <T extends Record<string, unknown>>(props: T) =>
+  Object.fromEntries(
+    Object.entries(props).filter(
+      ([, value]) => value !== undefined && value !== null,
+    ),
+  ) as Partial<T>;
 
 const normalizeHttpUrl = (rawUrl: string | undefined) => {
   if (!rawUrl) return null;
@@ -201,17 +237,18 @@ const persistDesktopStorage = (
   }
 
   const roots: DesktopRootItem[] = [
-    { id: "dock", children: dockItems },
-    ...nextPages,
+    { id: "dock", type: "dock", children: dockItems },
+    ...nextPages.map((page, index) => ({
+      ...page,
+      id: page.id ?? `page-${index + 1}`,
+      type: page.type ?? "page",
+    })),
   ];
   localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, JSON.stringify(roots));
 };
 
 const toDesktopNextPages = (list: DesktopRootItem[]): DesktopPage[] => {
-  const pages = normalizeWidgetDesktopList(list).map((root, index) => ({
-    id: root.id ?? `page-${index + 1}`,
-    children: root.children ?? [],
-  }));
+  const pages = normalizeWidgetDesktopList(list);
 
   return pages.length ? pages : createEmptyDesktopPages();
 };
@@ -230,10 +267,16 @@ function Index() {
   useState(migrateStoredWidgetDesktopList);
 
   const desktopRef = useRef<DesktopNextHandleRef>(null);
-  const desktopPagesRef = useRef<DesktopPage[]>(createEmptyDesktopPages());
+  const initialDesktopPagesRef = useRef<DesktopPage[] | null>(null);
+  if (!initialDesktopPagesRef.current) {
+    initialDesktopPagesRef.current = readStoredDesktopPages();
+  }
+  const desktopPagesRef = useRef<DesktopPage[]>(
+    initialDesktopPagesRef.current,
+  );
   const dockItemsRef = useRef<DesktopItem[]>(readStoredDockItems());
   const [desktopPages, setDesktopPages] = useState<DesktopPage[]>(
-    readStoredDesktopPages,
+    () => initialDesktopPagesRef.current ?? createEmptyDesktopPages(),
   );
   const [dockItems, setDockItems] = useState<DesktopItem[]>(
     () => dockItemsRef.current,
@@ -251,6 +294,8 @@ function Index() {
     devWidgets,
     getEntryUrl,
     getAppIconUrl,
+    addToDesktop,
+    addAppToDesktop,
     registerDesktopRef,
   } = useWidget();
 
@@ -392,6 +437,7 @@ function Index() {
     ): DesktopItemData["widgetConfig"] | undefined => {
       const entry = getEntryUrl(widget) || fallback?.entry;
       if (!entry) return fallback;
+      const snapshot = widget.configSnapshot;
 
       return {
         ...(fallback ?? {}),
@@ -402,38 +448,47 @@ function Index() {
           ...(fallback?.props ?? {}),
           title: widget.name,
         },
-        settingsSchema:
-          widget.configSnapshot?.settingsSchema || widget.settingsSchema,
-        defaultSizeId:
-          widget.configSnapshot?.defaultSizeId ||
-          widget.defaultSizeId ||
-          fallback?.defaultSizeId,
-        pagePaths: widget.configSnapshot?.pagePaths ?? widget.pagePaths,
-        pages: widget.configSnapshot?.pages ?? widget.pages,
-        settingsPagePath:
-          widget.configSnapshot?.settingsPagePath ??
-          widget.configSnapshot?.settingsPath ??
-          widget.configSnapshot?.settingsPage ??
-          widget.settingsPagePath ??
-          widget.settingsPath ??
-          widget.settingsPage,
-        settingsPath: widget.configSnapshot?.settingsPath ?? widget.settingsPath,
-        settingsPage: widget.configSnapshot?.settingsPage ?? widget.settingsPage,
-        customSettings: Boolean(
-          widget.configSnapshot?.customSettings ?? widget.customSettings,
-        ),
-        supportAppMode: Boolean(
-          widget.configSnapshot?.supportAppMode ?? widget.supportAppMode,
-        ),
-        appIcon: widget.configSnapshot?.appIcon ?? widget.appIcon,
-        appIconUrl:
-          getAppIconUrl(widget) ??
-          widget.configSnapshot?.appIconUrl ??
-          widget.appIconUrl,
-        sourceType: widget.sourceType,
-        version: widget.configSnapshot?.version ?? widget.version,
-        author: widget.configSnapshot?.author ?? widget.author,
-        description: widget.description,
+        ...definedProps({
+          settingsSchema: firstDefined(
+            snapshot?.settingsSchema,
+            widget.settingsSchema,
+            fallback?.settingsSchema,
+          ),
+          defaultSizeId: firstDefined(
+            snapshot?.defaultSizeId,
+            widget.defaultSizeId,
+            fallback?.defaultSizeId,
+          ),
+          pagePaths: firstDefined(
+            snapshot?.pagePaths,
+            widget.pagePaths,
+            fallback?.pagePaths,
+          ),
+          supportAppMode: firstDefined(
+            snapshot?.supportAppMode,
+            widget.supportAppMode,
+            fallback?.supportAppMode,
+          ),
+          appIcon: firstDefined(
+            snapshot?.appIcon,
+            widget.appIcon,
+            fallback?.appIcon,
+          ),
+          appIconUrl: firstDefined(
+            getAppIconUrl(widget),
+            snapshot?.appIconUrl,
+            widget.appIconUrl,
+            fallback?.appIconUrl,
+          ),
+          sourceType: firstDefined(widget.sourceType, fallback?.sourceType),
+          version: firstDefined(
+            snapshot?.version,
+            widget.version,
+            fallback?.version,
+          ),
+          author: firstDefined(snapshot?.author, widget.author, fallback?.author),
+          description: firstDefined(widget.description, fallback?.description),
+        }),
       };
     },
     [getAppIconUrl, getEntryUrl],
@@ -868,9 +923,11 @@ function Index() {
 
   const handleDesktopPagesChange = useCallback(
     (pages: DesktopPage[]) => {
-      const nextPages = pages.length ? pages : createEmptyDesktopPages();
       const previousPages = desktopPagesRef.current.length
         ? desktopPagesRef.current
+        : createEmptyDesktopPages();
+      const nextPages = pages.length
+        ? preserveDesktopPageMetadata(pages, previousPages)
         : createEmptyDesktopPages();
       const nextHasContent = hasDesktopPagesContent(nextPages);
       const previousHasContent = hasDesktopPagesContent(previousPages);
@@ -982,28 +1039,39 @@ function Index() {
     );
   }, [addItemToCurrentPage, registerDesktopRef, removeDesktopItemsByType]);
 
-  const handleAddWebsite = (site: {
-    name?: string;
-    url?: string;
-    iconEdited?: { url?: string };
-    icon?: { url?: string };
-  }) => {
-    const url = normalizeHttpUrl(site?.url);
-    const icon = site?.iconEdited?.url ?? site?.icon?.url;
-    if (!url) return;
-    const name = site?.name || url;
-    const appItem = {
-      id: uuidv4(),
-      type: "app",
-      data: {
-        name,
-        icon,
-        url,
-      },
-    };
-    addItemToCurrentPage(appItem);
-    message.success("添加成功");
-  };
+  const handleAddStoreItem = useCallback(
+    (payload: StoreAddPayload) => {
+      if (payload.kind === "website") {
+        const url = normalizeHttpUrl(payload.site?.url);
+        const icon = payload.site?.iconEdited?.url ?? payload.site?.icon?.url;
+        if (!url) return;
+        const name = payload.site?.name || url;
+        const appItem = {
+          id: uuidv4(),
+          type: "app",
+          data: {
+            name,
+            icon,
+            url,
+          },
+        };
+        addItemToCurrentPage(appItem);
+        message.success("添加成功");
+        return;
+      }
+
+      if (payload.kind === "app") {
+        addAppToDesktop(payload.widgetId);
+        return;
+      }
+
+      addToDesktop(
+        payload.widgetId,
+        payload.sizeId ? { sizeId: payload.sizeId } : undefined,
+      );
+    },
+    [addAppToDesktop, addItemToCurrentPage, addToDesktop, message],
+  );
 
   const handleContextMenuItemClick = useCallback(
     (item: DesktopItem, payload: ContextMenuActionPayload) => {
@@ -1018,41 +1086,28 @@ function Index() {
       if (!widgetId) return;
       const latestWidget = widgets.find((widget) => widget._id === widgetId);
       const latestDevWidget = devWidgets.find((widget) => widget.id === widgetId);
-      const latestConfig: DesktopItemData["widgetConfig"] | undefined = latestWidget
-        ? {
-            id: latestWidget._id,
-            name: latestWidget.name,
-            entry: getEntryUrl(latestWidget) ?? widgetConfig?.entry ?? "",
-            pagePaths: latestWidget.configSnapshot?.pagePaths ?? latestWidget.pagePaths,
-            pages: latestWidget.configSnapshot?.pages ?? latestWidget.pages,
-            settingsPagePath: latestWidget.configSnapshot?.settingsPagePath ?? latestWidget.settingsPagePath,
-            settingsPath: latestWidget.configSnapshot?.settingsPath ?? latestWidget.settingsPath,
-            settingsPage: latestWidget.configSnapshot?.settingsPage ?? latestWidget.settingsPage,
-            customSettings: Boolean(latestWidget.configSnapshot?.customSettings ?? latestWidget.customSettings),
-            supportAppMode: Boolean(latestWidget.configSnapshot?.supportAppMode ?? latestWidget.supportAppMode),
-            appIcon: latestWidget.configSnapshot?.appIcon ?? latestWidget.appIcon,
-            appIconUrl:
-              (typeof latestWidget.configSnapshot?.appIconUrl === "string"
-                ? latestWidget.configSnapshot.appIconUrl
-                : undefined) ??
-              latestWidget.appIconUrl ??
-              widgetConfig?.appIconUrl,
-            sourceType: latestWidget.sourceType,
-            version: (latestWidget.configSnapshot?.version as string | undefined) ?? latestWidget.version,
-            author: (latestWidget.configSnapshot?.author as string | undefined) ?? latestWidget.author,
-            description: latestWidget.description,
-          }
+      const latestConfig = latestWidget
+        ? createWidgetConfigFromApi(latestWidget, widgetConfig)
         : undefined;
 
       setInfoTarget({
         widgetId,
         widgetName:
-          latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
+          latestWidget?.name ??
+          latestDevWidget?.name ??
+          widgetConfig?.name ??
+          item.data?.name ??
+          "小组件",
         widgetConfig: {
           ...(widgetConfig ?? {}),
           ...(latestConfig ?? {}),
           id: widgetId,
-          name: latestWidget?.name ?? latestDevWidget?.name ?? widgetConfig?.name ?? item.data?.name ?? "小组件",
+          name:
+            latestWidget?.name ??
+            latestDevWidget?.name ??
+            widgetConfig?.name ??
+            item.data?.name ??
+            "小组件",
           entry:
             latestConfig?.entry ??
             latestDevWidget?.entry ??
@@ -1061,7 +1116,7 @@ function Index() {
         },
       });
     },
-    [devWidgets, getEntryUrl, widgets],
+    [createWidgetConfigFromApi, devWidgets, widgets],
   );
 
   return (
@@ -1212,7 +1267,7 @@ function Index() {
           }}
         />
       </div>
-      <Outlet context={{ onAddWebsite: handleAddWebsite }} />
+      <Outlet context={{ onAddStoreItem: handleAddStoreItem }} />
       {fullWidget && (
         <PureWidgetWindow
           visible={true}
