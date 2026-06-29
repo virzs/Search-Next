@@ -1,16 +1,23 @@
 import { Button } from "antd";
-import { useMemo, type CSSProperties } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
-import { RiLandscapeLine, RiPaletteLine, RiTShirtLine } from "@remixicon/react";
+import {
+  RiComputerLine,
+  RiLandscapeLine,
+  RiMoonLine,
+  RiSunLine,
+  RiTShirtLine,
+} from "@remixicon/react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
+import type { AppearanceMode } from "@/contexts/DesktopThemeContext";
 import { getActiveThemeConfigs } from "@/services/desktop";
+import { AppSegmented } from "@/components";
 import { getMyThemeConfigs } from "../../../personalization/my-assets";
 import { personalizationRoute } from "../../../personalization/route-paths";
 import {
   MacSettingsRow,
   MacSettingsSection,
-  MacSettingsValue,
   MacSettingsView,
 } from "../../components/macos-settings";
 
@@ -35,7 +42,12 @@ const resolveThemeName = (
 
 const PersonalizationView = () => {
   const navigate = useNavigate();
-  const { personalization } = useDesktopTheme();
+  const {
+    appearanceMode,
+    personalization,
+    resolvedColorScheme,
+    setAppearanceMode,
+  } = useDesktopTheme();
   const { data: themes } = useRequest(getActiveThemeConfigs);
 
   const activeTheme = useMemo(() => {
@@ -52,61 +64,36 @@ const PersonalizationView = () => {
     personalization.themeId,
   );
 
-  const wallpaperPreviewStyle = useMemo<CSSProperties>(() => {
-    const wallpaper = personalization.wallpaper;
-    if (wallpaper.type === "gradient") return { background: wallpaper.css };
-    if (wallpaper.type === "image") {
-      const safeUrl = (wallpaper.url || "").replace(/"/g, '\\"');
-      return {
-        backgroundImage: `url("${safeUrl}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      };
-    }
-    return {
-      background: "linear-gradient(135deg, #e7f5ff, #fff3ea 57%, #f5f0ff)",
-    };
-  }, [personalization.wallpaper]);
-
   return (
     <MacSettingsView>
-      <section className="rounded-[20px] border border-white/80 bg-white/80 p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div className="text-[13px] font-bold text-[#6e6e73]">桌面预览</div>
-          <div className="rounded-full bg-[#f2f2f7] px-2.5 py-1 text-xs font-bold text-[#6e6e73]">
-            {themeName} · {wallpaperName}
-          </div>
-        </div>
-        <div
-          className="relative h-32 overflow-hidden rounded-[15px] border border-[rgba(60,60,67,0.13)] p-3"
-          style={wallpaperPreviewStyle}
-        >
-          <div className="mx-auto mt-1 grid h-[62%] w-[54%] grid-rows-[22px_1fr] overflow-hidden rounded-xl border border-white/75 bg-white/90 shadow-[0_12px_24px_rgba(0,0,0,0.1)]">
-            <div className="flex items-center gap-1.5 border-b border-[rgba(60,60,67,0.1)] pl-3">
-              <span className="h-2 w-2 rounded-full bg-[#d1d1d6]" />
-              <span className="h-2 w-2 rounded-full bg-[#d1d1d6]" />
-              <span className="h-2 w-2 rounded-full bg-[#d1d1d6]" />
-            </div>
-            <div className="grid grid-cols-[1fr_1.15fr]">
-              <div className="border-r border-[rgba(60,60,67,0.08)]" />
-              <div />
-            </div>
-          </div>
-          <div className="absolute bottom-2.5 left-1/2 flex h-5 w-[144px] -translate-x-1/2 items-center justify-center gap-1.5 rounded-xl border border-white/70 bg-white/60 shadow-[0_8px_18px_rgba(0,0,0,0.08)]">
-            {["#0a84ff", "#ff9500", "#34c759", "#af52de", "#8e8e93"].map(
-              (color) => (
-                <span
-                  key={color}
-                  className="h-2.5 w-2.5 rounded-[4px]"
-                  style={{ background: color }}
-                />
-              ),
-            )}
-          </div>
-        </div>
-      </section>
-
       <MacSettingsSection title="外观">
+        <MacSettingsRow
+          icon={
+            appearanceMode === "dark" ? (
+              <RiMoonLine size={16} />
+            ) : appearanceMode === "light" ? (
+              <RiSunLine size={16} />
+            ) : (
+              <RiComputerLine size={16} />
+            )
+          }
+          iconTone="blue"
+          title="模式"
+          description={`当前为${resolvedColorScheme === "dark" ? "深色" : "浅色"}`}
+          extra={
+            <AppSegmented<AppearanceMode>
+              size="small"
+              value={appearanceMode}
+              onChange={setAppearanceMode}
+              options={[
+                { label: "跟随系统", value: "system" },
+                { label: "浅色", value: "light" },
+                { label: "深色", value: "dark" },
+              ]}
+            />
+          }
+        />
+
         <MacSettingsRow
           icon={<RiTShirtLine size={16} />}
           iconTone="orange"
@@ -146,27 +133,6 @@ const PersonalizationView = () => {
         />
       </MacSettingsSection>
 
-      <MacSettingsSection title="强调色">
-        <MacSettingsRow
-          icon={<RiPaletteLine size={16} />}
-          iconTone="blue"
-          title="颜色"
-          description="用于按钮、选中状态和高亮描边"
-          extra={<MacSettingsValue>蓝色</MacSettingsValue>}
-        />
-        <MacSettingsRow
-          title={
-            <div className="flex gap-2.5 py-1">
-              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#0a84ff] shadow-[0_0_0_2px_rgba(0,122,255,0.42)]" />
-              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#ff9500] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
-              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#34c759] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
-              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#af52de] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
-              <span className="h-[30px] w-[30px] rounded-full border-2 border-white bg-[#d1d1d6] shadow-[0_0_0_1px_rgba(60,60,67,0.15)]" />
-            </div>
-          }
-          extra={<MacSettingsValue>系统推荐</MacSettingsValue>}
-        />
-      </MacSettingsSection>
     </MacSettingsView>
   );
 };

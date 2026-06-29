@@ -287,7 +287,12 @@ function Index() {
   const { message } = App.useApp();
   const { coverGradientCss, user, isAuthenticated } = useAuth();
   const { userLimit } = useConfig();
-  const { activeThemeId, personalization } = useDesktopTheme();
+  const {
+    activeThemeId,
+    appearanceMode,
+    personalization,
+    resolvedColorScheme,
+  } = useDesktopTheme();
   const navigate = useNavigate();
   const {
     widgets,
@@ -301,9 +306,7 @@ function Index() {
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
   const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
-  const [preferDark, setPreferDark] = useState(() => {
-    return window.document.documentElement.dataset.theme === "dark";
-  });
+  const preferDark = resolvedColorScheme === "dark";
 
   useEffect(() => {
     const reloadMyThemes = () => setMyThemeConfigs(getMyThemeConfigs());
@@ -313,15 +316,6 @@ function Index() {
       window.removeEventListener("storage", reloadMyThemes);
       window.removeEventListener(MY_THEMES_CHANGED_EVENT, reloadMyThemes);
     };
-  }, []);
-
-  useEffect(() => {
-    const el = window.document.documentElement;
-    const update = () => setPreferDark(el.dataset.theme === "dark");
-    update();
-    const observer = new MutationObserver(update);
-    observer.observe(el, { attributes: true, attributeFilter: ["data-theme"] });
-    return () => observer.disconnect();
   }, []);
 
   const desktopTheme = useMemo(() => {
@@ -387,6 +381,8 @@ function Index() {
   /** 为指定小组件创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
   const sdkDepsRef = useRef({
     activeThemeId,
+    appearanceMode,
+    resolvedColorScheme,
     user,
     isAuthenticated,
     userLimit,
@@ -394,6 +390,8 @@ function Index() {
   });
   sdkDepsRef.current = {
     activeThemeId,
+    appearanceMode,
+    resolvedColorScheme,
     user,
     isAuthenticated,
     userLimit,
@@ -411,7 +409,12 @@ function Index() {
         widgetId,
         sizeId,
         mode,
-        theme: { activeThemeId: deps.activeThemeId },
+        theme: {
+          activeThemeId: deps.resolvedColorScheme,
+          desktopThemeId: deps.activeThemeId,
+          appearanceMode: deps.appearanceMode,
+          resolvedColorScheme: deps.resolvedColorScheme,
+        },
         user: deps.user
           ? {
               _id: deps.user._id,
@@ -623,8 +626,13 @@ function Index() {
 
   /** 当主题变化时通过事件总线广播，让所有小组件收到通知 */
   useEffect(() => {
-    sharedEventBus.emit("theme:change", { activeThemeId } as WidgetThemeInfo);
-  }, [activeThemeId]);
+    sharedEventBus.emit("theme:change", {
+      activeThemeId: resolvedColorScheme,
+      desktopThemeId: activeThemeId,
+      appearanceMode,
+      resolvedColorScheme,
+    } as WidgetThemeInfo);
+  }, [activeThemeId, appearanceMode, resolvedColorScheme]);
 
   /** 根据后端小组件数据动态构建 Desktop 的 typeConfigMap */
   const typeConfigMap = useMemo((): TypeConfigMap => {

@@ -2,7 +2,6 @@ import { Switch } from "antd";
 import { RiCodeSSlashLine, RiStore2Line } from "@remixicon/react";
 import { useWidget } from "@/hooks/useWidget";
 import {
-  MacSettingsHero,
   MacSettingsRow,
   MacSettingsSection,
   MacSettingsValue,
@@ -14,13 +13,6 @@ const DeveloperView = () => {
 
   return (
     <MacSettingsView>
-      <MacSettingsHero
-        icon={<RiCodeSSlashLine size={24} />}
-        tone="green"
-        title="开发者工具"
-        description="开启后可在应用商店侧边栏看到「开发者」入口。"
-      />
-
       <MacSettingsSection title="小组件开发">
         <MacSettingsRow
           icon={<RiCodeSSlashLine size={16} />}

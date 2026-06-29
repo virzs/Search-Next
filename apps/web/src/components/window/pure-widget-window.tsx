@@ -137,23 +137,23 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
       }}
     >
       <div
-        className="flex w-full flex-col overflow-hidden bg-white/95 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.72)] backdrop-blur-xl"
+        className="flex w-full flex-col overflow-hidden bg-white/95 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.72)] backdrop-blur-xl dark:bg-[#1c1c1e]/95 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
         style={{ height: windowHeight }}
       >
-        <div className="grid h-[42px] flex-none grid-cols-[92px_1fr_92px] items-center border-b border-black/5 bg-white/90 px-2">
+        <div className="grid h-[42px] flex-none grid-cols-[92px_1fr_92px] items-center border-b border-black/5 bg-white/90 px-2 dark:border-white/10 dark:bg-[#1c1c1e]/90">
           <div className="flex items-center justify-start">
             {showBackButton && (
               <button
                 type="button"
                 onClick={handleHeaderBack}
-                className="inline-flex h-8 cursor-pointer items-center gap-0.5 rounded-full border-0 bg-transparent px-2 text-[13px] font-medium text-[#007aff] hover:bg-[#f2f2f7]"
+                className="inline-flex h-8 cursor-pointer items-center gap-0.5 rounded-full border-0 bg-transparent px-2 text-[13px] font-medium text-[#007aff] hover:bg-[#f2f2f7] dark:hover:bg-white/10"
               >
                 <RiArrowLeftSLine size={18} />
                 返回
               </button>
             )}
           </div>
-          <div className="min-w-0 truncate text-center text-[13px] font-semibold text-[#424245]">
+          <div className="min-w-0 truncate text-center text-[13px] font-semibold text-[#424245] dark:text-[#f5f5f7]">
             {viewMode === "settings" ? `${widgetTitle} 设置` : widgetTitle}
           </div>
           <div className="flex items-center justify-end">
@@ -163,7 +163,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
                 aria-label="打开设置"
                 title="设置"
                 onClick={() => setViewMode("settings")}
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/5 bg-[#f5f5f7] text-[#1d1d1f] shadow-[0_4px_12px_rgba(0,0,0,0.10)] transition hover:bg-white"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/5 bg-[#f5f5f7] text-[#1d1d1f] shadow-[0_4px_12px_rgba(0,0,0,0.10)] transition hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-[#f5f5f7] dark:hover:bg-white/15"
               >
                 <RiSettings3Line size={17} />
               </button>

@@ -9,8 +9,14 @@ export interface WidgetEventBus {
 
 /** 小组件 SDK 主题信息 */
 export interface WidgetThemeInfo {
-  /** 当前主题 ID（如 'light', 'dark'） */
+  /** 当前生效色彩模式（兼容既有小组件：'light' 或 'dark'） */
   activeThemeId: string;
+  /** 桌面主题 ID */
+  desktopThemeId?: string;
+  /** 用户选择的外观模式 */
+  appearanceMode?: 'system' | 'light' | 'dark';
+  /** 当前生效色彩模式 */
+  resolvedColorScheme?: 'light' | 'dark';
 }
 
 /** 小组件 SDK 用户信息（只读） */

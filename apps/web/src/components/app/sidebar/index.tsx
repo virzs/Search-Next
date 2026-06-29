@@ -198,4 +198,70 @@ const appSidebarClassName = css`
   .ant-menu-item-selected::after {
     display: none;
   }
+
+  [data-theme="dark"] & {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(38, 38, 41, 0.9),
+        rgba(28, 28, 30, 0.84)
+      ),
+      rgba(28, 28, 30, 0.78);
+    border-right-color: rgba(235, 235, 245, 0.1);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.05);
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] & .app-sidebar-header,
+  [data-theme="dark"] & .app-sidebar-header [class*="text-gray-950"],
+  [data-theme="dark"] & .app-sidebar-header [class*="dark:text-gray-50"] {
+    color: #f5f5f7 !important;
+  }
+
+  [data-theme="dark"] & .app-sidebar-header [class*="text-gray-500"],
+  [data-theme="dark"] & .app-sidebar-header [class*="dark:text-gray-400"] {
+    color: rgba(235, 235, 245, 0.62) !important;
+  }
+
+  [data-theme="dark"] & .ant-input-affix-wrapper {
+    border-color: rgba(235, 235, 245, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 1px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  [data-theme="dark"] & .ant-input-affix-wrapper:hover,
+  [data-theme="dark"] & .ant-input-affix-wrapper-focused {
+    border-color: rgba(10, 132, 255, 0.5);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 0 0 3px rgba(10, 132, 255, 0.18),
+      inset 0 1px 1px rgba(0, 0, 0, 0.22);
+  }
+
+  [data-theme="dark"] & .ant-input {
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] & .ant-input::placeholder {
+    color: rgba(235, 235, 245, 0.48);
+  }
+
+  [data-theme="dark"] & .ant-menu-item {
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] & .ant-menu-item:hover {
+    background: rgba(235, 235, 245, 0.1) !important;
+    color: #ffffff !important;
+  }
+
+  [data-theme="dark"] & .ant-menu-item-selected {
+    background: rgba(255, 255, 255, 0.13) !important;
+    color: #ffffff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.24);
+  }
 `;

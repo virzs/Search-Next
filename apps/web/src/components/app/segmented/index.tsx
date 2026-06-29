@@ -57,8 +57,33 @@ const appSegmentedItemStyle: CSSProperties = {
 };
 
 const appSegmentedItemClassName = css`
+  color: rgba(60, 60, 67, 0.74);
+
   &.ant-segmented-item-selected {
     background: #ffffff;
+    color: #1d1d1f;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  }
+
+  [data-theme="dark"] .ant-segmented & {
+    color: rgba(235, 235, 245, 0.68);
+  }
+
+  [data-theme="dark"] .ant-segmented &:hover {
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] .ant-segmented &.ant-segmented-item-selected {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 1px 3px rgba(0, 0, 0, 0.28);
+  }
+
+  [data-theme="dark"] .ant-segmented
+    &.ant-segmented-item-selected
+    .ant-segmented-item-label {
+    color: #ffffff;
   }
 `;

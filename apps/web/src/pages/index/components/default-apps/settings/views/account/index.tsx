@@ -11,7 +11,6 @@ import {
 } from "@remixicon/react";
 import {
   MacSettingsChevron,
-  MacSettingsHero,
   MacSettingsRow,
   MacSettingsSection,
   MacSettingsValue,
@@ -19,12 +18,7 @@ import {
 } from "../../components/macos-settings";
 
 const AccountView = () => {
-  const {
-    user,
-    isAuthenticated,
-    logout,
-    coverGradientCss,
-  } = useAuth();
+  const { user, isAuthenticated, logout, coverGradientCss } = useAuth();
 
   const joinedAt = user?.createdAt
     ? format(user.createdAt, "yyyy-MM-dd")
@@ -32,12 +26,7 @@ const AccountView = () => {
 
   const renderUnloggedView = () => (
     <>
-      <MacSettingsHero
-        icon={<span className="font-black">S</span>}
-        title="登录 Search Next"
-        description="登录后可以同步桌面布局、网站、小组件和偏好设置。"
-      />
-      <MacSettingsSection title="账号">
+      <MacSettingsSection>
         <div className="px-6 py-6">
           <div className="mx-auto w-full max-w-[520px]">
             <UnloggedView
@@ -125,10 +114,7 @@ const AccountView = () => {
   };
 
   return (
-    <MacSettingsView
-      title="账号"
-      description="管理登录状态、同步身份和个人信息。"
-    >
+    <MacSettingsView>
       {isAuthenticated ? renderLoggedView() : renderUnloggedView()}
     </MacSettingsView>
   );

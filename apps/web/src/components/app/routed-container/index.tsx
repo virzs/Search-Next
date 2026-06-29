@@ -168,6 +168,10 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
         overlayProps?.contentClassName,
         css`
           background: #f5f5f7;
+
+          [data-theme="dark"] & {
+            background: #111113;
+          }
         `,
       )}
       open={overlayProps?.open ?? open}
@@ -285,5 +289,20 @@ const historyControlsClassName = css`
     opacity: 0.38;
     color: #6e6e73 !important;
     background: transparent !important;
+  }
+
+  [data-theme="dark"] & .app-history-button {
+    color: #d1d1d6 !important;
+  }
+
+  [data-theme="dark"] &
+    .app-history-button:not(:disabled):not(.ant-btn-disabled):hover {
+    background: rgba(235, 235, 245, 0.12) !important;
+    color: #f5f5f7 !important;
+  }
+
+  [data-theme="dark"] & .app-history-button:disabled,
+  [data-theme="dark"] & .app-history-button.ant-btn-disabled {
+    color: #8e8e93 !important;
   }
 `;

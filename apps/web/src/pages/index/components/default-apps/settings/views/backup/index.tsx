@@ -23,7 +23,6 @@ import {
   type UserDataSyncInfo,
 } from "@/services/user-data";
 import {
-  MacSettingsHero,
   MacSettingsRow,
   MacSettingsSection,
   MacSettingsValue,
@@ -550,16 +549,6 @@ const BackupView = () => {
   return (
     <div ref={modalRootRef} className="h-full">
       <MacSettingsView>
-        <MacSettingsHero
-          icon={<RiCloudLine size={24} />}
-          tone="purple"
-          title={isAuthenticated ? "同步与备份" : "本地备份"}
-          description={
-            isAuthenticated
-              ? "可导出本地备份，也可保存多个云备份版本。"
-              : "当前可导出和导入本地备份；登录后可使用云备份。"
-          }
-        />
         {isAuthenticated ? renderLoggedView() : renderUnloggedView()}
       </MacSettingsView>
     </div>

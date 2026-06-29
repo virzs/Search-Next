@@ -43,7 +43,9 @@ const DefaultAppViewHeader: FC<DefaultAppViewHeaderProps> = ({
     >
       <div className="min-w-0 flex-1">
         {title && (
-          <div className="ml-2 text-base font-bold leading-6">{title}</div>
+          <div className="ml-2 text-base font-bold leading-6 text-[#1d1d1f] dark:text-[#f5f5f7]">
+            {title}
+          </div>
         )}
         {headerLeft}
       </div>

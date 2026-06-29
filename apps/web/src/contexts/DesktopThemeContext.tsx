@@ -8,11 +8,16 @@ import React, {
 import { PERSONALIZATION_STORAGE_KEY } from "@/utils/storage";
 
 export type DesktopThemeId = string;
+export type AppearanceMode = "system" | "dark" | "light";
+export type ResolvedColorScheme = "dark" | "light";
 
 export interface DesktopThemeContextValue {
   personalization: PersonalizationConfig;
   activeThemeId: DesktopThemeId;
+  appearanceMode: AppearanceMode;
+  resolvedColorScheme: ResolvedColorScheme;
   setActiveThemeId: (id: DesktopThemeId) => void;
+  setAppearanceMode: (mode: AppearanceMode) => void;
   setWallpaper: (wallpaper: PersonalizationWallpaper | null) => void;
 }
 
@@ -27,24 +32,60 @@ export type PersonalizationWallpaper =
 
 export interface PersonalizationConfig {
   themeId: DesktopThemeId;
+  appearanceMode?: AppearanceMode;
   wallpaper: PersonalizationWallpaper;
   fontFamily?: string;
 }
+
+const defaultThemeId: DesktopThemeId = "light";
+const defaultAppearanceMode: AppearanceMode = "system";
+const defaultWallpaper: PersonalizationWallpaper = { type: "none", name: "无" };
 
 const isThemeId = (value: unknown): value is DesktopThemeId => {
   return typeof value === "string" && value.length > 0;
 };
 
+const isAppearanceMode = (value: unknown): value is AppearanceMode => {
+  return value === "system" || value === "dark" || value === "light";
+};
+
+const getSystemColorScheme = (): ResolvedColorScheme => {
+  if (
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-color-scheme: dark)").matches
+  ) {
+    return "dark";
+  }
+  return "light";
+};
+
+const resolveColorScheme = (
+  mode: AppearanceMode,
+  systemColorScheme: ResolvedColorScheme,
+): ResolvedColorScheme => {
+  return mode === "system" ? systemColorScheme : mode;
+};
+
+const persistPersonalization = (config: PersonalizationConfig) => {
+  try {
+    localStorage.setItem(PERSONALIZATION_STORAGE_KEY, JSON.stringify(config));
+  } catch {
+    void 0;
+  }
+};
+
 export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const defaultThemeId: DesktopThemeId = "light";
   const [personalization, setPersonalization] = useState<PersonalizationConfig>(
     {
       themeId: defaultThemeId,
-      wallpaper: { type: "none", name: "无" },
+      appearanceMode: defaultAppearanceMode,
+      wallpaper: defaultWallpaper,
     },
   );
+  const [systemColorScheme, setSystemColorScheme] =
+    useState<ResolvedColorScheme>(getSystemColorScheme);
 
   useEffect(() => {
     try {
@@ -54,11 +95,15 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         const resolvedThemeId = isThemeId(parsed?.themeId)
           ? parsed.themeId
           : defaultThemeId;
+        const appearanceMode = isAppearanceMode(parsed?.appearanceMode)
+          ? parsed.appearanceMode
+          : defaultAppearanceMode;
         const wallpaper = (parsed?.wallpaper as
           | PersonalizationWallpaper
-          | undefined) ?? { type: "none", name: "无" };
+          | undefined) ?? defaultWallpaper;
         setPersonalization({
           themeId: resolvedThemeId,
+          appearanceMode,
           wallpaper,
           fontFamily: parsed?.fontFamily,
         });
@@ -67,46 +112,67 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
     } catch {
       setPersonalization({
         themeId: defaultThemeId,
-        wallpaper: { type: "none", name: "无" },
+        appearanceMode: defaultAppearanceMode,
+        wallpaper: defaultWallpaper,
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    const update = () => setSystemColorScheme(query.matches ? "dark" : "light");
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  const appearanceMode = personalization.appearanceMode ?? defaultAppearanceMode;
+  const resolvedColorScheme = resolveColorScheme(
+    appearanceMode,
+    systemColorScheme,
+  );
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = resolvedColorScheme;
+    root.dataset.appearanceMode = appearanceMode;
+    root.classList.toggle("dark", resolvedColorScheme === "dark");
+    root.style.colorScheme = resolvedColorScheme;
+  }, [appearanceMode, resolvedColorScheme]);
 
   const value: DesktopThemeContextValue = useMemo(
     () => ({
       personalization,
       activeThemeId: personalization.themeId,
+      appearanceMode,
+      resolvedColorScheme,
       setActiveThemeId: (id) => {
         if (!isThemeId(id)) return;
         const next: PersonalizationConfig = { ...personalization, themeId: id };
         setPersonalization(next);
-        try {
-          localStorage.setItem(
-            PERSONALIZATION_STORAGE_KEY,
-            JSON.stringify(next),
-          );
-        } catch {
-          void 0;
-        }
+        persistPersonalization(next);
+      },
+      setAppearanceMode: (mode) => {
+        if (!isAppearanceMode(mode)) return;
+        const next: PersonalizationConfig = {
+          ...personalization,
+          appearanceMode: mode,
+        };
+        setPersonalization(next);
+        persistPersonalization(next);
       },
       setWallpaper: (wallpaper) => {
-        const nextWallpaper = wallpaper ?? { type: "none", name: "无" };
+        const nextWallpaper = wallpaper ?? defaultWallpaper;
         const next: PersonalizationConfig = {
           ...personalization,
           wallpaper: nextWallpaper,
         };
         setPersonalization(next);
-        try {
-          localStorage.setItem(
-            PERSONALIZATION_STORAGE_KEY,
-            JSON.stringify(next),
-          );
-        } catch {
-          void 0;
-        }
+        persistPersonalization(next);
       },
     }),
-    [personalization],
+    [appearanceMode, personalization, resolvedColorScheme],
   );
 
   return (

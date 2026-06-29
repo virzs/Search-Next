@@ -7,13 +7,14 @@ import { Theme } from "@radix-ui/themes";
 import "./index.css";
 import DesktopNextIndex from "./pages/index";
 import { App, ConfigProvider } from "antd";
-import theme from "./theme/config";
+import { createThemeConfig } from "./theme/config";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AppConfigProvider } from "./contexts/ConfigContext";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 import { DesktopThemeProvider } from "./contexts/DesktopThemeContext";
 import { WidgetProvider } from "./contexts/WidgetContext";
 import defaultAppRoutes from "./pages/index/components/default-apps/routes";
+import useDesktopTheme from "./hooks/useDesktopTheme";
 
 const router = createBrowserRouter([
   {
@@ -23,23 +24,37 @@ const router = createBrowserRouter([
   },
 ]);
 
-createRoot(document.getElementById("root")!).render(
-  <Theme>
-    <App>
-      <GlobalNotificationProvider />
-      <ConfigProvider theme={theme}>
-        <AuthProvider>
-          <AppConfigProvider>
-            <DesktopThemeProvider>
-              <WidgetProvider>
-                <RouterProvider router={router} />
-              </WidgetProvider>
-            </DesktopThemeProvider>
-          </AppConfigProvider>
-        </AuthProvider>
+const ThemedConfigProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { resolvedColorScheme } = useDesktopTheme();
+  const themeConfig = React.useMemo(
+    () => createThemeConfig(resolvedColorScheme),
+    [resolvedColorScheme],
+  );
+
+  return (
+    <Theme appearance={resolvedColorScheme}>
+      <ConfigProvider theme={themeConfig}>
+        <App>{children}</App>
       </ConfigProvider>
-    </App>
-  </Theme>,
+    </Theme>
+  );
+};
+
+createRoot(document.getElementById("root")!).render(
+  <AuthProvider>
+    <AppConfigProvider>
+      <DesktopThemeProvider>
+        <ThemedConfigProvider>
+          <GlobalNotificationProvider />
+          <WidgetProvider>
+            <RouterProvider router={router} />
+          </WidgetProvider>
+        </ThemedConfigProvider>
+      </DesktopThemeProvider>
+    </AppConfigProvider>
+  </AuthProvider>,
 );
 
 // 让外部纯 JS 小组件复用宿主项目的 React 和 ReactDOM

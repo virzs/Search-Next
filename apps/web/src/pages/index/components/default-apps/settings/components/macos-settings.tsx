@@ -16,19 +16,19 @@ export const MacSettingsView: FC<MacSettingsViewProps> = ({
   action,
   children,
 }) => (
-  <div className="h-full overflow-y-auto bg-[#f5f5f7] px-6 pb-8 pt-1">
+  <div className="h-full overflow-y-auto bg-[#f5f5f7] px-6 pb-8 pt-1 dark:bg-[#111113]">
     <div className="mx-auto w-full max-w-[700px]">
       {(title || description || action) && (
         <div className="mb-5 flex items-end justify-between gap-4 pt-1">
           {title || description ? (
             <div className="min-w-0">
               {title ? (
-                <div className="truncate text-[28px] font-bold tracking-normal text-[#1d1d1f]">
+                <div className="truncate text-[28px] font-bold tracking-normal text-[#1d1d1f] dark:text-[#f5f5f7]">
                   {title}
                 </div>
               ) : null}
               {description ? (
-                <div className="mt-1 text-sm font-medium leading-5 text-[#6e6e73]">
+                <div className="mt-1 text-sm font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
                   {description}
                 </div>
               ) : null}
@@ -57,16 +57,16 @@ export const MacSettingsHero: FC<MacSettingsHeroProps> = ({
   action,
   tone = "blue",
 }) => (
-  <div className="grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-4 overflow-hidden rounded-[20px] border border-white/70 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.045),inset_0_1px_0_rgba(255,255,255,0.88)] backdrop-blur-xl max-[760px]:grid-cols-[48px_minmax(0,1fr)]">
+  <div className="grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-4 overflow-hidden rounded-[20px] border border-white/70 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.045),inset_0_1px_0_rgba(255,255,255,0.88)] backdrop-blur-xl max-[760px]:grid-cols-[48px_minmax(0,1fr)] dark:border-white/10 dark:bg-white/[0.08] dark:shadow-[0_1px_2px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]">
     <MacSettingsIcon tone={tone} size="large">
       {icon}
     </MacSettingsIcon>
     <div className="min-w-0">
-      <div className="truncate text-[18px] font-semibold text-[#1d1d1f]">
+      <div className="truncate text-[18px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
         {title}
       </div>
       {description ? (
-        <div className="mt-1 text-[13px] leading-5 text-[#6e6e73]">
+        <div className="mt-1 text-[13px] leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
           {description}
         </div>
       ) : null}
@@ -88,11 +88,11 @@ export const MacSettingsSection: FC<MacSettingsSectionProps> = ({
 }) => (
   <section>
     {title ? (
-      <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73]">
+      <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73] dark:text-[#aeaeb2]">
         {title}
       </div>
     ) : null}
-    <div className="overflow-hidden rounded-[14px] border border-white/80 bg-white/80 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+    <div className="overflow-hidden rounded-[14px] border border-white/80 bg-white/80 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08] dark:shadow-[0_1px_2px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]">
       {children}
     </div>
   </section>
@@ -132,8 +132,10 @@ export const MacSettingsRow: FC<MacSettingsRowProps> = ({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       className={cx(
-        "border-t border-[rgba(60,60,67,0.12)] first:border-t-0",
-        onClick ? "cursor-pointer transition hover:bg-[#f7f7f9]" : null,
+        "border-t border-[rgba(60,60,67,0.12)] first:border-t-0 dark:border-white/10",
+        onClick
+          ? "cursor-pointer transition hover:bg-[#f7f7f9] dark:hover:bg-white/[0.06]"
+          : null,
       )}
     >
       <div className="grid min-h-[50px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-2.5">
@@ -142,11 +144,11 @@ export const MacSettingsRow: FC<MacSettingsRowProps> = ({
             <MacSettingsIcon tone={iconTone}>{icon}</MacSettingsIcon>
           ) : null}
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-[#1d1d1f]">
+            <div className="truncate text-sm font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
               {title}
             </div>
             {description ? (
-              <div className="mt-0.5 text-xs leading-[18px] text-[#6e6e73]">
+              <div className="mt-0.5 text-xs leading-[18px] text-[#6e6e73] dark:text-[#aeaeb2]">
                 {description}
               </div>
             ) : null}
@@ -184,11 +186,13 @@ export const MacSettingsIcon: FC<MacSettingsIconProps> = ({
 );
 
 export const MacSettingsChevron = () => (
-  <span className="text-[20px] leading-none text-[#b0b0b4]">›</span>
+  <span className="text-[20px] leading-none text-[#b0b0b4] dark:text-[#636366]">
+    ›
+  </span>
 );
 
 export const MacSettingsValue: FC<{ children: ReactNode }> = ({ children }) => (
-  <span className="max-w-[220px] truncate text-[13px] font-semibold text-[#6e6e73]">
+  <span className="max-w-[220px] truncate text-[13px] font-semibold text-[#6e6e73] dark:text-[#aeaeb2]">
     {children}
   </span>
 );
@@ -198,9 +202,14 @@ export const MacSettingsInfoGrid: FC<{
 }> = ({ items }) => (
   <div className="grid grid-cols-2 gap-3 max-[640px]:grid-cols-1">
     {items.map((item, index) => (
-      <div key={index} className="rounded-[12px] bg-[#f2f2f7] p-3">
-        <div className="text-[11px] font-bold text-[#6e6e73]">{item.label}</div>
-        <div className="mt-1 truncate text-sm font-bold text-[#1d1d1f]">
+      <div
+        key={index}
+        className="rounded-[12px] bg-[#f2f2f7] p-3 dark:bg-white/[0.06]"
+      >
+        <div className="text-[11px] font-bold text-[#6e6e73] dark:text-[#aeaeb2]">
+          {item.label}
+        </div>
+        <div className="mt-1 truncate text-sm font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">
           {item.value}
         </div>
       </div>
