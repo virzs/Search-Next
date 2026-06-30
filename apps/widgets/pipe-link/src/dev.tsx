@@ -10,6 +10,8 @@ type SizeConfig = {
 
 type ThemeId = "light" | "dark";
 type WidgetConfig = typeof rawConfig & {
+  sizeConfigs?: SizeConfig[];
+  defaultSizeId?: string;
   pagePaths?: {
     settings?: string;
   };
@@ -99,20 +101,37 @@ document.getElementById("root")!.innerHTML = `
   </header>
 `;
 
-for (const themeId of ["light", "dark"] as ThemeId[]) {
-  const section = createSection(`Icon Mode - ${themeId}`, "所有 sizeConfigs");
-  const grid = document.createElement("div");
-  grid.className = "demo-grid";
-  section.append(grid);
+if (config.supportIconMode !== false) {
+  for (const themeId of ["light", "dark"] as ThemeId[]) {
+    const section = createSection(`Icon Mode - ${themeId}`, "所有 sizeConfigs");
+    const grid = document.createElement("div");
+    grid.className = "demo-grid";
+    section.append(grid);
 
-  for (const size of sizeConfigs) {
-    const sizeId = size.id || `${size.col}x${size.row}`;
-    const previewSize = getPreviewSize(size);
-    const frame = createPreview(grid, size.name || sizeId, previewSize.width, previewSize.height, themeId);
+    for (const size of sizeConfigs) {
+      const sizeId = size.id || `${size.col}x${size.row}`;
+      const previewSize = getPreviewSize(size);
+      const frame = createPreview(grid, size.name || sizeId, previewSize.width, previewSize.height, themeId);
+      mountPreview(frame, {
+        mode: "icon",
+        title: config.displayName || config.name,
+        sdk: createSdk(sizeId, themeId),
+      });
+    }
+  }
+}
+
+if (config.supportAppMode) {
+  for (const themeId of ["light", "dark"] as ThemeId[]) {
+    const section = createSection(`App Icon Mode - ${themeId}`, "应用入口图标");
+    const grid = document.createElement("div");
+    grid.className = "demo-grid";
+    section.append(grid);
+    const frame = createPreview(grid, "appIcon", 80, 80, themeId);
     mountPreview(frame, {
-      mode: "icon",
+      mode: "appIcon",
       title: config.displayName || config.name,
-      sdk: createSdk(sizeId, themeId),
+      sdk: createSdk("appIcon", themeId),
     });
   }
 }

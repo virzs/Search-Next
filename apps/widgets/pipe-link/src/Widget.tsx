@@ -336,7 +336,7 @@ const clearEditorPoint = (draft: EditorDraft, point: Point): EditorDraft => {
   };
 };
 
-const PipeLink = ({ mode = "icon", title = "管道连线", sdk }: WidgetProps) => {
+const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) => {
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
   const [settings, setSettings] = useState<PipeLinkSettings>(DEFAULT_SETTINGS);
   const [progress, setProgress] = useState<ProgressState>(() => createDefaultProgress());
@@ -565,9 +565,9 @@ const PipeLink = ({ mode = "icon", title = "管道连线", sdk }: WidgetProps) =
   }, [persistProgress, progress]);
 
   const continueGame = useCallback(() => {
-    setDialogView(gameState.completed ? "complete" : null);
+    setDialogView(gameState.completed && isBuiltInLevel(level.id) ? "complete" : null);
     setActiveView("game");
-  }, [gameState.completed]);
+  }, [gameState.completed, level.id]);
 
   const restart = useCallback(() => {
     setGameState(createGameState(level));
@@ -578,7 +578,7 @@ const PipeLink = ({ mode = "icon", title = "管道连线", sdk }: WidgetProps) =
   const recordCompletion = useCallback(
     (completedState: GameState) => {
       if (!isBuiltInLevel(level.id)) {
-        sdk?.toast?.success("关卡完成", `${level.name} 用了 ${completedState.steps} 步`);
+        sdk?.toast?.success("试玩通过", `${level.name} 用了 ${completedState.steps} 步`);
         return;
       }
       const previousBest = progress.bestSteps[level.id];
@@ -607,7 +607,13 @@ const PipeLink = ({ mode = "icon", title = "管道连线", sdk }: WidgetProps) =
         const result = applyMove(level, state, direction);
         if (result.state.completed && !state.completed) {
           recordCompletion(result.state);
-          setDialogView("complete");
+          if (isBuiltInLevel(level.id)) {
+            setDialogView("complete");
+          } else {
+            setDialogView(null);
+            setEditorMessage(`试玩通过：${result.state.steps} 步`);
+            setActiveView("editor");
+          }
         }
         return result.state;
       });
@@ -752,11 +758,32 @@ const PipeLink = ({ mode = "icon", title = "管道连线", sdk }: WidgetProps) =
       <div className="pipe-link-app">
         {activeView === "home" ? (
           <section className="pipe-link-home-view">
+            <div className="pipe-link-home-backdrop" aria-hidden="true">
+              <span className="pipe-link-home-grid" />
+              <span className="pipe-link-home-scan" />
+              <span className="pipe-link-home-route">
+                <span className="pipe-link-home-route__segment pipe-link-home-route__segment--1" />
+                <span className="pipe-link-home-route__segment pipe-link-home-route__segment--2" />
+                <span className="pipe-link-home-route__segment pipe-link-home-route__segment--3" />
+                <span className="pipe-link-home-route__segment pipe-link-home-route__segment--4" />
+                <span className="pipe-link-home-route__segment pipe-link-home-route__segment--5" />
+                <span className="pipe-link-home-route__node pipe-link-home-route__node--1" />
+                <span className="pipe-link-home-route__node pipe-link-home-route__node--2" />
+                <span className="pipe-link-home-route__node pipe-link-home-route__node--3" />
+                <span className="pipe-link-home-route__node pipe-link-home-route__node--4" />
+              </span>
+              <span className="pipe-link-home-tile pipe-link-home-tile--1" />
+              <span className="pipe-link-home-tile pipe-link-home-tile--2" />
+              <span className="pipe-link-home-tile pipe-link-home-tile--3" />
+              <span className="pipe-link-home-tile pipe-link-home-tile--4" />
+              <span className="pipe-link-home-tile pipe-link-home-tile--5" />
+            </div>
             <div className="pipe-link-title-screen">
               <div className="pipe-link-title-copy">
-                <p>管道连线</p>
-                <h1>{title}</h1>
-                <span>连接所有节点，避开错误方块</span>
+                <h1 className="pipe-link-art-title" data-text={title}>
+                  {title}
+                </h1>
+                <span>接入所有信标，避开故障节点，重构通往终端的唯一线路。</span>
               </div>
 
               <div className="pipe-link-title-menu" aria-label="主菜单">
