@@ -1,5 +1,5 @@
 import { App, Button, Modal, Space, Table, Tag, Typography } from "antd";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { useRequest } from "ahooks";
 import { getWidgetVersions, publishWidgetVersion, WidgetVersionItem } from "@/services/tabs/widget";
 
@@ -35,12 +35,22 @@ const WidgetVersionModal: FC<WidgetVersionModalProps> = ({
     if (open && widgetId) run(widgetId);
   }, [open, widgetId, run]);
 
+  const versionRows = useMemo(() => {
+    const seen = new Set<string>();
+    return (data || []).filter((item) => {
+      if (!item.version) return true;
+      if (seen.has(item.version)) return false;
+      seen.add(item.version);
+      return true;
+    });
+  }, [data]);
+
   return (
     <Modal open={open} title={`${widgetName || "小组件"} - 版本管理`} onCancel={onClose} footer={null} width={900}>
       <Table<WidgetVersionItem>
         rowKey="_id"
         loading={loading}
-        dataSource={data || []}
+        dataSource={versionRows}
         pagination={false}
         columns={[
           {

@@ -81,4 +81,5 @@ export class WidgetVersion extends BaseSchema {
 }
 
 export const WidgetVersionSchema = SchemaFactory.createForClass(WidgetVersion);
+WidgetVersionSchema.index({ widget: 1, version: 1 });
 baseSchemaMiddleware(WidgetVersionSchema);

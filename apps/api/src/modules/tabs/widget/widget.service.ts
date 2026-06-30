@@ -59,6 +59,21 @@ type WidgetPackageConfig = {
   settingsEntry?: string;
   settingsSchema?: Record<string, unknown>[];
 };
+type WidgetVersionPayload = {
+  widget: unknown;
+  name: string;
+  version: string;
+  packageName: string;
+  packageKey: string;
+  packageUrl: string;
+  entryFileName: string;
+  entryUrl: string;
+  iconUrl?: string;
+  appIcon?: WidgetAppIcon;
+  appIconUrl?: string;
+  screenshots: WidgetScreenshot[];
+  configSnapshot: Record<string, unknown>;
+};
 type WidgetConfigPayload = {
   entryFileName?: unknown;
   files?: unknown;
@@ -166,10 +181,11 @@ export class WidgetService {
 
   async listVersions(widgetId: string) {
     await this.ensureWidget(widgetId);
-    return this.widgetVersionModel
+    const versions = await this.widgetVersionModel
       .find({ widget: widgetId })
-      .sort({ createdAt: -1 })
+      .sort({ active: -1, updatedAt: -1, createdAt: -1 })
       .exec();
+    return this.dedupeVersionRows(versions);
   }
 
   async importPackage(file: Express.Multer.File, user?: string, widgetId?: string) {
@@ -235,7 +251,7 @@ export class WidgetService {
       widgetId,
     );
     const packageName = `${config.name}-${config.version}${SNWIDGET_EXT}`;
-    const versionDoc = await this.widgetVersionModel.create({
+    const versionDoc = await this.upsertPackageVersion({
       widget: widget._id,
       name: config.name,
       version: config.version,
@@ -249,9 +265,7 @@ export class WidgetService {
       appIconUrl,
       screenshots,
       configSnapshot,
-      active: false,
-      creator: user,
-    });
+    }, user);
 
     await fs.writeFile(
       this.getLocalStoragePath(`${baseKey}/${packageName}`),
@@ -676,6 +690,60 @@ export class WidgetService {
       settingsSchema: config.settingsSchema ?? [],
       screenshots,
     };
+  }
+
+  private dedupeVersionRows<T extends { version?: string }>(versions: T[]) {
+    const seen = new Set<string>();
+    return versions.filter((item) => {
+      const key = item.version;
+      if (!key) return true;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  private async upsertPackageVersion(
+    payload: WidgetVersionPayload,
+    user?: string,
+  ) {
+    const existingVersions = await this.widgetVersionModel
+      .find({ widget: payload.widget, version: payload.version })
+      .sort({ active: -1, updatedAt: -1, createdAt: -1 })
+      .exec();
+    const existing = existingVersions[0];
+
+    if (existing) {
+      const updated = await this.widgetVersionModel
+        .findByIdAndUpdate(
+          existing._id,
+          {
+            ...payload,
+            active: false,
+            updater: user,
+          },
+          { new: true },
+        )
+        .exec();
+      if (!updated) throw new NotFoundException('小组件版本不存在');
+
+      const duplicateIds = existingVersions.slice(1).map((item) => item._id);
+      if (duplicateIds.length) {
+        await this.widgetVersionModel
+          .updateMany(
+            { _id: { $in: duplicateIds } },
+            { active: false, isDelete: true, updater: user },
+          )
+          .exec();
+      }
+      return updated;
+    }
+
+    return this.widgetVersionModel.create({
+      ...payload,
+      active: false,
+      creator: user,
+    });
   }
 
   private async upsertPackageWidget(

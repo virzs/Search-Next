@@ -132,4 +132,17 @@ describe('WidgetService app mode manifest parsing', () => {
     expect(response.configSnapshot.version).toBe('1.0.0');
     expect(response.pagePaths).toEqual({ settings: '/settings' });
   });
+
+  it('dedupes version rows by version and keeps the first sorted row', () => {
+    const rows = [
+      { _id: 'active-010', version: '0.1.0', active: true },
+      { _id: 'old-010', version: '0.1.0', active: false },
+      { _id: 'active-020', version: '0.2.0', active: false },
+    ];
+
+    expect((service as any).dedupeVersionRows(rows)).toEqual([
+      rows[0],
+      rows[2],
+    ]);
+  });
 });
