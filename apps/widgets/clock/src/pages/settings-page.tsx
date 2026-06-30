@@ -72,6 +72,23 @@ export function SettingsPage({ settings, saving, onSave }: { settings: ClockSett
           <ToggleRow title="日程进度" description="显示今日与今年进度" checked={draft.showProgress} onChange={(checked) => setDraft((prev) => ({ ...prev, showProgress: checked }))} />
         </section>
 
+        <section className={groupClassName}>
+          <SettingRow title="默认页面" description="展开时优先显示的时钟工具">
+            <div className="tw:grid tw:min-w-[220px] tw:grid-cols-3 tw:gap-[3px] tw:rounded-xl tw:bg-[var(--clock-card-soft)] tw:p-[3px] tw:[@container(max-width:520px)]:w-full tw:max-[520px]:w-full" role="group" aria-label="默认页面">
+              {[
+                { label: "时钟", value: "world" },
+                { label: "秒表", value: "stopwatch" },
+                { label: "计时器", value: "timer" },
+              ].map((item) => (
+                <button className={cn("tw:cursor-pointer tw:rounded-[9px] tw:border-0 tw:bg-transparent tw:px-2.5 tw:py-[7px] tw:text-[13px] tw:font-[780] tw:text-[var(--clock-fg-2)]", draft.defaultView === item.value && "tw:bg-[var(--clock-accent)] tw:text-[var(--clock-active-fg)]")} key={item.value} type="button" onClick={() => setDraft((prev) => ({ ...prev, defaultView: item.value as ClockSettings["defaultView"] }))}>{item.label}</button>
+              ))}
+            </div>
+          </SettingRow>
+          <SettingRow title="默认计时器" description="计时器页面的初始预设">
+            <input className="tw:min-w-[120px] tw:rounded-xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card-soft)] tw:px-2.5 tw:py-2 tw:text-sm tw:font-bold tw:text-[var(--clock-fg)] tw:outline-none tw:[@container(max-width:520px)]:w-full tw:max-[520px]:w-full" min={1} max={240} type="number" value={draft.timerPresetMinutes} onChange={(event) => setDraft((prev) => ({ ...prev, timerPresetMinutes: Math.max(1, Math.min(240, Number(event.target.value) || 1)) }))} />
+          </SettingRow>
+        </section>
+
         <section className={cn(groupClassName, "tw:pb-3.5")}>
           <div className={cn(rowClassName, "tw:items-start tw:border-b-0")}><strong className={rowTitleClassName}>世界时钟城市</strong><span className={rowDescriptionClassName}>最多选择 6 个，用于 4x2 和展开页。</span></div>
           <div className="tw:grid tw:grid-cols-2 tw:gap-2.5 tw:px-4 tw:[@container(max-width:520px)]:grid-cols-1 tw:max-[520px]:grid-cols-1">

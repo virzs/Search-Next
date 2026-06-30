@@ -1,0 +1,10 @@
+@source "./**/*.{ts,tsx}";
+
+@import "tailwindcss/theme" layer(theme) prefix(tw);
+@import "tailwindcss/utilities" layer(utilities) prefix(tw);
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

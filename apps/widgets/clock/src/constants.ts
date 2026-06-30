@@ -33,4 +33,6 @@ export const DEFAULT_SETTINGS: ClockSettings = {
   showSeconds: true,
   showProgress: true,
   worldTimezones: DEFAULT_WORLD_TIMEZONES,
+  defaultView: "world",
+  timerPresetMinutes: 25,
 };

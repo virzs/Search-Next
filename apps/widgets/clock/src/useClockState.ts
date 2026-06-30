@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_SETTINGS } from "./constants";
 import { parseBoolean, parseWorldTimezones } from "./time";
-import type { ClockSettings, WidgetSDK } from "./types";
+import type { ClockSettings, ClockView, WidgetSDK } from "./types";
+
+const parseClockView = (value: unknown): ClockView =>
+  value === "stopwatch" || value === "timer" ? value : "world";
+
+const parseTimerPreset = (value: unknown) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) && numberValue >= 1 && numberValue <= 240
+    ? Math.round(numberValue)
+    : DEFAULT_SETTINGS.timerPresetMinutes;
+};
 
 export function useClockState(sdk?: WidgetSDK) {
   const [now, setNow] = useState(new Date());
@@ -17,14 +27,18 @@ export function useClockState(sdk?: WidgetSDK) {
       sdk.storage.get("showSeconds"),
       sdk.storage.get("showProgress"),
       sdk.storage.get("worldTimezones"),
+      sdk.storage.get("defaultView"),
+      sdk.storage.get("timerPresetMinutes"),
     ])
-      .then(([timezone, timeFormat, showSeconds, showProgress, worldTimezones]) => {
+      .then(([timezone, timeFormat, showSeconds, showProgress, worldTimezones, defaultView, timerPresetMinutes]) => {
         setSettings({
           timezone: typeof timezone === "string" ? timezone : DEFAULT_SETTINGS.timezone,
           timeFormat: timeFormat === "12h" ? "12h" : "24h",
           showSeconds: parseBoolean(showSeconds, DEFAULT_SETTINGS.showSeconds),
           showProgress: parseBoolean(showProgress, DEFAULT_SETTINGS.showProgress),
           worldTimezones: parseWorldTimezones(worldTimezones),
+          defaultView: parseClockView(defaultView),
+          timerPresetMinutes: parseTimerPreset(timerPresetMinutes),
         });
       })
       .catch(() => undefined);
@@ -40,6 +54,8 @@ export function useClockState(sdk?: WidgetSDK) {
         if (payload.key === "showSeconds") return { ...prev, showSeconds: parseBoolean(payload.value, prev.showSeconds) };
         if (payload.key === "showProgress") return { ...prev, showProgress: parseBoolean(payload.value, prev.showProgress) };
         if (payload.key === "worldTimezones") return { ...prev, worldTimezones: parseWorldTimezones(payload.value) };
+        if (payload.key === "defaultView") return { ...prev, defaultView: parseClockView(payload.value) };
+        if (payload.key === "timerPresetMinutes") return { ...prev, timerPresetMinutes: parseTimerPreset(payload.value) };
         return prev;
       });
     };
@@ -70,6 +86,8 @@ export function useClockState(sdk?: WidgetSDK) {
         sdk.storage.set("showSeconds", String(next.showSeconds)),
         sdk.storage.set("showProgress", String(next.showProgress)),
         sdk.storage.set("worldTimezones", JSON.stringify(next.worldTimezones)),
+        sdk.storage.set("defaultView", next.defaultView),
+        sdk.storage.set("timerPresetMinutes", String(next.timerPresetMinutes)),
       ]);
       setSettings(next);
       sdk.toast?.success("设置已保存", "时钟小组件会立即使用新的显示偏好。");

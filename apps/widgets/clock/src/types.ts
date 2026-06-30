@@ -1,5 +1,6 @@
 export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 export type TimeFormat = "24h" | "12h";
+export type ClockView = "world" | "stopwatch" | "timer";
 
 export interface ClockSettings {
   timezone: string;
@@ -7,6 +8,8 @@ export interface ClockSettings {
   showSeconds: boolean;
   showProgress: boolean;
   worldTimezones: string[];
+  defaultView: ClockView;
+  timerPresetMinutes: number;
 }
 
 export interface TimezoneOption {
