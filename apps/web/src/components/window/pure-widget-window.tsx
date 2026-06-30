@@ -41,21 +41,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
 
   const settingsRoutePath = widgetConfig?.pagePaths?.settings;
   const widgetTitle = title || widgetConfig?.name || "小组件";
-  const isPipeLinkWidget = [
-    widgetTitle,
-    widgetConfig?.name,
-    widgetConfig?.entry,
-    config.entry,
-  ]
-    .filter(Boolean)
-    .some(
-      (value) =>
-        String(value).includes("pipe-link") ||
-        String(value).includes("管道连线"),
-    );
-  const hasSettings = Boolean(
-    widgetConfig?.id && settingsRoutePath && !isPipeLinkWidget,
-  );
+  const hasSettings = Boolean(widgetConfig?.id && settingsRoutePath);
   const contentHeight = typeof height === "number" ? height : undefined;
   const windowHeight = typeof height === "number" ? height + 46 : height;
   const currentSdk = useMemo(() => {
@@ -93,7 +79,6 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   useEffect(() => {
     if (
       !visible ||
-      !isPipeLinkWidget ||
       viewMode !== "full" ||
       !currentSdk?.events
     ) {
@@ -112,10 +97,9 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
 
     currentSdk.events.on("widget:chrome", handler);
     return () => currentSdk.events.off("widget:chrome", handler);
-  }, [currentSdk, isPipeLinkWidget, viewMode, visible]);
+  }, [currentSdk, viewMode, visible]);
 
-  const showBackButton =
-    viewMode === "settings" || (isPipeLinkWidget && widgetBackVisible);
+  const showBackButton = viewMode === "settings" || widgetBackVisible;
   const handleHeaderBack = () => {
     if (viewMode === "settings") {
       setViewMode("full");

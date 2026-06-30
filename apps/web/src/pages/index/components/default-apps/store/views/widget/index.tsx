@@ -43,6 +43,9 @@ const FALLBACK_SIZE_CONFIG: WidgetSizeConfig = {
 const getPreviewTheme = (themeId?: string): PreviewTheme =>
   themeId === "dark" ? "dark" : "light";
 
+const supportsIconMode = (widget: WidgetApiItem) =>
+  Boolean(widget.configSnapshot?.supportIconMode ?? widget.supportIconMode);
+
 const getPreviewSortIndex = (sizeId: string) => {
   const order = ["1x1", "2x1", "2x2", "3x2", "4x2"];
   const index = order.indexOf(sizeId);
@@ -163,10 +166,10 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
 
   const filteredWidgets = useMemo(() => {
     const q = (query || "").trim().toLowerCase();
-    if (!q) return widgets;
     return widgets.filter((w) => {
-      const haystack =
-        `${w.name} ${w.description || ""} ${w.tags?.join(" ") || ""}`.toLowerCase();
+      if (!supportsIconMode(w)) return false;
+      if (!q) return true;
+      const haystack = `${w.name} ${w.description || ""} ${w.tags?.join(" ") || ""}`.toLowerCase();
       return haystack.includes(q);
     });
   }, [query, widgets]);

@@ -64,6 +64,9 @@ const getWidgetDefaultSizeId = (item: WidgetApiItem) =>
 const supportsAppMode = (item: WidgetApiItem) =>
   Boolean(item.configSnapshot?.supportAppMode ?? item.supportAppMode);
 
+const supportsIconMode = (item: WidgetApiItem) =>
+  Boolean(item.configSnapshot?.supportIconMode ?? item.supportIconMode);
+
 const matchesQuery = (item: any, query: string) => {
   const q = query.trim().toLowerCase();
   if (!q) return false;
@@ -298,6 +301,7 @@ const StoreSearchView = () => {
   const widgetResults = useMemo(() => {
     if (!normalizedQuery) return [];
     return searchableWidgets
+      .filter(supportsIconMode)
       .filter((item) => matchesQuery(item, normalizedQuery))
       .slice(0, SEARCH_PAGE_SIZE);
   }, [normalizedQuery, searchableWidgets]);
