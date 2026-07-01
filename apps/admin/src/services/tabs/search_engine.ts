@@ -1,4 +1,11 @@
-import { baseDeleteRequest, baseDetailRequest, baseGetRequest, basePostRequest, basePutRequest } from "@/utils/axios";
+import {
+  baseDeleteRequest,
+  baseDetailRequest,
+  baseGetRequest,
+  basePostRequest,
+  basePutRequest,
+  basePutRequestNoId,
+} from "@/utils/axios";
 
 /**
  * 搜索引擎分页
@@ -14,7 +21,7 @@ export interface SearchEngine {
   searchUrl: string;
   suggestUrl?: string;
   jsonpCode: string;
-  isEnabled: true;
+  isEnabled: boolean;
   icon?: string;
 }
 
@@ -32,6 +39,14 @@ export async function addSearchEngine(data: SearchEngine) {
  */
 export async function updateSearchEngine(id: string, data: SearchEngine) {
   return basePutRequest("/tabs/search-engine")(id, data);
+}
+
+/**
+ * 切换启用状态
+ * /tabs/search-engine/:id/enable
+ */
+export async function toggleSearchEngineEnable(id: string) {
+  return basePutRequestNoId(`/tabs/search-engine/${id}/enable`)({});
 }
 
 /**

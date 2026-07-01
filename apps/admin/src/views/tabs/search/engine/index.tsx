@@ -2,7 +2,7 @@ import TablePageContainer from "@/components/containter/table";
 import TablePage from "@/components/TablePage2";
 import Operation from "@/components/TablePage2/Operation";
 import { useTablePage } from "@/hooks/useTablePage2";
-import { delSearchEngine, getSearchEngine, updateSearchEngine } from "@/services/tabs/search_engine";
+import { delSearchEngine, getSearchEngine, toggleSearchEngineEnable } from "@/services/tabs/search_engine";
 import { Button, message } from "antd";
 import { useRequest } from "ahooks";
 import { RiAddLine } from "@remixicon/react";
@@ -17,7 +17,7 @@ const SearchEngine = () => {
 
   const { refresh } = table;
 
-  const { runAsync: toggleRun, loading: toggleLoading } = useRequest(updateSearchEngine, {
+  const { runAsync: toggleRun, loading: toggleLoading } = useRequest(toggleSearchEngineEnable, {
     manual: true,
     onSuccess: () => {
       message.success("操作成功");
@@ -98,13 +98,7 @@ const SearchEngine = () => {
                 title: record.isEnabled ? "禁用" : "启用",
                 loading: toggleLoading,
                 onClick: async () => {
-                  await toggleRun(record._id, {
-                    name: record.name,
-                    description: record.description,
-                    searchUrl: record.searchUrl,
-                    jsonpCode: record.jsonpCode,
-                    isEnabled: !record.isEnabled,
-                  } as any);
+                  await toggleRun(record._id);
                 },
               },
               {

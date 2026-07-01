@@ -6,6 +6,7 @@ import BackupView from "./views/backup";
 import DeveloperView from "./views/developer";
 import LanguageView from "./views/language";
 import PersonalizationView from "./views/personalization";
+import SearchSettingsView from "./views/search";
 import { settingsRoute } from "./route-paths";
 
 export const settingsRoutes = {
@@ -21,6 +22,7 @@ export const settingsRoutes = {
       path: settingsRoute.segment.personalization,
       element: <PersonalizationView />,
     },
+    { path: settingsRoute.segment.search, element: <SearchSettingsView /> },
     { path: settingsRoute.segment.language, element: <LanguageView /> },
     { path: settingsRoute.segment.backup, element: <BackupView /> },
     { path: settingsRoute.segment.about, element: <AboutView /> },

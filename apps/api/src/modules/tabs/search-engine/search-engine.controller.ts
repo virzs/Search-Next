@@ -16,6 +16,7 @@ import {
 } from './dto/search-engine.dto';
 import { PageDto } from 'src/public/dto/page';
 import { User } from 'src/public/decorator/route-user.decoratpr';
+import { RequireLogin } from 'src/public/decorator/require_login.decorator';
 
 @ApiTags('新标签页/搜索引擎')
 @Controller('tabs/search-engine')
@@ -31,6 +32,7 @@ export class SearchEngineController {
   }
 
   @Get('/enabled')
+  @RequireLogin()
   @ApiOperation({ summary: '获取全部启用的搜索引擎' })
   getEnabledList() {
     return this.searchEngineService.listEnabled();

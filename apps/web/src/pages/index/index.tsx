@@ -63,6 +63,12 @@ import { accountRoute } from "./components/default-apps/account/route-paths";
 import BoringAccountAvatar from "@/components/auth/BoringAccountAvatar";
 import { getPublicWidgetDetail } from "@/services/widget";
 import type { WidgetApiItem } from "@/types";
+import {
+  DesktopSearchBar,
+  matchesUnifiedSearchShortcut,
+  SearchSpotlight,
+  useUnifiedSearchPreferences,
+} from "@/components/unified-search";
 
 type DesktopItem = DndSortItem<DesktopItemData>;
 type DesktopPage = DndPageItem<DesktopItemData> & {
@@ -283,6 +289,7 @@ function Index() {
   );
   const [desktopMountKey, setDesktopMountKey] = useState(0);
   const ignoreDesktopChangeUntilRef = useRef(0);
+  const [spotlightOpen, setSpotlightOpen] = useState(false);
 
   const { message } = App.useApp();
   const { coverGradientCss, user, isAuthenticated } = useAuth();
@@ -307,6 +314,7 @@ function Index() {
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
   const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
   const preferDark = resolvedColorScheme === "dark";
+  const { preferences: searchPreferences } = useUnifiedSearchPreferences();
 
   useEffect(() => {
     const reloadMyThemes = () => setMyThemeConfigs(getMyThemeConfigs());
@@ -623,6 +631,28 @@ function Index() {
   useEffect(() => {
     refreshStoredWidgetSnapshots();
   }, [refreshStoredWidgetSnapshots]);
+
+  useEffect(() => {
+    if (!searchPreferences.enableSpotlightShortcut) return undefined;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        !matchesUnifiedSearchShortcut(
+          event,
+          searchPreferences.spotlightShortcut,
+        )
+      )
+        return;
+      event.preventDefault();
+      setSpotlightOpen(true);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    searchPreferences.enableSpotlightShortcut,
+    searchPreferences.spotlightShortcut,
+  ]);
 
   /** 当主题变化时通过事件总线广播，让所有小组件收到通知 */
   useEffect(() => {
@@ -1127,6 +1157,19 @@ function Index() {
     [createWidgetConfigFromApi, devWidgets, widgets],
   );
 
+  const handleOpenSearchApp = useCallback(
+    (widget: WidgetApiItem) => {
+      const widgetConfig = createWidgetConfigFromApi(widget);
+      if (!widgetConfig?.entry) return;
+      void openWidgetWindow({
+        widgetId: widget._id,
+        widgetConfig,
+        fallbackTitle: widget.name || "应用",
+      });
+    },
+    [createWidgetConfigFromApi, openWidgetWindow],
+  );
+
   return (
     <div
       className={cx(
@@ -1140,6 +1183,13 @@ function Index() {
         <Notice />
         <Feedback />
       </div>
+      {searchPreferences.showDesktopSearchBar ? (
+        <DesktopSearchBar
+          onOpenApp={handleOpenSearchApp}
+          showShortcutHint={searchPreferences.enableSpotlightShortcut}
+          shortcut={searchPreferences.spotlightShortcut}
+        />
+      ) : null}
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}
@@ -1301,6 +1351,12 @@ function Index() {
           widgetConfig={infoTarget.widgetConfig}
         />
       )}
+      <SearchSpotlight
+        open={spotlightOpen}
+        onClose={() => setSpotlightOpen(false)}
+        onOpenApp={handleOpenSearchApp}
+        shortcut={searchPreferences.spotlightShortcut}
+      />
       {init && <LoadingOverlay open text="正在加载配置…" />}
     </div>
   );

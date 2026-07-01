@@ -9,6 +9,7 @@ import {
   RiInbox2Line,
   RiInformationLine,
   RiSearchLine,
+  RiSearchFill,
   RiUserFill,
   RiUserLine,
   RiGlobalLine,
@@ -48,6 +49,13 @@ const SettingsModalRoute: FC = () => {
             path: settingsRoute.path.personalization,
             icon: <RiBrushLine size={16} />,
             activeIcon: <RiBrushFill size={16} />,
+          },
+          {
+            key: "search",
+            label: "搜索",
+            path: settingsRoute.path.search,
+            icon: <RiSearchLine size={16} />,
+            activeIcon: <RiSearchFill size={16} />,
           },
           {
             key: "language",

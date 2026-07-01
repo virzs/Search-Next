@@ -32,7 +32,11 @@ export class SearchEngineService {
   }
 
   async listEnabled() {
-    return this.searchEngineModel.find({ isEnabled: true }).exec();
+    return this.searchEngineModel
+      .find({ isEnabled: true })
+      .select('_id name description icon searchUrl suggestUrl jsonpCode')
+      .lean()
+      .exec();
   }
 
   async create(dto: CreateSearchEngineDto, user?: string) {
