@@ -2,7 +2,11 @@ import TablePageContainer from "@/components/containter/table";
 import TablePage from "@/components/TablePage2";
 import Operation from "@/components/TablePage2/Operation";
 import { useTablePage } from "@/hooks/useTablePage2";
-import { delSearchEngine, getSearchEngine, toggleSearchEngineEnable } from "@/services/tabs/search_engine";
+import {
+  delSearchEngine,
+  getSearchEngine,
+  toggleSearchEngineEnable,
+} from "@/services/tabs/search_engine";
 import { Button, message } from "antd";
 import { useRequest } from "ahooks";
 import { RiAddLine } from "@remixicon/react";
@@ -17,21 +21,27 @@ const SearchEngine = () => {
 
   const { refresh } = table;
 
-  const { runAsync: toggleRun, loading: toggleLoading } = useRequest(toggleSearchEngineEnable, {
-    manual: true,
-    onSuccess: () => {
-      message.success("操作成功");
-      refresh();
+  const { runAsync: toggleRun, loading: toggleLoading } = useRequest(
+    toggleSearchEngineEnable,
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success("操作成功");
+        refresh();
+      },
     },
-  });
+  );
 
-  const { runAsync: delRun, loading: delLoading } = useRequest(delSearchEngine, {
-    manual: true,
-    onSuccess: () => {
-      message.success("删除成功");
-      refresh();
+  const { runAsync: delRun, loading: delLoading } = useRequest(
+    delSearchEngine,
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success("删除成功");
+        refresh();
+      },
     },
-  });
+  );
 
   const columns: WindowTableColumnType<any>[] = [
     {
@@ -48,7 +58,7 @@ const SearchEngine = () => {
                     width: 100%;
                     height: 100%;
                   }
-                `
+                `,
               )}
               dangerouslySetInnerHTML={{ __html: r.icon }}
             />
@@ -90,6 +100,7 @@ const SearchEngine = () => {
       title: "操作",
       dataIndex: "operation",
       fixed: "right",
+      width: 160,
       render: (_, record: any) => {
         return (
           <Operation
