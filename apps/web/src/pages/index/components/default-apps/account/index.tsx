@@ -5,6 +5,7 @@ import { AccountInfo, UnloggedView } from "@/components/auth";
 import { useAuth } from "@/hooks/useAuth";
 import type { AuthAction } from "@/types/auth";
 import { accountRoute } from "./route-paths";
+import { useI18n } from "@/i18n";
 
 const AccountModalRoute = () => {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ export const AccountIndexRedirect = () => {
 
 export const AccountAuthView = ({ action }: { action: AuthAction }) => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const { loading, isAuthenticated } = useAuth();
 
   if (loading) return <AccountLoadingView />;
@@ -76,11 +78,15 @@ export const AccountAuthView = ({ action }: { action: AuthAction }) => {
         mode="inline"
         activeAction={action}
         defaultAction={action}
-        title={action === "login" ? "登录 Search Next" : "创建 Search Next 账号"}
+        title={
+          action === "login"
+            ? t("ui.signInToSearchNext")
+            : t("ui.createASearchNextAccount")
+        }
         description={
           action === "login"
-            ? "登录后同步桌面布局、网站、小组件和偏好设置。"
-            : "注册后即可在不同设备间同步您的 Search Next 数据。"
+            ? t("ui.auth.signInSyncSubtitle")
+            : t("ui.auth.registerSyncSubtitle")
         }
         onActionChange={handleActionChange}
         onLoginSuccess={() =>
@@ -112,9 +118,18 @@ export const AccountProfileView = () => {
 
 const AccountLoadingView = () => (
   <div className={cx(accountAuthPageClassName, "text-center")}>
-    <div className="text-sm font-semibold text-[#6e6e73]">正在读取账号状态...</div>
+    <AccountLoadingText />
   </div>
 );
+
+const AccountLoadingText = () => {
+  const { t } = useI18n();
+  return (
+    <div className="text-sm font-semibold text-[#6e6e73]">
+      {t("ui.readingAccountStatus")}
+    </div>
+  );
+};
 
 const accountModalShellClassName = css`
   width: 100%;

@@ -4,6 +4,7 @@ export type {
   WidgetSDK,
   WidgetEventBus,
   WidgetThemeInfo,
+  WidgetLocaleInfo,
   WidgetUserInfo,
   WidgetToast,
   WidgetStorage,

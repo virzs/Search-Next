@@ -20,14 +20,15 @@ import {
   MacSettingsSection,
   MacSettingsView,
 } from "../../components/macos-settings";
+import { useI18n } from "@/i18n";
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
 ) => {
   if (wallpaper.name) return wallpaper.name;
-  if (wallpaper.type === "none") return "无";
-  if (wallpaper.type === "image") return "图片";
-  return "渐变";
+  if (wallpaper.type === "none") return "ui.none";
+  if (wallpaper.type === "image") return "ui.image";
+  return "ui.gradient";
 };
 
 const resolveThemeName = (
@@ -35,13 +36,14 @@ const resolveThemeName = (
   themeId: string,
 ) => {
   if (themeName) return themeName;
-  if (themeId === "light") return "默认";
-  if (themeId === "dark") return "深色";
+  if (themeId === "light") return "ui.default";
+  if (themeId === "dark") return "ui.dark";
   return themeId;
 };
 
 const PersonalizationView = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const {
     appearanceMode,
     personalization,
@@ -58,15 +60,15 @@ const PersonalizationView = () => {
     );
   }, [personalization.themeId, themes]);
 
-  const wallpaperName = resolveWallpaperName(personalization.wallpaper);
-  const themeName = resolveThemeName(
+  const wallpaperName = t(resolveWallpaperName(personalization.wallpaper));
+  const themeName = t(resolveThemeName(
     activeTheme?.name,
     personalization.themeId,
-  );
+  ));
 
   return (
     <MacSettingsView>
-      <MacSettingsSection title="外观">
+      <MacSettingsSection title={t("ui.appearance")}>
         <MacSettingsRow
           icon={
             appearanceMode === "dark" ? (
@@ -78,17 +80,19 @@ const PersonalizationView = () => {
             )
           }
           iconTone="blue"
-          title="模式"
-          description={`当前为${resolvedColorScheme === "dark" ? "深色" : "浅色"}`}
+          title={t("ui.mode")}
+          description={t("ui.currentlyScheme", {
+            scheme: t(resolvedColorScheme === "dark" ? "ui.dark" : "ui.light"),
+          })}
           extra={
             <AppSegmented<AppearanceMode>
               size="small"
               value={appearanceMode}
               onChange={setAppearanceMode}
               options={[
-                { label: "跟随系统", value: "system" },
-                { label: "浅色", value: "light" },
-                { label: "深色", value: "dark" },
+                { label: t("ui.followSystem"), value: "system" },
+                { label: t("ui.light"), value: "light" },
+                { label: t("ui.dark"), value: "dark" },
               ]}
             />
           }
@@ -97,14 +101,14 @@ const PersonalizationView = () => {
         <MacSettingsRow
           icon={<RiTShirtLine size={16} />}
           iconTone="orange"
-          title="主题"
+          title={t("ui.theme")}
           description={themeName}
           extra={
             <Button
               size="small"
               onClick={() => navigate(personalizationRoute.path.root)}
             >
-              管理
+              {t("ui.manage")}
             </Button>
           }
         />
@@ -112,7 +116,7 @@ const PersonalizationView = () => {
         <MacSettingsRow
           icon={<RiLandscapeLine size={16} />}
           iconTone="purple"
-          title="背景"
+          title={t("ui.background")}
           description={wallpaperName}
           extra={
             <div className="flex items-center gap-2">
@@ -120,13 +124,13 @@ const PersonalizationView = () => {
                 size="small"
                 onClick={() => navigate(personalizationRoute.path.wallpaper)}
               >
-                管理
+                {t("ui.manage")}
               </Button>
               <Button
                 size="small"
                 onClick={() => navigate(personalizationRoute.path.my)}
               >
-                我的
+                {t("ui.mine")}
               </Button>
             </div>
           }

@@ -446,6 +446,9 @@ importers:
       framer-motion:
         specifier: ^12.12.1
         version: 12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
       react:
         specifier: ^19.2.0
         version: 19.2.3
@@ -458,6 +461,9 @@ importers:
       react-infinite-scroll-component:
         specifier: ^6.1.0
         version: 6.1.1(react@19.2.3)
+      react-i18next:
+        specifier: ^15.7.4
+        version: 15.7.4(i18next@24.2.3(typescript@5.7.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.7.3)
       react-router:
         specifier: ^7.9.4
         version: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)

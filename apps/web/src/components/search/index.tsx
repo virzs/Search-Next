@@ -21,7 +21,7 @@ type SearchMode = "normal" | "ai";
 const searchEngines: SearchEngine[] = [
   {
     value: "bing",
-    label: "Bing",
+    label: "ui.bing",
     icon: <RiGlobalLine size={16} />,
     searchUrl: "https://www.bing.com/search?q=",
   },
@@ -33,7 +33,7 @@ const searchEngines: SearchEngine[] = [
   },
   {
     value: "google",
-    label: "Google",
+    label: "ui.google",
     icon: <RiGlobalLine size={16} />,
     searchUrl: "https://www.google.com/search?q=",
   },

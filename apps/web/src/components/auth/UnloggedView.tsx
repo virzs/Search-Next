@@ -15,11 +15,12 @@ import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { appleAuthPanelClassName } from "./apple-auth-styles";
 import { AppSegmented } from "@/components";
+import { useI18n } from "@/i18n";
 
 const authActions: AuthAction[] = ["login", "register"];
 const authActionLabel: Record<AuthAction, string> = {
-  login: "登录",
-  register: "注册",
+  login: "ui.signIn",
+  register: "ui.register",
 };
 
 const UnloggedView: React.FC<UnloggedViewProps> = ({
@@ -35,6 +36,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   className,
   modalProps = {},
 }) => {
+  const { t } = useI18n();
   const [internalAction, setInternalAction] =
     useState<AuthAction>(defaultAction);
   const currentAction = activeAction ?? internalAction;
@@ -53,7 +55,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   const { projectInfo } = useConfig();
   const allowRegister = projectInfo?.register?.allowRegister ?? true;
   const registerDisabledTip =
-    projectInfo?.register?.registerDisabledTip || "当前项目暂不开放注册";
+    projectInfo?.register?.registerDisabledTip || t("ui.auth.registrationDisabled");
 
   // 处理登录成功
   const handleLoginSuccess = useCallback(
@@ -63,7 +65,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
       } else {
         switch (onLoginSuccess) {
           case "show-toast":
-            message.success("登录成功！");
+            message.success(t("ui.signedInSuccessfully"));
             break;
           case "close-modal":
             if (mode === "modal" && modalProps.onClose) {
@@ -72,18 +74,18 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
             break;
           case "show-account":
             // 这里可以触发显示账号信息的逻辑
-            message.success(`欢迎回来，${user.username}！`);
+            message.success(t("ui.welcomeBackUsername", { username: user.username }));
             break;
           case "redirect":
             // 这里可以添加页面跳转逻辑
             window.location.reload();
             break;
           default:
-            message.success("登录成功！");
+            message.success(t("ui.signedInSuccessfully"));
         }
       }
     },
-    [onLoginSuccess, mode, modalProps],
+    [onLoginSuccess, mode, modalProps, t],
   );
 
   // 处理注册成功
@@ -94,7 +96,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
       } else {
         switch (onRegisterSuccess) {
           case "show-toast":
-            message.success("注册成功！");
+            message.success(t("ui.registeredSuccessfully"));
             break;
           case "close-modal":
             if (mode === "modal" && modalProps.onClose) {
@@ -102,17 +104,17 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
             }
             break;
           case "show-account":
-            message.success(`注册成功，欢迎 ${user.username}！`);
+            message.success(t("ui.registeredSuccessfullyWelcomeUsername", { username: user.username }));
             break;
           case "redirect":
             window.location.reload();
             break;
           default:
-            message.success("注册成功！");
+            message.success(t("ui.registeredSuccessfully"));
         }
       }
     },
-    [onRegisterSuccess, mode, modalProps],
+    [onRegisterSuccess, mode, modalProps, t],
   );
 
   // 已迁移到 useRequest 上方
@@ -135,7 +137,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
     } catch (error: any) {
       return {
         success: false,
-        message: error.message || "登录失败",
+        message: error.message || t("ui.signInFailed"),
       };
     }
   };
@@ -162,17 +164,17 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
     } catch (error: any) {
       return {
         success: false,
-        message: error.message || "注册失败",
+        message: error.message || t("ui.registrationFailed"),
       };
     }
   };
 
   // 渲染内容
-  const defaultTitle = currentAction === "login" ? "欢迎回来" : "创建账号";
+  const defaultTitle = currentAction === "login" ? t("ui.welcomeBack") : t("ui.createAccount");
   const defaultDescription =
     currentAction === "login"
-      ? "登录后可以同步您的数据和设置"
-      : "注册账号以享受完整功能";
+      ? t("ui.signInToSyncYourDataAndSettings")
+      : t("ui.auth.createAccountSubtitle");
 
   const renderRegisterForm = () =>
     allowRegister ? (
@@ -220,7 +222,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
             block
             className="apple-auth-segmented"
             options={authActions.map((action) => ({
-              label: authActionLabel[action],
+              label: t(authActionLabel[action]),
               value: action,
             }))}
             value={currentAction}
@@ -234,14 +236,14 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
       {/* 切换提示（当不显示Tab时） */}
       {!showToggle && (
         <div className="apple-auth-switch-row">
-          {currentAction === "login" ? "还没有账号？" : "已有账号？"}
+          {t(currentAction === "login" ? "ui.noAccountYet" : "ui.alreadyHaveAnAccount")}
           <button
             type="button"
             onClick={() =>
               setCurrentAction(currentAction === "login" ? "register" : "login")
             }
           >
-            {currentAction === "login" ? "立即注册" : "立即登录"}
+            {t(currentAction === "login" ? "ui.registerNow" : "ui.signInNow")}
           </button>
         </div>
       )}

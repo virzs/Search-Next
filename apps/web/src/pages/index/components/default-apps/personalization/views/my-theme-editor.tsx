@@ -13,6 +13,7 @@ import {
   type MyThemeItem,
 } from "../my-assets";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const themeEditorClassName = css`
   .apple-theme-action.ant-btn-primary:not(:disabled) {
@@ -32,6 +33,7 @@ const getThemeOverlayContainer = () =>
   document.querySelector<HTMLElement>(".base-modal-panel") ?? document.body;
 
 const ThemeMyThemeEditorView = () => {
+  const { t } = useI18n();
   const { message, modal } = App.useApp();
   const navigate = useNavigate();
   const params = useParams();
@@ -82,8 +84,8 @@ const ThemeMyThemeEditorView = () => {
   const previewTheme = useMemo<MyThemeItem>(() => {
     return {
       id: currentItem?.id ?? "preview",
-      name: String(watchedName ?? "").trim() || "自定义主题",
-      description: String(watchedDescription ?? "").trim() || "自定义主题",
+      name: String(watchedName ?? "").trim() || t("ui.customTheme"),
+      description: String(watchedDescription ?? "").trim() || t("ui.customTheme"),
       lightBackground,
       darkBackground,
       accentColor,
@@ -96,6 +98,7 @@ const ThemeMyThemeEditorView = () => {
     currentItem?.id,
     darkBackground,
     lightBackground,
+    t,
     watchedDescription,
     watchedName,
   ]);
@@ -149,7 +152,7 @@ const ThemeMyThemeEditorView = () => {
           ? items.map((item) => (item.id === currentItem.id ? nextItem : item))
           : [nextItem, ...items];
       persist(nextItems);
-      message.success("已保存");
+      message.success(t("ui.saved"));
       navigate(personalizationRoute.path.my, { replace: true });
       return nextItem;
     } catch {
@@ -166,11 +169,11 @@ const ThemeMyThemeEditorView = () => {
   const handleDelete = () => {
     if (!currentItem) return;
     modal.confirm({
-      title: "删除此主题？",
-      content: "删除后不可恢复。若当前正在使用，将切回默认主题。",
-      okText: "删除",
+      title: t("ui.deleteThisTheme"),
+      content: t("ui.theme.deleteWarning"),
+      okText: t("ui.delete"),
       okButtonProps: { danger: true },
-      cancelText: "取消",
+      cancelText: t("ui.cancel"),
       getContainer: getThemeOverlayContainer,
       onOk: () => {
         persist(items.filter((item) => item.id !== currentItem.id));
@@ -184,22 +187,22 @@ const ThemeMyThemeEditorView = () => {
     <DefaultAppView
       className={`h-full ${themeEditorClassName}`}
       animate
-      title={isEdit ? "编辑主题" : "创建主题"}
+      title={isEdit ? t("ui.editTheme") : t("ui.createTheme")}
       headerRight={
         <Space size={8}>
           {isEdit ? (
             <Button danger onClick={handleDelete}>
-              删除
+              {t("ui.delete")}
             </Button>
           ) : null}
-          <Button onClick={handleSave}>保存</Button>
+          <Button onClick={handleSave}>{t("ui.save")}</Button>
           <Button
             type="primary"
             shape="round"
             className="apple-theme-action"
             onClick={handleSaveAndApply}
           >
-            保存并应用
+            {t("ui.saveAndApply")}
           </Button>
         </Space>
       }
@@ -219,19 +222,19 @@ const ThemeMyThemeEditorView = () => {
           <Form form={form} layout="vertical">
             <Form.Item
               name="name"
-              label="名称"
-              rules={[{ required: true, message: "请输入名称" }]}
+              label={t("ui.name")}
+              rules={[{ required: true, message: t("ui.enterAName") }]}
             >
-              <Input placeholder="例如：我的专注主题" />
+              <Input placeholder={t("ui.exampleMyFocusTheme")} />
             </Form.Item>
-            <Form.Item name="description" label="描述">
-              <Input placeholder="例如：低对比、适合长时间工作" />
+            <Form.Item name="description" label={t("ui.description")}>
+              <Input placeholder={t("ui.theme.descriptionPlaceholder")} />
             </Form.Item>
           </Form>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <div className="mb-2 text-sm font-medium">浅色背景</div>
+              <div className="mb-2 text-sm font-medium">{t("ui.lightBackground")}</div>
               <ColorPicker
                 value={lightBackground}
                 onChange={(color, hex) =>
@@ -244,7 +247,7 @@ const ThemeMyThemeEditorView = () => {
               />
             </div>
             <div>
-              <div className="mb-2 text-sm font-medium">深色背景</div>
+              <div className="mb-2 text-sm font-medium">{t("ui.darkBackground")}</div>
               <ColorPicker
                 value={darkBackground}
                 onChange={(color, hex) =>
@@ -259,7 +262,7 @@ const ThemeMyThemeEditorView = () => {
           </div>
 
           <div className="mt-4">
-            <div className="mb-2 text-sm font-medium">强调色</div>
+            <div className="mb-2 text-sm font-medium">{t("ui.accentColor")}</div>
             <ColorPicker
               value={accentColor}
               onChange={(color, hex) => setAccentColor(colorToHex(color, hex))}
@@ -273,13 +276,13 @@ const ThemeMyThemeEditorView = () => {
 
         <div>
           <div className="mb-2 ml-1 text-[13px] font-extrabold text-[#6e6e73]">
-            实时预览
+            {t("ui.livePreview")}
           </div>
           <div className="aspect-video overflow-hidden rounded-[18px] border border-white/80 bg-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06)]">
             <ThemeDesktopPreview theme={previewConfig} draggable />
           </div>
           <div className="mt-3 rounded-[16px] border border-white/80 bg-white/80 p-3 text-xs leading-5 text-[#6e6e73] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-            自定义主题会保存在本地“我的”中，保存并应用后立即参与桌面主题渲染。
+            {t("ui.theme.localSaveHint")}
           </div>
         </div>
       </div>

@@ -1,59 +1,48 @@
 import { Select } from "antd";
-import { useState } from "react";
 import { RiTranslate } from "@remixicon/react";
-import { APP_LANGUAGE_STORAGE_KEY } from "@/utils/storage";
+import { useI18n, type AppLanguage } from "@/i18n";
 import {
   MacSettingsRow,
   MacSettingsSection,
   MacSettingsView,
 } from "../../components/macos-settings";
 
-interface LanguageOption {
-  code: string;
-  nativeName: string;
-  description?: string;
-}
-
-const languages: LanguageOption[] = [
-  {
-    code: "zh-CN",
-    nativeName: "简体中文",
-    description: "用于菜单、设置和系统界面的显示语言",
-  },
-];
-
 const LanguageView = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    () => localStorage.getItem(APP_LANGUAGE_STORAGE_KEY) || "zh-CN",
+  const { language, languages, setLanguage, t } = useI18n();
+
+  const selectedLanguageInfo = languages.find(
+    (item) => item.code === language,
   );
 
-  const selectedLanguageInfo =
-    languages.find((language) => language.code === selectedLanguage) ??
-    languages[0];
-
-  const handleLanguageChange = (languageCode: string) => {
-    setSelectedLanguage(languageCode);
-    localStorage.setItem(APP_LANGUAGE_STORAGE_KEY, languageCode);
+  const handleLanguageChange = (languageCode: AppLanguage) => {
+    void setLanguage(languageCode);
   };
 
   return (
     <MacSettingsView>
-      <MacSettingsSection title="语言">
+      <MacSettingsSection title={t("ui.language")}>
         <MacSettingsRow
           icon={<RiTranslate size={16} />}
           iconTone="green"
-          title="界面语言"
-          description={selectedLanguageInfo?.description}
+          title={t("ui.interfaceLanguage")}
+          description={
+            selectedLanguageInfo
+              ? t(`language.description.${selectedLanguageInfo.code}`)
+              : undefined
+          }
           extra={
             <Select
               size="small"
-              value={selectedLanguage}
+              value={language}
               onChange={handleLanguageChange}
               options={languages.map((language) => ({
-                label: language.nativeName,
+                label: t(`language.name.${language.code}`),
                 value: language.code,
               }))}
               popupMatchSelectWidth={false}
+              getPopupContainer={(triggerNode) =>
+                triggerNode.closest(".base-modal-panel") ?? document.body
+              }
               className="w-[118px]"
             />
           }

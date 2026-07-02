@@ -5,14 +5,21 @@ import {
   personalizationRootRouteDefinition,
   personalizationRouteDefinitions,
 } from "./route-definitions";
+import { useI18n } from "@/i18n";
 
 const PersonalizationModalRoute: FC = () => {
-  const menuItems = createSidebarMenuItems(personalizationRouteDefinitions);
+  const { routeTextResolver } = useI18n();
+  const menuItems = createSidebarMenuItems(personalizationRouteDefinitions, {
+    textResolver: routeTextResolver,
+  });
 
   return (
     <AppRoutedOverlay
       closeTo="/"
-      title={personalizationRootRouteDefinition.meta.title}
+      title={routeTextResolver(personalizationRootRouteDefinition.meta.title, {
+        route: personalizationRootRouteDefinition,
+        field: "title",
+      })}
       wrapContent
       componentSize="small"
       keepAlive={{ enabled: true }}

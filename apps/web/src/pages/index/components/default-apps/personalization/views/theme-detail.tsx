@@ -11,8 +11,10 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router";
 import { personalizationRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
+import { useI18n } from "@/i18n";
 
 const ThemeDetailView: FC = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -59,7 +61,7 @@ const ThemeDetailView: FC = () => {
           disabled={active}
           onClick={() => setActiveThemeId(theme._id)}
         >
-          {active ? "已应用" : "应用到桌面"}
+          {active ? t("ui.applied") : t("ui.applyToDesktop")}
         </Button>
       }
     >

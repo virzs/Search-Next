@@ -18,6 +18,7 @@ import {
 } from "./wallpaper-gradients";
 import PreviewCard from "../components/PreviewCard";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const wallpaperViewClassName = css`
   .apple-theme-action.ant-btn-primary:not(:disabled) {
@@ -32,6 +33,7 @@ const wallpaperViewClassName = css`
 `;
 
 const WallpaperView: FC = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { personalization, setWallpaper } = useDesktopTheme();
   const [activeType, setActiveType] = useState<"gradient" | "image">(
@@ -64,9 +66,9 @@ const WallpaperView: FC = () => {
   }, [categories]);
 
   const activeCategoryName = useMemo(() => {
-    if (!activeCategoryId) return "壁纸";
-    return categoryNameMap[activeCategoryId] ?? "壁纸";
-  }, [activeCategoryId, categoryNameMap]);
+    if (!activeCategoryId) return t("ui.wallpaper");
+    return categoryNameMap[activeCategoryId] ?? t("ui.wallpaper");
+  }, [activeCategoryId, categoryNameMap, t]);
 
   const categoryIdList = useMemo(() => {
     const items: WallpaperCategoryApiItem[] = categories ?? [];
@@ -199,12 +201,12 @@ const WallpaperView: FC = () => {
         disabled={disabled}
         title={w.name}
         description={
-          active ? "当前使用" : w.description || (url ? "图片壁纸" : "资源不可用")
+          active ? t("ui.inUse") : w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))
         }
         status={
           active ? (
             <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-              当前
+              {t("ui.current")}
             </span>
           ) : null
         }
@@ -218,7 +220,7 @@ const WallpaperView: FC = () => {
               className={active ? undefined : "apple-theme-action"}
               onClick={() => handleSelectImage(w)}
             >
-              {active ? "已应用" : "应用"}
+              {active ? t("ui.applied") : t("action.apply")}
             </Button>
           ) : null
         }
@@ -245,8 +247,8 @@ const WallpaperView: FC = () => {
       headerLeft={
         <AppSegmented
           options={[
-            { label: "渐变", value: "gradient" },
-            { label: "图片", value: "image" },
+            { label: t("ui.gradient"), value: "gradient" },
+            { label: t("ui.image"), value: "image" },
           ]}
           value={activeType}
           onChange={(v) => setActiveType(v as any)}
@@ -258,10 +260,10 @@ const WallpaperView: FC = () => {
       <div className="mx-auto w-full max-w-6xl">
         <div className="mb-5">
           <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
-            壁纸
+            {t("ui.wallpaper")}
           </div>
           <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
-            选择渐变或图片背景，应用到当前桌面。
+            {t("ui.wallpaper.chooseDescription")}
           </div>
         </div>
       {activeType === "gradient" ? (
@@ -274,18 +276,18 @@ const WallpaperView: FC = () => {
               <PreviewCard
                 key={w.id}
                 active={active}
-                title={w.name}
+                title={t(w.name)}
                 description={
                   active
-                    ? "当前使用"
+                    ? t("ui.inUse")
                     : w.id === "none"
-                      ? "使用默认背景"
-                      : "渐变背景"
+                      ? t("ui.useDefaultBackground")
+                      : t("ui.gradientBackground")
                 }
                 status={
                   active ? (
                     <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                      当前
+                      {t("ui.current")}
                     </span>
                   ) : null
                 }
@@ -298,7 +300,7 @@ const WallpaperView: FC = () => {
                     className={active ? undefined : "apple-theme-action"}
                     onClick={() => handleSelectGradient(w)}
                   >
-                    {active ? "已应用" : "应用"}
+                    {active ? t("ui.applied") : t("action.apply")}
                   </Button>
                 }
                 cover={
@@ -362,13 +364,13 @@ const WallpaperView: FC = () => {
                       className="apple-link px-0!"
                       onClick={() => openCategory(c._id)}
                     >
-                      查看更多
+                      {t("ui.viewMore")}
                     </Button>
                   </div>
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {items.map((item) => renderWallpaperCard(item))}
                     {items.length === 0 ? (
-                      <Empty className="mt-2" description="暂无壁纸" />
+                      <Empty className="mt-2" description={t("ui.noWallpapers")} />
                     ) : null}
                   </div>
                 </div>
@@ -377,12 +379,12 @@ const WallpaperView: FC = () => {
           </div>
         ) : (
           <div className="h-[220px] w-full flex items-center justify-center">
-            <Empty description="暂无分类" />
+            <Empty description={t("ui.noCategories")} />
           </div>
         )
       ) : wallpaperLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <div className="text-sm text-gray-500">正在加载壁纸…</div>
+          <div className="text-sm text-gray-500">{t("ui.loadingWallpapers")}</div>
         </div>
       ) : visibleWallpapers.length ? (
         <div>
@@ -407,7 +409,7 @@ const WallpaperView: FC = () => {
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">
           <Empty
-            description={imageViewMode === "category" ? "暂无壁纸" : "暂无数据"}
+            description={imageViewMode === "category" ? t("ui.noWallpapers") : t("ui.noData")}
           />
         </div>
       )}

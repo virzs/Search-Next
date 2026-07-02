@@ -2,6 +2,7 @@ import { Button, Image } from "antd";
 import { FC } from "react";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../utils";
 import { css, cx } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 interface WebsiteCardProps {
   item: any;
@@ -18,6 +19,7 @@ const WebsiteCard: FC<WebsiteCardProps> = ({
   layout = "grid",
   variant = "normal",
 }) => {
+  const { t } = useI18n();
   const iconUrl = getWebsiteIconUrl(item);
   const name = getWebsiteName(item);
   const url = getWebsiteUrl(item);
@@ -95,7 +97,7 @@ const WebsiteCard: FC<WebsiteCardProps> = ({
             onAdd(item);
           }}
         >
-          获取
+          {t("ui.get")}
         </Button>
       </div>
     </div>

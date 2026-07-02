@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { WidgetMode, WidgetSDK } from "@/sdk";
+import { useI18n } from "@/i18n";
 
 export interface PureWidgetConfig {
   entry: string;
@@ -39,6 +40,7 @@ const createShadowMount = (container: HTMLElement) => {
 };
 
 const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onClick }) => {
+  const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -152,7 +154,9 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
   if (error) {
     return (
       <div className={className} style={style}>
-        <div className="flex items-center justify-center w-full h-full text-red-500 text-xs">小组件加载失败</div>
+        <div className="flex items-center justify-center w-full h-full text-red-500 text-xs">
+          {t("widget.loadFailed")}
+        </div>
       </div>
     );
   }

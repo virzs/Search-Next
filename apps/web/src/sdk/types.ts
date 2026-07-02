@@ -19,6 +19,12 @@ export interface WidgetThemeInfo {
   resolvedColorScheme?: 'light' | 'dark';
 }
 
+/** 小组件 SDK 语言环境信息 */
+export interface WidgetLocaleInfo {
+  language: 'zh-CN' | 'en-US';
+  direction: 'ltr';
+}
+
 /** 小组件 SDK 用户信息（只读） */
 export interface WidgetUserInfo {
   _id: string;
@@ -65,6 +71,12 @@ export interface WidgetSDK {
   theme: WidgetThemeInfo;
   /** 监听主题变化 */
   onThemeChange(callback: (theme: WidgetThemeInfo) => void): () => void;
+  /** 宿主语言环境 */
+  locale: WidgetLocaleInfo;
+  /** 读取最新宿主语言环境 */
+  getLocale(): WidgetLocaleInfo;
+  /** 监听宿主语言变化 */
+  onLocaleChange(callback: (locale: WidgetLocaleInfo) => void): () => void;
   /** 用户信息（未登录为 null） */
   user: WidgetUserInfo | null;
   /** 是否已认证 */
@@ -90,6 +102,10 @@ export interface CreateHostSDKOptions {
   mode: WidgetMode;
   /** 当前主题 */
   theme: WidgetThemeInfo;
+  /** 当前语言环境 */
+  locale: WidgetLocaleInfo;
+  /** 读取最新语言环境 */
+  getLocale?: () => WidgetLocaleInfo;
   /** 用户信息 */
   user: WidgetUserInfo | null;
   isAuthenticated: boolean;

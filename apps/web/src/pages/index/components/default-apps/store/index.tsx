@@ -8,6 +8,7 @@ import {
   storeRootRouteDefinition,
   storeRouteDefinitions,
 } from "./route-definitions";
+import { useI18n } from "@/i18n";
 
 export type StoreWebsitePayload = {
   name?: string;
@@ -45,19 +46,24 @@ const buildStoreRouteContext = ({
 
 const StoreModalRoute: FC = () => {
   const { devModeEnabled } = useWidget();
+  const { routeTextResolver, t } = useI18n();
 
   const menuItems = useMemo(
     () =>
       createSidebarMenuItems(storeRouteDefinitions, {
         context: { devModeEnabled },
+        textResolver: routeTextResolver,
       }),
-    [devModeEnabled],
+    [devModeEnabled, routeTextResolver],
   );
 
   return (
     <AppRoutedOverlay<DesktopOutletContext, StoreOutletContext>
       closeTo="/"
-      title={storeRootRouteDefinition.meta.title}
+      title={routeTextResolver(storeRootRouteDefinition.meta.title, {
+        route: storeRootRouteDefinition,
+        field: "title",
+      })}
       wrapContent
       componentSize="small"
       overlayProps={{
@@ -65,7 +71,7 @@ const StoreModalRoute: FC = () => {
       }}
       sidebarProps={{
         search: {
-          placeholder: "搜索",
+          placeholder: t("ui.search"),
           prefix: <RiSearchLine size={16} className="text-gray-400" />,
           redirectPath: storeRoute.path.search,
           throttleWait: 360,

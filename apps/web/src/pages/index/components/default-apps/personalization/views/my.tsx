@@ -32,6 +32,7 @@ import {
   type MyWallpaperItem,
 } from "../my-assets";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const themeMyClassName = css`
   .apple-theme-action.ant-btn-primary:not(:disabled) {
@@ -45,15 +46,15 @@ const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
 ) => {
   if (wallpaper.name) return wallpaper.name;
-  if (wallpaper.type === "none") return "无";
-  if (wallpaper.type === "image") return "图片";
-  return "渐变";
+  if (wallpaper.type === "none") return "ui.none";
+  if (wallpaper.type === "image") return "ui.image";
+  return "ui.gradient";
 };
 
 const resolveThemeName = (themeName: string | null | undefined, themeId: string) => {
   if (themeName) return themeName;
-  if (themeId === "light") return "默认";
-  if (themeId === "dark") return "深色";
+  if (themeId === "light") return "ui.default";
+  if (themeId === "dark") return "ui.dark";
   return themeId;
 };
 
@@ -186,6 +187,7 @@ const CreateActionCard = ({
 };
 
 const ThemeMyView = () => {
+  const { t } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const { activeThemeId, personalization, setActiveThemeId, setWallpaper } =
@@ -247,8 +249,11 @@ const ThemeMyView = () => {
     });
   }, [themes]);
 
-  const currentWallpaperName = resolveWallpaperName(personalization.wallpaper);
-  const currentThemeName = resolveThemeName(currentTheme?.name, activeThemeId);
+  const currentWallpaperName =
+    personalization.wallpaper.name || t(resolveWallpaperName(personalization.wallpaper));
+  const currentThemeName = currentTheme?.name
+    ? currentTheme.name
+    : t(resolveThemeName(currentTheme?.name, activeThemeId));
   const applyWallpaper = (item: MyWallpaperItem) => {
     if (item.type === "gradient") {
       setWallpaper({ type: "gradient", css: item.css, name: item.name });
@@ -263,7 +268,7 @@ const ThemeMyView = () => {
       headerRight={
         <div className="flex items-center gap-2">
           <Button onClick={() => navigate(personalizationRoute.path.myThemeCreate)}>
-            创建主题
+            {t("ui.createTheme")}
           </Button>
           <Button
             type="primary"
@@ -271,7 +276,7 @@ const ThemeMyView = () => {
             className="apple-theme-action"
             onClick={() => navigate(personalizationRoute.path.myCreate)}
           >
-            添加壁纸
+            {t("ui.addWallpaper")}
           </Button>
         </div>
       }
@@ -280,15 +285,15 @@ const ThemeMyView = () => {
       <div className="mx-auto w-full max-w-6xl">
         <div className="mb-5">
           <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
-            我的
+            {t("ui.mine")}
           </div>
           <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
-            管理你创建的主题和壁纸，并快速应用到桌面。
+            {t("ui.personalization.mineDescription")}
           </div>
         </div>
       <section>
         <div className="mb-2 ml-1 text-[13px] font-extrabold text-[#6e6e73]">
-          当前使用
+          {t("ui.inUse")}
         </div>
         <div className="grid grid-cols-[1.2fr_0.8fr] gap-5 max-[760px]:grid-cols-1">
           <CurrentDesktopPreview
@@ -298,29 +303,29 @@ const ThemeMyView = () => {
           <div className="grid gap-3">
             <CurrentStatusCard
               icon={<RiTShirtLine size={16} />}
-              title="当前主题"
+              title={t("ui.currentTheme")}
               description={currentThemeName}
-              detail="已应用到桌面"
+              detail={t("ui.appliedToDesktop")}
               tone="blue"
             />
             <CurrentStatusCard
               icon={<RiLandscapeLine size={16} />}
-              title="当前壁纸"
+              title={t("ui.currentWallpaper")}
               description={currentWallpaperName}
               detail={
                 personalization.wallpaper.type === "none"
-                  ? "使用默认背景"
+                  ? t("ui.useDefaultBackground")
                   : personalization.wallpaper.type === "image"
-                    ? "图片壁纸"
-                    : "渐变壁纸"
+                    ? t("ui.imageWallpaper")
+                    : t("ui.gradientWallpaper")
               }
               tone="purple"
             />
             <CurrentStatusCard
               icon={<RiAddLine size={16} />}
-              title="自建内容"
-              description="创建主题或添加壁纸"
-              detail="在下方管理"
+              title={t("ui.customContent")}
+              description={t("ui.createAThemeOrAddAWallpaper")}
+              detail={t("ui.manageBelow")}
               tone="green"
             />
           </div>
@@ -329,18 +334,18 @@ const ThemeMyView = () => {
 
       <section className="mt-5">
         <div className="mb-2 ml-1 text-[13px] font-extrabold text-[#6e6e73]">
-          我的创建
+          {t("ui.myCreations")}
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <CreateActionCard
-            title="创建主题"
-            description="配置浅色、深色和强调色，保存后可直接应用到桌面。"
+            title={t("ui.createTheme")}
+            description={t("ui.theme.editorDescription")}
             tone="theme"
             action={() => navigate(personalizationRoute.path.myThemeCreate)}
           />
           <CreateActionCard
-            title="添加壁纸"
-            description="创建渐变背景，或添加一张图片作为桌面壁纸。"
+            title={t("ui.addWallpaper")}
+            description={t("ui.wallpaper.editorDescription")}
             tone="wallpaper"
             action={() => navigate(personalizationRoute.path.myCreate)}
           />
@@ -353,12 +358,12 @@ const ThemeMyView = () => {
                 active={active}
                 title={theme.name}
                 description={
-                  active ? "自定义主题 · 当前使用" : "点击卡片编辑主题"
+                  active ? t("ui.customThemeInUse") : t("ui.clickTheCardToEditTheme")
                 }
                 status={
                   active ? (
                     <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                      当前
+                      {t("ui.current")}
                     </span>
                   ) : null
                 }
@@ -370,7 +375,7 @@ const ThemeMyView = () => {
                         navigate(personalizationRoute.path.myThemeEdit(theme.id))
                       }
                     >
-                      编辑
+                      {t("ui.edit")}
                     </Button>
                     <Button
                       size="small"
@@ -380,7 +385,7 @@ const ThemeMyView = () => {
                       className={active ? undefined : "apple-theme-action"}
                       onClick={() => setActiveThemeId(theme.id)}
                     >
-                      {active ? "已应用" : "应用"}
+                      {active ? t("ui.applied") : t("action.apply")}
                     </Button>
                   </div>
                 }
@@ -407,13 +412,13 @@ const ThemeMyView = () => {
                 title={item.name}
                 description={
                   item.type === "gradient"
-                    ? `${active ? "自定义壁纸 · 当前使用" : "点击卡片编辑渐变"}`
-                    : `${active ? "自定义壁纸 · 当前使用" : "点击卡片编辑图片"}`
+                    ? active ? t("ui.customWallpaperInUse") : t("ui.clickTheCardToEditGradient")
+                    : active ? t("ui.customWallpaperInUse") : t("ui.clickTheCardToEditImage")
                 }
                 status={
                   active ? (
                     <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                      当前
+                      {t("ui.current")}
                     </span>
                   ) : null
                 }
@@ -423,7 +428,7 @@ const ThemeMyView = () => {
                       size="small"
                       onClick={() => navigate(personalizationRoute.path.myEdit(item.id))}
                     >
-                      编辑
+                      {t("ui.edit")}
                     </Button>
                     <Button
                       size="small"
@@ -433,7 +438,7 @@ const ThemeMyView = () => {
                       className={active ? undefined : "apple-theme-action"}
                       onClick={() => applyWallpaper(item)}
                     >
-                      {active ? "已应用" : "应用"}
+                      {active ? t("ui.applied") : t("action.apply")}
                     </Button>
                   </div>
                 }
@@ -450,7 +455,7 @@ const ThemeMyView = () => {
         </div>
         {sortedThemes.length || sortedWallpapers.length ? null : (
           <div className="mt-3 rounded-[14px] border border-[rgba(60,60,67,0.12)] bg-white/70 px-4 py-3 text-xs font-medium text-[#8e8e93]">
-            还没有自定义内容，可以从上方创建主题或添加壁纸开始。
+            {t("ui.personalization.emptyMine")}
           </div>
         )}
       </section>

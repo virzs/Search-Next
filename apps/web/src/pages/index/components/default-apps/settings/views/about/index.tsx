@@ -12,8 +12,10 @@ import {
   MacSettingsSection,
   MacSettingsView,
 } from "../../components/macos-settings";
+import { useI18n } from "@/i18n";
 
 const AboutView = () => {
+  const { t } = useI18n();
   const appInfo = {
     name: "Search Next",
     version: "1.0.0",
@@ -38,7 +40,7 @@ const AboutView = () => {
                 v{appInfo.version}
               </span>
               <span className="rounded-full bg-[#f2f2f7] px-3 py-1 text-xs font-bold text-[#555]">
-                测试版
+                {t("ui.beta")}
               </span>
               <span className="rounded-full bg-[#f2f2f7] px-3 py-1 text-xs font-bold text-[#555]">
                 {appInfo.license}
@@ -49,20 +51,20 @@ const AboutView = () => {
         <div className="mt-4">
           <MacSettingsInfoGrid
             items={[
-              { label: "版本号", value: appInfo.version },
-              { label: "构建日期", value: appInfo.buildDate },
-              { label: "开发者", value: appInfo.author },
-              { label: "许可证", value: appInfo.license },
+              { label: t("ui.versionNumber"), value: appInfo.version },
+              { label: t("ui.buildDate"), value: appInfo.buildDate },
+              { label: t("ui.developer"), value: appInfo.author },
+              { label: t("ui.license"), value: appInfo.license },
             ]}
           />
         </div>
       </div>
 
-      <MacSettingsSection title="联系">
+      <MacSettingsSection title={t("ui.contact")}>
         <MacSettingsRow
           icon={<RiMailLine size={16} />}
           iconTone="blue"
-          title="电子邮件"
+          title={t("ui.emailAddress")}
           description="zcccxyss@outlook.com"
           extra={<MacSettingsChevron />}
           onClick={() => {
@@ -72,7 +74,7 @@ const AboutView = () => {
         <MacSettingsRow
           icon={<RiGlobalLine size={16} />}
           iconTone="green"
-          title="官方网站"
+          title={t("ui.officialWebsite")}
           description="github.com/virzs/Search-Next"
           extra={<MacSettingsChevron />}
           onClick={() => {
@@ -82,8 +84,8 @@ const AboutView = () => {
         <MacSettingsRow
           icon={<RiQuestionLine size={16} />}
           iconTone="purple"
-          title="帮助文档"
-          description="GitHub 项目主页"
+          title={t("ui.helpDocs")}
+          description={t("ui.gitHubProjectPage")}
           extra={<MacSettingsChevron />}
           onClick={() => {
             window.open("https://github.com/virzs/Search-Next", "_blank");
@@ -102,8 +104,8 @@ const AboutView = () => {
         <MacSettingsRow
           icon={<RiBugLine size={16} />}
           iconTone="red"
-          title="反馈问题"
-          description="创建 GitHub Issue"
+          title={t("ui.reportIssue")}
+          description={t("ui.createAGitHubIssue")}
           extra={<MacSettingsChevron />}
           onClick={() => {
             window.open(
@@ -115,9 +117,9 @@ const AboutView = () => {
       </MacSettingsSection>
 
       <div className="rounded-[16px] border border-white/80 bg-white/80 p-5 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
-        <div className="text-base font-bold text-[#1d1d1f]">特别感谢</div>
+        <div className="text-base font-bold text-[#1d1d1f]">{t("ui.specialThanks")}</div>
         <div className="mt-2 text-sm leading-6 text-[#6e6e73]">
-          感谢所有开源项目的贡献者，以及每一位用户的支持与反馈。
+          {t("ui.about.thanksBody")}
         </div>
         <div className="mt-4 text-xs text-[#8e8e93]">
           © 2026 Search Next. All rights reserved.

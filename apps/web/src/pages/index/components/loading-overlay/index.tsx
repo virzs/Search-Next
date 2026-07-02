@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react";
 import { Spin } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import { css, cx } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const MotionDiv = motion.div as any;
 
@@ -15,12 +16,14 @@ export interface LoadingOverlayProps {
 
 const LoadingOverlay: FC<LoadingOverlayProps> = ({
   open,
-  text = "正在加载…",
+  text,
   delayMs = 0,
   spinSize = "large",
   className,
 }) => {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(open && delayMs <= 0);
+  const displayText = text ?? t("ui.loading");
 
   useEffect(() => {
     if (!open) {
@@ -73,7 +76,7 @@ const LoadingOverlay: FC<LoadingOverlayProps> = ({
           >
             <Spin size={spinSize} />
             <div className="text-sm font-semibold tracking-normal text-[#1d1d1f]">
-              {text}
+              {displayText}
             </div>
           </MotionDiv>
         </MotionDiv>

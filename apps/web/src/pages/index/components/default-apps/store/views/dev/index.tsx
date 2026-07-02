@@ -20,6 +20,7 @@ import DevWidgetModal, { toSizeConfigs } from "./dev-widget-modal";
 import type { DevWidgetFormValues } from "./dev-widget-modal";
 import type { StoreOutletContext } from "../../index";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const devViewClassName = css`
   .apple-store-action.ant-btn-primary:not(:disabled) {
@@ -31,6 +32,7 @@ const devViewClassName = css`
 `;
 
 const DevView: React.FC = () => {
+  const { t } = useI18n();
   const { message } = App.useApp();
   const {
     devWidgets,
@@ -70,7 +72,7 @@ const DevView: React.FC = () => {
         sizeConfigs,
         defaultSizeId,
       });
-      message.success("已更新");
+      message.success(t("ui.updated"));
     } else {
       const created = addDevWidget({
         name: values.name,
@@ -79,17 +81,17 @@ const DevView: React.FC = () => {
         defaultSizeId,
       });
       if (!created) {
-        message.warning("该入口地址已存在，请勿重复添加");
+        message.warning(t("ui.dev.duplicateEntry"));
         return;
       }
       onAddStoreItem?.({ kind: "widget", widgetId: created.id });
-      message.success("已添加到桌面");
+      message.success(t("ui.addedToDesktop"));
     }
   };
 
   const handleRemove = (id: string) => {
     removeDevWidget(id);
-    message.success("已移除");
+    message.success(t("ui.removed"));
   };
 
   return (
@@ -99,7 +101,7 @@ const DevView: React.FC = () => {
     >
       <div className="mb-4 flex shrink-0 items-end justify-between gap-3 px-1">
         <div className="text-[34px] font-extrabold leading-[38px] tracking-normal text-gray-950 dark:text-gray-50">
-          开发者
+          {t("ui.developer")}
         </div>
         <Button
           type="primary"
@@ -108,21 +110,21 @@ const DevView: React.FC = () => {
           className="apple-store-action font-bold!"
           onClick={openAddModal}
         >
-          添加
+          {t("ui.add")}
         </Button>
       </div>
 
       <div className="shrink-0">
         <StoreHeroCard
-          title="调试自定义小组件"
-          description="维护 ESM 入口地址和尺寸配置，用于本地或后端解压入口的小组件调试。"
+          title={t("ui.debugCustomWidgets")}
+          description={t("ui.dev.customWidgetsDescription")}
           tone="dev"
         />
       </div>
 
       {devWidgets.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <Empty description="暂无自定义小组件" />
+          <Empty description={t("ui.noCustomWidgets")} />
         </div>
       ) : (
         <div className="mt-5 grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-1 pr-1">
@@ -151,7 +153,7 @@ const DevView: React.FC = () => {
                           size="small"
                           shape="circle"
                           icon={<RiEditLine size={14} />}
-                          aria-label="编辑"
+                          aria-label={t("ui.edit")}
                           onClick={() => openEditModal(dw)}
                         />
                         <Button
@@ -163,20 +165,20 @@ const DevView: React.FC = () => {
                             onAddStoreItem?.({ kind: "widget", widgetId: dw.id })
                           }
                         >
-                          添加到桌面
+                          {t("ui.addToDesktop")}
                         </Button>
                         <Popconfirm
-                          title="确定删除该小组件？"
+                          title={t("ui.deleteThisWidget")}
                           onConfirm={() => handleRemove(dw.id)}
-                          okText="删除"
-                          cancelText="取消"
+                          okText={t("ui.delete")}
+                          cancelText={t("ui.cancel")}
                         >
                           <Button
                             danger
                             size="small"
                             shape="circle"
                             icon={<RiDeleteBinLine size={14} />}
-                            aria-label="删除"
+                            aria-label={t("ui.delete")}
                           />
                         </Popconfirm>
                       </div>

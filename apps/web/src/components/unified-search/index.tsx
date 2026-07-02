@@ -51,6 +51,7 @@ import {
   getUnifiedSearchShortcutParts,
   type UnifiedSearchShortcut,
 } from "./shortcut";
+import { useI18n } from "@/i18n";
 export {
   defaultUnifiedSearchPreferences,
   readUnifiedSearchPreferences,
@@ -174,40 +175,40 @@ const SEARCH_SHORTCUTS: SearchShortcutItem[] = [
     code: "all",
     aliases: ["all", "全部"],
     scope: "all",
-    label: "全部",
-    description: "搜索网页、网站、应用、设置",
+    label: "ui.all",
+    description: "ui.searchWebWebsitesAppsAndSettings",
     example: "@all ai",
   },
   {
     code: "ws",
     aliases: ["ws", "web", "search", "websearch", "网页搜索"],
     scope: "web-search",
-    label: "网页搜索",
-    description: "只打开搜索引擎与建议",
+    label: "ui.webSearch",
+    description: "ui.onlyOpenSearchEnginesAndSuggestions",
     example: "@ws ai",
   },
   {
     code: "site",
     aliases: ["site", "sites", "website", "websites", "w", "网站"],
     scope: "website",
-    label: "网站",
-    description: "只搜索站内网站",
+    label: "ui.websites",
+    description: "ui.onlySearchSavedWebsites",
     example: "@site 知乎",
   },
   {
     code: "app",
     aliases: ["app", "apps", "应用"],
     scope: "app",
-    label: "应用",
-    description: "只搜索应用",
+    label: "ui.app",
+    description: "ui.onlySearchApps",
     example: "@app 日历",
   },
   {
     code: "setting",
     aliases: ["setting", "settings", "set", "设置"],
     scope: "setting",
-    label: "设置",
-    description: "只搜索设置项",
+    label: "ui.settings",
+    description: "ui.onlySearchSettings",
     example: "@setting 主题",
   },
 ];
@@ -455,6 +456,7 @@ const UnifiedSearch = ({
 }: UnifiedSearchProps) => {
   const navigate = useNavigate();
   const { message } = AntdApp.useApp();
+  const { t, routeTextResolver } = useI18n();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [query, setQuery] = useState("");
@@ -528,8 +530,9 @@ const UnifiedSearch = ({
     () =>
       getDefaultAppRouteSearchItems({
         context: { devModeEnabled },
+        textResolver: routeTextResolver,
       }),
-    [devModeEnabled],
+    [devModeEnabled, routeTextResolver],
   );
   const shortcutToken = useMemo(() => {
     if (!rawQuery.startsWith("@") || rawQuery.startsWith("@@")) return "";
@@ -1231,11 +1234,11 @@ const UnifiedSearch = ({
     (targetEngines: SearchEngineItem[], searchText: string) => {
       const text = searchText.trim();
       if (!text) {
-        message.warning("请输入搜索内容");
+        message.warning(t("ui.enterASearchQuery"));
         return false;
       }
       if (!targetEngines.length) {
-        message.warning("暂无可用搜索引擎");
+        message.warning(t("ui.noSearchEnginesAvailable"));
         return false;
       }
 
@@ -1248,20 +1251,20 @@ const UnifiedSearch = ({
       });
       return true;
     },
-    [message],
+    [message, t],
   );
 
   const openWebsite = useCallback(
     (website: any) => {
       const url = resolveHttpUrl(getWebsiteUrl(website));
       if (!url) {
-        message.warning("网站地址无效");
+        message.warning(t("ui.invalidWebsiteURL"));
         return;
       }
       window.open(url, "_blank", "noopener,noreferrer");
       closeSpotlight();
     },
-    [closeSpotlight, message],
+    [closeSpotlight, message, t],
   );
 
   const openApp = useCallback(
@@ -1320,8 +1323,8 @@ const UnifiedSearch = ({
             kind: "search",
             title: defaultSearchText,
             description: primaryEngineNames
-              ? `用 ${primaryEngineNames} 搜索`
-              : "网页搜索",
+              ? t("ui.searchWithEngines", { engines: primaryEngineNames })
+              : t("ui.webSearch"),
             query: defaultSearchText,
           });
           closeSpotlight();
@@ -1351,7 +1354,7 @@ const UnifiedSearch = ({
             window.open(url, "_blank", "noopener,noreferrer");
             closeSpotlight();
           } else {
-            message.warning("网站地址无效");
+            message.warning(t("ui.invalidWebsiteURL"));
           }
           return;
         }
@@ -1380,8 +1383,8 @@ const UnifiedSearch = ({
         recordHistory({
           id: `shortcut:${targetItem.shortcut.code}`,
           kind: "shortcut",
-          title: `@${targetItem.shortcut.code} ${targetItem.shortcut.label}`,
-          description: targetItem.shortcut.description,
+          title: `@${targetItem.shortcut.code} ${t(targetItem.shortcut.label)}`,
+          description: t(targetItem.shortcut.description),
           shortcutCode: targetItem.shortcut.code,
           shortcutScope: targetItem.shortcut.scope,
         });
@@ -1395,8 +1398,8 @@ const UnifiedSearch = ({
             kind: "search",
             title: actionSearchText,
             description: primaryEngineNames
-              ? `用 ${primaryEngineNames} 搜索`
-              : "网页搜索",
+              ? t("ui.searchWithEngines", { engines: primaryEngineNames })
+              : t("ui.webSearch"),
             query: actionSearchText,
           });
           closeSpotlight();
@@ -1409,7 +1412,7 @@ const UnifiedSearch = ({
             id: `search:all:${actionSearchText}`,
             kind: "search",
             title: actionSearchText,
-            description: "打开全部搜索引擎",
+            description: t("ui.openAllSearchEngines"),
             query: actionSearchText,
           });
           closeSpotlight();
@@ -1422,7 +1425,9 @@ const UnifiedSearch = ({
             id: `search:${targetItem.engine._id}:${actionSearchText}`,
             kind: "search",
             title: actionSearchText,
-            description: `用 ${targetItem.engine.name} 搜索`,
+            description: t("ui.searchWithEngines", {
+              engines: targetItem.engine.name,
+            }),
             query: actionSearchText,
           });
           closeSpotlight();
@@ -1437,8 +1442,8 @@ const UnifiedSearch = ({
             kind: "search",
             title: targetItem.suggestion,
             description: primaryEngineNames
-              ? `用 ${primaryEngineNames} 搜索`
-              : "网页搜索",
+              ? t("ui.searchWithEngines", { engines: primaryEngineNames })
+              : t("ui.webSearch"),
             query: targetItem.suggestion,
           });
           closeSpotlight();
@@ -1461,7 +1466,7 @@ const UnifiedSearch = ({
           id: `app:${targetItem.widget._id}`,
           kind: "app",
           title: targetItem.widget.name,
-          description: targetItem.widget.description || "应用",
+          description: targetItem.widget.description || t("ui.app"),
           widgetId: targetItem.widget._id,
         });
         openApp(targetItem.widget);
@@ -1504,7 +1509,9 @@ const UnifiedSearch = ({
       currentSearchScope,
       rawQuery,
       recordHistory,
+      shouldSearchWeb,
       showShortcutSuggestions,
+      t,
       trimmedQuery,
       widgets,
     ],
@@ -1515,7 +1522,7 @@ const UnifiedSearch = ({
       setSelectedEngineIds((current) => {
         const exists = current.includes(engineId);
         if (exists && current.length <= 1) {
-          message.warning("请至少选择一个搜索引擎");
+          message.warning(t("ui.selectAtLeastOneSearchEngine"));
           return current;
         }
         const next = exists
@@ -1525,7 +1532,7 @@ const UnifiedSearch = ({
         return next;
       });
     },
-    [message],
+    [message, t],
   );
 
   const toggleSuggestionEngineExpanded = useCallback((engineId: string) => {
@@ -1606,13 +1613,13 @@ const UnifiedSearch = ({
         }}
         autoComplete="off"
         spellCheck={false}
-        placeholder="搜索网页、网站、应用、设置，输入 @ 查看命令"
+        placeholder={t("ui.search.placeholder")}
         className="min-w-0 flex-1 border-0 bg-transparent text-[15px] font-semibold text-[#1d1d1f] outline-none placeholder:text-[#8e8e93] dark:text-[#f5f5f7]"
       />
       {query ? (
         <button
           type="button"
-          aria-label="清空"
+          aria-label={t("ui.clearAll")}
           className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-[#8e8e93] hover:bg-black/5 dark:hover:bg-white/10"
           onClick={() => {
             setQuery("");
@@ -1625,7 +1632,7 @@ const UnifiedSearch = ({
         <span className="flex shrink-0 items-center gap-1.5">
           <button
             type="button"
-            title="快捷搜索命令"
+            title={t("ui.quickSearchCommands")}
             className="h-6 cursor-pointer rounded-md border-0 bg-black/[0.06] px-2 text-[11px] font-bold text-[#6e6e73] hover:bg-black/[0.09] dark:bg-white/10 dark:text-[#aeaeb2] dark:hover:bg-white/[0.14]"
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => {
@@ -1633,7 +1640,7 @@ const UnifiedSearch = ({
               inputRef.current?.focus();
             }}
           >
-            @命令
+            {t("ui.atCommands")}
           </button>
           {showShortcutHint ? (
             <span className="flex items-center gap-1">
@@ -1656,7 +1663,7 @@ const UnifiedSearch = ({
     if (!showStartPanel || !visibleHistoryItems.length) return null;
 
     return (
-      <SearchSection title="最近使用">
+      <SearchSection title={t("ui.recent")}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {visibleHistoryItems.map((history) => {
             const itemId = `history:${history.id}`;
@@ -1688,7 +1695,7 @@ const UnifiedSearch = ({
     if (!visibleShortcutItems.length) return null;
 
     return (
-      <SearchSection title={showStartPanel ? "快捷命令" : "快捷搜索"}>
+      <SearchSection title={t(showStartPanel ? "ui.quickSearchCommands" : "ui.quickSearch")}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {visibleShortcutItems.map((shortcut) => {
             const itemId = `shortcut:${shortcut.code}`;
@@ -1698,8 +1705,8 @@ const UnifiedSearch = ({
                 {...getNavigationMeta(itemId)}
                 active={activeItemId === itemId}
                 icon={renderShortcutIcon(shortcut.scope)}
-                title={`@${shortcut.code} ${shortcut.label}`}
-                description={`${shortcut.description} · ${shortcut.example}`}
+                title={`@${shortcut.code} ${t(shortcut.label)}`}
+                description={`${t(shortcut.description)} · ${shortcut.example}`}
                 compact
                 onClick={() =>
                   runFocusableItem({
@@ -1723,12 +1730,12 @@ const UnifiedSearch = ({
       <div className="flex min-w-0 flex-wrap items-center gap-1.5">
         {!enginesLoading && engines.length > 0 ? (
           <span className="mr-0.5 px-1 text-[11px] font-extrabold text-[#8e8e93]">
-            使用
+            {t("ui.use")}
           </span>
         ) : null}
         {enginesLoading ? (
           <span className="px-2 text-xs font-semibold text-[#8e8e93]">
-            读取中
+            {t("ui.loading2")}
           </span>
         ) : null}
         {engines.map((engine) => {
@@ -1764,13 +1771,15 @@ const UnifiedSearch = ({
       return null;
     }
     return (
-      <SearchSection title="搜索">
+      <SearchSection title={t("ui.search")}>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <SearchResultButton
             {...getNavigationMeta("action:selected")}
             active={activeItemId === "action:selected"}
             icon={<RiSearchLine size={17} />}
-            title={`用 ${primaryEngines.map((engine) => engine.name).join("、")} 搜索`}
+            title={t("ui.searchWithEngines", {
+              engines: primaryEngines.map((engine) => engine.name).join("、"),
+            })}
             description={actionSearchText}
             compact
             onClick={() =>
@@ -1781,8 +1790,8 @@ const UnifiedSearch = ({
             {...getNavigationMeta("action:all")}
             active={activeItemId === "action:all"}
             icon={<RiArrowRightUpLine size={17} />}
-            title="打开全部搜索引擎"
-            description={`${engines.length} 个搜索页`}
+            title={t("ui.openAllSearchEngines")}
+            description={t("ui.countSearchPages", { count: engines.length })}
             compact
             onClick={() =>
               runFocusableItem({ id: "action:all", type: "all-search" })
@@ -1798,7 +1807,7 @@ const UnifiedSearch = ({
     if (!trimmedQuery && !suggestionsLoading) return null;
     if (suggestionsLoading && !suggestionGroups.length) {
       return (
-        <SearchSection title="建议">
+        <SearchSection title={t("ui.suggestions")}>
           <div className="flex h-12 items-center justify-center">
             <Spin size="small" />
           </div>
@@ -1807,7 +1816,7 @@ const UnifiedSearch = ({
     }
     if (!visibleSuggestionGroups.length) return null;
     return (
-      <SearchSection title="建议">
+      <SearchSection title={t("ui.suggestions")}>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {visibleSuggestionGroups.map((group) => {
             const totalCount =
@@ -1835,7 +1844,7 @@ const UnifiedSearch = ({
                         toggleSuggestionEngineExpanded(group.engine._id)
                       }
                     >
-                      {expanded ? "收起" : "展开"}
+                      {t(expanded ? "ui.collapse" : "ui.expand")}
                     </button>
                   ) : null}
                 </div>
@@ -1877,7 +1886,7 @@ const UnifiedSearch = ({
     if (!trimmedQuery || !shouldSearchWebsites) return null;
     if (options?.showLoading && websiteLoading && !websiteResults.length) {
       return (
-        <SearchSection title={options.title ?? "网站"}>
+        <SearchSection title={t(options.title ?? "ui.websites")}>
           <div className="flex h-14 items-center justify-center">
             <Spin size="small" />
           </div>
@@ -1886,7 +1895,7 @@ const UnifiedSearch = ({
     }
     if (!results.length) return null;
     return (
-      <SearchSection title={options?.title ?? "网站"}>
+      <SearchSection title={t(options?.title ?? "ui.websites")}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {results.map((result) => {
             const website = result.item;
@@ -1932,7 +1941,7 @@ const UnifiedSearch = ({
     if (!trimmedQuery || !shouldSearchApps) return null;
     if (options?.showLoading && widgetsLoading && !scoredAppResults.length) {
       return (
-        <SearchSection title={options.title ?? "应用"}>
+        <SearchSection title={t(options.title ?? "ui.app")}>
           <div className="flex h-14 items-center justify-center">
             <Spin size="small" />
           </div>
@@ -1941,7 +1950,7 @@ const UnifiedSearch = ({
     }
     if (!results.length) return null;
     return (
-      <SearchSection title={options?.title ?? "应用"}>
+      <SearchSection title={t(options?.title ?? "ui.app")}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {results.map((result) => {
             const widget = result.item;
@@ -1963,7 +1972,7 @@ const UnifiedSearch = ({
                   )
                 }
                 title={widget.name}
-                description={widget.description || "应用"}
+                description={widget.description || t("ui.app")}
                 tag={widget.version ? `v${widget.version}` : undefined}
                 onClick={() =>
                   runFocusableItem({
@@ -1982,12 +1991,12 @@ const UnifiedSearch = ({
 
   const renderRoutes = (
     results: StandardizedSearchResult<RouteSearchItem>[],
-    title = "页面",
+    title = "ui.pages",
   ) => {
     if (!shouldSearchPages) return null;
     if (!results.length) return null;
     return (
-      <SearchSection title={title}>
+      <SearchSection title={t(title)}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {results.map((result) => {
             const route = result.item;
@@ -2016,12 +2025,12 @@ const UnifiedSearch = ({
 
   const renderSettings = (
     results: StandardizedSearchResult<RouteSearchItem>[],
-    title = "设置",
+    title = "ui.settings",
   ) => {
     if (!shouldSearchSettings) return null;
     if (!results.length) return null;
     return (
-      <SearchSection title={title}>
+      <SearchSection title={t(title)}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {results.map((result) => {
             const setting = result.item;
@@ -2096,7 +2105,7 @@ const UnifiedSearch = ({
                   type="text"
                   size="small"
                   shape="circle"
-                  aria-label="关闭"
+                  aria-label={t("ui.close")}
                   icon={<RiCloseLine size={17} />}
                   onClick={closeUnifiedSearch}
                 />
@@ -2114,7 +2123,7 @@ const UnifiedSearch = ({
             {renderHistory()}
             {renderShortcutSuggestions()}
             {isSearchDebouncing ? (
-              <SearchSection title="搜索">
+              <SearchSection title={t("ui.search")}>
                 <div className="flex h-14 items-center justify-center">
                   <Spin size="small" />
                 </div>
@@ -2143,7 +2152,7 @@ const UnifiedSearch = ({
               <div className="py-8">
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="没有匹配内容"
+                  description={t("ui.noMatchingContent")}
                 />
               </div>
             ) : null}

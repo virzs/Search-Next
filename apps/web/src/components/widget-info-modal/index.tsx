@@ -1,6 +1,6 @@
 import { DesktopNextBaseModal } from "zs_library";
 import { App, Button, Popconfirm, Tag } from "antd";
-import { useMemo, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { css } from "@emotion/css";
 import type { WidgetConfig } from "@/types";
 import { sharedEventBus } from "@/sdk";
@@ -9,6 +9,7 @@ import {
   formatWidgetStorageSize,
   getWidgetStorageStats,
 } from "@/utils/widget-storage";
+import { useI18n } from "@/i18n";
 
 interface WidgetInfoModalProps {
   visible: boolean;
@@ -34,12 +35,13 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
   widgetName,
   widgetConfig,
 }) => {
+  const { t } = useI18n();
   const { message } = App.useApp();
-  const [version, setVersion] = useState(0);
-  const stats = useMemo(() => getWidgetStorageStats(widgetId), [widgetId, version]);
-  const title = widgetName || widgetConfig?.name || "应用";
+  const [, setVersion] = useState(0);
+  const stats = getWidgetStorageStats(widgetId);
+  const title = widgetName || widgetConfig?.name || t("ui.app");
   const appIconType =
-    widgetConfig?.appIcon?.type === "custom" ? "自定义元素" : "图片";
+    widgetConfig?.appIcon?.type === "custom" ? t("ui.customElement") : t("ui.image");
 
   const handleClear = () => {
     const keys = clearWidgetStorage(widgetId);
@@ -48,7 +50,7 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
     });
     sharedEventBus.emit("storage:changed", { widgetId, key: "*", value: null });
     setVersion((value) => value + 1);
-    message.success("应用数据已清除");
+    message.success(t("ui.appDataCleared"));
   };
 
   return (
@@ -71,38 +73,38 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
             ) : null}
           </div>
           <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! px-3! py-1! text-xs! font-bold! text-[#6e6e73]!">
-            应用信息
+            {t("ui.appInfo")}
           </Tag>
         </div>
 
         <div className="mt-5 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
-          <InfoRow label="应用ID" value={widgetId} />
-          <InfoRow label="版本" value={widgetConfig?.version} />
-          <InfoRow label="作者" value={widgetConfig?.author} />
-          <InfoRow label="来源" value={widgetConfig?.sourceType || "legacy"} />
-          <InfoRow label="图标模式" value={appIconType} />
-          <InfoRow label="入口" value={widgetConfig?.entry} />
+          <InfoRow label={t("ui.appID")} value={widgetId} />
+          <InfoRow label={t("ui.version")} value={widgetConfig?.version} />
+          <InfoRow label={t("ui.author")} value={widgetConfig?.author} />
+          <InfoRow label={t("ui.source")} value={widgetConfig?.sourceType || "legacy"} />
+          <InfoRow label={t("ui.iconMode")} value={appIconType} />
+          <InfoRow label={t("ui.entry")} value={widgetConfig?.entry} />
         </div>
 
         <div className="mt-4 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
-          <InfoRow label="存储占用" value={formatWidgetStorageSize(stats.byteSize)} />
-          <InfoRow label="数据项" value={`${stats.keyCount} 项`} />
-          <InfoRow label="命名空间" value={stats.key} />
+          <InfoRow label={t("ui.storageUsed")} value={formatWidgetStorageSize(stats.byteSize)} />
+          <InfoRow label={t("ui.dataItems")} value={t("ui.countItems", { count: stats.keyCount })} />
+          <InfoRow label={t("ui.namespace")} value={stats.key} />
         </div>
 
         <div className="mt-5 flex items-center justify-end gap-2">
           <Button shape="round" onClick={onClose}>
-            关闭
+            {t("ui.close")}
           </Button>
           <Popconfirm
-            title="清除应用数据？"
-            description="清除后该应用的本地数据将无法恢复。"
-            okText="清除"
-            cancelText="取消"
+            title={t("ui.clearAppData")}
+            description={t("ui.app.clearDataWarning")}
+            okText={t("ui.clear")}
+            cancelText={t("ui.cancel")}
             onConfirm={handleClear}
           >
             <Button danger shape="round" disabled={stats.keyCount === 0}>
-              清除应用数据
+              {t("ui.clearAppData2")}
             </Button>
           </Popconfirm>
         </div>

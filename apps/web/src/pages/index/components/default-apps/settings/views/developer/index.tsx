@@ -7,28 +7,30 @@ import {
   MacSettingsValue,
   MacSettingsView,
 } from "../../components/macos-settings";
+import { useI18n } from "@/i18n";
 
 const DeveloperView = () => {
   const { devModeEnabled, toggleDevMode } = useWidget();
+  const { t } = useI18n();
 
   return (
     <MacSettingsView>
-      <MacSettingsSection title="小组件开发">
+      <MacSettingsSection title={t("ui.widgetDevelopment")}>
         <MacSettingsRow
           icon={<RiCodeSSlashLine size={16} />}
           iconTone="green"
-          title="开发者模式"
-          description="用于测试自定义小组件和本地 ESM 入口。"
+          title={t("ui.developerMode")}
+          description={t("ui.dev.modeDescription")}
           extra={<Switch checked={devModeEnabled} onChange={toggleDevMode} />}
         />
         <MacSettingsRow
           icon={<RiStore2Line size={16} />}
           iconTone="blue"
-          title="应用商店入口"
-          description="开发者模式开启后显示「开发者」导航项"
+          title={t("ui.appStoreEntry")}
+          description={t("ui.dev.storeEntryDescription")}
           extra={
             <MacSettingsValue>
-              {devModeEnabled ? "已启用" : "未启用"}
+              {t(devModeEnabled ? "ui.enabled" : "ui.disabled")}
             </MacSettingsValue>
           }
         />

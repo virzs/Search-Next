@@ -1,5 +1,6 @@
 import { css, cx } from "@emotion/css";
 import { FC } from "react";
+import { useI18n } from "@/i18n";
 
 interface StoreHeroCardProps {
   title: string;
@@ -75,13 +76,14 @@ const StoreHeroCard: FC<StoreHeroCardProps> = ({
   tone = "website",
   className = "",
 }) => {
+  const { t } = useI18n();
   return (
     <div
       className={cx(heroBaseClassName, heroToneClassName[tone], className)}
     >
       <div className="relative z-[1] flex max-w-xl flex-col gap-3">
         <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#007aff]">
-          今日推荐
+          {t("ui.featuredToday")}
         </div>
         <div className="text-[33px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
           {title}

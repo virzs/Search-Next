@@ -3,6 +3,9 @@ import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { Theme } from "@radix-ui/themes";
+import { I18nextProvider } from "react-i18next";
+import zhCN from "antd/locale/zh_CN";
+import enUS from "antd/locale/en_US";
 
 import "./index.css";
 import DesktopNextIndex from "./pages/index";
@@ -15,6 +18,7 @@ import { DesktopThemeProvider } from "./contexts/DesktopThemeContext";
 import { WidgetProvider } from "./contexts/WidgetContext";
 import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 import useDesktopTheme from "./hooks/useDesktopTheme";
+import { i18n, useI18n, type AppLanguage } from "./i18n";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +32,7 @@ const ThemedConfigProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { resolvedColorScheme } = useDesktopTheme();
+  const { language } = useI18n();
   const themeConfig = React.useMemo(
     () => createThemeConfig(resolvedColorScheme),
     [resolvedColorScheme],
@@ -35,26 +40,33 @@ const ThemedConfigProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <Theme appearance={resolvedColorScheme}>
-      <ConfigProvider theme={themeConfig}>
+      <ConfigProvider locale={antdLocales[language]} theme={themeConfig}>
         <App>{children}</App>
       </ConfigProvider>
     </Theme>
   );
 };
 
+const antdLocales: Record<AppLanguage, typeof zhCN> = {
+  "zh-CN": zhCN,
+  "en-US": enUS,
+};
+
 createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <AppConfigProvider>
-      <DesktopThemeProvider>
-        <ThemedConfigProvider>
-          <GlobalNotificationProvider />
-          <WidgetProvider>
-            <RouterProvider router={router} />
-          </WidgetProvider>
-        </ThemedConfigProvider>
-      </DesktopThemeProvider>
-    </AppConfigProvider>
-  </AuthProvider>,
+  <I18nextProvider i18n={i18n}>
+    <AuthProvider>
+      <AppConfigProvider>
+        <DesktopThemeProvider>
+          <ThemedConfigProvider>
+            <GlobalNotificationProvider />
+            <WidgetProvider>
+              <RouterProvider router={router} />
+            </WidgetProvider>
+          </ThemedConfigProvider>
+        </DesktopThemeProvider>
+      </AppConfigProvider>
+    </AuthProvider>
+  </I18nextProvider>,
 );
 
 // 让外部纯 JS 小组件复用宿主项目的 React 和 ReactDOM

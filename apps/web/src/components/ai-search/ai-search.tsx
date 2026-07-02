@@ -5,6 +5,7 @@ import { RiGlobalLine, RiRobot2Line, RiHistoryLine } from "@remixicon/react";
 import { css, cx } from "@emotion/css";
 import { DesktopNextBaseModal } from "zs_library";
 import { performAISearch, isDeepSeekConfigured } from "../../services/ai-search";
+import { useI18n } from "@/i18n";
 
 interface SearchEngine {
   value: string;
@@ -22,9 +23,9 @@ interface Message {
 }
 
 const searchEngines: SearchEngine[] = [
-  { value: "bing", label: "Bing", icon: <RiGlobalLine size={16} /> },
-  { value: "baidu", label: "百度", icon: <RiGlobalLine size={16} /> },
-  { value: "google", label: "Google", icon: <RiGlobalLine size={16} /> },
+  { value: "bing", label: "ui.bing", icon: <RiGlobalLine size={16} /> },
+  { value: "baidu", label: "ui.baidu", icon: <RiGlobalLine size={16} /> },
+  { value: "google", label: "ui.google", icon: <RiGlobalLine size={16} /> },
 ];
 
 interface AISearchModalProps {
@@ -33,23 +34,24 @@ interface AISearchModalProps {
 }
 
 const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
+  const { language, t } = useI18n();
   // 示例对话内容
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "example-1",
-      content: "你好！我是AI搜索助手，可以帮你搜索任何问题。",
+      content: t("ui.ai.welcomeMessage"),
       role: "assistant",
       timestamp: Date.now() - 60000,
     },
     {
       id: "example-2",
-      content: "请问今天的天气怎么样？",
+      content: t("ui.whatIsTheWeatherLikeToday"),
       role: "user",
       timestamp: Date.now() - 50000,
     },
     {
       id: "example-3",
-      content: "我可以帮你搜索天气信息。你可以选择使用Bing、百度或Google搜索引擎来获取最新的天气数据。",
+      content: t("ui.ai.weatherHelpMessage"),
       role: "assistant",
       timestamp: Date.now() - 40000,
     },
@@ -87,6 +89,8 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
           query,
           searchEngine: selectedEngine,
           context,
+        }, {
+          language,
         });
 
         const assistantMessage: Message = {
@@ -102,23 +106,23 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
 
         // 如果是模拟响应，提示用户配置API
         if (!isDeepSeekConfigured()) {
-          message.info("当前为模拟模式，请配置DeepSeek API密钥以启用真实AI搜索功能");
+          message.info(t("ui.ai.simulationNotice"));
         }
       } catch (error) {
         console.error("搜索失败:", error);
         const errorMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: "搜索失败，请稍后重试。如果问题持续存在，请检查网络连接或API配置。",
+          content: t("ui.ai.searchFailedMessage"),
           role: "assistant",
           timestamp: Date.now() + 1,
         };
         setMessages((prev) => [...prev, errorMessage]);
-        message.error("搜索请求失败");
+        message.error(t("ui.searchRequestFailed"));
       } finally {
         setLoading(false);
       }
     },
-    [messages, selectedEngine]
+    [language, messages, selectedEngine, t]
   );
 
   const saveCurrentConversation = useCallback(() => {
@@ -135,24 +139,24 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
     setMessages([
       {
         id: "example-1",
-        content: "你好！我是AI搜索助手，可以帮你搜索任何问题。",
+        content: t("ui.ai.welcomeMessage"),
         role: "assistant",
         timestamp: Date.now() - 60000,
       },
       {
         id: "example-2",
-        content: "请问今天的天气怎么样？",
+        content: t("ui.whatIsTheWeatherLikeToday"),
         role: "user",
         timestamp: Date.now() - 50000,
       },
       {
         id: "example-3",
-        content: "我可以帮你搜索天气信息。你可以选择使用Bing、百度或Google搜索引擎来获取最新的天气数据。",
+        content: t("ui.ai.weatherHelpMessage"),
         role: "assistant",
         timestamp: Date.now() - 40000,
       },
     ]);
-  }, [saveCurrentConversation]);
+  }, [saveCurrentConversation, t]);
 
   const handleModalClose = useCallback(() => {
     onClose();
@@ -207,12 +211,12 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
             >
               <RiRobot2Line size={24} style={{ color: "#667eea" }} />
               <Typography.Title level={4} style={{ margin: 0, color: "#667eea" }}>
-                AI 网络搜索
+                {t("ui.aIWebSearch")}
               </Typography.Title>
             </div>
 
             <Space>
-              <Button icon={<RiHistoryLine />} onClick={handleDrawerOpen} type="text" title="历史对话" />
+              <Button icon={<RiHistoryLine />} onClick={handleDrawerOpen} type="text" title={t("ui.conversationHistory")} />
               <Select
                 role="combobox"
                 value={selectedEngine}
@@ -223,13 +227,13 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
                   label: (
                     <Space size={8}>
                       {engine.icon}
-                      {engine.label}
+                      {t(engine.label)}
                     </Space>
                   ),
                 }))}
               />
               <Button onClick={clearMessages} type="text">
-                清空对话
+                {t("ui.clearConversation")}
               </Button>
             </Space>
           </div>
@@ -277,7 +281,9 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
           <div className="shrink-0">
             <Sender
               className="bg-gray-50"
-              placeholder={`使用 ${searchEngines.find((e) => e.value === selectedEngine)?.label} 搜索...`}
+              placeholder={t("ui.searchWithEngine", {
+                engine: t(searchEngines.find((e) => e.value === selectedEngine)?.label || ""),
+              })}
               onSubmit={handleSearch}
               onFocus={() => undefined}
               onBlur={() => undefined}
@@ -291,7 +297,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
 
           {/* 历史对话抽屉 - 放在modal内部 */}
           <Drawer
-            title="历史对话"
+            title={t("ui.conversationHistory")}
             placement="right"
             onClose={handleDrawerClose}
             open={drawerVisible}
@@ -303,13 +309,13 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
           >
             {conversationHistory.length === 0 ? (
               <Typography.Text type="secondary" style={{ textAlign: "center", padding: "20px 0" }}>
-                暂无历史对话
+                {t("ui.noConversationHistory")}
               </Typography.Text>
             ) : (
               <Conversations
                 items={conversationHistory.map((conversation, index) => {
                   const firstUserMessage = conversation.find((msg) => msg.role === "user" && msg.id !== "example-2");
-                  const preview = firstUserMessage?.content || "新对话";
+                  const preview = firstUserMessage?.content || t("ui.newConversation");
                   const timestamp = conversation[conversation.length - 1]?.timestamp || Date.now();
 
                   return {

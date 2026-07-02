@@ -69,6 +69,7 @@ import {
   SearchSpotlight,
   useUnifiedSearchPreferences,
 } from "@/components/unified-search";
+import { getCurrentWidgetLocale, useI18n } from "@/i18n";
 
 type DesktopItem = DndSortItem<DesktopItemData>;
 type DesktopPage = DndPageItem<DesktopItemData> & {
@@ -292,6 +293,7 @@ function Index() {
   const [spotlightOpen, setSpotlightOpen] = useState(false);
 
   const { message } = App.useApp();
+  const { t, locale } = useI18n();
   const { coverGradientCss, user, isAuthenticated } = useAuth();
   const { userLimit } = useConfig();
   const {
@@ -315,6 +317,10 @@ function Index() {
   const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
   const preferDark = resolvedColorScheme === "dark";
   const { preferences: searchPreferences } = useUnifiedSearchPreferences();
+
+  useEffect(() => {
+    sharedEventBus.emit("locale:change", locale);
+  }, [locale]);
 
   useEffect(() => {
     const reloadMyThemes = () => setMyThemeConfigs(getMyThemeConfigs());
@@ -394,6 +400,7 @@ function Index() {
     user,
     isAuthenticated,
     userLimit,
+    locale,
     navigate,
   });
   sdkDepsRef.current = {
@@ -403,6 +410,7 @@ function Index() {
     user,
     isAuthenticated,
     userLimit,
+    locale,
     navigate,
   };
 
@@ -423,6 +431,8 @@ function Index() {
           appearanceMode: deps.appearanceMode,
           resolvedColorScheme: deps.resolvedColorScheme,
         },
+        locale: deps.locale,
+        getLocale: getCurrentWidgetLocale,
         user: deps.user
           ? {
               _id: deps.user._id,
@@ -561,7 +571,7 @@ function Index() {
       };
       const nextData: DesktopItem["data"] = {
         ...(item.data ?? { name: nextWidgetConfig.name }),
-        name: nextWidgetConfig.name || item.data?.name || "小组件",
+        name: nextWidgetConfig.name || item.data?.name || t("ui.widget"),
         widgetConfig: nextWidgetConfig,
       };
 
@@ -599,7 +609,7 @@ function Index() {
     setDesktopPages(nextPages);
     setDockItems(nextDockItems);
     persistDesktopStorage(nextPages, nextDockItems);
-  }, [createWidgetConfigFromApi, getAppIconUrl, widgets]);
+  }, [createWidgetConfigFromApi, getAppIconUrl, t, widgets]);
 
   const openWidgetWindow = useCallback(
     async ({
@@ -705,7 +715,7 @@ function Index() {
     const addInfoItem = (widgetType: string) => {
       map[widgetType] = [
         {
-          text: "应用信息",
+          text: t("ui.appInfo"),
           icon: <RiInformationLine size={18} />,
         },
       ];
@@ -718,7 +728,7 @@ function Index() {
     }
 
     return map;
-  }, [widgets]);
+  }, [t, widgets]);
 
   // userLimit 由 ConfigContext 提供
 
@@ -847,7 +857,7 @@ function Index() {
       case "*:my":
         return createFixedItem({
           key: "my",
-          name: "账号",
+          name: t("ui.account"),
           IconComponent: isAuthenticated
             ? () => (
                 <BoringAccountAvatar
@@ -871,7 +881,7 @@ function Index() {
       case "*:theme":
         return createFixedItem({
           key: "personalization",
-          name: "个性化",
+          name: t("ui.personalization"),
           IconComponent: RiBrushLine,
           tintStyle:
             "linear-gradient(135deg, rgba(88, 86, 214, 0.92) 0%, rgba(10, 132, 255, 0.9) 55%, rgba(255, 45, 85, 0.86) 100%)",
@@ -881,7 +891,7 @@ function Index() {
       case "*:store":
         return createFixedItem({
           key: "store",
-          name: "应用商店",
+          name: t("ui.appStore"),
           IconComponent: RiStore2Line,
           tintStyle:
             "linear-gradient(135deg, rgba(10, 132, 255, 0.95) 0%, rgba(90, 200, 250, 0.9) 100%)",
@@ -891,7 +901,7 @@ function Index() {
       case "*:settings":
         return createFixedItem({
           key: "settings",
-          name: "设置",
+          name: t("ui.settings"),
           IconComponent: RiSettingsLine,
           tintStyle:
             "linear-gradient(135deg, rgba(242, 242, 247, 0.95) 0%, rgba(199, 199, 204, 0.9) 100%)",
@@ -906,7 +916,7 @@ function Index() {
 
   const createDockHistoryItem = useCallback((item: DesktopItem) => {
     const icon = item.data?.icon;
-    const name = item.data?.name || "应用";
+    const name = item.data?.name || t("ui.app");
 
     return (
       <button
@@ -952,7 +962,7 @@ function Index() {
         )}
       </button>
     );
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     runDefaultDesktop();
@@ -1094,7 +1104,7 @@ function Index() {
           },
         };
         addItemToCurrentPage(appItem);
-        message.success("添加成功");
+        message.success(t("ui.added"));
         return;
       }
 
@@ -1108,7 +1118,7 @@ function Index() {
         payload.sizeId ? { sizeId: payload.sizeId } : undefined,
       );
     },
-    [addAppToDesktop, addItemToCurrentPage, addToDesktop, message],
+    [addAppToDesktop, addItemToCurrentPage, addToDesktop, message, t],
   );
 
   const handleContextMenuItemClick = useCallback(
@@ -1135,7 +1145,7 @@ function Index() {
           latestDevWidget?.name ??
           widgetConfig?.name ??
           item.data?.name ??
-          "小组件",
+          t("ui.widget"),
         widgetConfig: {
           ...(widgetConfig ?? {}),
           ...(latestConfig ?? {}),
@@ -1145,7 +1155,7 @@ function Index() {
             latestDevWidget?.name ??
             widgetConfig?.name ??
             item.data?.name ??
-            "小组件",
+            t("ui.widget"),
           entry:
             latestConfig?.entry ??
             latestDevWidget?.entry ??
@@ -1154,7 +1164,7 @@ function Index() {
         },
       });
     },
-    [createWidgetConfigFromApi, devWidgets, widgets],
+    [createWidgetConfigFromApi, devWidgets, t, widgets],
   );
 
   const handleOpenSearchApp = useCallback(
@@ -1164,10 +1174,10 @@ function Index() {
       void openWidgetWindow({
         widgetId: widget._id,
         widgetConfig,
-        fallbackTitle: widget.name || "应用",
+        fallbackTitle: widget.name || t("ui.app"),
       });
     },
-    [createWidgetConfigFromApi, openWidgetWindow],
+    [createWidgetConfigFromApi, openWidgetWindow, t],
   );
 
   return (
@@ -1259,7 +1269,7 @@ function Index() {
                     void openWidgetWindow({
                       widgetId,
                       widgetConfig,
-                      fallbackTitle: item.data?.name || "小组件",
+                      fallbackTitle: item.data?.name || t("ui.widget"),
                     });
                   }}
                 />
@@ -1276,28 +1286,28 @@ function Index() {
                 id: "*:my",
                 type: "app",
                 data: {
-                  name: "账号",
+                  name: t("ui.account"),
                 },
               },
               {
                 id: "*:personalization",
                 type: "app",
                 data: {
-                  name: "个性化",
+                  name: t("ui.personalization"),
                 },
               },
               {
                 id: "*:store",
                 type: "app",
                 data: {
-                  name: "应用商店",
+                  name: t("ui.appStore"),
                 },
               },
               {
                 id: "*:settings",
                 type: "app",
                 data: {
-                  name: "设置",
+                  name: t("ui.settings"),
                 },
               },
             ],
@@ -1313,7 +1323,7 @@ function Index() {
               void openWidgetWindow({
                 widgetId,
                 widgetConfig,
-                fallbackTitle: item.data?.name || widgetConfig.name || "应用",
+                fallbackTitle: item.data?.name || widgetConfig.name || t("ui.app"),
               });
               return;
             }
@@ -1357,7 +1367,7 @@ function Index() {
         onOpenApp={handleOpenSearchApp}
         shortcut={searchPreferences.spotlightShortcut}
       />
-      {init && <LoadingOverlay open text="正在加载配置…" />}
+      {init && <LoadingOverlay open text={t("ui.loadingConfiguration")} />}
     </div>
   );
 }

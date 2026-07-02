@@ -7,6 +7,7 @@ import { storeRoute } from "../../route-paths";
 import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
 import { css } from "@emotion/css";
 import type { StoreOutletContext } from "../../index";
+import { useI18n } from "@/i18n";
 
 const websiteDetailClassName = css`
   .apple-store-action.ant-btn-primary {
@@ -18,6 +19,7 @@ const websiteDetailClassName = css`
 `;
 
 const WebsiteDetailView: FC = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
@@ -92,7 +94,7 @@ const WebsiteDetailView: FC = () => {
               className="apple-store-action h-8! px-5! font-bold!"
               onClick={() => onAddStoreItem?.({ kind: "website", site: item })}
             >
-              获取
+              {t("ui.get")}
             </Button>
             {url ? (
               <Button
@@ -107,7 +109,7 @@ const WebsiteDetailView: FC = () => {
         {item.description ? (
           <div>
             <h3 className="mb-3 text-lg font-bold tracking-normal text-gray-950 dark:text-gray-50">
-              关于此应用
+              {t("ui.aboutThisApp")}
             </h3>
             <p className="max-w-2xl leading-7 text-gray-600 dark:text-gray-300">
               {item.description}

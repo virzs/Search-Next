@@ -28,8 +28,10 @@ import {
   MacSettingsSection,
   MacSettingsView,
 } from "../../components/macos-settings";
+import { useI18n } from "@/i18n";
 
 const SearchSettingsView = () => {
+  const { t } = useI18n();
   const { preferences, setPreference } = useUnifiedSearchPreferences();
   const { history, removeHistoryItem, clearHistory } =
     useUnifiedSearchHistory();
@@ -71,7 +73,7 @@ const SearchSettingsView = () => {
           !isShortcutModifierOnlyKey(event) &&
           !hasRequiredShortcutModifier(event)
         ) {
-          message.warning("快捷键需要包含 Command/Ctrl/Alt");
+          message.warning(t("ui.shortcutMustIncludeCommandCtrlAlt"));
         }
         return;
       }
@@ -102,20 +104,23 @@ const SearchSettingsView = () => {
     recordingShortcut,
     resetShortcut,
     setPreference,
+    t,
   ]);
 
   const shortcutDescription = recordingShortcut
-    ? "按新的组合键，Esc 取消，Delete/Backspace 恢复默认"
-    : `点击右侧输入框修改，当前系统默认修饰键为 ${getSystemShortcutModifierName()}`;
+    ? t("ui.search.shortcutRecordHint")
+    : t("ui.search.shortcutEditHint", {
+        modifier: getSystemShortcutModifierName(),
+      });
 
   return (
     <MacSettingsView>
-      <MacSettingsSection title="搜索">
+      <MacSettingsSection title={t("ui.search")}>
         <MacSettingsRow
           icon={<RiSearchLine size={16} />}
           iconTone="blue"
-          title="桌面搜索框"
-          description="在桌面顶部显示整行搜索入口"
+          title={t("ui.desktopSearchBar")}
+          description={t("ui.search.desktopBarDescription")}
           extra={
             <Switch
               checked={preferences.showDesktopSearchBar}
@@ -128,10 +133,10 @@ const SearchSettingsView = () => {
         <MacSettingsRow
           icon={<RiKeyboardLine size={16} />}
           iconTone="purple"
-          title="键盘呼出"
-          description={`通过 ${formatUnifiedSearchShortcut(
-            preferences.spotlightShortcut,
-          )} 打开聚焦搜索`}
+          title={t("ui.keyboardShortcut")}
+          description={t("ui.openSpotlightSearchWithShortcut", {
+            shortcut: formatUnifiedSearchShortcut(preferences.spotlightShortcut),
+          })}
           extra={
             <Switch
               checked={preferences.enableSpotlightShortcut}
@@ -144,7 +149,7 @@ const SearchSettingsView = () => {
         <MacSettingsRow
           icon={<RiCommandLine size={16} />}
           iconTone="gray"
-          title={recordingShortcut ? "输入新的快捷键" : "快捷键"}
+          title={t(recordingShortcut ? "ui.enterNewShortcut" : "ui.shortcut")}
           description={shortcutDescription}
           extra={
             <ShortcutEditorControl
@@ -153,6 +158,8 @@ const SearchSettingsView = () => {
                 preferences.spotlightShortcut,
               )}
               onStart={() => setRecordingShortcut(true)}
+              recordingText={t("ui.pressShortcut")}
+              hintText={t("ui.escCancelDelDefault")}
             />
           }
         />
@@ -160,17 +167,17 @@ const SearchSettingsView = () => {
       <MacSettingsSection
         title={
           <span className="flex w-full items-center justify-between gap-3">
-            <span>最近使用</span>
+            <span>{t("ui.recent")}</span>
             {history.length ? (
               <Popconfirm
-                title="清空最近使用记录？"
-                okText="清空"
-                cancelText="取消"
+                title={t("ui.clearRecentItems")}
+                okText={t("ui.clearAll")}
+                cancelText={t("ui.cancel")}
                 okButtonProps={{ danger: true }}
                 onConfirm={clearHistory}
               >
                 <Button size="small" type="text" danger>
-                  清空
+                  {t("ui.clearAll")}
                 </Button>
               </Popconfirm>
             ) : null}
@@ -184,14 +191,14 @@ const SearchSettingsView = () => {
               icon={renderSearchHistoryIcon(item)}
               iconTone={getSearchHistoryIconTone(item)}
               title={item.title}
-              description={item.description || getSearchHistoryKindLabel(item)}
+              description={item.description || getSearchHistoryKindLabel(item, t)}
               extra={
                 <Button
                   type="text"
                   danger
                   size="small"
                   shape="circle"
-                  aria-label={`删除 ${item.title}`}
+                  aria-label={t("ui.deleteTitle", { title: item.title })}
                   icon={<RiDeleteBinLine size={15} />}
                   onClick={() => removeHistoryItem(item.id)}
                 />
@@ -202,8 +209,8 @@ const SearchSettingsView = () => {
           <MacSettingsRow
             icon={<RiHistoryLine size={16} />}
             iconTone="gray"
-            title="暂无最近使用"
-            description="聚焦搜索打开过的搜索、网站、应用、页面和设置会显示在这里"
+            title={t("ui.noRecentItems")}
+            description={t("ui.search.recentDescription")}
           />
         )}
       </MacSettingsSection>
@@ -211,13 +218,16 @@ const SearchSettingsView = () => {
   );
 };
 
-const getSearchHistoryKindLabel = (item: SearchHistoryItem) => {
-  if (item.kind === "website") return "网站";
-  if (item.kind === "app") return "应用";
-  if (item.kind === "route") return "页面";
-  if (item.kind === "setting") return "设置";
-  if (item.kind === "shortcut") return "快捷命令";
-  return "网页搜索";
+const getSearchHistoryKindLabel = (
+  item: SearchHistoryItem,
+  t: (key: string) => string,
+) => {
+  if (item.kind === "website") return t("ui.websites");
+  if (item.kind === "app") return t("ui.app");
+  if (item.kind === "route") return t("ui.pages");
+  if (item.kind === "setting") return t("ui.settings");
+  if (item.kind === "shortcut") return t("ui.shortcuts");
+  return t("ui.webSearch");
 };
 
 const getSearchHistoryIconTone = (
@@ -244,10 +254,14 @@ const ShortcutEditorControl = ({
   recording,
   parts,
   onStart,
+  recordingText,
+  hintText,
 }: {
   recording: boolean;
   parts: ReactNode[];
   onStart: () => void;
+  recordingText: ReactNode;
+  hintText: ReactNode;
 }) => {
   return (
     <button
@@ -266,10 +280,10 @@ const ShortcutEditorControl = ({
       {recording ? (
         <>
           <span className="text-[13px] font-semibold text-[#007aff] dark:text-[#64a9ff]">
-            按下快捷键
+            {recordingText}
           </span>
           <span className="ml-auto text-[11px] font-medium text-[#8e8e93] dark:text-[#aeaeb2]">
-            Esc 取消 · Del 默认
+            {hintText}
           </span>
         </>
       ) : (

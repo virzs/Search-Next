@@ -16,6 +16,7 @@ import type { StoreOutletContext } from "../../index";
 import AddWebsiteModal from "./add-website-modal";
 import { storeRoute } from "../../route-paths";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const websiteViewClassName = css`
   .apple-store-action.ant-btn-primary {
@@ -46,6 +47,7 @@ const WebsiteGridSkeleton: React.FC<{ count: number }> = ({ count }) => (
 );
 
 const WebsiteView: React.FC = () => {
+  const { t } = useI18n();
   const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -124,14 +126,14 @@ const WebsiteView: React.FC = () => {
 
   const viewOptions = useMemo(() => {
     const options: { label: string; value: string }[] = [
-      { label: "推荐", value: "featured" },
-      { label: "全部", value: "all" },
+      { label: t("ui.featured"), value: "featured" },
+      { label: t("ui.all"), value: "all" },
     ];
     for (const cat of categories) {
       options.push({ label: cat.label, value: `cat:${cat.key}` });
     }
     return options;
-  }, [categories]);
+  }, [categories, t]);
 
   const handleViewChange = (value: string | number) => {
     const v = String(value);
@@ -181,7 +183,7 @@ const WebsiteView: React.FC = () => {
             boxShadow: "0 8px 18px rgba(0,122,255,0.2)",
           }}
         >
-          自定义
+          {t("ui.custom")}
         </Button>
       }
     >
@@ -199,10 +201,10 @@ const WebsiteView: React.FC = () => {
           <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
             <div className="mb-4 px-1">
               <div className="text-[30px] font-extrabold leading-9 tracking-normal text-gray-950 dark:text-gray-50">
-                {activeCategory?.label ?? "全部网站"}
+                {activeCategory?.label ?? t("ui.allWebsites")}
               </div>
               <div className="mt-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
-                {listTotal} 个项目
+                {t("ui.storeItemCount", { count: listTotal })}
               </div>
             </div>
 
@@ -224,7 +226,7 @@ const WebsiteView: React.FC = () => {
             )}
 
             {!listLoading && listItems.length === 0 ? (
-              <Empty className="mt-16" description="暂无数据" />
+              <Empty className="mt-16" description={t("ui.noData")} />
             ) : null}
           </div>
 

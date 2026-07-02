@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { appleAuthFormClassName } from "./apple-auth-styles";
 import useConfig from "@/hooks/useConfig";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
+import { useI18n } from "@/i18n";
 
 const { Link } = Typography;
 const { Item } = Form;
@@ -24,6 +25,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   className = "",
   initialValues = {},
 }) => {
+  const { t } = useI18n();
   const [form] = Form.useForm<LoginFormData>();
   const { login, loginLoading: contextLoginLoading } = useAuth();
   const { projectInfo } = useConfig();
@@ -50,13 +52,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const handleSubmit = async (values: LoginFormData) => {
     try {
       if (turnstileEnabled && !turnstileSiteKey) {
-        message.error("人机验证未配置完整，请联系管理员");
-        return { success: false, message: "人机验证未配置完整" };
+        message.error(t("ui.auth.turnstileConfigMissing"));
+        return { success: false, message: t("ui.auth.turnstileConfigMissing") };
       }
 
       if (turnstileEnabled && !turnstileToken) {
-        message.error("请完成人机验证");
-        return { success: false, message: "请完成人机验证" };
+        message.error(t("ui.completeHumanVerification"));
+        return { success: false, message: t("ui.completeHumanVerification") };
       }
 
       const submitHandler = onSubmit || defaultLogin;
@@ -66,15 +68,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
       });
 
       if (result.success) {
-        message.success(result.message || "登录成功");
+        message.success(result.message || t("ui.signedInSuccessfully2"));
       } else {
-        message.error(result.message || "登录失败");
+        message.error(result.message || t("ui.signInFailed"));
         resetTurnstile();
       }
 
       return result;
     } catch (error: any) {
-      const errorMessage = error.message || "登录过程中发生错误";
+      const errorMessage = error.message || t("ui.anErrorOccurredWhileSigningIn");
       message.error(errorMessage);
       resetTurnstile();
       return {
@@ -98,33 +100,33 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         {/* 邮箱输入 */}
         <Item
-          label="邮箱"
+          label={t("ui.email")}
           name="email"
           rules={[
-            { required: true, message: "请输入邮箱地址" },
-            { type: "email", message: "请输入有效的邮箱地址" },
+            { required: true, message: t("ui.enterYourEmailAddress") },
+            { type: "email", message: t("ui.enterAValidEmailAddress") },
           ]}
         >
           <Input
             prefix={<RiMailFill size={16} className="apple-auth-field-icon" />}
-            placeholder="请输入邮箱地址"
+            placeholder={t("ui.enterYourEmailAddress")}
             autoComplete="email"
           />
         </Item>
 
         {/* 密码输入 */}
         <Item
-          label="密码"
+          label={t("ui.password")}
           name="password"
           rules={[
-            { required: true, message: "请输入密码" },
-            { min: 6, message: "密码长度至少6位" },
+            { required: true, message: t("ui.enterYourPassword") },
+            { min: 6, message: t("ui.passwordMustBeAtLeast6Characters") },
           ]}
         >
           <Input
             prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showPassword ? "text" : "password"}
-            placeholder="请输入密码"
+            placeholder={t("ui.enterYourPassword")}
             autoComplete="current-password"
             suffix={
               <Button
@@ -149,12 +151,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
           <div className="apple-auth-form-options">
             {showRemember && (
               <Item name="remember" valuePropName="checked" className="mb-0!">
-                <Checkbox>记住我</Checkbox>
+                <Checkbox>{t("ui.rememberMe")}</Checkbox>
               </Item>
             )}
             {showForgotPassword && (
               <Link href="#" className="apple-auth-link">
-                忘记密码？
+                {t("ui.forgotPassword")}
               </Link>
             )}
           </div>
@@ -172,7 +174,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               />
             ) : (
               <div className="text-sm text-red-500">
-                人机验证未配置完整，请联系管理员
+                {t("ui.auth.turnstileConfigMissing")}
               </div>
             )}
           </Item>
@@ -189,7 +191,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             size="large"
             className="apple-auth-primary-button"
           >
-            <span>{isLoading ? "登录中..." : "登录"}</span>
+            <span>{t(isLoading ? "ui.signingIn" : "ui.signIn")}</span>
           </Button>
         </Item>
       </Form>

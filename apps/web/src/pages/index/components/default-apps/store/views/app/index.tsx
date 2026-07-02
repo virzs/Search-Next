@@ -8,6 +8,7 @@ import type { StoreAddPayload } from "../../index";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const appViewClassName = css`
   .apple-store-get-button.ant-btn {
@@ -69,6 +70,7 @@ interface AppViewProps {
 }
 
 const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
+  const { t } = useI18n();
   const {
     widgets,
     loading,
@@ -105,8 +107,8 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
       <div className="h-full overflow-y-auto px-4 pb-8 pt-4">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
           <StoreHeroCard
-            title="把工具作为应用打开"
-            description="应用以固定图标添加到桌面，点击后在独立窗口中运行完整功能。"
+            title={t("ui.openToolsAsApps")}
+            description={t("ui.apps.openAsAppsHint")}
             tone="widget"
           />
 
@@ -118,7 +120,7 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
 
           {!loading && filteredApps.length === 0 ? (
             <div className="flex min-h-80 items-center justify-center">
-              <Empty description={query ? "未找到匹配的应用" : "暂无可用应用"} />
+              <Empty description={t(query ? "ui.noMatchingApps" : "ui.noAppsAvailable")} />
             </div>
           ) : null}
 
@@ -155,7 +157,7 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
                     <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                       <div className="flex min-w-0 flex-wrap items-center gap-2">
                         <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!">
-                          应用
+                          {t("ui.app")}
                         </Tag>
                         {widget.version ? (
                           <span className="text-xs font-medium text-[#8e8e93]">
@@ -170,7 +172,7 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
                         className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
                         onClick={() => handleAdd(widget)}
                       >
-                        获取
+                        {t("ui.get")}
                       </Button>
                     </div>
                   </article>

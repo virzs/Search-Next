@@ -1,10 +1,12 @@
 import { RiFeedbackFill } from "@remixicon/react";
 import { Button, Tooltip } from "antd";
+import { useI18n } from "@/i18n";
 
 const Feedback = () => {
+  const { t } = useI18n();
   return (
     <div>
-      <Tooltip title="反馈">
+      <Tooltip title={t("ui.feedback")}>
         <Button
           type="text"
           icon={

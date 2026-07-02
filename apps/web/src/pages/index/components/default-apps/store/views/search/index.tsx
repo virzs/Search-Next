@@ -16,14 +16,15 @@ import { getTabsWebsitePublic } from "@/services/website";
 import { useWidget } from "@/hooks/useWidget";
 import type { WidgetApiItem } from "@/types";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 type SearchKind = "all" | "website" | "app" | "widget";
 
 const SEARCH_KIND_OPTIONS = [
-  { label: "全部", value: "all" },
-  { label: "网站", value: "website" },
-  { label: "应用", value: "app" },
-  { label: "小组件", value: "widget" },
+  { label: "ui.all", value: "all" },
+  { label: "ui.websites", value: "website" },
+  { label: "ui.app", value: "app" },
+  { label: "ui.widget", value: "widget" },
 ];
 
 const SEARCH_PAGE_SIZE = 12;
@@ -98,22 +99,25 @@ const ResultSection = ({
   count: number;
   action?: ReactNode;
   children: ReactNode;
-}) => (
-  <section className="flex flex-col gap-3">
-    <div className="flex items-center justify-between gap-3 px-1">
-      <div>
-        <div className="text-base font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
-          {title}
+}) => {
+  const { t } = useI18n();
+  return (
+    <section className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <div>
+          <div className="text-base font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
+            {t(title)}
+          </div>
+          <div className="mt-0.5 text-xs font-semibold text-gray-500">
+            {t("ui.countResults", { count })}
+          </div>
         </div>
-        <div className="mt-0.5 text-xs font-semibold text-gray-500">
-          {count} 个结果
-        </div>
+        {action}
       </div>
-      {action}
-    </div>
-    {children}
-  </section>
-);
+      {children}
+    </section>
+  );
+};
 
 const WidgetResultCard = ({
   item,
@@ -123,7 +127,9 @@ const WidgetResultCard = ({
   item: WidgetApiItem;
   iconUrl?: string | null;
   onAdd?: (widget: WidgetApiItem, sizeId?: string) => void;
-}) => (
+}) => {
+  const { t } = useI18n();
+  return (
   <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
     <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
       {iconUrl ? (
@@ -167,10 +173,11 @@ const WidgetResultCard = ({
       className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
       onClick={() => onAdd?.(item, getWidgetDefaultSizeId(item))}
     >
-      获取
+      {t("ui.get")}
     </Button>
   </article>
-);
+  );
+};
 
 const AppResultCard = ({
   item,
@@ -180,7 +187,9 @@ const AppResultCard = ({
   item: WidgetApiItem;
   iconUrl?: string | null;
   onAdd?: (widget: WidgetApiItem) => void;
-}) => (
+}) => {
+  const { t } = useI18n();
+  return (
   <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
     <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
       {iconUrl ? (
@@ -203,7 +212,7 @@ const AppResultCard = ({
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
-          应用
+          {t("ui.app")}
         </Tag>
         {getWidgetTags(item)
           .slice(0, 3)
@@ -224,12 +233,14 @@ const AppResultCard = ({
       className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
       onClick={() => onAdd?.(item)}
     >
-      获取
+      {t("ui.get")}
     </Button>
   </article>
-);
+  );
+};
 
 const StoreSearchView = () => {
+  const { t } = useI18n();
   const { query, setQuery, onAddStoreItem } =
     useAppRouteContext<StoreOutletContext>();
   const {
@@ -241,6 +252,14 @@ const StoreSearchView = () => {
     getAppIconUrl,
   } = useWidget();
   const [kind, setKind] = useState<SearchKind>("all");
+  const searchKindOptions = useMemo(
+    () =>
+      SEARCH_KIND_OPTIONS.map((option) => ({
+        ...option,
+        label: t(option.label),
+      })),
+    [t],
+  );
   const navigate = useNavigate();
   const normalizedQuery = query.trim();
   const showWebsites = kind === "all" || kind === "website";
@@ -290,7 +309,7 @@ const StoreSearchView = () => {
               defaultSizeId: item.defaultSizeId,
               supportIconMode: false,
               supportAppMode: false,
-              tags: ["开发者"],
+              tags: ["Developer"],
               sortOrder: 0,
             }) as WidgetApiItem,
         )
@@ -346,11 +365,15 @@ const StoreSearchView = () => {
   return (
     <DefaultAppView
       className={storeSearchClassName}
-      title={normalizedQuery ? `搜索「${normalizedQuery}」` : "搜索"}
+      title={
+        normalizedQuery
+          ? t("ui.searchQuery", { query: normalizedQuery })
+          : t("ui.search")
+      }
       headerClassName="items-center px-3 pt-3 pb-2"
       headerRight={
         <AppSegmented
-          options={SEARCH_KIND_OPTIONS}
+          options={searchKindOptions}
           value={kind}
           onChange={(value) => setKind(value as SearchKind)}
           className="max-w-full overflow-auto"
@@ -362,13 +385,13 @@ const StoreSearchView = () => {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
           {!normalizedQuery ? (
             <div className="flex min-h-72 items-center justify-center">
-              <Empty description="输入关键词后会显示真实商店结果" />
+              <Empty description={t("ui.enterKeywordsToShowRealStoreResults")} />
             </div>
           ) : null}
 
           {normalizedQuery && resultCount === 0 && !searching ? (
             <div className="flex min-h-72 items-center justify-center">
-              <Empty description="没有找到匹配内容" />
+              <Empty description={t("ui.noMatchingContentFound")} />
             </div>
           ) : null}
 
@@ -380,7 +403,7 @@ const StoreSearchView = () => {
 
           {showWebsites && websiteResults.length > 0 ? (
             <ResultSection
-              title="网站"
+              title={t("ui.websites")}
               count={websiteTotal}
               action={
                 <Button
@@ -390,7 +413,7 @@ const StoreSearchView = () => {
                   className="apple-link"
                   onClick={() => navigateFromSearch(storeRoute.path.website.root)}
                 >
-                  查看网站
+                  {t("ui.viewWebsites")}
                 </Button>
               }
             >
@@ -419,7 +442,7 @@ const StoreSearchView = () => {
 
           {showApps && appResults.length > 0 ? (
             <ResultSection
-              title="应用"
+              title={t("ui.app")}
               count={appResults.length}
               action={
                 <Button
@@ -429,7 +452,7 @@ const StoreSearchView = () => {
                   className="apple-link"
                   onClick={() => navigateFromSearch(storeRoute.path.app)}
                 >
-                  查看应用
+                  {t("ui.viewApps")}
                 </Button>
               }
             >
@@ -448,7 +471,7 @@ const StoreSearchView = () => {
 
           {showWidgets && widgetResults.length > 0 ? (
             <ResultSection
-              title="小组件"
+              title={t("ui.widget")}
               count={widgetResults.length}
               action={
                 <Button
@@ -458,7 +481,7 @@ const StoreSearchView = () => {
                   className="apple-link"
                   onClick={() => navigateFromSearch(storeRoute.path.widget)}
                 >
-                  查看小组件
+                  {t("ui.viewWidgets")}
                 </Button>
               }
             >

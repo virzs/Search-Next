@@ -1,6 +1,7 @@
 import type {
   CreateHostSDKOptions,
   WidgetApiProxy,
+  WidgetLocaleInfo,
   WidgetSDK,
   WidgetStorage,
   WidgetThemeInfo,
@@ -81,6 +82,15 @@ export function createHostSDK(options: CreateHostSDKOptions): WidgetSDK {
       const handler = (newTheme: WidgetThemeInfo) => callback(newTheme);
       options.eventBus.on('theme:change', handler);
       return () => options.eventBus.off('theme:change', handler);
+    },
+    get locale() {
+      return options.getLocale?.() ?? options.locale;
+    },
+    getLocale: () => options.getLocale?.() ?? options.locale,
+    onLocaleChange: (callback) => {
+      const handler = (newLocale: WidgetLocaleInfo) => callback(newLocale);
+      options.eventBus.on('locale:change', handler);
+      return () => options.eventBus.off('locale:change', handler);
     },
     user: options.user,
     isAuthenticated: options.isAuthenticated,

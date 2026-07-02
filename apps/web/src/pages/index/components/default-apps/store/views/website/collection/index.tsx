@@ -11,6 +11,7 @@ import WebsiteCard from "../../../components/WebsiteCard";
 import { getWebsiteId } from "../../../utils";
 import { storeRoute } from "../../../route-paths";
 import type { StoreOutletContext } from "../../../index";
+import { useI18n } from "@/i18n";
 
 const SkeletonWebsiteGrid: React.FC<{ count: number }> = ({ count }) => {
   return (
@@ -32,6 +33,7 @@ const SkeletonWebsiteGrid: React.FC<{ count: number }> = ({ count }) => {
 };
 
 const WebsiteCollectionRoute: FC = () => {
+  const { t } = useI18n();
   const { id } = useParams();
   const collectionId = id ? decodeURIComponent(id) : "";
   const navigate = useNavigate();
@@ -133,7 +135,7 @@ const WebsiteCollectionRoute: FC = () => {
               ))}
             </div>
             {activeCollectionWebsites.length === 0 && (
-              <Empty className="mt-8" description="暂无数据" />
+              <Empty className="mt-8" description={t("ui.noData")} />
             )}
             <div className="flex items-center justify-end pt-4">
               <Pagination

@@ -8,8 +8,10 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const Notice = () => {
+  const { t } = useI18n();
   const [open, { setTrue: openModal, setFalse: closeModal }] =
     useBoolean(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -80,7 +82,7 @@ const Notice = () => {
   return (
     <div>
       <Badge dot={hasUnread}>
-        <Tooltip title="通知">
+        <Tooltip title={t("ui.notifications")}>
           <Button
             type="text"
             onClick={() => {
@@ -145,7 +147,7 @@ const Notice = () => {
               markNoticeRead(key);
             }}
             className="w-44! pr-2!"
-            emptyText="暂无通知"
+            emptyText={t("ui.noNotifications")}
           />
           <div className="flex-1 min-h-0 flex overflow-hidden bg-[#f5f5f7]">
             <div className="flex-1 min-w-0 overflow-y-auto p-5">
@@ -171,7 +173,7 @@ const Notice = () => {
                         }}
                         onClick={() => markNoticeRead(activeNotice._id)}
                       >
-                        标记已读
+                        {t("ui.markAsRead")}
                       </Button>
                     ) : null}
                   </div>
@@ -184,12 +186,12 @@ const Notice = () => {
               ) : activeId ? (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="通知不存在或已下线"
+                  description={t("ui.notice.missingDescription")}
                 />
               ) : (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="请从左侧选择一条通知查看详情"
+                  description={t("ui.notice.selectPlaceholder")}
                 />
               )}
             </div>

@@ -5,6 +5,7 @@ import type { FC } from "react";
 import type { DevWidget } from "@/contexts/WidgetContext";
 import type { WidgetSizeConfig } from "@/types";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 // ====== 表单数据类型 ======
 
@@ -28,6 +29,7 @@ const SizeConfigList: FC<{
   value?: SizeFormItem[];
   onChange?: (v: SizeFormItem[]) => void;
 }> = ({ value = [], onChange }) => {
+  const { t } = useI18n();
   const update = (index: number, field: keyof SizeFormItem, val: any) => {
     const next = [...value];
     next[index] = { ...next[index], [field]: val };
@@ -59,7 +61,7 @@ const SizeConfigList: FC<{
             value={item.col}
             onChange={(v) => update(index, "col", v ?? 1)}
             className="w-18!"
-            placeholder="列数"
+            placeholder={t("ui.columns")}
           />
           <InputNumber
             min={1}
@@ -67,13 +69,13 @@ const SizeConfigList: FC<{
             value={item.row}
             onChange={(v) => update(index, "row", v ?? 1)}
             className="w-18!"
-            placeholder="行数"
+            placeholder={t("ui.rows")}
           />
           <Input
             value={item.name}
             onChange={(e) => update(index, "name", e.target.value)}
             className="w-20! shrink-0"
-            placeholder="名称"
+            placeholder={t("ui.name")}
           />
           {value.length > 1 && (
             <Button
@@ -91,7 +93,7 @@ const SizeConfigList: FC<{
         onClick={add}
         className="w-full"
       >
-        添加尺寸
+        {t("ui.addSize")}
       </Button>
     </div>
   );
@@ -131,6 +133,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
   editingWidget,
   onSubmit,
 }) => {
+  const { t } = useI18n();
   const [form] = Form.useForm<DevWidgetFormValues>();
 
   /** 弹窗打开时，若为编辑模式则回填表单 */
@@ -177,7 +180,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
         }}
       >
         <div className="mb-4 text-[21px] font-semibold tracking-tight text-[#1d1d1f]">
-          {editingWidget ? "编辑小组件" : "添加小组件"}
+          {editingWidget ? t("ui.editWidget") : t("ui.addWidget")}
         </div>
 
         <Form
@@ -192,18 +195,18 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
         >
           <Form.Item
             name="name"
-            label="名称"
-            rules={[{ required: true, message: "请输入小组件名称" }]}
+            label={t("ui.name")}
+            rules={[{ required: true, message: t("ui.enterAWidgetName") }]}
           >
-            <Input placeholder="如：我的时钟" />
+            <Input placeholder={t("ui.exampleMyClock")} />
           </Form.Item>
 
           <Form.Item
             name="entry"
-            label="ESM 入口地址"
+            label={t("ui.eSMEntryURL")}
             rules={[
-              { required: true, message: "请输入入口地址" },
-              { type: "url", message: "请输入有效的 URL" },
+              { required: true, message: t("ui.enterAnEntryURL") },
+              { type: "url", message: t("ui.enterAValidURL") },
             ]}
           >
             <Input placeholder="http://localhost:5173/src/index.tsx" />
@@ -211,13 +214,13 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
 
           <Form.Item
             name="sizes"
-            label="尺寸配置"
+            label={t("ui.sizeConfig")}
             rules={[
               {
                 validator: (_, val) =>
                   val?.length > 0
                     ? Promise.resolve()
-                    : Promise.reject("至少需要一个尺寸配置"),
+                    : Promise.reject(t("ui.atLeastOneSizeConfigIsRequired")),
               },
             ]}
           >
@@ -226,7 +229,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
 
           <div className="flex items-center justify-center gap-2 pt-2">
             <Button shape="round" onClick={handleClose}>
-              取消
+              {t("ui.cancel")}
             </Button>
             <Button
               shape="round"
@@ -234,7 +237,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
               className="apple-primary"
               onClick={() => (form as any).submit()}
             >
-              {editingWidget ? "保存" : "添加到桌面"}
+              {editingWidget ? t("ui.save") : t("ui.addToDesktop")}
             </Button>
           </div>
         </Form>

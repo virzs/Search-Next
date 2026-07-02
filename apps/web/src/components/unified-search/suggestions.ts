@@ -89,11 +89,10 @@ const runSuggestionTransform = (
 const requestJsonp = (url: string, callbackName: string) =>
   new Promise<unknown>((resolve, reject) => {
     let settled = false;
-    let timer: number | undefined;
     const script = document.createElement("script");
 
     const cleanup = () => {
-      if (timer !== undefined) window.clearTimeout(timer);
+      window.clearTimeout(timer);
       try {
         delete (window as any)[callbackName];
       } catch {
@@ -119,7 +118,7 @@ const requestJsonp = (url: string, callbackName: string) =>
       settle(() => reject(new Error("JSONP load failed")));
     };
 
-    timer = window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       settle(() => reject(new Error("JSONP timeout")));
     }, JSONP_TIMEOUT_MS);
 

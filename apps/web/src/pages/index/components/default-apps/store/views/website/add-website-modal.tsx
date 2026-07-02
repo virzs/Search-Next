@@ -2,6 +2,7 @@ import { DesktopNextBaseModal } from "zs_library";
 import { Button, Form, Input } from "antd";
 import type { FC } from "react";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 export type AddWebsitePayload = {
   name: string;
@@ -26,6 +27,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
   onClose,
   onAdd,
 }) => {
+  const { t } = useI18n();
   const [form] = Form.useForm<AddWebsiteFormValues>();
 
   return (
@@ -45,7 +47,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
     >
       <div className={`w-full min-h-full ${appleFormModalClassName}`}>
         <div className="mb-4 text-[21px] font-semibold tracking-tight text-[#1d1d1f]">
-          新增网站
+          {t("ui.addWebsite")}
         </div>
 
         <Form
@@ -64,18 +66,18 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
             (form as any).resetFields();
           }}
         >
-          <Form.Item name="name" label="名称" rules={[{ required: true }]}>
-            <Input placeholder="例如：我的常用站点" />
+          <Form.Item name="name" label={t("ui.name")} rules={[{ required: true }]}>
+            <Input placeholder={t("ui.exampleMyFavoriteSite")} />
           </Form.Item>
           <Form.Item
             name="url"
-            label="网址"
+            label={t("ui.uRL")}
             rules={[{ required: true, type: "url" }]}
           >
-            <Input placeholder="例如：https://example.com" />
+            <Input placeholder={t("ui.exampleHttpExampleCom")} />
           </Form.Item>
-          <Form.Item name="iconUrl" label="图标URL" rules={[{ type: "url" }]}>
-            <Input placeholder="例如：https://example.com/icon.png" />
+          <Form.Item name="iconUrl" label={t("ui.iconURL")} rules={[{ type: "url" }]}>
+            <Input placeholder={t("ui.exampleHttpExampleComIconPng")} />
           </Form.Item>
           <div className="flex items-center justify-center gap-2 pt-2">
             <Button
@@ -85,7 +87,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
                 onClose();
               }}
             >
-              取消
+              {t("ui.cancel")}
             </Button>
             <Button
               shape="round"
@@ -93,7 +95,7 @@ const AddWebsiteModal: FC<AddWebsiteModalProps> = ({
               className="apple-primary"
               onClick={() => (form as any).submit()}
             >
-              添加
+              {t("ui.add")}
             </Button>
           </div>
         </Form>

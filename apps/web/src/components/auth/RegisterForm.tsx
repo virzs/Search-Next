@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { appleAuthFormClassName } from "./apple-auth-styles";
 import useConfig from "@/hooks/useConfig";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
+import { useI18n } from "@/i18n";
 
 const { Text } = Typography;
 const { Item } = Form;
@@ -31,6 +32,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   className = "",
   initialValues = {},
 }) => {
+  const { t } = useI18n();
   const [form] = Form.useForm<RegisterFormData>();
   const { register, registerLoading: contextRegisterLoading } = useAuth();
   const { projectInfo } = useConfig();
@@ -63,9 +65,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const defaultGetCaptcha = async (email: string): Promise<void> => {
     try {
       await getEmailCaptcha(email);
-      message.success("验证码已发送到您的邮箱");
+      message.success(t("ui.verificationCodeSentToYourEmail"));
     } catch (error: any) {
-      throw new Error(error.message || "发送验证码失败");
+      throw new Error(error.message || t("ui.failedToSendVerificationCode"));
     }
   };
 
@@ -74,14 +76,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     try {
       const email = (form as any).getFieldValue("email");
       if (!email) {
-        message.warning("请先输入邮箱地址");
+        message.warning(t("ui.enterYourEmailAddressFirst"));
         return;
       }
 
       // 验证邮箱格式
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        message.warning("请输入有效的邮箱地址");
+        message.warning(t("ui.enterAValidEmailAddress"));
         return;
       }
 
@@ -103,7 +105,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         }
       }, 1000);
     } catch (error: any) {
-      message.error(error.message || "获取验证码失败");
+      message.error(error.message || t("ui.failedToGetVerificationCode"));
     } finally {
       setCaptchaLoading(false);
     }
@@ -113,13 +115,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const handleSubmit = async (values: RegisterFormData) => {
     try {
       if (turnstileEnabled && !turnstileSiteKey) {
-        message.error("人机验证未配置完整，请联系管理员");
-        return { success: false, message: "人机验证未配置完整" };
+        message.error(t("ui.auth.turnstileConfigMissing"));
+        return { success: false, message: t("ui.auth.turnstileConfigMissing") };
       }
 
       if (turnstileEnabled && !turnstileToken) {
-        message.error("请完成人机验证");
-        return { success: false, message: "请完成人机验证" };
+        message.error(t("ui.completeHumanVerification"));
+        return { success: false, message: t("ui.completeHumanVerification") };
       }
 
       const submitHandler = onSubmit || defaultRegister;
@@ -129,16 +131,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       });
 
       if (result.success) {
-        message.success(result.message || "注册成功");
+        message.success(result.message || t("ui.registeredSuccessfully2"));
         (form as any).resetFields();
       } else {
-        message.error(result.message || "注册失败");
+        message.error(result.message || t("ui.registrationFailed"));
         resetTurnstile();
       }
 
       return result;
     } catch (error: any) {
-      const errorMessage = error.message || "注册过程中发生错误";
+      const errorMessage = error.message || t("ui.anErrorOccurredWhileRegistering");
       message.error(errorMessage);
       resetTurnstile();
       return {
@@ -159,36 +161,36 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       >
         {/* 用户名输入 */}
         <Item
-          label="用户名"
+          label={t("ui.username")}
           name="username"
           rules={[
-            { required: true, message: "请输入用户名" },
-            { min: 2, max: 20, message: "用户名长度为2-20个字符" },
+            { required: true, message: t("ui.enterAUsername") },
+            { min: 2, max: 20, message: t("ui.usernameMustBe220Characters") },
             {
               pattern: /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/,
-              message: "用户名只能包含字母、数字、下划线和中文",
+              message: t("ui.auth.usernamePattern"),
             },
           ]}
         >
           <Input
             prefix={<RiUserFill size={16} className="apple-auth-field-icon" />}
-            placeholder="请输入用户名"
+            placeholder={t("ui.enterAUsername")}
             autoComplete="username"
           />
         </Item>
 
         {/* 邮箱输入 */}
         <Item
-          label="邮箱"
+          label={t("ui.email")}
           name="email"
           rules={[
-            { required: true, message: "请输入邮箱地址" },
-            { type: "email", message: "请输入有效的邮箱地址" },
+            { required: true, message: t("ui.enterYourEmailAddress") },
+            { type: "email", message: t("ui.enterAValidEmailAddress") },
           ]}
         >
           <Input
             prefix={<RiMailFill size={16} className="apple-auth-field-icon" />}
-            placeholder="请输入邮箱地址"
+            placeholder={t("ui.enterYourEmailAddress")}
             autoComplete="email"
           />
         </Item>
@@ -196,11 +198,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         {/* 验证码输入（如果需要） */}
         {requireCaptcha && (
           <Item
-            label="邮箱验证码"
+            label={t("ui.emailVerificationCode")}
             name="captcha"
             rules={[
-              { required: true, message: "请输入验证码" },
-              { len: 6, message: "验证码为6位数字" },
+              { required: true, message: t("ui.enterTheVerificationCode") },
+              { len: 6, message: t("ui.theVerificationCodeMustBe6Digits") },
             ]}
           >
             <div className="apple-auth-captcha-row">
@@ -211,7 +213,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     className="apple-auth-field-icon"
                   />
                 }
-                placeholder="请输入6位验证码"
+                placeholder={t("ui.enterThe6DigitCode")}
                 maxLength={6}
               />
               <Button
@@ -220,7 +222,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 disabled={captchaSent}
                 className="apple-auth-code-button"
               >
-                {captchaSent ? `${countdown}s` : "获取验证码"}
+                {captchaSent ? `${countdown}s` : t("ui.getCode")}
               </Button>
             </div>
           </Item>
@@ -228,21 +230,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {/* 密码输入 */}
         <Item
-          label="密码"
+          label={t("ui.password")}
           name="password"
           rules={[
-            { required: true, message: "请输入密码" },
-            { min: 6, message: "密码长度至少6位" },
+            { required: true, message: t("ui.enterYourPassword") },
+            { min: 6, message: t("ui.passwordMustBeAtLeast6Characters") },
             {
               pattern: /^(?=.*[a-zA-Z])(?=.*\d)/,
-              message: "密码必须包含字母和数字",
+              message: t("ui.passwordMustIncludeLettersAndNumbers"),
             },
           ]}
         >
           <Input
             prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showPassword ? "text" : "password"}
-            placeholder="请输入密码（至少6位，包含字母和数字）"
+            placeholder={t("ui.auth.passwordPlaceholder")}
             autoComplete="new-password"
             suffix={
               <Button
@@ -264,17 +266,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {/* 确认密码输入 */}
         <Item
-          label="确认密码"
+          label={t("ui.confirmPassword")}
           name="confirmPassword"
           dependencies={["password"]}
           rules={[
-            { required: true, message: "请确认密码" },
+            { required: true, message: t("ui.confirmYourPassword") },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue("password") === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error("两次输入的密码不一致"));
+                return Promise.reject(new Error(t("ui.theTwoPasswordsDoNotMatch")));
               },
             }),
           ]}
@@ -282,7 +284,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <Input
             prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="请再次输入密码"
+            placeholder={t("ui.enterYourPasswordAgain")}
             autoComplete="new-password"
             suffix={
               <Button
@@ -314,7 +316,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               />
             ) : (
               <div className="text-sm text-red-500">
-                人机验证未配置完整，请联系管理员
+                {t("ui.auth.turnstileConfigMissing")}
               </div>
             )}
           </Item>
@@ -330,7 +332,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             size="large"
             className="apple-auth-primary-button"
           >
-            {isLoading ? "注册中..." : "注册账号"}
+            {t(isLoading ? "ui.registering" : "ui.registerAccount")}
           </Button>
         </Item>
       </Form>
@@ -338,13 +340,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       {/* 注册提示 */}
       <div className="apple-auth-terms">
         <Text type="secondary">
-          注册即表示您同意我们的
+          {t("ui.byRegisteringYouAgreeToOur")}
           <a href="#" className="apple-auth-link mx-1">
-            服务条款
+            {t("ui.termsOfService")}
           </a>
-          和
+          {t("ui.and")}
           <a href="#" className="apple-auth-link mx-1">
-            隐私政策
+            {t("ui.privacyPolicy")}
           </a>
         </Text>
       </div>

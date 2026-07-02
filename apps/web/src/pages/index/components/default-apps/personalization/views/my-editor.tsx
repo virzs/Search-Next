@@ -11,6 +11,7 @@ import {
   type MyWallpaperItem,
 } from "../my-assets";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const wallpaperEditorClassName = css`
   .apple-theme-action.ant-btn-primary:not(:disabled) {
@@ -57,6 +58,7 @@ const getThemeOverlayContainer = () =>
   document.querySelector<HTMLElement>(".base-modal-panel") ?? document.body;
 
 const ThemeMyEditorView = () => {
+  const { t } = useI18n();
   const { message, modal } = App.useApp();
   const navigate = useNavigate();
   const params = useParams();
@@ -167,7 +169,7 @@ const ThemeMyEditorView = () => {
       if (type === "image") {
         const url = String(values.url ?? "").trim();
         if (!isValidUrl(url)) {
-          message.error("请输入有效的图片链接（http/https/data）");
+          message.error(t("ui.enterAValidImageURLHttpHttpData"));
           return;
         }
         if (isEdit && currentItem) {
@@ -200,7 +202,7 @@ const ThemeMyEditorView = () => {
         }
       }
 
-      message.success("已保存");
+      message.success(t("ui.saved"));
       navigate(personalizationRoute.path.my, { replace: true });
     } catch {
       void 0;
@@ -220,7 +222,7 @@ const ThemeMyEditorView = () => {
 
       const url = String(values.url ?? "").trim();
       if (!isValidUrl(url)) {
-        message.error("请输入有效的图片链接（http/https/data）");
+        message.error(t("ui.enterAValidImageURLHttpHttpData"));
         return;
       }
       setWallpaper({ type: "image", url, name });
@@ -231,13 +233,13 @@ const ThemeMyEditorView = () => {
 
   const handleDelete = () => {
     if (!currentItem) return;
-    const restoreDefault = () => setWallpaper({ type: "none", name: "无" });
+    const restoreDefault = () => setWallpaper({ type: "none", name: "None" });
     modal.confirm({
-      title: "删除此项？",
-      content: "删除后不可恢复",
-      okText: "删除",
+      title: t("ui.deleteThisItem"),
+      content: t("ui.thisCannotBeUndone"),
+      okText: t("ui.delete"),
       okButtonProps: { danger: true },
-      cancelText: "取消",
+      cancelText: t("ui.cancel"),
       getContainer: getThemeOverlayContainer,
       onOk: () => {
         const wallpaper = personalization.wallpaper;
@@ -293,15 +295,15 @@ const ThemeMyEditorView = () => {
     <DefaultAppView
       className={`h-full ${wallpaperEditorClassName}`}
       animate
-      title={isEdit ? "编辑壁纸" : "添加壁纸"}
+      title={isEdit ? t("ui.editWallpaper") : t("ui.addWallpaper")}
       headerRight={
         <Space size={8}>
           {isEdit ? (
             <Button danger onClick={handleDelete}>
-              删除
+              {t("ui.delete")}
             </Button>
           ) : null}
-          <Button onClick={handleSave}>保存</Button>
+          <Button onClick={handleSave}>{t("ui.save")}</Button>
           <Button
             type="primary"
             shape="round"
@@ -309,7 +311,7 @@ const ThemeMyEditorView = () => {
             className="apple-theme-action"
             onClick={handleApply}
           >
-            {applied ? "已应用" : "应用"}
+            {applied ? t("ui.applied") : t("action.apply")}
           </Button>
         </Space>
       }
@@ -326,14 +328,14 @@ const ThemeMyEditorView = () => {
         }}
       >
         <div className="flex items-center justify-between gap-3">
-          <div className="font-medium">类型</div>
+          <div className="font-medium">{t("ui.type")}</div>
           <AppSegmented
             value={type}
             disabled={isEdit}
             onChange={(v) => setType(v as any)}
             options={[
-              { label: "渐变", value: "gradient" },
-              { label: "图片", value: "image" },
+              { label: t("ui.gradient"), value: "gradient" },
+              { label: t("ui.image"), value: "image" },
             ]}
           />
         </div>
@@ -342,17 +344,17 @@ const ThemeMyEditorView = () => {
           <Form form={form} layout="vertical">
             <Form.Item
               name="name"
-              label="名称"
-              rules={[{ required: true, message: "请输入名称" }]}
+              label={t("ui.name")}
+              rules={[{ required: true, message: t("ui.enterAName") }]}
             >
-              <Input placeholder="例如：我的极光" />
+              <Input placeholder={t("ui.exampleMyAurora")} />
             </Form.Item>
 
             {type === "gradient" ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <div className="text-sm mb-2">起始色</div>
+                    <div className="text-sm mb-2">{t("ui.startColor")}</div>
                     <ColorPicker
                       value={gradientStart}
                       onChange={(color, hex) => setGradientStart(colorToHex(color, hex))}
@@ -363,7 +365,7 @@ const ThemeMyEditorView = () => {
                     />
                   </div>
                   <div>
-                    <div className="text-sm mb-2">结束色</div>
+                    <div className="text-sm mb-2">{t("ui.endColor")}</div>
                     <ColorPicker
                       value={gradientEnd}
                       onChange={(color, hex) => setGradientEnd(colorToHex(color, hex))}
@@ -376,7 +378,7 @@ const ThemeMyEditorView = () => {
                 </div>
 
                 <div className="mt-4">
-                  <div className="text-sm mb-2">角度</div>
+                  <div className="text-sm mb-2">{t("ui.angle")}</div>
                   <Slider
                     min={0}
                     max={360}
@@ -388,14 +390,14 @@ const ThemeMyEditorView = () => {
             ) : (
               <Form.Item
                 name="url"
-                label="图片链接"
+                label={t("ui.imageURL")}
                 rules={[
-                  { required: true, message: "请输入图片链接" },
+                  { required: true, message: t("ui.enterAnImageURL") },
                   {
                     validator: async (_, value) => {
                       if (!value) return;
                       if (!isValidUrl(String(value))) {
-                        throw new Error("请输入有效的图片链接（http/https/data）");
+                        throw new Error(t("ui.enterAValidImageURLHttpHttpData"));
                       }
                     },
                   },

@@ -13,6 +13,7 @@ import {
 } from "@/services/desktop";
 import PreviewCard from "../components/PreviewCard";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const wallpaperCategoryClassName = css`
   .apple-theme-action.ant-btn-primary:not(:disabled) {
@@ -23,6 +24,7 @@ const wallpaperCategoryClassName = css`
 `;
 
 const WallpaperCategoryView: FC = () => {
+  const { t } = useI18n();
   const { id } = useParams();
   const categoryId = id ? decodeURIComponent(String(id)) : "";
   const { personalization, setWallpaper } = useDesktopTheme();
@@ -83,7 +85,7 @@ const WallpaperCategoryView: FC = () => {
     >
       {categoryLoading || wallpaperLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <div className="text-sm text-gray-500">正在加载壁纸…</div>
+          <div className="text-sm text-gray-500">{t("ui.loadingWallpapers")}</div>
         </div>
       ) : visibleWallpapers.length ? (
         <div>
@@ -99,13 +101,13 @@ const WallpaperCategoryView: FC = () => {
                   title={w.name}
                   description={
                     active
-                      ? "当前使用"
-                      : w.description || (url ? "图片壁纸" : "资源不可用")
+                      ? t("ui.inUse")
+                      : w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))
                   }
                   status={
                     active ? (
                       <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                        当前
+                        {t("ui.current")}
                       </span>
                     ) : null
                   }
@@ -119,7 +121,7 @@ const WallpaperCategoryView: FC = () => {
                         className={active ? undefined : "apple-theme-action"}
                         onClick={() => handleSelectImage(w)}
                       >
-                        {active ? "已应用" : "应用"}
+                        {active ? t("ui.applied") : t("action.apply")}
                       </Button>
                     ) : null
                   }
@@ -155,7 +157,7 @@ const WallpaperCategoryView: FC = () => {
         </div>
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <Empty description="暂无壁纸" />
+          <Empty description={t("ui.noWallpapers")} />
         </div>
       )}
     </DefaultAppView>

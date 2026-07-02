@@ -15,6 +15,7 @@ import { personalizationRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
 import PreviewCard from "../components/PreviewCard";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 const themeViewClassName = css`
   .apple-theme-action.ant-btn-primary:not(:disabled) {
@@ -25,6 +26,7 @@ const themeViewClassName = css`
 `;
 
 const ThemeView: FC = () => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { activeThemeId, setActiveThemeId } = useDesktopTheme();
   const [activeCategoryId, setActiveCategoryId] = useState<string>("all");
@@ -44,10 +46,10 @@ const ThemeView: FC = () => {
   const categoryOptions = useMemo(() => {
     const items: ThemeCategoryApiItem[] = categories ?? [];
     return [
-      { label: "全部", value: "all" },
+      { label: t("ui.all"), value: "all" },
       ...items.map((c) => ({ label: c.name, value: c._id })),
     ];
-  }, [categories]);
+  }, [categories, t]);
 
   const openThemeDetail = (theme: ThemeConfigApiItem) => {
     navigate(personalizationRoute.path.detail(theme._id), { state: { theme } });
@@ -70,41 +72,41 @@ const ThemeView: FC = () => {
       <div className="mx-auto w-full max-w-6xl">
         <div className="mb-5">
           <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
-            主题
+            {t("ui.theme")}
           </div>
           <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
-            选择桌面的窗口、Dock、菜单和图标视觉风格。
+            {t("ui.theme.chooseDescription")}
           </div>
         </div>
 
         {themeLoading || categoryLoading ? (
           <div className="flex h-[220px] w-full items-center justify-center">
-            <div className="text-sm text-[#6e6e73]">正在加载主题…</div>
+            <div className="text-sm text-[#6e6e73]">{t("ui.loadingThemes")}</div>
           </div>
         ) : themes?.length ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {themes.map((t) => {
-              const previewUrl = getThemePreviewImageUrl(t, 0);
+            {themes.map((theme) => {
+              const previewUrl = getThemePreviewImageUrl(theme, 0);
               const active =
-                t._id === activeThemeId ||
+                theme._id === activeThemeId ||
                 ((activeThemeId === "light" || activeThemeId === "default") &&
-                  (t._id === "light" ||
-                    t._id === "default" ||
-                    t.name === "默认"));
+                  (theme._id === "light" ||
+                    theme._id === "default" ||
+                    theme.name === "默认"));
               return (
                 <PreviewCard
-                  key={t._id}
+                  key={theme._id}
                   active={active}
-                  title={t.name}
+                  title={theme.name}
                   description={
                     active
-                      ? "当前使用"
-                      : t.description || "点击卡片查看预览详情"
+                      ? t("ui.inUse")
+                      : theme.description || t("ui.clickTheCardToViewPreviewDetails")
                   }
                   status={
                     active ? (
                       <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                        当前
+                        {t("ui.current")}
                       </span>
                     ) : null
                   }
@@ -115,22 +117,22 @@ const ThemeView: FC = () => {
                       shape="round"
                       disabled={active}
                       className={active ? undefined : "apple-theme-action"}
-                      onClick={() => setActiveThemeId(t._id)}
+                      onClick={() => setActiveThemeId(theme._id)}
                     >
-                      {active ? "已应用" : "应用"}
+                      {active ? t("ui.applied") : t("action.apply")}
                     </Button>
                   }
-                  onClick={() => openThemeDetail(t)}
+                  onClick={() => openThemeDetail(theme)}
                   cover={
                     <div className="h-full w-full">
                       {previewUrl ? (
                         <img
                           className="h-full w-full object-cover"
                           src={previewUrl}
-                          alt={t.name}
+                          alt={theme.name}
                         />
                       ) : (
-                        <ThemeDesktopPreview theme={t} />
+                        <ThemeDesktopPreview theme={theme} />
                       )}
                     </div>
                   }
@@ -140,7 +142,7 @@ const ThemeView: FC = () => {
           </div>
         ) : (
           <div className="flex h-[220px] w-full items-center justify-center rounded-[22px] bg-white/80">
-            <Empty description="暂无可切换主题" />
+            <Empty description={t("ui.noThemesAvailable")} />
           </div>
         )}
       </div>

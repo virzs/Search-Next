@@ -12,12 +12,13 @@ import type { StoreAddPayload } from "../../index";
 import { toBackendAssetUrl } from "@/utils/utils";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import { css } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 type PreviewTheme = "light" | "dark";
 
 const PREVIEW_THEME_OPTIONS = [
-  { label: "浅色", value: "light" },
-  { label: "深色", value: "dark" },
+  { label: "ui.light", value: "light" },
+  { label: "ui.dark", value: "dark" },
 ];
 
 const widgetViewClassName = css`
@@ -157,8 +158,17 @@ interface WidgetViewProps {
 }
 
 const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
+  const { t } = useI18n();
   const { widgets, loading, refresh, getIconUrl } = useWidget();
   const [previewTheme, setPreviewTheme] = React.useState<PreviewTheme>("light");
+  const previewThemeOptions = useMemo(
+    () =>
+      PREVIEW_THEME_OPTIONS.map((option) => ({
+        ...option,
+        label: t(option.label),
+      })),
+    [t],
+  );
 
   React.useEffect(() => {
     void refresh();
@@ -185,7 +195,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
       headerRight={
         <AppSegmented
           size="small"
-          options={PREVIEW_THEME_OPTIONS}
+          options={previewThemeOptions}
           value={previewTheme}
           onChange={(value) => setPreviewTheme(value as PreviewTheme)}
         />
@@ -194,8 +204,8 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
       <div className="h-full overflow-y-auto px-4 pb-8 pt-4">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
           <StoreHeroCard
-            title="桌面信息一眼可见"
-            description="查看浅色或深色预览，比较不同尺寸截图，再选择合适尺寸添加到桌面。"
+            title={t("ui.desktopInfoAtAGlance")}
+            description={t("ui.store.widgetHeroDescription")}
             tone="widget"
           />
 
@@ -208,7 +218,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
           {!loading && filteredWidgets.length === 0 ? (
             <div className="flex min-h-80 items-center justify-center">
               <Empty
-                description={query ? "未找到匹配的小组件" : "暂无可用小组件"}
+                description={t(query ? "ui.noMatchingWidgets" : "ui.noWidgetsAvailable")}
               />
             </div>
           ) : null}
@@ -262,7 +272,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                               handleAdd(widget, widget.defaultSizeId)
                             }
                           >
-                            获取
+                            {t("ui.get")}
                           </Button>
                         </div>
 
@@ -278,7 +288,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                             ))
                           ) : (
                             <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!">
-                              小组件
+                              {t("ui.widget")}
                             </Tag>
                           )}
                           {widget.version ? (
@@ -325,10 +335,13 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                                   type="link"
                                   size="small"
                                   className="apple-store-get-link h-5! px-0! text-[11px]! font-bold!"
-                                  aria-label={`添加 ${widget.name} ${item.label}`}
+                                  aria-label={t("ui.addNameLabel", {
+                                    name: widget.name,
+                                    label: item.label,
+                                  })}
                                   onClick={() => handleAdd(widget, item.sizeId)}
                                 >
-                                  获取
+                                  {t("ui.get")}
                                 </Button>
                               </div>
                               {item.screenshot?.width &&
@@ -353,7 +366,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                               handleAdd(widget, widget.defaultSizeId)
                             }
                           >
-                            获取
+                            {t("ui.get")}
                           </Button>
                         </div>
                       </div>

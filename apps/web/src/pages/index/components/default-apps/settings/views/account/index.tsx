@@ -16,13 +16,15 @@ import {
   MacSettingsValue,
   MacSettingsView,
 } from "../../components/macos-settings";
+import { useI18n } from "@/i18n";
 
 const AccountView = () => {
   const { user, isAuthenticated, logout, coverGradientCss } = useAuth();
+  const { t } = useI18n();
 
   const joinedAt = user?.createdAt
     ? format(user.createdAt, "yyyy-MM-dd")
-    : "未知";
+    : t("ui.unknown");
 
   const renderUnloggedView = () => (
     <>
@@ -31,8 +33,8 @@ const AccountView = () => {
           <div className="mx-auto w-full max-w-[520px]">
             <UnloggedView
               mode="inline"
-              title="欢迎使用"
-              description="登录后可以同步您的数据和设置"
+              title={t("ui.welcome")}
+              description={t("ui.signInToSyncYourDataAndSettings")}
               onLoginSuccess="show-account"
               onRegisterSuccess="show-account"
               showToggle={true}
@@ -55,7 +57,7 @@ const AccountView = () => {
               src={
                 <BoringAccountAvatar
                   seed={user.email || user.username}
-                  aria-label={user.username || "账号头像"}
+                  aria-label={user.username || t("ui.accountAvatar")}
                 />
               }
               style={{
@@ -73,7 +75,7 @@ const AccountView = () => {
               </div>
               <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#f2f2f7] px-2.5 py-1 text-xs font-semibold text-[#6e6e73]">
                 <RiShieldCheckLine size={14} />
-                <span>已登录</span>
+                <span>{t("ui.signedIn")}</span>
               </div>
             </div>
             <Button
@@ -82,30 +84,30 @@ const AccountView = () => {
               onClick={() => void logout()}
               className="h-[34px] shrink-0 rounded-full border border-[rgba(255,59,48,0.18)] bg-[rgba(255,59,48,0.07)] px-3 text-[13px] font-bold text-[#ff3b30] shadow-none hover:!border-[rgba(255,59,48,0.3)] hover:!bg-[rgba(255,59,48,0.1)] hover:!text-[#ff3b30]"
             >
-              退出登录
+              {t("ui.signOut")}
             </Button>
           </div>
         </div>
 
-        <MacSettingsSection title="账号信息">
+        <MacSettingsSection title={t("ui.accountInfo")}>
           <MacSettingsRow
             icon={<RiUserLine size={16} />}
-            title="个人资料"
+            title={t("ui.profile")}
             description={user.email}
             extra={<MacSettingsValue>{user.username}</MacSettingsValue>}
           />
           <MacSettingsRow
             icon={<RiShieldCheckLine size={16} />}
             iconTone="green"
-            title="登录与安全"
-            description="密码、会话与访问令牌"
+            title={t("ui.signInAndSecurity")}
+            description={t("ui.passwordSessionsAndAccessTokens")}
             extra={<MacSettingsChevron />}
           />
           <MacSettingsRow
             icon={<RiTimeLine size={16} />}
             iconTone="gray"
-            title="加入时间"
-            description="账号创建日期"
+            title={t("ui.joined")}
+            description={t("ui.accountCreationDate")}
             extra={<MacSettingsValue>{joinedAt}</MacSettingsValue>}
           />
         </MacSettingsSection>

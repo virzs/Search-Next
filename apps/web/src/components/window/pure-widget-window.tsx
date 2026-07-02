@@ -4,6 +4,7 @@ import { DesktopNextBaseModal } from "zs_library";
 import PureWidget, { PureWidgetConfig } from "../micro-frontend/pure-widget";
 import type { WidgetMode, WidgetSDK } from "@/sdk";
 import type { WidgetConfig } from "@/types";
+import { useI18n } from "@/i18n";
 
 interface PureWidgetWindowProps {
   config: PureWidgetConfig;
@@ -29,6 +30,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   sdk,
   createSdk,
 }) => {
+  const { t } = useI18n();
   const [viewMode, setViewMode] = useState<"full" | "settings">("full");
   const [widgetBackVisible, setWidgetBackVisible] = useState(false);
 
@@ -40,7 +42,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   }, [config.entry, visible]);
 
   const settingsRoutePath = widgetConfig?.pagePaths?.settings;
-  const widgetTitle = title || widgetConfig?.name || "小组件";
+  const widgetTitle = title || widgetConfig?.name || t("ui.widget");
   const hasSettings = Boolean(widgetConfig?.id && settingsRoutePath);
   const contentHeight = typeof height === "number" ? height : undefined;
   const windowHeight = typeof height === "number" ? height + 46 : height;
@@ -133,19 +135,21 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
                 className="inline-flex h-8 cursor-pointer items-center gap-0.5 rounded-full border-0 bg-transparent px-2 text-[13px] font-medium text-[#007aff] hover:bg-[#f2f2f7] dark:hover:bg-white/10"
               >
                 <RiArrowLeftSLine size={18} />
-                返回
+                {t("ui.back")}
               </button>
             )}
           </div>
           <div className="min-w-0 truncate text-center text-[13px] font-semibold text-[#424245] dark:text-[#f5f5f7]">
-            {viewMode === "settings" ? `${widgetTitle} 设置` : widgetTitle}
+            {viewMode === "settings"
+              ? t("ui.titleSettings", { title: widgetTitle })
+              : widgetTitle}
           </div>
           <div className="flex items-center justify-end">
             {viewMode === "full" && hasSettings && (
               <button
                 type="button"
-                aria-label="打开设置"
-                title="设置"
+                aria-label={t("ui.openSettings")}
+                title={t("ui.settings")}
                 onClick={() => setViewMode("settings")}
                 className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/5 bg-[#f5f5f7] text-[#1d1d1f] shadow-[0_4px_12px_rgba(0,0,0,0.10)] transition hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-[#f5f5f7] dark:hover:bg-white/15"
               >

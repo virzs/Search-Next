@@ -7,23 +7,30 @@ import {
   settingsRootRouteDefinition,
   settingsRouteDefinitions,
 } from "./route-definitions";
+import { useI18n } from "@/i18n";
 
 const SettingsModalRoute: FC = () => {
-  const menuItems = createSidebarMenuItems(settingsRouteDefinitions);
+  const { routeTextResolver, t } = useI18n();
+  const menuItems = createSidebarMenuItems(settingsRouteDefinitions, {
+    textResolver: routeTextResolver,
+  });
 
   return (
     <AppRoutedOverlay
       closeTo="/"
-      title={settingsRootRouteDefinition.meta.title}
+      title={routeTextResolver(settingsRootRouteDefinition.meta.title, {
+        route: settingsRootRouteDefinition,
+        field: "title",
+      })}
       wrapContent
       overlayProps={{
         modalProps: { width: 940 },
       }}
       sidebarProps={{
         search: {
-          placeholder: "搜索",
+          placeholder: t("ui.search"),
           prefix: <RiSearchLine size={16} className="text-gray-400" />,
-          emptyText: "没有匹配设置",
+          emptyText: t("ui.noMatchingSettings"),
         },
         className: settingsSidebarClassName,
         menuItems,
@@ -32,7 +39,7 @@ const SettingsModalRoute: FC = () => {
             paddingLeft: 14,
           },
         },
-        footer: "Search Next Settings",
+        footer: t("ui.searchNextSettings"),
       }}
       keepAlive={{ enabled: true }}
     />

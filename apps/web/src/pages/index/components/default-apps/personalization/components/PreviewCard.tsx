@@ -1,5 +1,6 @@
 import { cx } from "@emotion/css";
 import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
+import { useI18n } from "@/i18n";
 
 export interface PreviewCardProps {
   title: ReactNode;
@@ -20,7 +21,7 @@ export interface PreviewCardProps {
 const PreviewCard = ({
   title,
   description,
-  descriptionFallback = "暂无描述",
+  descriptionFallback,
   active = false,
   disabled = false,
   onClick,
@@ -32,11 +33,13 @@ const PreviewCard = ({
   coverPadding = 0,
   bodyPadding = "12px 13px 13px",
 }: PreviewCardProps) => {
+  const { t } = useI18n();
   const clickable = Boolean(onClick) && !disabled;
+  const fallbackDescription = descriptionFallback ?? t("ui.noDescription");
 
   const descriptionNode = (() => {
     const value =
-      description == null || description === "" ? descriptionFallback : description;
+      description == null || description === "" ? fallbackDescription : description;
     if (value == null || value === "") return null;
     if (typeof value === "string") {
       return (

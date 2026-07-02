@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Input, Empty, List, Pagination } from "antd";
 import iconTags from "../../assets/tags.json";
 import { css, cx } from "@emotion/css";
+import { useI18n } from "@/i18n";
 
 // 图标数据类型定义
 type IconTagsType = {
@@ -49,6 +50,7 @@ const IconSelecter: React.FC<IconSelecterProps> = ({
   onChange,
   defaultIconType = "line",
 }) => {
+  const { t } = useI18n();
   const [searchText, setSearchText] = useState("");
   const [iconType, setIconType] = useState<IconType>(
     value?.iconType || defaultIconType
@@ -131,7 +133,7 @@ const IconSelecter: React.FC<IconSelecterProps> = ({
     <div>
       <div className="mb-4 flex items-center">
         <Input
-          placeholder="搜索图标"
+          placeholder={t("ui.searchIcons")}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           prefix={<i className="ri-search-line" />}
@@ -157,7 +159,7 @@ const IconSelecter: React.FC<IconSelecterProps> = ({
               (currentPage - 1) * pageSize,
               currentPage * pageSize
             )}
-            locale={{ emptyText: <Empty description="没有找到匹配的图标" /> }}
+            locale={{ emptyText: <Empty description={t("ui.noMatchingIconsFound")} /> }}
             renderItem={(icon) => {
               // 使用 value 或内部状态 selectedIcon 确定是否选中
               const isSelected =

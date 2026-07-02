@@ -60,6 +60,7 @@ import {
   getSettingsBackupStoragePath,
   settingsRoute,
 } from "../../route-paths";
+import { useI18n } from "@/i18n";
 
 const { Text } = Typography;
 
@@ -125,64 +126,64 @@ const STORAGE_CATEGORY_ORDER: StorageCategoryId[] = [
 
 const STORAGE_CATEGORY_META: Record<StorageCategoryId, StorageCategoryMeta> = {
   desktop: {
-    label: "桌面与布局",
-    description: "桌面页面、图标布局和已修改标记",
+    label: "ui.desktopAndLayout",
+    description: "ui.backup.desktopDescription",
     color: "#ff3b30",
     tone: "red",
     icon: <RiHardDrive3Line size={16} />,
   },
   personalization: {
-    label: "个性化",
-    description: "主题、壁纸和外观配置",
+    label: "ui.personalization",
+    description: "ui.themesWallpapersAndAppearanceSettings",
     color: "#ff9500",
     tone: "orange",
     icon: <RiBrushLine size={16} />,
   },
   widgets: {
-    label: "小组件",
-    description: "已安装小组件和小组件私有存储",
+    label: "ui.widget",
+    description: "ui.backup.widgetDescription",
     color: "#ffcc00",
     tone: "orange",
     icon: <RiApps2Line size={16} />,
   },
   search: {
-    label: "搜索",
-    description: "搜索偏好、搜索引擎和最近使用",
+    label: "ui.search",
+    description: "ui.backup.searchDescription",
     color: "#34c759",
     tone: "green",
     icon: <RiSearchLine size={16} />,
   },
   language: {
-    label: "语言",
-    description: "界面语言设置",
+    label: "ui.language",
+    description: "ui.interfaceLanguageSetting",
     color: "#0a84ff",
     tone: "blue",
     icon: <RiGlobalLine size={16} />,
   },
   developer: {
-    label: "开发者",
-    description: "开发者模式和本地小组件入口",
+    label: "ui.developer",
+    description: "ui.developerModeAndLocalWidgetEntries",
     color: "#af52de",
     tone: "purple",
     icon: <RiCodeSSlashLine size={16} />,
   },
   notice: {
-    label: "通知",
-    description: "已读通知记录",
+    label: "ui.notifications",
+    description: "ui.readNotificationRecords",
     color: "#64d2ff",
     tone: "blue",
     icon: <RiInformationLine size={16} />,
   },
   metadata: {
-    label: "备份元数据",
-    description: "备份版本、时间、来源和结构开销",
+    label: "ui.backupMetadata",
+    description: "ui.backup.metadataDescription",
     color: "#8e8e93",
     tone: "gray",
     icon: <RiDatabase2Line size={16} />,
   },
   other: {
-    label: "其他",
-    description: "未归类的数据项",
+    label: "ui.other",
+    description: "ui.uncategorizedDataItems",
     color: "#c7c7cc",
     tone: "gray",
     icon: <RiPieChart2Line size={16} />,
@@ -276,93 +277,100 @@ const analyzeBackupStorage = (
   };
 };
 
-const getStorageUsageLabel = (usage: StorageUsageSummary) =>
-  `${usage.categories.length} 类数据，${usage.itemCount} 项数据`;
-
 const StorageUsageOverview = ({
   usage,
 }: {
   usage: StorageUsageSummary;
-}) => (
-  <section>
-    <div className="rounded-[14px] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
-      <div className="flex items-center justify-between gap-4">
-        <div className="min-w-0 truncate text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
-          {getStorageUsageLabel(usage)}
+}) => {
+  const { t } = useI18n();
+  return (
+    <section>
+      <div className="rounded-[14px] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0 truncate text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
+            {t("ui.categoryCountCategoriesItemCountItems", {
+              categoryCount: usage.categories.length,
+              itemCount: usage.itemCount,
+            })}
+          </div>
+          <div className="shrink-0 text-right text-[13px] font-semibold text-[#6e6e73] dark:text-[#aeaeb2]">
+            {t("ui.sizeUsed", { size: formatBytes(usage.totalBytes) })}
+          </div>
         </div>
-        <div className="shrink-0 text-right text-[13px] font-semibold text-[#6e6e73] dark:text-[#aeaeb2]">
-          已使用 {formatBytes(usage.totalBytes)}
+        <div className="mt-3 flex h-[22px] overflow-hidden rounded-[5px] bg-[#d1d1d6] dark:bg-white/15">
+          {usage.categories.length ? (
+            usage.categories.map((category) => (
+              <div
+                key={category.id}
+                title={`${t(category.label)} ${formatBytes(category.bytes)}`}
+                className="h-full border-r border-white/70 last:border-r-0 dark:border-[#111113]/70"
+                style={{
+                  flexBasis: 0,
+                  flexGrow: category.bytes,
+                  backgroundColor: category.color,
+                }}
+              />
+            ))
+          ) : (
+            <div className="h-full flex-1 bg-[#d1d1d6] dark:bg-white/15" />
+          )}
         </div>
-      </div>
-      <div className="mt-3 flex h-[22px] overflow-hidden rounded-[5px] bg-[#d1d1d6] dark:bg-white/15">
-        {usage.categories.length ? (
-          usage.categories.map((category) => (
-            <div
-              key={category.id}
-              title={`${category.label} ${formatBytes(category.bytes)}`}
-              className="h-full border-r border-white/70 last:border-r-0 dark:border-[#111113]/70"
-              style={{
-                flexBasis: 0,
-                flexGrow: category.bytes,
-                backgroundColor: category.color,
-              }}
-            />
-          ))
-        ) : (
-          <div className="h-full flex-1 bg-[#d1d1d6] dark:bg-white/15" />
-        )}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5">
-        {usage.categories.map((category) => (
-          <span
-            key={category.id}
-            className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6e6e73] dark:text-[#aeaeb2]"
-          >
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5">
+          {usage.categories.map((category) => (
             <span
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: category.color }}
-            />
-            {category.label}
-          </span>
-        ))}
+              key={category.id}
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6e6e73] dark:text-[#aeaeb2]"
+            >
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: category.color }}
+              />
+              {t(category.label)}
+            </span>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const StorageUsageDetailSection = ({
   usage,
 }: {
   usage: StorageUsageSummary;
-}) => (
-  <MacSettingsSection title="占用明细">
-    {usage.categories.length ? (
-      usage.categories.map((category) => (
+}) => {
+  const { t } = useI18n();
+  return (
+    <MacSettingsSection title={t("ui.usageDetails")}>
+      {usage.categories.length ? (
+        usage.categories.map((category) => (
+          <MacSettingsRow
+            key={category.id}
+            icon={category.icon}
+            iconTone={category.tone}
+            title={t(category.label)}
+            description={t(category.description)}
+            extra={
+              <MacSettingsValue>{formatBytes(category.bytes)}</MacSettingsValue>
+            }
+          />
+        ))
+      ) : (
         <MacSettingsRow
-          key={category.id}
-          icon={category.icon}
-          iconTone={category.tone}
-          title={category.label}
-          description={category.description}
-          extra={
-            <MacSettingsValue>{formatBytes(category.bytes)}</MacSettingsValue>
-          }
+          icon={<RiDatabase2Line size={16} />}
+          iconTone="gray"
+          title={t("ui.noLocalData")}
+          description={t("ui.thereIsNoBackupDataToSummarize")}
         />
-      ))
-    ) : (
-      <MacSettingsRow
-        icon={<RiDatabase2Line size={16} />}
-        iconTone="gray"
-        title="暂无本地数据"
-        description="当前没有可统计的备份数据。"
-      />
-    )}
-  </MacSettingsSection>
-);
+      )}
+    </MacSettingsSection>
+  );
+};
 
 const BackupView = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
   const modalRootRef = useRef<HTMLDivElement>(null);
   const confirmInSettings = (config: Parameters<typeof Modal.confirm>[0]) =>
     Modal.confirm({
@@ -381,7 +389,7 @@ const BackupView = () => {
     {
       manual: true,
       onSuccess: () => {
-        message.success("已同步到云端");
+        message.success(t("ui.syncedToCloud"));
         refreshCloudSync();
       },
     },
@@ -391,7 +399,7 @@ const BackupView = () => {
     {
       manual: true,
       onSuccess: () => {
-        message.success("名称已更新");
+        message.success(t("ui.nameUpdated"));
         refreshCloudSync();
       },
     },
@@ -424,7 +432,7 @@ const BackupView = () => {
     a.click();
     URL.revokeObjectURL(url);
 
-    message.success("已导出备份文件");
+    message.success(t("ui.backupFileExported"));
   };
 
   const handleImportData = () => {
@@ -455,25 +463,30 @@ const BackupView = () => {
 
         const confirmImport = (mode: "strict" | "merge") => {
           confirmInSettings({
-            title: "确认导入备份？",
+            title: t("ui.importThisBackup"),
             content: (
               <Flex vertical gap={8}>
                 <Text type="secondary">
-                  文件：{file.name}（{Math.ceil(file.size / 1024)} KB）
+                  {t("ui.fileNameSizeKB", {
+                    name: file.name,
+                    size: Math.ceil(file.size / 1024),
+                  })}
                 </Text>
-                <Text type="secondary">备份时间：{backup.createdAt}</Text>
+                <Text type="secondary">
+                  {t("ui.backupTimeTime", { time: backup.createdAt })}
+                </Text>
                 <Text type="danger">
-                  导入将覆盖当前本地所有设置，建议先导出当前数据作为备份。
+                  {t("ui.backup.importWarning")}
                 </Text>
               </Flex>
             ),
-            okText: mode === "strict" ? "确认导入" : "强制导入",
-            cancelText: "取消",
+            okText: t(mode === "strict" ? "ui.confirmImport" : "ui.forceImport"),
+            cancelText: t("ui.cancel"),
             onOk: () => {
               applySearchNextStorageBackup(backup, localStorage, {
                 mode,
               });
-              message.success("导入成功，正在刷新页面…");
+              message.success(t("ui.importedSuccessfullyRefreshing"));
               window.setTimeout(() => window.location.reload(), 300);
             },
           });
@@ -485,36 +498,47 @@ const BackupView = () => {
         }
 
         confirmInSettings({
-          title: originMismatch ? "备份文件来源不一致" : "备份文件字段不一致",
+          title: t(originMismatch ? "ui.backupOriginMismatch" : "ui.backupFieldsMismatch"),
           content: (
             <Flex vertical gap={8}>
               <Text type="secondary">
-                文件：{file.name}（{Math.ceil(file.size / 1024)} KB）
+                  {t("ui.fileNameSizeKB", {
+                    name: file.name,
+                    size: Math.ceil(file.size / 1024),
+                  })}
+                </Text>
+              <Text type="secondary">
+                {t("ui.backupTimeTime", { time: backup.createdAt })}
               </Text>
-              <Text type="secondary">备份时间：{backup.createdAt}</Text>
               {originMismatch ? (
                 <Text type="secondary">
-                  备份来源：{backup.origin}，当前页面：{window.location.origin}
+                  {t("ui.backupOriginOriginCurrentPageCurrent", {
+                    origin: backup.origin,
+                    current: window.location.origin,
+                  })}
                 </Text>
               ) : (
                 <Text type="secondary">
-                  缺失字段：{missingKeys.length}，额外字段：{extraKeys.length}
+                  {t("ui.missingFieldsMissingExtraFieldsExtra", {
+                    missing: missingKeys.length,
+                    extra: extraKeys.length,
+                  })}
                 </Text>
               )}
               <Text type="danger">
-                {originMismatch
-                  ? "继续后将允许导入该来源的备份，导入将覆盖当前本地设置。"
-                  : "继续后将尝试强制导入，未包含的字段会保留当前本地值。"}
+                {t(originMismatch
+                  ? "ui.backup.originMismatchContinue"
+                  : "ui.backup.fieldsMismatchContinue")}
               </Text>
             </Flex>
           ),
-          okText: "继续",
-          cancelText: "取消",
+          okText: t("ui.continue"),
+          cancelText: t("ui.cancel"),
           onOk: () => confirmImport(originMismatch ? "strict" : "merge"),
         });
       } catch (e) {
         const err = e instanceof Error ? e.message : String(e);
-        message.error(`导入失败：${err}`);
+        message.error(t("ui.importFailedError", { error: err }));
       } finally {
         input.value = "";
       }
@@ -528,19 +552,19 @@ const BackupView = () => {
 
     let selectedBackupId: string | undefined;
     confirmInSettings({
-      title: "选择要覆盖的云备份",
+      title: t("ui.chooseCloudBackupToOverwrite"),
       content: (
         <Flex vertical gap={8}>
           <Text type="secondary">
-            已达到云备份数量上限，请选择一个已有备份用当前本地数据覆盖。
+            {t("ui.backup.chooseOverwriteDescription")}
           </Text>
           <Select
-            placeholder="请选择要覆盖的云备份"
+            placeholder={t("ui.chooseACloudBackupToOverwrite")}
             style={{ width: "100%" }}
             options={backups.map((backup) => ({
               value: backup._id,
-              label: backup.name || "未命名备份",
-              title: backup.name || "未命名备份",
+              label: backup.name || t("ui.untitledBackup"),
+              title: backup.name || t("ui.untitledBackup"),
               backup,
             }))}
             optionRender={({ data }) => {
@@ -548,11 +572,11 @@ const BackupView = () => {
               return (
                 <div className="min-w-0 py-1">
                   <div className="truncate text-sm font-semibold">
-                    {backup.name || "未命名备份"}
+                    {backup.name || t("ui.untitledBackup")}
                   </div>
                   <div className="mt-0.5 text-xs text-[#6e6e73]">
                     {formatDateTime(backup.lastSyncedAt)} ·{" "}
-                    {formatBytes(backup.byteSize)} · {backup.itemCount} 项
+                    {formatBytes(backup.byteSize)} · {t("ui.countItems", { count: backup.itemCount })}
                   </div>
                 </div>
               );
@@ -566,18 +590,18 @@ const BackupView = () => {
           />
         </Flex>
       ),
-      okText: "继续",
-      cancelText: "取消",
+      okText: t("ui.continue"),
+      cancelText: t("ui.cancel"),
       onOk: () => {
         if (!selectedBackupId) {
-          message.warning("请选择要覆盖的云备份");
+          message.warning(t("ui.chooseACloudBackupToOverwrite"));
           return Promise.reject();
         }
         const target = backups.find(
           (backup) => backup._id === selectedBackupId,
         );
         if (!target) {
-          message.warning("未找到所选云备份");
+          message.warning(t("ui.selectedCloudBackupNotFound"));
           return Promise.reject();
         }
         handleOverwriteCloud(target, payload);
@@ -597,56 +621,62 @@ const BackupView = () => {
       return;
     }
 
-    let name = `云备份 ${new Date().toLocaleString()}`;
+    let name = t("ui.cloudBackupTime", { time: new Date().toLocaleString() });
     confirmInSettings({
-      title: "上传到云端",
+      title: t("ui.uploadToCloud"),
       content: (
         <Flex vertical gap={8}>
           <Text type="secondary">
-            将当前本地数据保存为新的云备份版本。当前{" "}
-            {cloudSync?.versionCount ?? 0}/{cloudSync?.maxSyncBackups ?? 1}。
+            {t("ui.backup.uploadCloudDescription", {
+              current: cloudSync?.versionCount ?? 0,
+              max: cloudSync?.maxSyncBackups ?? 1,
+            })}
           </Text>
           <Input
             defaultValue={name}
             maxLength={100}
-            placeholder="请输入备份名称"
+            placeholder={t("ui.enterABackupName")}
             onChange={(event) => {
               name = event.target.value;
             }}
           />
         </Flex>
       ),
-      okText: "上传",
-      cancelText: "取消",
+      okText: t("ui.upload"),
+      cancelText: t("ui.cancel"),
       onOk: () => uploadCloudSync({ payload: backup, name }),
     });
   };
 
   const handleRestoreCloud = (backup: CloudBackupItem) => {
     confirmInSettings({
-      title: "确认从云端恢复？",
+      title: t("ui.restoreFromCloud"),
       content: (
         <Flex vertical gap={8}>
-          <Text type="secondary">版本：{backup.name || "未命名备份"}</Text>
           <Text type="secondary">
-            同步时间：{formatDateTime(backup.lastSyncedAt)}，大小：
-            {formatBytes(backup.byteSize)}
+            {t("ui.versionName", { name: backup.name || t("ui.untitledBackup") })}
+          </Text>
+          <Text type="secondary">
+            {t("ui.syncTimeTimeSizeSize", {
+              time: formatDateTime(backup.lastSyncedAt),
+              size: formatBytes(backup.byteSize),
+            })}
           </Text>
           <Text type="danger">
-            恢复会用云端数据覆盖当前本地所有设置，建议先导出当前数据作为备份。
+            {t("ui.backup.restoreWarning")}
           </Text>
         </Flex>
       ),
-      okText: "确认恢复",
-      cancelText: "取消",
+      okText: t("ui.confirmRestore"),
+      cancelText: t("ui.cancel"),
       onOk: () => {
         const payload = backup.payload;
         if (!payload) {
-          message.warning("未找到所选云备份版本");
+          message.warning(t("ui.selectedCloudBackupVersionNotFound"));
           return;
         }
         applySearchNextStorageBackup(payload, localStorage, { mode: "strict" });
-        message.success("恢复成功，正在刷新页面…");
+        message.success(t("ui.restoredSuccessfullyRefreshing"));
         window.setTimeout(() => window.location.reload(), 300);
       },
     });
@@ -657,20 +687,24 @@ const BackupView = () => {
     payload = createSearchNextStorageBackup(),
   ) => {
     confirmInSettings({
-      title: "确认覆盖云备份？",
+      title: t("ui.overwriteCloudBackup"),
       content: (
         <Flex vertical gap={8}>
-          <Text type="secondary">目标版本：{target.name || "未命名备份"}</Text>
           <Text type="secondary">
-            原同步时间：{formatDateTime(target.lastSyncedAt)}
+            {t("ui.targetVersionName", { name: target.name || t("ui.untitledBackup") })}
+          </Text>
+          <Text type="secondary">
+            {t("ui.originalSyncTimeTime", {
+              time: formatDateTime(target.lastSyncedAt),
+            })}
           </Text>
           <Text type="danger">
-            覆盖后该云备份版本会替换为当前本地数据，原云端内容无法从后台查看或恢复。
+            {t("ui.backup.overwriteCloudWarning")}
           </Text>
         </Flex>
       ),
-      okText: "确认覆盖",
-      cancelText: "取消",
+      okText: t("ui.confirmOverwrite"),
+      cancelText: t("ui.cancel"),
       onOk: () =>
         uploadCloudSync({
           payload,
@@ -683,23 +717,23 @@ const BackupView = () => {
   const handleRenameCloud = (backup: CloudBackupItem) => {
     let nextName = backup.name || "";
     confirmInSettings({
-      title: "设置备份名称",
+      title: t("ui.setBackupName"),
       content: (
         <Input
           defaultValue={nextName}
           maxLength={100}
-          placeholder="请输入备份名称"
+          placeholder={t("ui.enterABackupName")}
           onChange={(event) => {
             nextName = event.target.value;
           }}
         />
       ),
-      okText: "保存",
-      cancelText: "取消",
+      okText: t("ui.save"),
+      cancelText: t("ui.cancel"),
       onOk: () => {
         const trimmed = nextName.trim();
         if (!trimmed) {
-          message.warning("请输入备份名称");
+          message.warning(t("ui.enterABackupName"));
           return Promise.reject();
         }
         return renameCloudBackup(backup._id, trimmed);
@@ -723,12 +757,12 @@ const BackupView = () => {
     });
 
     return (
-      <MacSettingsSection title="储存空间">
+      <MacSettingsSection title={t("ui.storage")}>
         <MacSettingsRow
           icon={<RiHardDrive3Line size={16} />}
           iconTone="blue"
-          title="当前数据占用"
-          description="查看桌面、设置、小组件等数据的空间占比"
+          title={t("ui.currentDataUsage")}
+          description={t("ui.backup.storageUsageDescription")}
           extra={
             <span className="inline-flex items-center gap-2">
               <MacSettingsValue>{formatBytes(usage.totalBytes)}</MacSettingsValue>
@@ -748,10 +782,10 @@ const BackupView = () => {
       return (
         <section>
           <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73]">
-            云备份列表
+            {t("ui.cloudBackupList")}
           </div>
           <div className="rounded-xl border border-[rgba(60,60,67,0.12)] bg-white/70 px-4 py-5 text-sm text-[#6e6e73]">
-            正在读取云备份
+            {t("ui.readingCloudBackups")}
           </div>
         </section>
       );
@@ -761,10 +795,10 @@ const BackupView = () => {
       return (
         <section>
           <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73]">
-            云备份列表
+            {t("ui.cloudBackupList")}
           </div>
           <div className="rounded-xl border border-dashed border-[rgba(60,60,67,0.18)] bg-white/50 px-4 py-5 text-sm text-[#6e6e73]">
-            暂无云备份，点击上传创建第一个云备份版本。
+            {t("ui.backup.emptyCloudBackups")}
           </div>
         </section>
       );
@@ -773,7 +807,7 @@ const BackupView = () => {
     return (
       <section>
         <div className="mb-2 ml-1 flex items-center justify-between gap-3 text-[13px] font-bold text-[#6e6e73]">
-          <span>云备份列表</span>
+          <span>{t("ui.cloudBackupList")}</span>
           <span className="font-semibold">
             {cloudSync?.versionCount ?? backups.length}/
             {cloudSync?.maxSyncBackups ?? backups.length}
@@ -791,12 +825,12 @@ const BackupView = () => {
             >
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold text-[#1d1d1f]">
-                  {backup.name || "未命名备份"}
+                  {backup.name || t("ui.untitledBackup")}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs leading-[18px] text-[#6e6e73]">
                   <span>{formatDateTime(backup.lastSyncedAt)}</span>
                   <span>{formatBytes(backup.byteSize)}</span>
-                  <span>{backup.itemCount} 项</span>
+                  <span>{t("ui.countItems", { count: backup.itemCount })}</span>
                 </div>
               </div>
               <Flex gap={8} wrap="wrap" justify="flex-end">
@@ -808,7 +842,7 @@ const BackupView = () => {
                     handleRenameCloud(backup);
                   }}
                 >
-                  重命名
+                  {t("ui.rename")}
                 </Button>
                 <Button
                   size="small"
@@ -817,7 +851,7 @@ const BackupView = () => {
                     handleRestoreCloud(backup);
                   }}
                 >
-                  恢复
+                  {t("ui.restore")}
                 </Button>
                 <Button
                   size="small"
@@ -828,7 +862,7 @@ const BackupView = () => {
                     handleOverwriteCloud(backup);
                   }}
                 >
-                  覆盖
+                  {t("ui.overwrite")}
                 </Button>
                 <span className="grid h-6 w-5 shrink-0 place-items-center text-[#b0b0b4]">
                   <RiArrowRightSLine size={20} />
@@ -842,34 +876,34 @@ const BackupView = () => {
   };
 
   const renderLocalBackupSection = () => (
-    <MacSettingsSection title="本地备份">
+    <MacSettingsSection title={t("ui.localBackup")}>
       <MacSettingsRow
         icon={<RiDownloadLine size={16} />}
         iconTone="orange"
-        title="导出数据"
-        description="保存为 .snbak 备份文件"
+        title={t("ui.exportData")}
+        description={t("ui.saveAsASnbakBackupFile")}
         extra={
           <Button size="small" onClick={handleExportData}>
-            导出
+            {t("ui.export")}
           </Button>
         }
       />
       <MacSettingsRow
         icon={<RiUploadLine size={16} />}
         iconTone="purple"
-        title="导入数据"
-        description="导入会覆盖当前本地设置"
+        title={t("ui.importData")}
+        description={t("ui.backup.importDescription")}
         extra={
           <Button size="small" onClick={handleImportData}>
-            导入
+            {t("ui.import")}
           </Button>
         }
       />
       <MacSettingsRow
         icon={<RiErrorWarningLine size={16} />}
         iconTone="orange"
-        title="导入前建议先导出当前数据"
-        description="导入数据将覆盖当前所有设置。"
+        title={t("ui.exportCurrentDataBeforeImporting")}
+        description={t("ui.backup.importOverwriteNotice")}
       />
     </MacSettingsSection>
   );
@@ -884,19 +918,23 @@ const BackupView = () => {
   const renderLoggedView = () => (
     <>
       {renderCurrentStorageSection()}
-      <MacSettingsSection title="云端同步">
+      <MacSettingsSection title={t("ui.cloudSync")}>
         <MacSettingsRow
           icon={<RiCloudLine size={16} />}
           iconTone="green"
-          title="同步状态"
+          title={t("ui.syncStatus")}
           description={
             cloudSync?.hasSynced
-              ? `最近同步：${formatDateTime(cloudSync.lastSyncedAt)}，版本 ${cloudSync.versionCount}/${cloudSync.maxSyncBackups}`
-              : "当前账号暂无云端同步数据"
+              ? t("ui.lastSyncedTimeVersionCurrentMax", {
+                  time: formatDateTime(cloudSync.lastSyncedAt),
+                  current: cloudSync.versionCount,
+                  max: cloudSync.maxSyncBackups,
+                })
+              : t("ui.thisAccountHasNoCloudSyncDataYet")
           }
           extra={
             <MacSettingsValue>
-              {cloudLoading ? "读取中" : formatBytes(cloudSync?.byteSize)}
+              {cloudLoading ? t("ui.loading2") : formatBytes(cloudSync?.byteSize)}
             </MacSettingsValue>
           }
         />
@@ -904,22 +942,25 @@ const BackupView = () => {
           <MacSettingsRow
             icon={<RiErrorWarningLine size={16} />}
             iconTone="orange"
-            title="云备份版本超过当前限制"
-            description={`当前已有 ${cloudSync.versionCount} 个版本，当前限制为 ${cloudSync.maxSyncBackups} 个。下次上传需要覆盖已有版本。`}
+            title={t("ui.backup.limitExceeded")}
+            description={t("ui.backup.limitExceededDescription", {
+              current: cloudSync.versionCount,
+              max: cloudSync.maxSyncBackups,
+            })}
           />
         ) : null}
         <MacSettingsRow
           icon={<RiUploadLine size={16} />}
           iconTone="blue"
-          title="上传云备份"
-          description="未达上限时创建新版本，达到上限后请覆盖下方已有版本"
+          title={t("ui.uploadCloudBackup")}
+          description={t("ui.backup.cloudUploadHint")}
           extra={
             <Button
               size="small"
               loading={uploadLoading}
               onClick={handleUploadCloud}
             >
-              上传
+              {t("ui.upload")}
             </Button>
           }
         />
@@ -941,6 +982,7 @@ const BackupView = () => {
 export const StorageUsageView = () => {
   const { backupId } = useParams<{ backupId?: string }>();
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
   const isCloudBackup = Boolean(backupId);
 
   const {
@@ -957,10 +999,10 @@ export const StorageUsageView = () => {
     ? (cloudSync?.backups ?? []).find((backup) => backup._id === backupId)
     : null;
   const backup = cloudBackup?.payload ?? createSearchNextStorageBackup();
-  const cloudBackupName = cloudBackup?.name || "未命名备份";
+  const cloudBackupName = cloudBackup?.name || t("ui.untitledBackup");
   const storageNavigationTitle = cloudBackup
     ? cloudBackupName
-    : "当前空间占用";
+    : t("ui.currentStorageUsage");
   const usage = analyzeBackupStorage(
     backup,
     cloudBackup ? cloudBackup.byteSize : null,
@@ -969,13 +1011,13 @@ export const StorageUsageView = () => {
 
   if (isCloudBackup && (cloudLoading || !cloudSync)) {
     return (
-      <MacSettingsView navigationTitle="储存空间" showPageHeader={false}>
-        <MacSettingsSection title="云备份">
+      <MacSettingsView navigationTitle={t("ui.storage")} showPageHeader={false}>
+        <MacSettingsSection title={t("ui.cloudBackup")}>
           <MacSettingsRow
             icon={<RiCloudLine size={16} />}
             iconTone="gray"
-            title="正在读取"
-            description="正在获取云备份版本的储存空间数据。"
+            title={t("ui.reading")}
+            description={t("ui.backup.storageLoadingDescription")}
           />
         </MacSettingsSection>
       </MacSettingsView>
@@ -984,13 +1026,13 @@ export const StorageUsageView = () => {
 
   if (isCloudBackup && !cloudBackup) {
     return (
-      <MacSettingsView navigationTitle="储存空间" showPageHeader={false}>
-        <MacSettingsSection title="云备份">
+      <MacSettingsView navigationTitle={t("ui.storage")} showPageHeader={false}>
+        <MacSettingsSection title={t("ui.cloudBackup")}>
           <MacSettingsRow
             icon={<RiErrorWarningLine size={16} />}
             iconTone="orange"
-            title="未找到云备份"
-            description="该云备份版本可能已被覆盖或删除。"
+            title={t("ui.cloudBackupNotFound")}
+            description={t("ui.backup.notFoundDescription")}
           />
         </MacSettingsSection>
       </MacSettingsView>

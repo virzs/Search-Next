@@ -3,6 +3,7 @@ import type React from "react";
 import StoreHeroCard from "../../../components/StoreHeroCard";
 import { getWebsiteId } from "../../../utils";
 import WebsiteCard from "../../../components/WebsiteCard";
+import { useI18n } from "@/i18n";
 
 export interface FeaturedViewProps {
   featuredHomeScrollRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -43,14 +44,15 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
   onAddFromCard,
   onOpenWebsiteDetail,
 }) => {
+  const { t } = useI18n();
   return (
     <div
       ref={featuredHomeScrollRef}
       className="flex-1 overflow-y-auto px-3 pb-6"
     >
       <StoreHeroCard
-        title="高效工作网站精选"
-        description="集中浏览常用工具、文档与设计资源，进入详情后可直接获取到桌面。"
+        title={t("ui.curatedProductivityWebsites")}
+        description={t("ui.store.websiteHeroDescription")}
         tone="website"
         className="mb-5"
       />
@@ -75,7 +77,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
         ) : (
           <>
             {collectionItems.length === 0 ? (
-              <Empty className="mt-4" description="暂无合集" />
+              <Empty className="mt-4" description={t("ui.noCollections")} />
             ) : (
               <div className="flex flex-col gap-5">
                 {collectionItems.map((c: any) => (
@@ -94,7 +96,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                         className="px-0! font-bold! text-[#0071e3]!"
                         onClick={() => onOpenCollection(c._id)}
                       >
-                        查看更多
+                        {t("ui.viewMore")}
                       </Button>
                     </div>
                     <div className="-mx-1 flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
@@ -110,7 +112,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                         </div>
                       ))}
                       {(c.websites || []).length === 0 && (
-                        <Empty className="mt-2" description="暂无网站" />
+                        <Empty className="mt-2" description={t("ui.noWebsites")} />
                       )}
                     </div>
                   </div>
