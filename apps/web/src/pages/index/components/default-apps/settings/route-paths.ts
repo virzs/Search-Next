@@ -7,6 +7,8 @@ export const settingsRoute = {
     thirdParty: "third-party",
     language: "language",
     backup: "backup",
+    backupStorage: "backup/storage",
+    backupStorageDetail: "backup/storage/:backupId",
     about: "about",
     developer: "developer",
     wildcard: "*",
@@ -19,7 +21,13 @@ export const settingsRoute = {
     thirdParty: "/settings/third-party",
     language: "/settings/language",
     backup: "/settings/backup",
+    backupStorage: "/settings/backup/storage",
     about: "/settings/about",
     developer: "/settings/developer",
   },
 } as const;
+
+export const getSettingsBackupStoragePath = (backupId?: string) =>
+  backupId
+    ? `${settingsRoute.path.backupStorage}/${backupId}`
+    : settingsRoute.path.backupStorage;

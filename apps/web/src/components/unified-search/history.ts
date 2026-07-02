@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { SEARCH_HISTORY_STORAGE_KEY } from "@/utils/storage";
+
+export { SEARCH_HISTORY_STORAGE_KEY };
 
 export type SearchHistoryKind =
   | "search"
@@ -28,8 +31,6 @@ export interface SearchHistoryItem {
   updatedAt: number;
 }
 
-export const SEARCH_HISTORY_STORAGE_KEY =
-  "search-next:unified-search:history";
 export const UNIFIED_SEARCH_HISTORY_CHANGED_EVENT =
   "search-next:unified-search-history-changed";
 export const SEARCH_HISTORY_LIMIT = 8;

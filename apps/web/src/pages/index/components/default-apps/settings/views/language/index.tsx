@@ -1,6 +1,7 @@
 import { Select } from "antd";
 import { useState } from "react";
 import { RiTranslate } from "@remixicon/react";
+import { APP_LANGUAGE_STORAGE_KEY } from "@/utils/storage";
 import {
   MacSettingsRow,
   MacSettingsSection,
@@ -23,7 +24,7 @@ const languages: LanguageOption[] = [
 
 const LanguageView = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(
-    () => localStorage.getItem("app-language") || "zh-CN",
+    () => localStorage.getItem(APP_LANGUAGE_STORAGE_KEY) || "zh-CN",
   );
 
   const selectedLanguageInfo =
@@ -32,7 +33,7 @@ const LanguageView = () => {
 
   const handleLanguageChange = (languageCode: string) => {
     setSelectedLanguage(languageCode);
-    localStorage.setItem("app-language", languageCode);
+    localStorage.setItem(APP_LANGUAGE_STORAGE_KEY, languageCode);
   };
 
   return (

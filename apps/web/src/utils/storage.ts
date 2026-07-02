@@ -49,6 +49,28 @@ export const DEV_MODE_STORAGE_KEY = "SEARCH_NEXT_DEV_MODE";
  */
 export const DEV_WIDGETS_STORAGE_KEY = "SEARCH_NEXT_DEV_WIDGETS";
 
+/**
+ * 界面语言设置
+ */
+export const APP_LANGUAGE_STORAGE_KEY = "app-language";
+
+/**
+ * 聚焦搜索偏好设置
+ */
+export const UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY =
+  "search-next:unified-search:preferences";
+
+/**
+ * 搜索引擎选择设置
+ */
+export const SEARCH_SELECTED_ENGINES_STORAGE_KEY =
+  "search-next:unified-search:selected-engines";
+
+/**
+ * 聚焦搜索最近使用记录
+ */
+export const SEARCH_HISTORY_STORAGE_KEY = "search-next:unified-search:history";
+
 export const SEARCH_NEXT_STORAGE_KEYS = [
   DESKTOP_LIST_STORAGE_KEY,
   DESKTOP_LIST_MODIFIED_STORAGE_KEY,
@@ -59,6 +81,10 @@ export const SEARCH_NEXT_STORAGE_KEYS = [
   INSTALLED_WIDGETS_STORAGE_KEY,
   DEV_MODE_STORAGE_KEY,
   DEV_WIDGETS_STORAGE_KEY,
+  APP_LANGUAGE_STORAGE_KEY,
+  UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
+  SEARCH_SELECTED_ENGINES_STORAGE_KEY,
+  SEARCH_HISTORY_STORAGE_KEY,
 ] as const;
 
 export const isSearchNextBackupKey = (key: string) =>

@@ -407,6 +407,7 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
       open
       onClose={() => navigate(closeTo)}
       title={title}
+      navigationTitle={activeMenuItem?.label}
       wrapContent={wrapContent}
       componentSize={componentSize}
       overlayProps={overlayProps}

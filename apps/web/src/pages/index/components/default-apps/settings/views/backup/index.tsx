@@ -1,21 +1,48 @@
 import { Button, Typography, message, Flex, Input, Modal, Select } from "antd";
 import { useEffect, useRef } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 import { useRequest } from "ahooks";
 import {
+  RiApps2Line,
+  RiArrowRightSLine,
+  RiBrushLine,
   RiCloudLine,
+  RiCodeSSlashLine,
+  RiDatabase2Line,
   RiDownloadLine,
   RiErrorWarningLine,
+  RiGlobalLine,
+  RiHardDrive3Line,
+  RiInformationLine,
+  RiPieChart2Line,
+  RiSearchLine,
   RiUploadLine,
 } from "@remixicon/react";
+import { useNavigate, useParams } from "react-router";
 import useAuth from "@/hooks/useAuth";
 import {
+  APP_LANGUAGE_STORAGE_KEY,
+  DESKTOP_LIST_MODIFIED_STORAGE_KEY,
+  DESKTOP_LIST_STORAGE_KEY,
+  DEV_MODE_STORAGE_KEY,
+  DEV_WIDGETS_STORAGE_KEY,
+  INSTALLED_WIDGETS_STORAGE_KEY,
+  MY_THEMES_STORAGE_KEY,
+  MY_WALLPAPERS_STORAGE_KEY,
+  NOTICE_READ_IDS_STORAGE_KEY,
+  PERSONALIZATION_STORAGE_KEY,
+  SEARCH_HISTORY_STORAGE_KEY,
   SEARCH_NEXT_STORAGE_KEYS,
+  SEARCH_SELECTED_ENGINES_STORAGE_KEY,
+  UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
   parseStorageBackup,
   applySearchNextStorageBackup,
   createSearchNextStorageBackup,
   isSearchNextBackupKey,
   stringifyStorageBackup,
+  type StorageBackupV1,
 } from "@/utils/storage";
+import { isWidgetStorageKey } from "@/utils/widget-storage";
 import {
   getUserDataSync,
   putUserDataSync,
@@ -23,11 +50,16 @@ import {
   type UserDataSyncInfo,
 } from "@/services/user-data";
 import {
+  MacSettingsChevron,
   MacSettingsRow,
   MacSettingsSection,
   MacSettingsValue,
   MacSettingsView,
 } from "../../components/macos-settings";
+import {
+  getSettingsBackupStoragePath,
+  settingsRoute,
+} from "../../route-paths";
 
 const { Text } = Typography;
 
@@ -45,7 +77,291 @@ const formatDateTime = (value?: string | null) => {
 
 type CloudBackupItem = UserDataSyncInfo["backups"][number];
 
+type StorageIconTone = "blue" | "green" | "orange" | "red" | "purple" | "gray";
+
+type StorageCategoryId =
+  | "desktop"
+  | "personalization"
+  | "widgets"
+  | "search"
+  | "language"
+  | "developer"
+  | "notice"
+  | "metadata"
+  | "other";
+
+interface StorageCategoryMeta {
+  label: string;
+  description: string;
+  color: string;
+  tone: StorageIconTone;
+  icon: ReactNode;
+}
+
+interface StorageCategoryUsage extends StorageCategoryMeta {
+  id: StorageCategoryId;
+  bytes: number;
+  percentage: number;
+}
+
+interface StorageUsageSummary {
+  totalBytes: number;
+  dataBytes: number;
+  itemCount: number;
+  categories: StorageCategoryUsage[];
+}
+
+const STORAGE_CATEGORY_ORDER: StorageCategoryId[] = [
+  "desktop",
+  "personalization",
+  "widgets",
+  "search",
+  "language",
+  "developer",
+  "notice",
+  "metadata",
+  "other",
+];
+
+const STORAGE_CATEGORY_META: Record<StorageCategoryId, StorageCategoryMeta> = {
+  desktop: {
+    label: "桌面与布局",
+    description: "桌面页面、图标布局和已修改标记",
+    color: "#ff3b30",
+    tone: "red",
+    icon: <RiHardDrive3Line size={16} />,
+  },
+  personalization: {
+    label: "个性化",
+    description: "主题、壁纸和外观配置",
+    color: "#ff9500",
+    tone: "orange",
+    icon: <RiBrushLine size={16} />,
+  },
+  widgets: {
+    label: "小组件",
+    description: "已安装小组件和小组件私有存储",
+    color: "#ffcc00",
+    tone: "orange",
+    icon: <RiApps2Line size={16} />,
+  },
+  search: {
+    label: "搜索",
+    description: "搜索偏好、搜索引擎和最近使用",
+    color: "#34c759",
+    tone: "green",
+    icon: <RiSearchLine size={16} />,
+  },
+  language: {
+    label: "语言",
+    description: "界面语言设置",
+    color: "#0a84ff",
+    tone: "blue",
+    icon: <RiGlobalLine size={16} />,
+  },
+  developer: {
+    label: "开发者",
+    description: "开发者模式和本地小组件入口",
+    color: "#af52de",
+    tone: "purple",
+    icon: <RiCodeSSlashLine size={16} />,
+  },
+  notice: {
+    label: "通知",
+    description: "已读通知记录",
+    color: "#64d2ff",
+    tone: "blue",
+    icon: <RiInformationLine size={16} />,
+  },
+  metadata: {
+    label: "备份元数据",
+    description: "备份版本、时间、来源和结构开销",
+    color: "#8e8e93",
+    tone: "gray",
+    icon: <RiDatabase2Line size={16} />,
+  },
+  other: {
+    label: "其他",
+    description: "未归类的数据项",
+    color: "#c7c7cc",
+    tone: "gray",
+    icon: <RiPieChart2Line size={16} />,
+  },
+};
+
+const getUtf8ByteSize = (value: string) =>
+  new TextEncoder().encode(value).length;
+
+const getBackupEntryByteSize = (key: string, value: string | null) => {
+  if (value === null) return 0;
+  return getUtf8ByteSize(`${JSON.stringify(key)}:${JSON.stringify(value)}`);
+};
+
+const classifyBackupStorageKey = (key: string): StorageCategoryId => {
+  if (isWidgetStorageKey(key)) return "widgets";
+
+  switch (key) {
+    case DESKTOP_LIST_STORAGE_KEY:
+    case DESKTOP_LIST_MODIFIED_STORAGE_KEY:
+      return "desktop";
+    case PERSONALIZATION_STORAGE_KEY:
+    case MY_WALLPAPERS_STORAGE_KEY:
+    case MY_THEMES_STORAGE_KEY:
+      return "personalization";
+    case INSTALLED_WIDGETS_STORAGE_KEY:
+      return "widgets";
+    case UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY:
+    case SEARCH_SELECTED_ENGINES_STORAGE_KEY:
+    case SEARCH_HISTORY_STORAGE_KEY:
+      return "search";
+    case APP_LANGUAGE_STORAGE_KEY:
+      return "language";
+    case DEV_MODE_STORAGE_KEY:
+    case DEV_WIDGETS_STORAGE_KEY:
+      return "developer";
+    case NOTICE_READ_IDS_STORAGE_KEY:
+      return "notice";
+    default:
+      return "other";
+  }
+};
+
+const analyzeBackupStorage = (
+  backup: StorageBackupV1,
+  totalBytesOverride?: number | null,
+  options?: { includeMetadata?: boolean },
+): StorageUsageSummary => {
+  const includeMetadata = options?.includeMetadata ?? true;
+  const bytesByCategory = new Map<StorageCategoryId, number>();
+  const entries = Object.entries(backup.items ?? {});
+
+  for (const [key, value] of entries) {
+    const bytes = getBackupEntryByteSize(key, value);
+    if (bytes <= 0) continue;
+    const category = classifyBackupStorageKey(key);
+    bytesByCategory.set(category, (bytesByCategory.get(category) ?? 0) + bytes);
+  }
+
+  const dataBytes = [...bytesByCategory.values()].reduce(
+    (sum, bytes) => sum + bytes,
+    0,
+  );
+  const payloadBytes = getUtf8ByteSize(JSON.stringify(backup));
+  const totalBytes = includeMetadata
+    ? Math.max(totalBytesOverride ?? 0, payloadBytes, dataBytes)
+    : dataBytes;
+  const metadataBytes = includeMetadata
+    ? Math.max(0, totalBytes - dataBytes)
+    : 0;
+  if (metadataBytes > 0) {
+    bytesByCategory.set(
+      "metadata",
+      (bytesByCategory.get("metadata") ?? 0) + metadataBytes,
+    );
+  }
+
+  return {
+    totalBytes,
+    dataBytes,
+    itemCount: entries.length,
+    categories: STORAGE_CATEGORY_ORDER.map((id) => {
+      const bytes = bytesByCategory.get(id) ?? 0;
+      return {
+        id,
+        ...STORAGE_CATEGORY_META[id],
+        bytes,
+        percentage: totalBytes > 0 ? (bytes / totalBytes) * 100 : 0,
+      };
+    }).filter((category) => category.bytes > 0),
+  };
+};
+
+const getStorageUsageLabel = (usage: StorageUsageSummary) =>
+  `${usage.categories.length} 类数据，${usage.itemCount} 项数据`;
+
+const StorageUsageOverview = ({
+  usage,
+}: {
+  usage: StorageUsageSummary;
+}) => (
+  <section>
+    <div className="rounded-[14px] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0 truncate text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
+          {getStorageUsageLabel(usage)}
+        </div>
+        <div className="shrink-0 text-right text-[13px] font-semibold text-[#6e6e73] dark:text-[#aeaeb2]">
+          已使用 {formatBytes(usage.totalBytes)}
+        </div>
+      </div>
+      <div className="mt-3 flex h-[22px] overflow-hidden rounded-[5px] bg-[#d1d1d6] dark:bg-white/15">
+        {usage.categories.length ? (
+          usage.categories.map((category) => (
+            <div
+              key={category.id}
+              title={`${category.label} ${formatBytes(category.bytes)}`}
+              className="h-full border-r border-white/70 last:border-r-0 dark:border-[#111113]/70"
+              style={{
+                flexBasis: 0,
+                flexGrow: category.bytes,
+                backgroundColor: category.color,
+              }}
+            />
+          ))
+        ) : (
+          <div className="h-full flex-1 bg-[#d1d1d6] dark:bg-white/15" />
+        )}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5">
+        {usage.categories.map((category) => (
+          <span
+            key={category.id}
+            className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6e6e73] dark:text-[#aeaeb2]"
+          >
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: category.color }}
+            />
+            {category.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+const StorageUsageDetailSection = ({
+  usage,
+}: {
+  usage: StorageUsageSummary;
+}) => (
+  <MacSettingsSection title="占用明细">
+    {usage.categories.length ? (
+      usage.categories.map((category) => (
+        <MacSettingsRow
+          key={category.id}
+          icon={category.icon}
+          iconTone={category.tone}
+          title={category.label}
+          description={category.description}
+          extra={
+            <MacSettingsValue>{formatBytes(category.bytes)}</MacSettingsValue>
+          }
+        />
+      ))
+    ) : (
+      <MacSettingsRow
+        icon={<RiDatabase2Line size={16} />}
+        iconTone="gray"
+        title="暂无本地数据"
+        description="当前没有可统计的备份数据。"
+      />
+    )}
+  </MacSettingsSection>
+);
+
 const BackupView = () => {
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const modalRootRef = useRef<HTMLDivElement>(null);
   const confirmInSettings = (config: Parameters<typeof Modal.confirm>[0]) =>
@@ -84,6 +400,14 @@ const BackupView = () => {
   useEffect(() => {
     if (isAuthenticated) refreshCloudSync();
   }, [isAuthenticated, refreshCloudSync]);
+
+  const openCurrentStorageDetail = () => {
+    navigate(settingsRoute.path.backupStorage);
+  };
+
+  const openCloudStorageDetail = (backup: CloudBackupItem) => {
+    navigate(getSettingsBackupStoragePath(backup._id));
+  };
 
   const handleExportData = () => {
     const backup = createSearchNextStorageBackup();
@@ -383,6 +707,40 @@ const BackupView = () => {
     });
   };
 
+  const handleCloudBackupKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+    backup: CloudBackupItem,
+  ) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    openCloudStorageDetail(backup);
+  };
+
+  const renderCurrentStorageSection = () => {
+    const currentBackup = createSearchNextStorageBackup();
+    const usage = analyzeBackupStorage(currentBackup, null, {
+      includeMetadata: false,
+    });
+
+    return (
+      <MacSettingsSection title="储存空间">
+        <MacSettingsRow
+          icon={<RiHardDrive3Line size={16} />}
+          iconTone="blue"
+          title="当前数据占用"
+          description="查看桌面、设置、小组件等数据的空间占比"
+          extra={
+            <span className="inline-flex items-center gap-2">
+              <MacSettingsValue>{formatBytes(usage.totalBytes)}</MacSettingsValue>
+              <MacSettingsChevron />
+            </span>
+          }
+          onClick={openCurrentStorageDetail}
+        />
+      </MacSettingsSection>
+    );
+  };
+
   const renderCloudBackupList = () => {
     const backups = cloudSync?.backups ?? [];
 
@@ -425,7 +783,11 @@ const BackupView = () => {
           {backups.map((backup) => (
             <div
               key={backup._id}
-              className="grid min-h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-xl border border-[rgba(60,60,67,0.12)] bg-white/75 px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,0.035)] backdrop-blur-xl max-[640px]:grid-cols-1"
+              role="button"
+              tabIndex={0}
+              onClick={() => openCloudStorageDetail(backup)}
+              onKeyDown={(event) => handleCloudBackupKeyDown(event, backup)}
+              className="grid min-h-[68px] cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-xl border border-[rgba(60,60,67,0.12)] bg-white/75 px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,0.035)] backdrop-blur-xl transition hover:bg-white max-[640px]:grid-cols-1"
             >
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold text-[#1d1d1f]">
@@ -441,21 +803,36 @@ const BackupView = () => {
                 <Button
                   size="small"
                   loading={renameLoading}
-                  onClick={() => handleRenameCloud(backup)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRenameCloud(backup);
+                  }}
                 >
                   重命名
                 </Button>
-                <Button size="small" onClick={() => handleRestoreCloud(backup)}>
+                <Button
+                  size="small"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRestoreCloud(backup);
+                  }}
+                >
                   恢复
                 </Button>
                 <Button
                   size="small"
                   danger
                   loading={uploadLoading}
-                  onClick={() => handleOverwriteCloud(backup)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleOverwriteCloud(backup);
+                  }}
                 >
                   覆盖
                 </Button>
+                <span className="grid h-6 w-5 shrink-0 place-items-center text-[#b0b0b4]">
+                  <RiArrowRightSLine size={20} />
+                </span>
               </Flex>
             </div>
           ))}
@@ -497,10 +874,16 @@ const BackupView = () => {
     </MacSettingsSection>
   );
 
-  const renderUnloggedView = () => <>{renderLocalBackupSection()}</>;
+  const renderUnloggedView = () => (
+    <>
+      {renderCurrentStorageSection()}
+      {renderLocalBackupSection()}
+    </>
+  );
 
   const renderLoggedView = () => (
     <>
+      {renderCurrentStorageSection()}
       <MacSettingsSection title="云端同步">
         <MacSettingsRow
           icon={<RiCloudLine size={16} />}
@@ -552,6 +935,76 @@ const BackupView = () => {
         {isAuthenticated ? renderLoggedView() : renderUnloggedView()}
       </MacSettingsView>
     </div>
+  );
+};
+
+export const StorageUsageView = () => {
+  const { backupId } = useParams<{ backupId?: string }>();
+  const { isAuthenticated } = useAuth();
+  const isCloudBackup = Boolean(backupId);
+
+  const {
+    data: cloudSync,
+    loading: cloudLoading,
+    run: refreshCloudSync,
+  } = useRequest(getUserDataSync, { manual: true });
+
+  useEffect(() => {
+    if (isCloudBackup && isAuthenticated) refreshCloudSync();
+  }, [isAuthenticated, isCloudBackup, refreshCloudSync]);
+
+  const cloudBackup = isCloudBackup
+    ? (cloudSync?.backups ?? []).find((backup) => backup._id === backupId)
+    : null;
+  const backup = cloudBackup?.payload ?? createSearchNextStorageBackup();
+  const cloudBackupName = cloudBackup?.name || "未命名备份";
+  const storageNavigationTitle = cloudBackup
+    ? cloudBackupName
+    : "当前空间占用";
+  const usage = analyzeBackupStorage(
+    backup,
+    cloudBackup ? cloudBackup.byteSize : null,
+    { includeMetadata: Boolean(cloudBackup) },
+  );
+
+  if (isCloudBackup && (cloudLoading || !cloudSync)) {
+    return (
+      <MacSettingsView navigationTitle="储存空间" showPageHeader={false}>
+        <MacSettingsSection title="云备份">
+          <MacSettingsRow
+            icon={<RiCloudLine size={16} />}
+            iconTone="gray"
+            title="正在读取"
+            description="正在获取云备份版本的储存空间数据。"
+          />
+        </MacSettingsSection>
+      </MacSettingsView>
+    );
+  }
+
+  if (isCloudBackup && !cloudBackup) {
+    return (
+      <MacSettingsView navigationTitle="储存空间" showPageHeader={false}>
+        <MacSettingsSection title="云备份">
+          <MacSettingsRow
+            icon={<RiErrorWarningLine size={16} />}
+            iconTone="orange"
+            title="未找到云备份"
+            description="该云备份版本可能已被覆盖或删除。"
+          />
+        </MacSettingsSection>
+      </MacSettingsView>
+    );
+  }
+
+  return (
+    <MacSettingsView
+      navigationTitle={storageNavigationTitle}
+      showPageHeader={false}
+    >
+      <StorageUsageOverview usage={usage} />
+      <StorageUsageDetailSection usage={usage} />
+    </MacSettingsView>
   );
 };
 

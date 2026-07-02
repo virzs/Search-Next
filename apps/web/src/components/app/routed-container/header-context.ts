@@ -3,6 +3,7 @@ import { createContext, type ReactNode } from "react";
 export interface AppRoutedHeaderContextValue {
   hasHistoryControls: boolean;
   setHeader: (id: symbol, header: ReactNode | null) => void;
+  setTitle: (id: symbol, title: ReactNode | null) => void;
 }
 
 export const AppRoutedHeaderContext =

@@ -22,6 +22,7 @@ export interface AppRoutedContainerProps {
   open: boolean;
   onClose: () => void;
   title?: ReactNode;
+  navigationTitle?: ReactNode;
   wrapContent?: boolean;
   componentSize?: ConfigProviderProps["componentSize"];
   overlayProps?: Partial<AppResponsiveOverlayProps>;
@@ -33,6 +34,7 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
   open,
   onClose,
   title,
+  navigationTitle,
   wrapContent,
   componentSize,
   overlayProps,
@@ -137,6 +139,8 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
   );
   const [viewHeader, setViewHeader] = useState<ReactNode | null>(null);
   const activeHeaderIdRef = useRef<symbol | null>(null);
+  const [viewTitle, setViewTitle] = useState<ReactNode | null>(null);
+  const activeTitleIdRef = useRef<symbol | null>(null);
 
   const setHeader = useCallback((id: symbol, header: ReactNode | null) => {
     if (header) {
@@ -151,15 +155,31 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
     }
   }, []);
 
+  const setTitle = useCallback((id: symbol, titleNode: ReactNode | null) => {
+    if (titleNode) {
+      activeTitleIdRef.current = id;
+      setViewTitle(titleNode);
+      return;
+    }
+
+    if (activeTitleIdRef.current === id) {
+      activeTitleIdRef.current = null;
+      setViewTitle(null);
+    }
+  }, []);
+
   const headerContextValue = useMemo(
     () => ({
       hasHistoryControls: showHistoryControls,
       setHeader,
+      setTitle,
     }),
-    [setHeader, showHistoryControls],
+    [setHeader, setTitle, showHistoryControls],
   );
 
-  const showHeaderRow = showHistoryControls || Boolean(viewHeader);
+  const effectiveNavigationTitle = viewTitle ?? navigationTitle;
+  const showHeaderRow =
+    showHistoryControls || Boolean(viewHeader) || Boolean(effectiveNavigationTitle);
 
   return (
     <AppResponsiveOverlay
@@ -230,6 +250,10 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
                   ) : null}
                   {viewHeader ? (
                     <div className="min-w-0 flex-1">{viewHeader}</div>
+                  ) : effectiveNavigationTitle ? (
+                    <div className="app-route-title min-w-0 flex-1 truncate">
+                      {effectiveNavigationTitle}
+                    </div>
                   ) : (
                     <div className="min-w-0 flex-1" />
                   )}
@@ -260,6 +284,18 @@ const routedHeaderClassName = css`
   max-height: 48px;
   overflow: hidden;
   background: transparent;
+
+  .app-route-title {
+    padding: 0 16px 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 20px;
+    color: #424245;
+  }
+
+  [data-theme="dark"] & .app-route-title {
+    color: #d1d1d6;
+  }
 `;
 
 const historyControlsClassName = css`

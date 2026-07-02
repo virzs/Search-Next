@@ -2,7 +2,7 @@ import { Navigate } from "react-router";
 import SettingsModalRoute from "./index";
 import AboutView from "./views/about";
 import AccountView from "./views/account";
-import BackupView from "./views/backup";
+import BackupView, { StorageUsageView } from "./views/backup";
 import DeveloperView from "./views/developer";
 import LanguageView from "./views/language";
 import PersonalizationView from "./views/personalization";
@@ -25,6 +25,14 @@ export const settingsRoutes = {
     { path: settingsRoute.segment.search, element: <SearchSettingsView /> },
     { path: settingsRoute.segment.language, element: <LanguageView /> },
     { path: settingsRoute.segment.backup, element: <BackupView /> },
+    {
+      path: settingsRoute.segment.backupStorage,
+      element: <StorageUsageView />,
+    },
+    {
+      path: settingsRoute.segment.backupStorageDetail,
+      element: <StorageUsageView />,
+    },
     { path: settingsRoute.segment.about, element: <AboutView /> },
     { path: settingsRoute.segment.developer, element: <DeveloperView /> },
     {

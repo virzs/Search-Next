@@ -4,14 +4,18 @@ import {
   normalizeUnifiedSearchShortcut,
   type UnifiedSearchShortcut,
 } from "./shortcut";
+import {
+  SEARCH_SELECTED_ENGINES_STORAGE_KEY,
+  UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
+} from "@/utils/storage";
+
+export {
+  SEARCH_SELECTED_ENGINES_STORAGE_KEY,
+  UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
+};
 
 export const UNIFIED_SEARCH_PREFS_CHANGED_EVENT =
   "search-next:unified-search-preferences-changed";
-
-export const SEARCH_SELECTED_ENGINES_STORAGE_KEY =
-  "search-next:unified-search:selected-engines";
-
-const SEARCH_PREFS_STORAGE_KEY = "search-next:unified-search:preferences";
 
 export interface UnifiedSearchPreferences {
   showDesktopSearchBar: boolean;
@@ -27,7 +31,7 @@ export const defaultUnifiedSearchPreferences: UnifiedSearchPreferences = {
 
 export const readUnifiedSearchPreferences = (): UnifiedSearchPreferences => {
   try {
-    const raw = localStorage.getItem(SEARCH_PREFS_STORAGE_KEY);
+    const raw = localStorage.getItem(UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY);
     if (!raw) return defaultUnifiedSearchPreferences;
     const parsed = JSON.parse(raw) as Partial<UnifiedSearchPreferences>;
     return {
@@ -45,7 +49,10 @@ export const readUnifiedSearchPreferences = (): UnifiedSearchPreferences => {
 export const writeUnifiedSearchPreferences = (
   preferences: UnifiedSearchPreferences,
 ) => {
-  localStorage.setItem(SEARCH_PREFS_STORAGE_KEY, JSON.stringify(preferences));
+  localStorage.setItem(
+    UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
+    JSON.stringify(preferences),
+  );
   window.dispatchEvent(
     new CustomEvent(UNIFIED_SEARCH_PREFS_CHANGED_EVENT, {
       detail: preferences,
