@@ -34,6 +34,10 @@ import {
 } from "@/pages/index/components/default-apps/store/utils";
 import { storeRoute } from "@/pages/index/components/default-apps/store/route-paths";
 import { settingsRoute } from "@/pages/index/components/default-apps/settings/route-paths";
+import {
+  getDefaultAppRouteSearchItems,
+  type RouteSearchItem,
+} from "@/pages/index/components/default-apps/searchable-routes";
 import { fetchSearchEngineSuggestions } from "./suggestions";
 import { SEARCH_SELECTED_ENGINES_STORAGE_KEY } from "./preferences";
 import {
@@ -92,15 +96,13 @@ interface SuggestionGroup {
   suggestions: string[];
 }
 
-type SettingSearchItem = {
-  key: string;
-  title: string;
-  description: string;
-  path: string;
-  keywords: string[];
-};
-
-type SearchResultKind = "action" | "suggestion" | "website" | "app" | "setting";
+type SearchResultKind =
+  | "action"
+  | "suggestion"
+  | "website"
+  | "app"
+  | "route"
+  | "setting";
 type SearchResultSection =
   | "strong-internal"
   | "action"
@@ -130,7 +132,8 @@ type FocusableItem =
     }
   | { id: string; type: "website"; website: any }
   | { id: string; type: "app"; widget: WidgetApiItem }
-  | { id: string; type: "setting"; setting: SettingSearchItem };
+  | { id: string; type: "route"; route: RouteSearchItem }
+  | { id: string; type: "setting"; setting: RouteSearchItem };
 
 type NavigationDirection = "left" | "right" | "up" | "down";
 type SearchShortcutScope = "all" | "web-search" | "website" | "app" | "setting";
@@ -203,58 +206,6 @@ const SEARCH_SHORTCUTS: SearchShortcutItem[] = [
     label: "设置",
     description: "只搜索设置项",
     example: "@setting 主题",
-  },
-];
-
-const SETTINGS_SEARCH_ITEMS: SettingSearchItem[] = [
-  {
-    key: "account",
-    title: "账号",
-    description: "账号资料、登录与安全",
-    path: settingsRoute.path.account,
-    keywords: ["user", "account", "profile", "login", "安全"],
-  },
-  {
-    key: "personalization",
-    title: "个性化",
-    description: "外观、主题与桌面背景",
-    path: settingsRoute.path.personalization,
-    keywords: ["theme", "wallpaper", "appearance", "背景", "主题"],
-  },
-  {
-    key: "search",
-    title: "搜索",
-    description: "桌面搜索框与键盘呼出",
-    path: settingsRoute.path.search,
-    keywords: ["spotlight", "keyboard", "shortcut", "搜索框", "快捷键"],
-  },
-  {
-    key: "language",
-    title: "语言",
-    description: "界面语言",
-    path: settingsRoute.path.language,
-    keywords: ["language", "locale", "中文", "英文"],
-  },
-  {
-    key: "backup",
-    title: "备份与恢复",
-    description: "本地备份、云备份与数据恢复",
-    path: settingsRoute.path.backup,
-    keywords: ["backup", "restore", "sync", "备份", "恢复"],
-  },
-  {
-    key: "about",
-    title: "关于",
-    description: "版本与项目说明",
-    path: settingsRoute.path.about,
-    keywords: ["about", "version", "版本"],
-  },
-  {
-    key: "developer",
-    title: "开发者",
-    description: "小组件开发入口",
-    path: settingsRoute.path.developer,
-    keywords: ["dev", "widget", "esm", "开发", "小组件"],
   },
 ];
 
@@ -481,6 +432,7 @@ const renderShortcutIcon = (scope: SearchShortcutScope) => {
 const renderHistoryIcon = (history: SearchHistoryItem) => {
   if (history.kind === "app") return <RiApps2Line size={17} />;
   if (history.kind === "setting") return <RiSettings3Line size={17} />;
+  if (history.kind === "route") return <RiApps2Line size={17} />;
   if (history.kind === "website") return <RiGlobalLine size={17} />;
   if (history.kind === "shortcut") {
     return renderShortcutIcon(history.shortcutScope ?? "all");
@@ -516,7 +468,12 @@ const UnifiedSearch = ({
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [desktopFocused, setDesktopFocused] = useState(false);
-  const { widgets, loading: widgetsLoading, getAppIconUrl } = useWidget();
+  const {
+    widgets,
+    loading: widgetsLoading,
+    getAppIconUrl,
+    devModeEnabled,
+  } = useWidget();
 
   const { data: enginesData, loading: enginesLoading } = useRequest(
     getEnabledSearchEngines,
@@ -557,8 +514,16 @@ const UnifiedSearch = ({
   const shouldSearchWebsitesDebounced =
     debouncedSearchScope === "all" || debouncedSearchScope === "website";
   const shouldSearchApps = searchScope === "all" || searchScope === "app";
+  const shouldSearchPages = searchScope === "all";
   const shouldSearchSettings =
     searchScope === "all" || searchScope === "setting";
+  const routeSearchItems = useMemo(
+    () =>
+      getDefaultAppRouteSearchItems({
+        context: { devModeEnabled },
+      }),
+    [devModeEnabled],
+  );
   const shortcutToken = useMemo(() => {
     if (!rawQuery.startsWith("@") || rawQuery.startsWith("@@")) return "";
     return rawQuery.slice(1).split(/[\s:：]/)[0] ?? "";
@@ -801,23 +766,47 @@ const UnifiedSearch = ({
     );
   }, [shouldSearchApps, trimmedQuery, widgets]);
 
+  const scoredRouteResults = useMemo(() => {
+    if (!trimmedQuery || !shouldSearchPages) return [];
+    return sortScoredResults(
+      routeSearchItems
+        .filter((item) => item.group === "page")
+        .map((item) =>
+          withSearchResultSection({
+            id: `route:${item.key}`,
+            kind: "route",
+            score: getTextMatchScore(trimmedQuery, [item.title], [
+              item.description,
+              item.path,
+              ...item.keywords,
+            ]),
+            item,
+          }),
+        )
+        .filter((result) => result.score > 0),
+    );
+  }, [routeSearchItems, shouldSearchPages, trimmedQuery]);
+
   const scoredSettingResults = useMemo(() => {
     if (!trimmedQuery || !shouldSearchSettings) return [];
     return sortScoredResults(
-      SETTINGS_SEARCH_ITEMS.map((item) =>
-        withSearchResultSection({
-          id: `setting:${item.key}`,
-          kind: "setting",
-          score: getTextMatchScore(trimmedQuery, [item.title], [
-            item.description,
-            item.path,
-            ...item.keywords,
-          ]),
-          item,
-        }),
-      ).filter((result) => result.score > 0),
+      routeSearchItems
+        .filter((item) => item.group === "setting")
+        .map((item) =>
+          withSearchResultSection({
+            id: `setting:${item.key}`,
+            kind: "setting",
+            score: getTextMatchScore(trimmedQuery, [item.title], [
+              item.description,
+              item.path,
+              ...item.keywords,
+            ]),
+            item,
+          }),
+        )
+        .filter((result) => result.score > 0),
     );
-  }, [shouldSearchSettings, trimmedQuery]);
+  }, [routeSearchItems, shouldSearchSettings, trimmedQuery]);
 
   const websiteResultGroups = useMemo(
     () => splitInternalResults(scoredWebsiteResults),
@@ -826,6 +815,10 @@ const UnifiedSearch = ({
   const appResultGroups = useMemo(
     () => splitInternalResults(scoredAppResults),
     [scoredAppResults],
+  );
+  const routeResultGroups = useMemo(
+    () => splitInternalResults(scoredRouteResults),
+    [scoredRouteResults],
   );
   const settingResultGroups = useMemo(
     () => splitInternalResults(scoredSettingResults),
@@ -844,6 +837,11 @@ const UnifiedSearch = ({
         type: "app" as const,
         widget: result.item,
       })),
+      ...routeResultGroups.strong.map((result) => ({
+        id: result.id,
+        type: "route" as const,
+        route: result.item,
+      })),
       ...settingResultGroups.strong.map((result) => ({
         id: result.id,
         type: "setting" as const,
@@ -852,6 +850,7 @@ const UnifiedSearch = ({
     ],
     [
       appResultGroups.strong,
+      routeResultGroups.strong,
       settingResultGroups.strong,
       websiteResultGroups.strong,
     ],
@@ -869,13 +868,23 @@ const UnifiedSearch = ({
         type: "app" as const,
         widget: result.item,
       })),
+      ...routeResultGroups.weak.map((result) => ({
+        id: result.id,
+        type: "route" as const,
+        route: result.item,
+      })),
       ...settingResultGroups.weak.map((result) => ({
         id: result.id,
         type: "setting" as const,
         setting: result.item,
       })),
     ],
-    [appResultGroups.weak, settingResultGroups.weak, websiteResultGroups.weak],
+    [
+      appResultGroups.weak,
+      routeResultGroups.weak,
+      settingResultGroups.weak,
+      websiteResultGroups.weak,
+    ],
   );
 
   const focusableItems = useMemo<FocusableItem[]>(() => {
@@ -1158,7 +1167,7 @@ const UnifiedSearch = ({
   );
 
   const openSetting = useCallback(
-    (setting: SettingSearchItem) => {
+    (setting: RouteSearchItem) => {
       navigate(setting.path);
       closeSpotlight();
     },
@@ -1243,6 +1252,11 @@ const UnifiedSearch = ({
             navigate(storeRoute.path.app);
             closeSpotlight();
           }
+          return;
+        }
+        if (history.kind === "route") {
+          navigate(history.routePath ?? "/");
+          closeSpotlight();
           return;
         }
         navigate(history.settingPath ?? settingsRoute.path.search);
@@ -1338,6 +1352,18 @@ const UnifiedSearch = ({
           widgetId: targetItem.widget._id,
         });
         openApp(targetItem.widget);
+        return;
+      }
+      if (targetItem.type === "route") {
+        recordHistory({
+          id: `route:${targetItem.route.key}`,
+          kind: "route",
+          title: targetItem.route.title,
+          description: targetItem.route.description,
+          routePath: targetItem.route.path,
+        });
+        navigate(targetItem.route.path);
+        closeSpotlight();
         return;
       }
       recordHistory({
@@ -1825,8 +1851,42 @@ const UnifiedSearch = ({
     );
   };
 
+  const renderRoutes = (
+    results: StandardizedSearchResult<RouteSearchItem>[],
+    title = "页面",
+  ) => {
+    if (!shouldSearchPages) return null;
+    if (!results.length) return null;
+    return (
+      <SearchSection title={title}>
+        <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
+          {results.map((result) => {
+            const route = result.item;
+            return (
+              <SearchResultButton
+                key={result.id}
+                {...getNavigationMeta(result.id)}
+                active={activeItemId === result.id}
+                icon={route.icon ?? <RiApps2Line size={17} />}
+                title={route.title}
+                description={route.description}
+                onClick={() =>
+                  runFocusableItem({
+                    id: result.id,
+                    type: "route",
+                    route,
+                  })
+                }
+              />
+            );
+          })}
+        </div>
+      </SearchSection>
+    );
+  };
+
   const renderSettings = (
-    results: StandardizedSearchResult<SettingSearchItem>[],
+    results: StandardizedSearchResult<RouteSearchItem>[],
     title = "设置",
   ) => {
     if (!shouldSearchSettings) return null;
@@ -1866,6 +1926,7 @@ const UnifiedSearch = ({
       ((shouldSearchWeb && visibleSuggestionGroups.length > 0) ||
         scoredWebsiteResults.length > 0 ||
         scoredAppResults.length > 0 ||
+        scoredRouteResults.length > 0 ||
         scoredSettingResults.length > 0 ||
         (shouldSearchWebsites && websiteLoading) ||
         (shouldSearchApps && widgetsLoading) ||
@@ -1921,11 +1982,13 @@ const UnifiedSearch = ({
             title: "应用",
             showLoading: true,
           })}
+          {renderRoutes(routeResultGroups.strong, "页面")}
           {renderSettings(settingResultGroups.strong, "设置")}
           {renderActionSection()}
           {renderSuggestions()}
           {renderWebsites(websiteResultGroups.weak, { title: "更多网站" })}
           {renderApps(appResultGroups.weak, { title: "更多应用" })}
+          {renderRoutes(routeResultGroups.weak, "更多页面")}
           {renderSettings(settingResultGroups.weak, "更多设置")}
           {trimmedQuery && !hasResults ? (
             <div className="py-8">

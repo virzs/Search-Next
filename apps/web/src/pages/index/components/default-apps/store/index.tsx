@@ -1,18 +1,13 @@
-import { FC } from "react";
-import {
-  RiAppsFill,
-  RiApps2Fill,
-  RiApps2Line,
-  RiAppsLine,
-  RiCodeSSlashFill,
-  RiCodeSSlashLine,
-  RiLinksFill,
-  RiLinksLine,
-  RiSearchLine,
-} from "@remixicon/react";
+import { FC, useMemo } from "react";
+import { RiSearchLine } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
 import { storeRoute } from "./route-paths";
 import { useWidget } from "@/hooks/useWidget";
+import { createSidebarMenuItems } from "../route-config";
+import {
+  storeRootRouteDefinition,
+  storeRouteDefinitions,
+} from "./route-definitions";
 
 export type StoreWebsitePayload = {
   name?: string;
@@ -51,45 +46,18 @@ const buildStoreRouteContext = ({
 const StoreModalRoute: FC = () => {
   const { devModeEnabled } = useWidget();
 
-  const menuItems = [
-    {
-      key: "website",
-      label: "网站",
-      path: storeRoute.path.website.root,
-      icon: <RiLinksLine size={16} />,
-      activeIcon: <RiLinksFill size={16} />,
-    },
-    {
-      key: "app",
-      label: "应用",
-      path: storeRoute.path.app,
-      icon: <RiApps2Line size={16} />,
-      activeIcon: <RiApps2Fill size={16} />,
-    },
-    {
-      key: "widget",
-      label: "小组件",
-      path: storeRoute.path.widget,
-      icon: <RiAppsLine size={16} />,
-      activeIcon: <RiAppsFill size={16} />,
-    },
-    ...(devModeEnabled
-      ? [
-          {
-            key: "dev",
-            label: "开发者",
-            path: storeRoute.path.dev,
-            icon: <RiCodeSSlashLine size={16} />,
-            activeIcon: <RiCodeSSlashFill size={16} />,
-          },
-        ]
-      : []),
-  ];
+  const menuItems = useMemo(
+    () =>
+      createSidebarMenuItems(storeRouteDefinitions, {
+        context: { devModeEnabled },
+      }),
+    [devModeEnabled],
+  );
 
   return (
     <AppRoutedOverlay<DesktopOutletContext, StoreOutletContext>
       closeTo="/"
-      title="应用商店"
+      title={storeRootRouteDefinition.meta.title}
       wrapContent
       componentSize="small"
       overlayProps={{

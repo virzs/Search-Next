@@ -1,20 +1,18 @@
 import { AppRoutedOverlay } from "@/components";
 import { FC } from "react";
+import { createSidebarMenuItems } from "../route-config";
 import {
-  RiLandscapeFill,
-  RiLandscapeLine,
-  RiTShirtFill,
-  RiTShirtLine,
-  RiUserFill,
-  RiUserLine,
-} from "@remixicon/react";
-import { personalizationRoute } from "./route-paths";
+  personalizationRootRouteDefinition,
+  personalizationRouteDefinitions,
+} from "./route-definitions";
 
 const PersonalizationModalRoute: FC = () => {
+  const menuItems = createSidebarMenuItems(personalizationRouteDefinitions);
+
   return (
     <AppRoutedOverlay
       closeTo="/"
-      title="个性化"
+      title={personalizationRootRouteDefinition.meta.title}
       wrapContent
       componentSize="small"
       keepAlive={{ enabled: true }}
@@ -22,29 +20,7 @@ const PersonalizationModalRoute: FC = () => {
         modalProps: { width: 940 },
       }}
       sidebarProps={{
-        menuItems: [
-          {
-            key: "theme",
-            label: "主题",
-            path: personalizationRoute.path.root,
-            icon: <RiTShirtLine size={16} />,
-            activeIcon: <RiTShirtFill size={16} />,
-          },
-          {
-            key: "wallpaper",
-            label: "壁纸",
-            path: personalizationRoute.path.wallpaper,
-            icon: <RiLandscapeLine size={16} />,
-            activeIcon: <RiLandscapeFill size={16} />,
-          },
-          {
-            key: "my",
-            label: "我的",
-            path: personalizationRoute.path.my,
-            icon: <RiUserLine size={16} />,
-            activeIcon: <RiUserFill size={16} />,
-          },
-        ],
+        menuItems,
         menuStyles: {
           item: {
             height: 32,

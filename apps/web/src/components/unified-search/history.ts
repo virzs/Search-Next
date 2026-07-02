@@ -7,6 +7,7 @@ export type SearchHistoryKind =
   | "search"
   | "website"
   | "app"
+  | "route"
   | "setting"
   | "shortcut";
 
@@ -25,6 +26,7 @@ export interface SearchHistoryItem {
   query?: string;
   url?: string;
   widgetId?: string;
+  routePath?: string;
   settingPath?: string;
   shortcutCode?: string;
   shortcutScope?: SearchHistoryShortcutScope;

@@ -203,7 +203,7 @@ const SearchSettingsView = () => {
             icon={<RiHistoryLine size={16} />}
             iconTone="gray"
             title="暂无最近使用"
-            description="聚焦搜索打开过的搜索、网站、应用和设置会显示在这里"
+            description="聚焦搜索打开过的搜索、网站、应用、页面和设置会显示在这里"
           />
         )}
       </MacSettingsSection>
@@ -214,6 +214,7 @@ const SearchSettingsView = () => {
 const getSearchHistoryKindLabel = (item: SearchHistoryItem) => {
   if (item.kind === "website") return "网站";
   if (item.kind === "app") return "应用";
+  if (item.kind === "route") return "页面";
   if (item.kind === "setting") return "设置";
   if (item.kind === "shortcut") return "快捷命令";
   return "网页搜索";
@@ -223,6 +224,7 @@ const getSearchHistoryIconTone = (
   item: SearchHistoryItem,
 ): "blue" | "green" | "orange" | "red" | "purple" | "gray" => {
   if (item.kind === "app") return "purple";
+  if (item.kind === "route") return "green";
   if (item.kind === "setting") return "gray";
   if (item.kind === "website") return "blue";
   if (item.kind === "shortcut") return "orange";
@@ -231,6 +233,7 @@ const getSearchHistoryIconTone = (
 
 const renderSearchHistoryIcon = (item: SearchHistoryItem) => {
   if (item.kind === "app") return <RiApps2Line size={16} />;
+  if (item.kind === "route") return <RiApps2Line size={16} />;
   if (item.kind === "setting") return <RiSettings3Line size={16} />;
   if (item.kind === "website") return <RiGlobalLine size={16} />;
   if (item.kind === "shortcut") return <RiCommandLine size={16} />;

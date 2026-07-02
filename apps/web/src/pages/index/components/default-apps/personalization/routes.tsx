@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { createRouteObjectsFromDefinitions } from "../route-config";
 import { personalizationRoute } from "./route-paths";
 import PersonalizationModalRoute from "./index";
 import ThemeView from "./views/theme";
@@ -7,28 +9,25 @@ import WallpaperCategoryView from "./views/wallpaper-category";
 import ThemeMyView from "./views/my";
 import ThemeMyEditorView from "./views/my-editor";
 import ThemeMyThemeEditorView from "./views/my-theme-editor";
+import { personalizationRouteDefinitions } from "./route-definitions";
+
+const personalizationRouteElements = {
+  "personalization.theme": <ThemeView />,
+  "personalization.detail": <ThemeDetailView />,
+  "personalization.wallpaper-category": <WallpaperCategoryView />,
+  "personalization.wallpaper": <WallpaperView />,
+  "personalization.my": <ThemeMyView />,
+  "personalization.my-create": <ThemeMyEditorView />,
+  "personalization.my-edit": <ThemeMyEditorView />,
+  "personalization.my-theme-create": <ThemeMyThemeEditorView />,
+  "personalization.my-theme-edit": <ThemeMyThemeEditorView />,
+} satisfies Record<string, ReactNode>;
 
 export const personalizationRoutes = {
   path: personalizationRoute.segment.root,
   element: <PersonalizationModalRoute />,
-  children: [
-    { index: true, element: <ThemeView /> },
-    { path: personalizationRoute.segment.detail, element: <ThemeDetailView /> },
-    {
-      path: personalizationRoute.segment.wallpaperCategory,
-      element: <WallpaperCategoryView />,
-    },
-    { path: personalizationRoute.segment.wallpaper, element: <WallpaperView /> },
-    { path: personalizationRoute.segment.my, element: <ThemeMyView /> },
-    { path: personalizationRoute.segment.myCreate, element: <ThemeMyEditorView /> },
-    { path: personalizationRoute.segment.myEdit, element: <ThemeMyEditorView /> },
-    {
-      path: personalizationRoute.segment.myThemeCreate,
-      element: <ThemeMyThemeEditorView />,
-    },
-    {
-      path: personalizationRoute.segment.myThemeEdit,
-      element: <ThemeMyThemeEditorView />,
-    },
-  ],
+  children: createRouteObjectsFromDefinitions(
+    personalizationRouteDefinitions,
+    personalizationRouteElements,
+  ),
 };
