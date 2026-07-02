@@ -6,6 +6,7 @@ import {
   getTileKind,
   pointKey,
 } from "./logic";
+import type { WidgetTranslationFn } from "../i18n";
 import type { AnimationLevel } from "../types";
 import type { Direction, GameState, LevelConfig, PipeShape, Point } from "./types";
 
@@ -287,8 +288,10 @@ export interface BoardCanvasProps {
   animation: AnimationLevel;
   interactive?: boolean;
   compact?: boolean;
+  label?: string;
   onMove?: (direction: Direction) => void;
   onCellClick?: (point: Point) => void;
+  t?: WidgetTranslationFn;
 }
 
 export const BoardCanvas = ({
@@ -297,8 +300,10 @@ export const BoardCanvas = ({
   animation,
   interactive = true,
   compact = false,
+  label,
   onMove,
   onCellClick,
+  t,
 }: BoardCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stateRef = useRef(state);
@@ -372,6 +377,7 @@ export const BoardCanvas = ({
           animationRef.current,
           tick,
           compact,
+          t,
         );
       },
     });
@@ -385,13 +391,13 @@ export const BoardCanvas = ({
       }
       canvas.removeEventListener("pointerdown", handlePointerDown);
     };
-  }, [compact, interactive, Boolean(onCellClick)]);
+  }, [compact, interactive, Boolean(onCellClick), t]);
 
   return (
     <canvas
       ref={canvasRef}
       className="pipe-link-canvas"
-      aria-label={`${level.name} 游戏棋盘`}
+      aria-label={t ? t("aria.board", { name: label ?? level.name }) : `${label ?? level.name} game board`}
     />
   );
 };
@@ -403,6 +409,7 @@ export const drawBoard = (
   animation: AnimationLevel,
   tick: number,
   compact: boolean,
+  t?: WidgetTranslationFn,
 ) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -495,8 +502,8 @@ export const drawBoard = (
       const pipeShape = getPipeShapeAt(level, state, point);
       if (pipeShape) drawPipe(ctx, pipeShape, x, y, cellSize, visited || isCurrent);
 
-      if (kind === "start") drawStartFinish(ctx, "起点", x, y, cellSize, "#05271f");
-      if (kind === "finish") drawStartFinish(ctx, "终点", x, y, cellSize, "#05271f");
+      if (kind === "start") drawStartFinish(ctx, t?.("board.start") ?? "Start", x, y, cellSize, "#05271f");
+      if (kind === "finish") drawStartFinish(ctx, t?.("board.finish") ?? "Finish", x, y, cellSize, "#05271f");
       if (isCurrent) drawCurrentMarker(ctx, x, y, cellSize);
     }
   }

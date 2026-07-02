@@ -4,9 +4,10 @@ import { addHours, differenceInMilliseconds, startOfHour } from "date-fns";
 import { TIMEZONES } from "../constants";
 import { AnalogClock, MiniCalendar, ProgressRows, TimeText, WeekStrip, WorldTimes } from "../components/ClockPrimitives";
 import { cn } from "../styles";
-import { dayProgress, formatDate, getTimeInZone, greet, pad, yearProgress } from "../time";
+import { dayProgress, formatDate, getTimeInZone, greet, pad, timezoneName, yearProgress } from "../time";
 import { useWeekDays, useWorldTimes } from "../hooks";
 import type { ClockSettings, ClockView } from "../types";
+import type { WidgetLanguage, WidgetTranslationFn } from "../i18n";
 
 const frameClassName = "tw:flex tw:h-full tw:w-full tw:flex-col tw:overflow-hidden tw:rounded-[inherit] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-app)] tw:text-[var(--clock-fg)]";
 const bodyClassName = "tw:min-h-0 tw:flex-1 tw:overflow-auto tw:p-6 tw:[@container(max-width:860px)]:p-[18px] tw:[@container(max-width:700px)]:p-4 tw:max-[520px]:p-[18px]";
@@ -30,7 +31,7 @@ const formatDuration = (ms: number, includeCentiseconds = false) => {
   return includeCentiseconds ? `${base}.${pad(centiseconds)}` : base;
 };
 
-export function FullPage({ now, settings, title }: { now: Date; settings: ClockSettings; title: string }) {
+export function FullPage({ now, settings, title, language, t }: { now: Date; settings: ClockSettings; title: string; language: WidgetLanguage; t: WidgetTranslationFn }) {
   const [activeView, setActiveView] = useState<ClockView>(settings.defaultView);
 
   useEffect(() => {
@@ -40,20 +41,20 @@ export function FullPage({ now, settings, title }: { now: Date; settings: ClockS
   return (
     <div className={frameClassName}>
       <main className={bodyClassName}>
-        {activeView === "world" && <WorldClockView now={now} settings={settings} title={title} />}
-        {activeView === "stopwatch" && <StopwatchView />}
-        {activeView === "timer" && <TimerView presetMinutes={settings.timerPresetMinutes} />}
+        {activeView === "world" && <WorldClockView now={now} settings={settings} title={title} language={language} t={t} />}
+        {activeView === "stopwatch" && <StopwatchView t={t} />}
+        {activeView === "timer" && <TimerView presetMinutes={settings.timerPresetMinutes} t={t} />}
       </main>
-      <nav className={tabBarClassName} aria-label="时钟工具">
-        <button className={tabButtonClassName(activeView === "world")} type="button" onClick={() => setActiveView("world")}>世界时钟</button>
-        <button className={tabButtonClassName(activeView === "stopwatch")} type="button" onClick={() => setActiveView("stopwatch")}>秒表</button>
-        <button className={tabButtonClassName(activeView === "timer")} type="button" onClick={() => setActiveView("timer")}>计时器</button>
+      <nav className={tabBarClassName} aria-label={t("tool.aria")}>
+        <button className={tabButtonClassName(activeView === "world")} type="button" onClick={() => setActiveView("world")}>{t("tab.world")}</button>
+        <button className={tabButtonClassName(activeView === "stopwatch")} type="button" onClick={() => setActiveView("stopwatch")}>{t("tab.stopwatch")}</button>
+        <button className={tabButtonClassName(activeView === "timer")} type="button" onClick={() => setActiveView("timer")}>{t("tab.timer")}</button>
       </nav>
     </div>
   );
 }
 
-function WorldClockView({ now, settings, title }: { now: Date; settings: ClockSettings; title: string }) {
+function WorldClockView({ now, settings, title, language, t }: { now: Date; settings: ClockSettings; title: string; language: WidgetLanguage; t: WidgetTranslationFn }) {
   const displayNow = getTimeInZone(settings.timezone, now);
   const h24 = displayNow.getHours();
   const h = settings.timeFormat === "12h" ? pad(((h24 + 11) % 12) + 1) : pad(h24);
@@ -61,41 +62,41 @@ function WorldClockView({ now, settings, title }: { now: Date; settings: ClockSe
   const s = pad(displayNow.getSeconds());
   const dayPct = dayProgress(displayNow);
   const yearPct = yearProgress(displayNow);
-  const timezoneLabel = TIMEZONES.find((item) => item.value === settings.timezone)?.city ?? (settings.timezone ? settings.timezone.replace(/_/g, " ").split("/").pop() : "本地");
-  const weekDays = useWeekDays(displayNow);
-  const worldTimes = useWorldTimes(now, settings);
+  const timezoneLabel = timezoneName(settings.timezone, t, TIMEZONES.find((item) => item.value === settings.timezone)?.city);
+  const weekDays = useWeekDays(displayNow, language);
+  const worldTimes = useWorldTimes(now, settings, language, t);
   const nextHour = startOfHour(addHours(displayNow, 1));
   const minutesToNextHour = Math.max(0, Math.ceil(differenceInMilliseconds(nextHour, displayNow) / 60000));
 
   return (
     <>
       <div className="tw:mb-[18px] tw:flex tw:items-end tw:justify-between tw:gap-[18px] tw:[@container(max-width:700px)]:flex-col tw:[@container(max-width:700px)]:items-start tw:[@container(max-width:700px)]:gap-1.5 tw:max-[520px]:flex-col tw:max-[520px]:items-start">
-        <div><span className="tw:text-[13px] tw:font-[760] tw:text-[var(--clock-accent)]">{title}</span><h1 className="tw:m-0 tw:mt-1 tw:text-[34px] tw:font-[780] tw:leading-[1.08] tw:tracking-[0] tw:text-[var(--clock-fg)] tw:[@container(max-width:700px)]:text-[28px]">世界时钟</h1></div>
-        <strong className="tw:text-[13px] tw:font-bold tw:text-[var(--clock-fg-2)]">{formatDate(displayNow)}</strong>
+        <div><span className="tw:text-[13px] tw:font-[760] tw:text-[var(--clock-accent)]">{title}</span><h1 className="tw:m-0 tw:mt-1 tw:text-[34px] tw:font-[780] tw:leading-[1.08] tw:tracking-[0] tw:text-[var(--clock-fg)] tw:[@container(max-width:700px)]:text-[28px]">{t("tab.world")}</h1></div>
+        <strong className="tw:text-[13px] tw:font-bold tw:text-[var(--clock-fg-2)]">{formatDate(displayNow, language)}</strong>
       </div>
       <section className="tw:grid tw:grid-cols-[220px_minmax(0,1fr)] tw:items-center tw:gap-6 tw:rounded-3xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card)] tw:p-6 tw:shadow-[0_18px_36px_rgba(0,0,0,0.26)] tw:[@container(max-width:700px)]:grid-cols-[150px_minmax(0,1fr)] tw:[@container(max-width:520px)]:grid-cols-1 tw:max-[760px]:grid-cols-1">
         <AnalogClock now={displayNow} showSeconds={settings.showSeconds} showProgress={settings.showProgress} label={`${h}:${m}`} className="tw:w-[210px] tw:[@container(max-width:700px)]:w-[148px] tw:[@container(max-width:520px)]:w-[138px] tw:max-[760px]:w-[170px]" showNumbers />
         <div className="tw:min-w-0">
-          <div className="tw:flex tw:justify-between tw:gap-4 tw:text-sm tw:font-[740] tw:text-[var(--clock-fg-2)]"><span>{greet(displayNow.getHours())}</span><span>{timezoneLabel}</span></div>
+          <div className="tw:flex tw:justify-between tw:gap-4 tw:text-sm tw:font-[740] tw:text-[var(--clock-fg-2)]"><span>{greet(displayNow.getHours(), t)}</span><span>{timezoneLabel}</span></div>
           <TimeText h={h} m={m} s={s} showSeconds={settings.showSeconds} className="tw:mt-3.5 tw:text-[80px] tw:[@container(max-width:700px)]:text-[52px] tw:max-[760px]:text-[58px]" />
           <div className="tw:mt-[18px] tw:grid tw:grid-cols-3 tw:gap-2.5 tw:[@container(max-width:520px)]:grid-cols-1 tw:max-[760px]:grid-cols-1">
-            <Metric label="下一整点" value={`${minutesToNextHour} 分钟`} />
-            <Metric label="今日" value={`${dayPct.toFixed(1)}%`} />
-            <Metric label="今年" value={`${yearPct.toFixed(1)}%`} />
+            <Metric label={t("metric.nextHour")} value={t("unit.minute", { count: minutesToNextHour })} />
+            <Metric label={t("metric.day")} value={`${dayPct.toFixed(1)}%`} />
+            <Metric label={t("metric.year")} value={`${yearPct.toFixed(1)}%`} />
           </div>
         </div>
       </section>
       <section className="tw:mt-3.5 tw:grid tw:grid-cols-2 tw:gap-3.5 tw:[@container(max-width:700px)]:grid-cols-1 tw:max-[760px]:grid-cols-1">
-        {settings.showProgress && <div className={panelClassName}><h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780] tw:text-[var(--clock-fg)]">时间进度</h2><ProgressRows dayPct={dayPct} yearPct={yearPct} /></div>}
-        <div className={panelClassName}><h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780] tw:text-[var(--clock-fg)]">本周</h2><WeekStrip days={weekDays} /></div>
-        <div className={cn(panelClassName, "tw:col-span-full")}><h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780] tw:text-[var(--clock-fg)]">城市</h2><WorldTimes items={worldTimes} dayPct={dayPct} showProgress={settings.showProgress} wide /></div>
-        <div className="tw:hidden"><MiniCalendar now={displayNow} /></div>
+        {settings.showProgress && <div className={panelClassName}><h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780] tw:text-[var(--clock-fg)]">{t("section.progress")}</h2><ProgressRows dayPct={dayPct} yearPct={yearPct} t={t} /></div>}
+        <div className={panelClassName}><h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780] tw:text-[var(--clock-fg)]">{t("metric.week")}</h2><WeekStrip days={weekDays} /></div>
+        <div className={cn(panelClassName, "tw:col-span-full")}><h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780] tw:text-[var(--clock-fg)]">{t("section.cities")}</h2><WorldTimes items={worldTimes} dayPct={dayPct} showProgress={settings.showProgress} wide /></div>
+        <div className="tw:hidden"><MiniCalendar now={displayNow} language={language} /></div>
       </section>
     </>
   );
 }
 
-function StopwatchView() {
+function StopwatchView({ t }: { t: WidgetTranslationFn }) {
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -124,22 +125,22 @@ function StopwatchView() {
   const lap = () => elapsed > 0 && setLaps((items) => [elapsed, ...items].slice(0, 8));
 
   return (
-    <ToolShell accent="秒表" title={formatDuration(elapsed, true)} subtitle={running ? "正在计时" : elapsed > 0 ? "已暂停" : "准备开始"}>
+    <ToolShell accent={t("tab.stopwatch")} title={formatDuration(elapsed, true)} subtitle={running ? t("watch.running") : elapsed > 0 ? t("watch.paused") : t("watch.ready")}>
       <div className="tw:grid tw:grid-cols-[minmax(0,1fr)_280px] tw:gap-3.5 tw:[@container(max-width:760px)]:grid-cols-1 tw:max-[760px]:grid-cols-1">
         <div className={cn(panelClassName, "tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-6 tw:py-10")}>
           <div className="tw:text-[76px] tw:font-[780] tw:leading-none tw:tracking-[0] tw:text-[var(--clock-fg)] tw:[@container(max-width:620px)]:text-[48px]">{formatDuration(elapsed, true)}</div>
           <div className="tw:flex tw:flex-wrap tw:justify-center tw:gap-3">
-            <ActionButton muted type="button" onClick={lap}>计次</ActionButton>
-            <ActionButton type="button" onClick={running ? pause : start}>{running ? "暂停" : "开始"}</ActionButton>
-            <ActionButton muted type="button" onClick={reset}>重置</ActionButton>
+            <ActionButton muted type="button" onClick={lap}>{t("action.lap")}</ActionButton>
+            <ActionButton type="button" onClick={running ? pause : start}>{running ? t("action.pause") : t("action.start")}</ActionButton>
+            <ActionButton muted type="button" onClick={reset}>{t("action.reset")}</ActionButton>
           </div>
         </div>
         <div className={panelClassName}>
-          <h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780]">计次</h2>
+          <h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780]">{t("action.lap")}</h2>
           <div className="tw:flex tw:flex-col tw:gap-2">
             {(laps.length ? laps : [0]).map((lapMs, index) => (
               <div className="tw:flex tw:items-center tw:justify-between tw:rounded-[14px] tw:bg-[var(--clock-card-soft)] tw:px-3 tw:py-2.5 tw:text-sm tw:font-[740]" key={`${lapMs}-${index}`}>
-                <span className="tw:text-[var(--clock-fg-2)]">{laps.length ? `第 ${laps.length - index} 圈` : "暂无计次"}</span>
+                <span className="tw:text-[var(--clock-fg-2)]">{laps.length ? t("watch.lapName", { count: laps.length - index }) : t("watch.emptyLap")}</span>
                 <strong>{laps.length ? formatDuration(lapMs, true) : "--:--.--"}</strong>
               </div>
             ))}
@@ -150,7 +151,7 @@ function StopwatchView() {
   );
 }
 
-function TimerView({ presetMinutes }: { presetMinutes: number }) {
+function TimerView({ presetMinutes, t }: { presetMinutes: number; t: WidgetTranslationFn }) {
   const [duration, setDuration] = useState(presetMinutes * 60_000);
   const [remaining, setRemaining] = useState(presetMinutes * 60_000);
   const [running, setRunning] = useState(false);
@@ -197,25 +198,25 @@ function TimerView({ presetMinutes }: { presetMinutes: number }) {
   const reset = () => applyPreset(Math.max(1, Math.round(duration / 60_000)));
 
   return (
-    <ToolShell accent="计时器" title={complete ? "时间到" : formatDuration(remaining)} subtitle={complete ? "组件内提示已显示" : running ? "正在倒计时" : "选择预设后开始"}>
+    <ToolShell accent={t("tab.timer")} title={complete ? t("timer.done") : formatDuration(remaining)} subtitle={complete ? t("timer.doneSubtitle") : running ? t("timer.running") : t("timer.ready")}>
       <div className="tw:grid tw:grid-cols-[minmax(0,1fr)_280px] tw:gap-3.5 tw:[@container(max-width:760px)]:grid-cols-1 tw:max-[760px]:grid-cols-1">
         <div className={cn(panelClassName, "tw:flex tw:flex-col tw:items-center tw:gap-6 tw:py-8")}>
           <div className="tw:grid tw:aspect-square tw:w-[240px] tw:place-items-center tw:rounded-full tw:[background:conic-gradient(var(--clock-accent)_var(--timer-angle),var(--clock-card-soft)_0)]" style={{ "--timer-angle": `${(1 - progress) * 360}deg` } as CSSProperties}>
             <div className="tw:grid tw:aspect-square tw:w-[178px] tw:place-items-center tw:rounded-full tw:bg-[var(--clock-card)] tw:text-center">
-              <div><div className="tw:text-[38px] tw:font-[780] tw:leading-none">{complete ? "时间到" : formatDuration(remaining)}</div><div className="tw:mt-2 tw:text-xs tw:font-bold tw:text-[var(--clock-fg-2)]">{Math.round(duration / 60000)} 分钟</div></div>
+              <div><div className="tw:text-[38px] tw:font-[780] tw:leading-none">{complete ? t("timer.done") : formatDuration(remaining)}</div><div className="tw:mt-2 tw:text-xs tw:font-bold tw:text-[var(--clock-fg-2)]">{t("timer.minutes", { count: Math.round(duration / 60000) })}</div></div>
             </div>
           </div>
           <div className="tw:flex tw:flex-wrap tw:justify-center tw:gap-3">
-            <ActionButton type="button" onClick={running ? pause : start} disabled={complete}>{running ? "暂停" : "开始"}</ActionButton>
-            <ActionButton muted type="button" onClick={reset}>重置</ActionButton>
+            <ActionButton type="button" onClick={running ? pause : start} disabled={complete}>{running ? t("action.pause") : t("action.start")}</ActionButton>
+            <ActionButton muted type="button" onClick={reset}>{t("action.reset")}</ActionButton>
           </div>
         </div>
         <div className={cn(panelClassName, "tw:flex tw:flex-col tw:gap-3")}>
-          <h2 className="tw:m-0 tw:text-base tw:font-[780]">预设</h2>
+          <h2 className="tw:m-0 tw:text-base tw:font-[780]">{t("timer.presets")}</h2>
           {[5, 15, 25, 45].map((minutes) => (
-            <button className={cn("tw:cursor-pointer tw:rounded-[14px] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card-soft)] tw:px-3 tw:py-3 tw:text-left tw:text-sm tw:font-[780] tw:text-[var(--clock-fg)]", Math.round(duration / 60000) === minutes && "tw:border-[var(--clock-accent)] tw:text-[var(--clock-accent)]")} key={minutes} type="button" onClick={() => applyPreset(minutes)}>{minutes} 分钟</button>
+            <button className={cn("tw:cursor-pointer tw:rounded-[14px] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card-soft)] tw:px-3 tw:py-3 tw:text-left tw:text-sm tw:font-[780] tw:text-[var(--clock-fg)]", Math.round(duration / 60000) === minutes && "tw:border-[var(--clock-accent)] tw:text-[var(--clock-accent)]")} key={minutes} type="button" onClick={() => applyPreset(minutes)}>{t("timer.minutes", { count: minutes })}</button>
           ))}
-          {complete && <div className="tw:rounded-[16px] tw:bg-[rgba(255,159,10,0.18)] tw:p-3 tw:text-sm tw:font-[720] tw:text-[var(--clock-accent)]">时间到了。这里是组件内提醒，不使用系统通知权限。</div>}
+          {complete && <div className="tw:rounded-[16px] tw:bg-[rgba(255,159,10,0.18)] tw:p-3 tw:text-sm tw:font-[720] tw:text-[var(--clock-accent)]">{t("timer.doneNote")}</div>}
         </div>
       </div>
     </ToolShell>

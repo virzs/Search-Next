@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_SETTINGS } from "./constants";
 import { parseBoolean, parseWorldTimezones } from "./time";
+import type { WidgetTranslationFn } from "./i18n";
 import type { ClockSettings, ClockView, WidgetSDK } from "./types";
 
 const parseClockView = (value: unknown): ClockView =>
@@ -13,7 +14,7 @@ const parseTimerPreset = (value: unknown) => {
     : DEFAULT_SETTINGS.timerPresetMinutes;
 };
 
-export function useClockState(sdk?: WidgetSDK) {
+export function useClockState(sdk: WidgetSDK | undefined, t: WidgetTranslationFn) {
   const [now, setNow] = useState(new Date());
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
   const [settings, setSettings] = useState<ClockSettings>(DEFAULT_SETTINGS);
@@ -77,6 +78,7 @@ export function useClockState(sdk?: WidgetSDK) {
   }, [sdk]);
 
   const saveSettings = async (next: ClockSettings) => {
+    setSettings(next);
     if (!sdk?.storage) return;
     setSaving(true);
     try {
@@ -89,10 +91,9 @@ export function useClockState(sdk?: WidgetSDK) {
         sdk.storage.set("defaultView", next.defaultView),
         sdk.storage.set("timerPresetMinutes", String(next.timerPresetMinutes)),
       ]);
-      setSettings(next);
-      sdk.toast?.success("设置已保存", "时钟小组件会立即使用新的显示偏好。");
+      sdk.toast?.success(t("toast.saved"), t("toast.saveDesc"));
     } catch (error) {
-      sdk.toast?.error("保存失败", error instanceof Error ? error.message : "请稍后重试");
+      sdk.toast?.error(t("toast.saveFailed"), error instanceof Error ? error.message : t("toast.retry"));
     } finally {
       setSaving(false);
     }

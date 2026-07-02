@@ -150,7 +150,7 @@ const restorePreviousStep = (state: GameState): GameState | null => {
   if (!previous) return null;
   return {
     ...restoreSnapshot(state.levelId, previous, state.history.slice(0, -1)),
-    message: "已回退一步",
+    message: "game.undo",
   };
 };
 
@@ -242,7 +242,7 @@ export const applyMove = (
   direction: Direction,
 ): MoveResult => {
   if (state.completed) {
-    return { state, moved: false, blockedReason: "关卡已完成" };
+    return { state, moved: false, blockedReason: "block.finished" };
   }
 
   const nextPosition = movePoint(state.position, direction);
@@ -260,43 +260,43 @@ export const applyMove = (
     return {
       state: {
         ...state,
-        message: "管道只能从另一端离开",
+        message: "block.pipeExit",
       },
       moved: false,
-      blockedReason: "pipe-exit",
+      blockedReason: "block.pipeExit",
     };
   }
 
   if (!isInsideLevel(level, nextPosition)) {
     return {
-      state: { ...state, message: "已经到达边界" },
+      state: { ...state, message: "block.bounds" },
       moved: false,
-      blockedReason: "bounds",
+      blockedReason: "block.bounds",
     };
   }
 
   const nextKind = getTileKind(level, state, nextPosition);
   if (nextKind === "block") {
     return {
-      state: { ...state, message: "深灰色错误方块不可进入" },
+      state: { ...state, message: "block.tile" },
       moved: false,
-      blockedReason: "block",
+      blockedReason: "block.tile",
     };
   }
 
   if (!canEnterPipe(level, state, nextPosition, direction)) {
     return {
-      state: { ...state, message: "管道入口方向不匹配" },
+      state: { ...state, message: "block.pipeEntry" },
       moved: false,
-      blockedReason: "pipe-entry",
+      blockedReason: "block.pipeEntry",
     };
   }
 
   if (state.visitedKeys.includes(nextKey)) {
     return {
-      state: { ...state, message: "只能按原路回退上一步" },
+      state: { ...state, message: "block.visited" },
       moved: false,
-      blockedReason: "visited",
+      blockedReason: "block.visited",
     };
   }
 
@@ -327,9 +327,9 @@ export const applyMove = (
       steps: state.steps + 1,
       completed,
       message: completed
-        ? "连接完成"
+        ? "game.done"
         : nextKind === "rotate"
-          ? "旋转方块已转动所有管道"
+          ? "game.rotate"
           : undefined,
       history: [...state.history, snapshotState(state)],
     },

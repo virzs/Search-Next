@@ -2,12 +2,24 @@
   "schemaVersion": "1.0.0",
   "name": "todo",
   "displayName": "Todo",
+  "displayNameI18n": {
+    "zh-CN": "Todo",
+    "en-US": "Todo"
+  },
   "version": "0.2.0",
   "description": "Apple Reminders 风格 Todo 应用，支持提醒事项、显示偏好和应用图标模式",
+  "descriptionI18n": {
+    "zh-CN": "Apple Reminders 风格 Todo 应用，支持提醒事项、显示偏好和应用图标模式",
+    "en-US": "Apple Reminders-style Todo app with reminders, display preferences, and app icon mode"
+  },
   "author": "Search-Next",
   "entry": "index.js",
   "icon": "icon.svg",
   "tags": ["工具", "Todo", "提醒事项"],
+  "tagsI18n": {
+    "zh-CN": ["工具", "Todo", "提醒事项"],
+    "en-US": ["Tools", "Todo", "Reminders"]
+  },
   "sizeConfigs": [
     { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
     { "row": 2, "col": 4, "name": "4x2", "id": "4x2" }

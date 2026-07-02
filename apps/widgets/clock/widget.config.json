@@ -1,12 +1,24 @@
 {
   "name": "clock",
   "displayName": "时钟",
+  "displayNameI18n": {
+    "zh-CN": "时钟",
+    "en-US": "Clock"
+  },
   "version": "0.1.2",
   "description": "简洁实时时钟小组件，支持世界时区切换",
+  "descriptionI18n": {
+    "zh-CN": "简洁实时时钟小组件，支持世界时区切换",
+    "en-US": "Clean real-time clock widget with world time zone support"
+  },
   "author": "Search-Next",
   "entry": "index.js",
   "icon": "icon.svg",
   "tags": ["工具", "时钟", "时间"],
+  "tagsI18n": {
+    "zh-CN": ["工具", "时钟", "时间"],
+    "en-US": ["Tools", "Clock", "Time"]
+  },
   "sizeConfigs": [
     { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
     { "row": 2, "col": 4, "name": "4x2", "id": "4x2" },

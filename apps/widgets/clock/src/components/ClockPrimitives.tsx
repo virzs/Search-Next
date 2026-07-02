@@ -1,6 +1,6 @@
-import { WEEK_LABELS } from "../constants";
 import { cn } from "../styles";
 import { dayProgress } from "../time";
+import type { WidgetLanguage, WidgetTranslationFn } from "../i18n";
 
 const CLOCK_CENTER = 50;
 const toPoint = (angle: number, radius: number) => {
@@ -109,10 +109,10 @@ export const AnalogClock = ({
   );
 };
 
-export const ProgressRows = ({ dayPct, yearPct, compact, className }: { dayPct: number; yearPct: number; compact?: boolean; className?: string }) => (
+export const ProgressRows = ({ dayPct, yearPct, t, compact, className }: { dayPct: number; yearPct: number; t: WidgetTranslationFn; compact?: boolean; className?: string }) => (
   <div className={cn("tw:mt-auto tw:flex tw:min-w-0 tw:flex-col tw:gap-[7px]", compact && "tw:gap-2", className)}>
-    <ProgressRow label="今日" value={dayPct} compact={compact} />
-    <ProgressRow label="今年" value={yearPct} compact={compact} />
+    <ProgressRow label={t("metric.day")} value={dayPct} compact={compact} />
+    <ProgressRow label={t("metric.year")} value={yearPct} compact={compact} />
   </div>
 );
 
@@ -156,10 +156,10 @@ export const WorldTimes = ({ items, dayPct, showProgress, compact, wide }: { ite
   </div>
 );
 
-export const MiniCalendar = ({ now }: { now: Date }) => (
+export const MiniCalendar = ({ now, language }: { now: Date; language: WidgetLanguage }) => (
   <div className="tw:mt-auto tw:overflow-hidden tw:rounded-[18px] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-calendar-bg)] tw:text-center tw:shadow-[0_14px_28px_rgba(0,0,0,0.28)]">
-    <div className="tw:bg-[var(--clock-red)] tw:py-[7px] tw:text-[13px] tw:font-[780] tw:text-white">{now.getMonth() + 1}月</div>
+    <div className="tw:bg-[var(--clock-red)] tw:py-[7px] tw:text-[13px] tw:font-[780] tw:text-white">{new Intl.DateTimeFormat(language, { month: "short" }).format(now)}</div>
     <div className="tw:pt-3 tw:text-[56px] tw:font-[780] tw:leading-none tw:text-[var(--clock-calendar-fg)] tw:[@container(max-width:860px)]:text-[46px]">{now.getDate()}</div>
-    <div className="tw:pb-[13px] tw:pt-1 tw:text-[13px] tw:font-bold tw:text-[#6e6e73]">星期{WEEK_LABELS[now.getDay()]}</div>
+    <div className="tw:pb-[13px] tw:pt-1 tw:text-[13px] tw:font-bold tw:text-[#6e6e73]">{new Intl.DateTimeFormat(language, { weekday: "long" }).format(now)}</div>
   </div>
 );

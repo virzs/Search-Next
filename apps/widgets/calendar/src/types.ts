@@ -2,6 +2,8 @@ export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 export type WeekStart = "sun" | "mon";
 export type EventDensity = "compact" | "normal" | "detailed";
 
+import type { WidgetLocaleInfo } from "./i18n";
+
 export interface CalendarEvent {
   id?: string;
   title: string;
@@ -33,6 +35,9 @@ export interface WidgetSDK {
   sizeId?: string;
   mode?: WidgetMode;
   theme?: WidgetThemeInfo;
+  locale?: WidgetLocaleInfo;
+  getLocale?: () => WidgetLocaleInfo;
+  onLocaleChange?: (handler: (locale: WidgetLocaleInfo) => void) => (() => void) | void;
   storage?: {
     get: (key: string) => Promise<unknown>;
     set: (key: string, value: string) => Promise<void>;

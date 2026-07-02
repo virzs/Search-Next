@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import { resources, useWidgetI18n } from "./i18n";
+import type { WidgetTranslationFn } from "./i18n";
 import type {
   StorageChangedPayload,
   TodoItem,
@@ -14,22 +16,22 @@ const TODOS_STORAGE_KEY = "todos";
 const SETTINGS_STORAGE_KEY = "todoSettings";
 
 const ACCENT_OPTIONS = [
-  { label: "蓝色", value: "#007aff" },
-  { label: "绿色", value: "#34c759" },
-  { label: "橙色", value: "#ff9500" },
-  { label: "紫色", value: "#af52de" },
+  { labelKey: "accent.blue", value: "#007aff" },
+  { labelKey: "accent.green", value: "#34c759" },
+  { labelKey: "accent.orange", value: "#ff9500" },
+  { labelKey: "accent.purple", value: "#af52de" },
 ];
 
-const PRIORITY_OPTIONS: Array<{ label: string; value: TodoPriority }> = [
-  { label: "高", value: "high" },
-  { label: "标准", value: "normal" },
-  { label: "低", value: "low" },
+const PRIORITY_OPTIONS: Array<{ labelKey: string; value: TodoPriority }> = [
+  { labelKey: "priority.high", value: "high" },
+  { labelKey: "priority.normal", value: "normal" },
+  { labelKey: "priority.low", value: "low" },
 ];
 
-const SORT_OPTIONS: Array<{ label: string; value: TodoSortMode }> = [
-  { label: "优先级", value: "priority" },
-  { label: "创建时间", value: "created" },
-  { label: "完成状态", value: "completed" },
+const SORT_OPTIONS: Array<{ labelKey: string; value: TodoSortMode }> = [
+  { labelKey: "sort.priority", value: "priority" },
+  { labelKey: "sort.created", value: "created" },
+  { labelKey: "sort.completed", value: "completed" },
 ];
 
 const DEFAULT_SETTINGS: TodoSettings = {
@@ -180,6 +182,7 @@ const getThemeVars = (themeId: string, settings: TodoSettings) =>
   }) as CSSProperties;
 
 const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
+  const { language, t } = useWidgetI18n(sdk, resources);
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [settings, setSettings] = useState<TodoSettings>(DEFAULT_SETTINGS);
   const [draft, setDraft] = useState("");
@@ -297,10 +300,10 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
             <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
               <div>
                 <div className="tw:text-[13px] tw:font-semibold tw:leading-none">
-                  今天
+                  {t("title.today")}
                 </div>
                 <div className="tw:mt-1 tw:text-[11px] tw:text-[var(--todo-muted)]">
-                  {activeCount} 项待办
+                  {t("count.active", { count: activeCount })}
                 </div>
               </div>
               <div className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[var(--todo-accent)] tw:text-[16px] tw:font-bold tw:text-white">
@@ -342,7 +345,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
                     isWide && "tw:col-span-2",
                   )}
                 >
-                  暂无事项
+                  {t("empty.noItem")}
                 </div>
               )}
             </div>
@@ -360,20 +363,20 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
       >
         <div className="tw:mb-3 tw:flex-none">
           <div className="tw:text-[23px] tw:font-semibold tw:leading-tight">
-            Todo 设置
+            {t("settings.title")}
           </div>
           <div className="tw:mt-1 tw:text-[13px] tw:text-[var(--todo-muted)]">
-            调整列表显示方式和提醒事项强调色。
+            {t("settings.subtitle")}
           </div>
         </div>
         <div className="tw:flex-none tw:overflow-hidden tw:rounded-[18px] tw:border tw:border-[var(--todo-border)] tw:bg-[var(--todo-elevated)]">
-          <SettingRow title="主题色" description="用于按钮、勾选状态和数字">
+          <SettingRow title={t("settings.accent.title")} description={t("settings.accent.desc")}>
             <div className="tw:flex tw:gap-2">
               {ACCENT_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   type="button"
-                  aria-label={option.label}
+                  aria-label={t(option.labelKey)}
                   onClick={() =>
                     setAndPersistSettings({
                       ...settings,
@@ -390,7 +393,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
               ))}
             </div>
           </SettingRow>
-          <SettingRow title="显示已完成" description="在今天列表底部保留已完成事项">
+          <SettingRow title={t("settings.showDone.title")} description={t("settings.showDone.desc")}>
             <SwitchButton
               active={settings.showCompleted}
               onClick={() =>
@@ -401,7 +404,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
               }
             />
           </SettingRow>
-          <SettingRow title="紧凑列表" description="降低行高，在窗口中显示更多任务">
+          <SettingRow title={t("settings.compact.title")} description={t("settings.compact.desc")}>
             <SwitchButton
               active={settings.compact}
               onClick={() =>
@@ -412,7 +415,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
               }
             />
           </SettingRow>
-          <SettingRow title="排序方式" description="控制 full 与 widget 中任务顺序">
+          <SettingRow title={t("settings.sort.title")} description={t("settings.sort.desc")}>
             <select
               value={settings.sortMode}
               onChange={(event) =>
@@ -425,7 +428,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </option>
               ))}
             </select>
@@ -447,10 +450,10 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
               {title}
             </div>
             <div className="tw:mt-1 tw:truncate tw:text-[28px] tw:font-semibold tw:leading-none">
-              {filter === "done" ? "已完成" : "今天"}
+              {filter === "done" ? t("title.done") : t("title.today")}
             </div>
             <div className="tw:mt-1.5 tw:text-[13px] tw:text-[var(--todo-muted)]">
-              {new Date().toLocaleDateString("zh-CN", {
+              {new Date().toLocaleDateString(language, {
                 month: "long",
                 day: "numeric",
                 weekday: "long",
@@ -462,19 +465,19 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
             onClick={clearDone}
             className="tw:h-8 tw:flex-none tw:cursor-pointer tw:rounded-full tw:border-0 tw:bg-[var(--todo-card)] tw:px-3 tw:text-[12px] tw:font-medium tw:text-[var(--todo-accent)]"
           >
-            清除已完成
+            {t("action.clearDone")}
           </button>
         </div>
         <div className="tw:mb-2.5 tw:grid tw:grid-cols-3 tw:gap-2">
-          <SummaryCard label="未完成" value={activeCount} active />
-          <SummaryCard label="已完成" value={completedCount} />
-          <SummaryCard label="全部" value={todos.length} />
+          <SummaryCard label={t("summary.active")} value={activeCount} active />
+          <SummaryCard label={t("summary.done")} value={completedCount} />
+          <SummaryCard label={t("summary.all")} value={todos.length} />
         </div>
         <div className="tw:mb-2.5 tw:rounded-[16px] tw:border tw:border-[var(--todo-border)] tw:bg-[var(--todo-card)] tw:p-2">
           <div className="tw:grid tw:grid-cols-[1fr_auto] tw:gap-2">
             <input
               value={draft}
-              placeholder="新建提醒事项"
+              placeholder={t("placeholder.new")}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") addTodo();
@@ -502,7 +505,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
                     : "tw:border-[var(--todo-border)] tw:bg-[var(--todo-elevated)] tw:text-[var(--todo-muted)]",
                 )}
               >
-                {option.label}
+                {t(option.labelKey)}
               </button>
             ))}
           </div>
@@ -510,17 +513,17 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
         <div className="tw:mb-2.5 tw:grid tw:grid-cols-3 tw:gap-1 tw:rounded-full tw:bg-[var(--todo-card)] tw:p-1">
           <FilterButton
             active={filter === "today"}
-            label="今天"
+            label={t("filter.today")}
             onClick={() => setFilter("today")}
           />
           <FilterButton
             active={filter === "active"}
-            label="未完成"
+            label={t("filter.active")}
             onClick={() => setFilter("active")}
           />
           <FilterButton
             active={filter === "done"}
-            label="已完成"
+            label={t("filter.done")}
             onClick={() => setFilter("done")}
           />
         </div>
@@ -538,6 +541,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
                 compact={settings.compact}
                 onToggle={() => toggleTodo(todo.id)}
                 onDelete={() => removeTodo(todo.id)}
+                t={t}
               />
             ))
           ) : (
@@ -545,7 +549,7 @@ const Todo = ({ mode = "icon", title = "Todo", sdk }: TodoProps) => {
               <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-full tw:bg-[var(--todo-elevated)] tw:text-[24px] tw:text-[var(--todo-accent)]">
                 ✓
               </span>
-              暂无提醒事项
+              {t("empty.noReminder")}
             </div>
           )}
         </div>
@@ -636,11 +640,13 @@ const TaskRow = ({
   compact,
   onToggle,
   onDelete,
+  t,
 }: {
   todo: TodoItem;
   compact: boolean;
   onToggle: () => void;
   onDelete: () => void;
+  t: WidgetTranslationFn;
 }) => (
   <div
     className={cn(
@@ -650,7 +656,7 @@ const TaskRow = ({
   >
     <button
       type="button"
-      aria-label={todo.done ? "标记为未完成" : "标记为完成"}
+      aria-label={todo.done ? t("aria.markUndone") : t("aria.markDone")}
       onClick={onToggle}
       className={cn(
         "tw:flex tw:h-5 tw:w-5 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-2 tw:border-[var(--todo-accent)] tw:bg-transparent tw:text-[12px] tw:text-white",
@@ -670,7 +676,7 @@ const TaskRow = ({
       </div>
       {!compact && (
         <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2 tw:text-[11px] tw:text-[var(--todo-muted)]">
-          <span>{priorityLabel(todo.priority)}</span>
+          <span>{priorityLabel(todo.priority, t)}</span>
           {todo.note && <span className="tw:min-w-0 tw:truncate">{todo.note}</span>}
         </div>
       )}
@@ -680,15 +686,18 @@ const TaskRow = ({
       onClick={onDelete}
       className="tw:h-7 tw:cursor-pointer tw:rounded-full tw:border-0 tw:bg-transparent tw:px-2 tw:text-[12px] tw:text-[var(--todo-muted)] hover:tw:bg-[var(--todo-card)]"
     >
-      删除
+      {t("action.delete")}
     </button>
   </div>
 );
 
-const priorityLabel = (priority: TodoPriority | undefined) => {
-  if (priority === "high") return "高优先级";
-  if (priority === "low") return "低优先级";
-  return "标准";
+const priorityLabel = (
+  priority: TodoPriority | undefined,
+  t: WidgetTranslationFn,
+) => {
+  if (priority === "high") return t("priority.highFull");
+  if (priority === "low") return t("priority.lowFull");
+  return t("priority.normal");
 };
 
 const SettingRow = ({

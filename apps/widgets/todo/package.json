@@ -10,6 +10,7 @@
     "preview": "vite preview --host"
   },
   "dependencies": {
+    "i18next": "^24.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

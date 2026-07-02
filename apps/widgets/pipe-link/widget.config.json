@@ -1,12 +1,24 @@
 {
   "name": "pipe-link",
   "displayName": "终端回路",
+  "displayNameI18n": {
+    "zh-CN": "终端回路",
+    "en-US": "Pipe Link"
+  },
   "version": "0.1.0",
   "description": "接入所有信标，避开故障节点，重构通往终端的 2D 回路解谜游戏",
+  "descriptionI18n": {
+    "zh-CN": "接入所有信标，避开故障节点，重构通往终端的 2D 回路解谜游戏",
+    "en-US": "A 2D circuit puzzle game about linking every beacon, avoiding broken nodes, and rebuilding the route to the terminal"
+  },
   "author": "Search-Next",
   "entry": "index.js",
   "icon": "icon.svg",
   "tags": ["游戏", "解谜", "管道", "键盘"],
+  "tagsI18n": {
+    "zh-CN": ["游戏", "解谜", "管道", "键盘"],
+    "en-US": ["Game", "Puzzle", "Pipes", "Keyboard"]
+  },
   "sizeConfigs": [
     { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
   ],

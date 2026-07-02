@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
+import { resources, useWidgetI18n } from "./i18n";
+import type { WidgetTranslationFn } from "./i18n";
 import type { WidgetProps, WidgetSDK } from "./types";
 
 type Operator = "+" | "-" | "×" | "÷" | null;
@@ -55,13 +57,14 @@ const compute = (left: number, right: number, op: Operator) => {
   return right;
 };
 
-const formatNumber = (value: number) => {
-  if (!Number.isFinite(value)) return "错误";
+const formatNumber = (value: number, t: WidgetTranslationFn) => {
+  if (!Number.isFinite(value)) return t("calc.error");
   const fixed = Number(value.toPrecision(12));
   return String(fixed).length > 14 ? fixed.toExponential(6) : String(fixed);
 };
 
 export default function Widget({ mode = "icon", sdk }: WidgetProps) {
+  const { t } = useWidgetI18n(sdk, resources);
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
   const [display, setDisplay] = useState("0");
   const [stored, setStored] = useState<number | null>(null);
@@ -86,7 +89,7 @@ export default function Widget({ mode = "icon", sdk }: WidgetProps) {
     void writeHistory(sdk, next);
   };
   const inputDigit = (digit: string) => {
-    setDisplay((current) => waiting || current === "0" || current === "错误" ? digit : `${current}${digit}`);
+    setDisplay((current) => waiting || current === "0" || current === t("calc.error") ? digit : `${current}${digit}`);
     setWaiting(false);
   };
   const inputDot = () => {
@@ -99,14 +102,14 @@ export default function Widget({ mode = "icon", sdk }: WidgetProps) {
     setOperator(null);
     setWaiting(false);
   };
-  const backspace = () => setDisplay((current) => current.length <= 1 || current === "错误" ? "0" : current.slice(0, -1));
-  const toggleSign = () => setDisplay((current) => current === "0" || current === "错误" ? current : current.startsWith("-") ? current.slice(1) : `-${current}`);
-  const percent = () => setDisplay((current) => formatNumber(Number(current) / 100));
+  const backspace = () => setDisplay((current) => current.length <= 1 || current === t("calc.error") ? "0" : current.slice(0, -1));
+  const toggleSign = () => setDisplay((current) => current === "0" || current === t("calc.error") ? current : current.startsWith("-") ? current.slice(1) : `-${current}`);
+  const percent = () => setDisplay((current) => formatNumber(Number(current) / 100, t));
   const chooseOperator = (nextOperator: Operator) => {
     const value = Number(display);
     if (stored !== null && operator && !waiting) {
       const result = compute(stored, value, operator);
-      setDisplay(formatNumber(result));
+      setDisplay(formatNumber(result, t));
       setStored(result);
     } else {
       setStored(value);
@@ -118,8 +121,8 @@ export default function Widget({ mode = "icon", sdk }: WidgetProps) {
     if (stored === null || !operator) return;
     const right = Number(display);
     const result = compute(stored, right, operator);
-    const formatted = formatNumber(result);
-    pushHistory({ expression: `${formatNumber(stored)} ${operator} ${formatNumber(right)}`, result: formatted });
+    const formatted = formatNumber(result, t);
+    pushHistory({ expression: `${formatNumber(stored, t)} ${operator} ${formatNumber(right, t)}`, result: formatted });
     setDisplay(formatted);
     setStored(null);
     setOperator(null);
@@ -138,32 +141,32 @@ export default function Widget({ mode = "icon", sdk }: WidgetProps) {
 
   return (
     <div className="tw:h-full tw:w-full tw:overflow-hidden tw:bg-[var(--calc-bg)] tw:text-[var(--calc-fg)] tw:font-[-apple-system,BlinkMacSystemFont,SF_Pro_Text,system-ui,sans-serif] tw:[container-type:size] tw:[&_*]:box-border" style={themeVars(themeId)}>
-      {isIcon ? <IconView display={display} sizeId={sizeId} press={press} /> : <FullView display={display} history={history} press={press} />}
+      {isIcon ? <IconView display={display} sizeId={sizeId} press={press} t={t} /> : <FullView display={display} history={history} press={press} t={t} />}
     </div>
   );
 }
 
 const keys = ["AC", "±", "%", "÷", "7", "8", "9", "×", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "⌫", "="];
 
-function IconView({ display, sizeId, press }: { display: string; sizeId: string; press: (key: string) => void }) {
+function IconView({ display, sizeId, press, t }: { display: string; sizeId: string; press: (key: string) => void; t: WidgetTranslationFn }) {
   if (sizeId === "1x1") return <div className="tw:flex tw:h-full tw:w-full tw:items-end tw:justify-end tw:rounded-[15px] tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-2"><b className="tw:max-w-full tw:truncate tw:text-[20px]">{display}</b></div>;
-  if (sizeId === "2x1") return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-3"><span className="tw:text-xs tw:font-bold tw:text-[var(--calc-muted)]">最近结果</span><b className="tw:truncate tw:text-[30px]">{display}</b></div>;
+  if (sizeId === "2x1") return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-3"><span className="tw:text-xs tw:font-bold tw:text-[var(--calc-muted)]">{t("calc.recent")}</span><b className="tw:truncate tw:text-[30px]">{display}</b></div>;
   if (sizeId === "4x2") return <div className="tw:grid tw:h-full tw:w-full tw:grid-cols-[1fr_190px] tw:gap-2.5 tw:rounded-[20px] tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-3"><Display value={display} /><MiniKeypad press={press} /></div>;
   return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:gap-2 tw:rounded-[20px] tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-3"><Display value={display} compact /><div className="tw:grid tw:grid-cols-4 tw:gap-1.5">{["AC", "7", "8", "+"].map((key) => <CalcKey key={key} label={key} onClick={() => press(key)} small />)}</div></div>;
 }
 
-function FullView({ display, history, press }: { display: string; history: HistoryItem[]; press: (key: string) => void }) {
+function FullView({ display, history, press, t }: { display: string; history: HistoryItem[]; press: (key: string) => void; t: WidgetTranslationFn }) {
   return (
     <div className="tw:grid tw:h-full tw:grid-cols-[minmax(320px,440px)_minmax(220px,1fr)] tw:gap-4 tw:overflow-auto tw:p-6 tw:[@container(max-width:760px)]:grid-cols-1">
       <section className="tw:flex tw:flex-col tw:gap-3 tw:rounded-3xl tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-4">
-        <span className="tw:text-sm tw:font-bold tw:text-[var(--calc-muted)]">基础计算器</span>
+        <span className="tw:text-sm tw:font-bold tw:text-[var(--calc-muted)]">{t("calc.basic")}</span>
         <Display value={display} />
         <div className="tw:grid tw:grid-cols-4 tw:gap-2.5">{keys.map((key) => <CalcKey key={key} label={key} onClick={() => press(key)} wide={key === "0"} />)}</div>
       </section>
       <aside className="tw:rounded-3xl tw:border tw:border-[var(--calc-line)] tw:bg-[var(--calc-panel)] tw:p-4">
-        <h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780]">历史结果</h2>
+        <h2 className="tw:m-0 tw:mb-3 tw:text-base tw:font-[780]">{t("calc.history")}</h2>
         <div className="tw:flex tw:flex-col tw:gap-2">
-          {(history.length ? history : [{ expression: "暂无历史", result: "开始计算" }]).map((item, index) => <div className="tw:rounded-2xl tw:bg-[var(--calc-soft)] tw:p-3" key={`${item.expression}-${index}`}><span className="tw:block tw:truncate tw:text-xs tw:font-bold tw:text-[var(--calc-muted)]">{item.expression}</span><b className="tw:block tw:truncate tw:text-xl">{item.result}</b></div>)}
+          {(history.length ? history : [{ expression: t("calc.noHistory"), result: t("calc.start") }]).map((item, index) => <div className="tw:rounded-2xl tw:bg-[var(--calc-soft)] tw:p-3" key={`${item.expression}-${index}`}><span className="tw:block tw:truncate tw:text-xs tw:font-bold tw:text-[var(--calc-muted)]">{item.expression}</span><b className="tw:block tw:truncate tw:text-xl">{item.result}</b></div>)}
         </div>
       </aside>
     </div>

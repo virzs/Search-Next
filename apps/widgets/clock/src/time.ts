@@ -6,23 +6,41 @@ import {
   startOfDay,
   startOfYear,
 } from "date-fns";
+import { enUS } from "date-fns/locale/en-US";
 import { zhCN } from "date-fns/locale/zh-CN";
 import { TIMEZONES, DEFAULT_WORLD_TIMEZONES } from "./constants";
+import type { WidgetLanguage, WidgetTranslationFn } from "./i18n";
 
 export function pad(n: number) {
   return n.toString().padStart(2, "0");
 }
 
-export function greet(hour: number) {
-  if (hour < 6) return "夜深了";
-  if (hour < 12) return "早上好";
-  if (hour < 14) return "中午好";
-  if (hour < 18) return "下午好";
-  return "晚上好";
+export function dateFnsLocale(language: WidgetLanguage) {
+  return language === "en-US" ? enUS : zhCN;
 }
 
-export function formatDate(date: Date) {
-  return format(date, "yyyy年M月d日 EEEE", { locale: zhCN });
+export function greet(hour: number, t: WidgetTranslationFn) {
+  if (hour < 6) return t("greet.late");
+  if (hour < 12) return t("greet.morning");
+  if (hour < 14) return t("greet.noon");
+  if (hour < 18) return t("greet.afternoon");
+  return t("greet.evening");
+}
+
+export function formatDate(date: Date, language: WidgetLanguage) {
+  return format(
+    date,
+    language === "en-US" ? "EEEE, MMM d, yyyy" : "yyyy年M月d日 EEEE",
+    { locale: dateFnsLocale(language) },
+  );
+}
+
+export function formatCompactDate(date: Date, language: WidgetLanguage) {
+  return format(
+    date,
+    language === "en-US" ? "MMM d, EEE" : "M月d日 EEE",
+    { locale: dateFnsLocale(language) },
+  );
 }
 
 export function getTimeInZone(timezone: string, source = new Date()) {
@@ -88,15 +106,23 @@ export function calendarDayDiff(date: Date, base: Date) {
   return differenceInCalendarDays(date, base);
 }
 
-export function dayOffsetLabel(diff: number) {
-  if (diff === 0) return "今天";
-  if (diff === 1) return "明天";
-  if (diff === -1) return "昨天";
-  return diff > 0 ? `+${diff}天` : `${diff}天`;
+export function dayOffsetLabel(diff: number, t: WidgetTranslationFn) {
+  if (diff === 0) return t("date.today");
+  if (diff === 1) return t("date.tomorrow");
+  if (diff === -1) return t("date.yesterday");
+  return diff > 0
+    ? t("date.futureDay", { count: diff })
+    : t("date.day", { count: diff });
 }
 
-export function formatClockTime(date: Date, timeFormat: "12h" | "24h") {
-  return format(date, timeFormat === "12h" ? "hh:mm a" : "HH:mm");
+export function formatClockTime(
+  date: Date,
+  timeFormat: "12h" | "24h",
+  language: WidgetLanguage,
+) {
+  return format(date, timeFormat === "12h" ? "hh:mm a" : "HH:mm", {
+    locale: dateFnsLocale(language),
+  });
 }
 
 export function timezoneOffsetLabel(timezone: string, source = new Date()) {
@@ -113,4 +139,28 @@ export function timezoneOffsetLabel(timezone: string, source = new Date()) {
   } catch {
     return "";
   }
+}
+
+export function timezoneName(
+  timezone: string,
+  t: WidgetTranslationFn,
+  fallback?: string,
+) {
+  const keyByTimezone: Record<string, string> = {
+    "": "timezone.local",
+    UTC: "timezone.utc",
+    "Asia/Shanghai": "timezone.beijing",
+    "Asia/Tokyo": "timezone.tokyo",
+    "Europe/London": "timezone.london",
+    "America/New_York": "timezone.newYork",
+    "America/Los_Angeles": "timezone.losAngeles",
+    "Australia/Sydney": "timezone.sydney",
+    "Europe/Paris": "timezone.paris",
+    "Asia/Dubai": "timezone.dubai",
+    "Europe/Moscow": "timezone.moscow",
+    "Asia/Singapore": "timezone.singapore",
+  };
+  const key = keyByTimezone[timezone];
+  if (key) return t(key);
+  return fallback ?? timezone.replace(/_/g, " ").split("/").pop() ?? timezone;
 }

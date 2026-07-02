@@ -1,5 +1,7 @@
 export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 
+import type { WidgetLocaleInfo } from "./i18n";
+
 export interface WidgetThemeInfo {
   activeThemeId: string;
 }
@@ -25,6 +27,9 @@ export interface WidgetSDK {
   sizeId?: string;
   mode?: WidgetMode;
   theme?: WidgetThemeInfo;
+  locale?: WidgetLocaleInfo;
+  getLocale?: () => WidgetLocaleInfo;
+  onLocaleChange?: (handler: (locale: WidgetLocaleInfo) => void) => (() => void) | void;
   storage?: WidgetStorage;
   events?: WidgetEvents;
   onThemeChange?: (handler: (theme: WidgetThemeInfo) => void) => (() => void) | void;

@@ -1,25 +1,31 @@
 import { useMemo } from "react";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
-import { TIMEZONES, WEEK_LABELS } from "./constants";
-import { calendarDayDiff, dayOffsetLabel, formatClockTime, getTimeInZone, timezoneOffsetLabel } from "./time";
+import { TIMEZONES } from "./constants";
+import { calendarDayDiff, dayOffsetLabel, formatClockTime, getTimeInZone, timezoneName, timezoneOffsetLabel } from "./time";
 import type { ClockSettings } from "./types";
+import type { WidgetLanguage, WidgetTranslationFn } from "./i18n";
 
-export function useWeekDays(now: Date) {
+export function useWeekDays(now: Date, language: WidgetLanguage) {
   return useMemo(() => {
     const monday = startOfWeek(now, { weekStartsOn: 1 });
     return Array.from({ length: 7 }, (_, index) => {
       const day = addDays(monday, index);
       return {
         key: day.toDateString(),
-        label: WEEK_LABELS[day.getDay()],
+        label: new Intl.DateTimeFormat(language, { weekday: "short" }).format(day),
         date: day.getDate(),
         active: isSameDay(day, now),
       };
     });
-  }, [now]);
+  }, [language, now]);
 }
 
-export function useWorldTimes(now: Date, settings: ClockSettings) {
+export function useWorldTimes(
+  now: Date,
+  settings: ClockSettings,
+  language: WidgetLanguage,
+  t: WidgetTranslationFn,
+) {
   return useMemo(
     () => settings.worldTimezones.map((timezone) => {
       const item = TIMEZONES.find((candidate) => candidate.value === timezone);
@@ -27,12 +33,12 @@ export function useWorldTimes(now: Date, settings: ClockSettings) {
       const zonedDate = getTimeInZone(timezone, now);
       const dayDiff = calendarDayDiff(zonedDate, baseDate);
       return {
-        city: item?.city ?? timezone.split("/").pop() ?? timezone,
-        time: formatClockTime(zonedDate, settings.timeFormat),
-        dayLabel: dayOffsetLabel(dayDiff),
+        city: timezoneName(timezone, t, item?.city),
+        time: formatClockTime(zonedDate, settings.timeFormat, language),
+        dayLabel: dayOffsetLabel(dayDiff, t),
         offsetLabel: timezoneOffsetLabel(timezone, now),
       };
     }),
-    [settings.timeFormat, settings.timezone, settings.worldTimezones, now],
+    [language, settings.timeFormat, settings.timezone, settings.worldTimezones, now, t],
   );
 }

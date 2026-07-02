@@ -3,11 +3,13 @@ import { useClockState } from "./useClockState";
 import { FullPage } from "./pages/full-page";
 import { IconPage } from "./pages/icon-page";
 import { SettingsPage } from "./pages/settings-page";
+import { resources, useWidgetI18n } from "./i18n";
 import { clockThemeVars, cn } from "./styles";
 import type { ClockProps } from "./types";
 
 const Clock = ({ mode = "icon", pagePath, title, sdk }: ClockProps) => {
-  const { now, themeId, settings, saving, saveSettings } = useClockState(sdk);
+  const { language, t } = useWidgetI18n(sdk, resources);
+  const { now, themeId, settings, saving, saveSettings } = useClockState(sdk, t);
   const sizeId = sdk?.sizeId || "2x2";
   const isIcon = mode === "icon" || mode === "appIcon";
   const isSettings = mode === "settings";
@@ -24,7 +26,7 @@ const Clock = ({ mode = "icon", pagePath, title, sdk }: ClockProps) => {
       <div className={shellClassName} style={clockThemeVars[themeKey]}>
         <MemoryRouter initialEntries={[pagePath || "/settings"]}>
           <Routes>
-            <Route path="/settings" element={<SettingsPage settings={settings} saving={saving} onSave={saveSettings} />} />
+            <Route path="/settings" element={<SettingsPage settings={settings} saving={saving} onSave={saveSettings} language={language} t={t} />} />
             <Route path="*" element={<Navigate to="/settings" replace />} />
           </Routes>
         </MemoryRouter>
@@ -35,9 +37,9 @@ const Clock = ({ mode = "icon", pagePath, title, sdk }: ClockProps) => {
   return (
     <div className={shellClassName} style={clockThemeVars[themeKey]}>
       {isIcon ? (
-        <IconPage now={now} settings={settings} sizeId={sizeId} />
+        <IconPage now={now} settings={settings} sizeId={sizeId} language={language} t={t} />
       ) : (
-        <FullPage now={now} settings={settings} title={title || "时钟"} />
+        <FullPage now={now} settings={settings} title={title || t("settings.brand")} language={language} t={t} />
       )}
     </div>
   );

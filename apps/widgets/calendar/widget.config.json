@@ -1,12 +1,24 @@
 {
   "name": "calendar",
   "displayName": "日历",
+  "displayNameI18n": {
+    "zh-CN": "日历",
+    "en-US": "Calendar"
+  },
   "version": "0.1.0",
   "description": "iPadOS 风格日历小组件，支持月视图、今日日程和显示偏好",
+  "descriptionI18n": {
+    "zh-CN": "iPadOS 风格日历小组件，支持月视图、今日日程和显示偏好",
+    "en-US": "iPadOS-style calendar widget with month view, today's agenda, and display preferences"
+  },
   "author": "Search-Next",
   "entry": "index.js",
   "icon": "icon.svg",
   "tags": ["工具", "日历", "日程", "iPadOS"],
+  "tagsI18n": {
+    "zh-CN": ["工具", "日历", "日程", "iPadOS"],
+    "en-US": ["Tools", "Calendar", "Agenda", "iPadOS"]
+  },
   "sizeConfigs": [
     { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
     { "row": 2, "col": 4, "name": "4x2", "id": "4x2" },

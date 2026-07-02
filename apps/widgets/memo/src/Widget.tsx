@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import { resources, useWidgetI18n } from "./i18n";
+import type { WidgetTranslationFn } from "./i18n";
 import type { WidgetProps, WidgetSDK } from "./types";
 
 type MemoColor = "yellow" | "white" | "blue" | "green";
@@ -21,10 +23,11 @@ type MemoSettings = {
 const MEMOS_KEY = "memoItems";
 const SETTINGS_KEY = "memoSettings";
 const DEFAULT_SETTINGS: MemoSettings = { defaultColor: "yellow", sortMode: "updated", showChecklist: true };
-const SAMPLE_MEMOS: MemoItem[] = [
-  { id: "memo-1", title: "发布检查", body: "检查所有尺寸截图、深色模式和打包产物。", color: "yellow", pinned: true, checklist: ["截图", "打包", "深色模式"], updatedAt: Date.now() - 60000 },
-  { id: "memo-2", title: "购物清单", body: "牛奶、咖啡豆、面包。", color: "white", pinned: false, checklist: ["牛奶", "咖啡豆", "面包"], updatedAt: Date.now() - 3600000 },
-  { id: "memo-3", title: "想法", body: "把小组件做成更接近 Apple Notes 的轻量备忘录。", color: "blue", pinned: false, checklist: [], updatedAt: Date.now() - 86400000 },
+
+const createSampleMemos = (t: WidgetTranslationFn): MemoItem[] => [
+  { id: "memo-1", title: t("sample.1.title"), body: t("sample.1.body"), color: "yellow", pinned: true, checklist: [t("sample.1.check.1"), t("sample.1.check.2"), t("sample.1.check.3")], updatedAt: Date.now() - 60000 },
+  { id: "memo-2", title: t("sample.2.title"), body: t("sample.2.body"), color: "white", pinned: false, checklist: [t("sample.2.check.1"), t("sample.2.check.2"), t("sample.2.check.3")], updatedAt: Date.now() - 3600000 },
+  { id: "memo-3", title: t("sample.3.title"), body: t("sample.3.body"), color: "blue", pinned: false, checklist: [], updatedAt: Date.now() - 86400000 },
 ];
 
 const safeParse = <T,>(value: unknown, fallback: T): T => {
@@ -78,19 +81,21 @@ const noteBg = (color: MemoColor) => {
 };
 
 export default function Widget({ mode = "icon", sdk }: WidgetProps) {
+  const { t } = useWidgetI18n(sdk, resources);
+  const sampleMemos = useMemo(() => createSampleMemos(t), [t]);
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
-  const [memos, setMemos] = useState<MemoItem[]>(SAMPLE_MEMOS);
+  const [memos, setMemos] = useState<MemoItem[]>(sampleMemos);
   const [settings, setSettings] = useState<MemoSettings>(DEFAULT_SETTINGS);
-  const [selectedId, setSelectedId] = useState(SAMPLE_MEMOS[0]?.id);
+  const [selectedId, setSelectedId] = useState(sampleMemos[0]?.id);
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    Promise.all([readValue(sdk, MEMOS_KEY, SAMPLE_MEMOS), readValue(sdk, SETTINGS_KEY, DEFAULT_SETTINGS)]).then(([nextMemos, nextSettings]) => {
-      setMemos(Array.isArray(nextMemos) && nextMemos.length ? nextMemos : SAMPLE_MEMOS);
+    Promise.all([readValue(sdk, MEMOS_KEY, sampleMemos), readValue(sdk, SETTINGS_KEY, DEFAULT_SETTINGS)]).then(([nextMemos, nextSettings]) => {
+      setMemos(Array.isArray(nextMemos) && nextMemos.length ? nextMemos : sampleMemos);
       setSettings({ ...DEFAULT_SETTINGS, ...nextSettings });
-      setSelectedId((Array.isArray(nextMemos) && nextMemos[0]?.id) || SAMPLE_MEMOS[0].id);
+      setSelectedId((Array.isArray(nextMemos) && nextMemos[0]?.id) || sampleMemos[0].id);
     });
-  }, [sdk]);
+  }, [sdk, sampleMemos]);
 
   useEffect(() => {
     if (!sdk?.onThemeChange) return undefined;
@@ -122,7 +127,7 @@ export default function Widget({ mode = "icon", sdk }: WidgetProps) {
     persistMemos(memos.map((memo) => memo.id === selected.id ? { ...memo, ...patch, updatedAt: Date.now() } : memo));
   };
   const addMemo = () => {
-    const next: MemoItem = { id: `memo-${Date.now()}`, title: "新备忘录", body: "", color: settings.defaultColor, pinned: false, checklist: [], updatedAt: Date.now() };
+    const next: MemoItem = { id: `memo-${Date.now()}`, title: t("memo.new"), body: "", color: settings.defaultColor, pinned: false, checklist: [], updatedAt: Date.now() };
     persistMemos([next, ...memos]);
     setSelectedId(next.id);
   };
@@ -136,61 +141,61 @@ export default function Widget({ mode = "icon", sdk }: WidgetProps) {
   return (
     <div className="tw:h-full tw:w-full tw:overflow-hidden tw:bg-[var(--memo-bg)] tw:text-[var(--memo-fg)] tw:font-[-apple-system,BlinkMacSystemFont,SF_Pro_Text,system-ui,sans-serif] tw:[container-type:size] tw:[&_*]:box-border" style={themeVars(themeId)}>
       {isIcon ? (
-        <IconView memos={sortedMemos} sizeId={sizeId} settings={settings} />
+        <IconView memos={sortedMemos} sizeId={sizeId} settings={settings} sampleMemos={sampleMemos} t={t} />
       ) : mode === "settings" ? (
-        <SettingsView settings={settings} onChange={persistSettings} />
+        <SettingsView settings={settings} onChange={persistSettings} t={t} />
       ) : (
-        <FullView memos={sortedMemos} selected={selected} query={query} setQuery={setQuery} setSelectedId={setSelectedId} onAdd={addMemo} onDelete={removeSelected} onUpdate={updateSelected} settings={settings} />
+        <FullView memos={sortedMemos} selected={selected} query={query} setQuery={setQuery} setSelectedId={setSelectedId} onAdd={addMemo} onDelete={removeSelected} onUpdate={updateSelected} settings={settings} t={t} />
       )}
     </div>
   );
 }
 
-function IconView({ memos, sizeId, settings }: { memos: MemoItem[]; sizeId: string; settings: MemoSettings }) {
-  const primary = memos[0] || SAMPLE_MEMOS[0];
+function IconView({ memos, sizeId, settings, sampleMemos, t }: { memos: MemoItem[]; sizeId: string; settings: MemoSettings; sampleMemos: MemoItem[]; t: WidgetTranslationFn }) {
+  const primary = memos[0] || sampleMemos[0];
   if (sizeId === "1x1") {
-    return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-between tw:rounded-[15px] tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-yellow)] tw:p-2 tw:text-[#1d1d1f]"><b className="tw:text-xl">备</b><span className="tw:text-[11px] tw:font-bold">{memos.length} 条</span></div>;
+    return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-between tw:rounded-[15px] tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-yellow)] tw:p-2 tw:text-[#1d1d1f]"><b className="tw:text-xl">{t("icon.char")}</b><span className="tw:text-[11px] tw:font-bold">{t("note.count", { count: memos.length })}</span></div>;
   }
   if (sizeId === "2x1") {
-    return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-[var(--memo-line)] tw:p-3" style={{ background: noteBg(primary.color) }}><b className="tw:truncate tw:text-sm">{primary.title}</b><span className="tw:mt-1 tw:truncate tw:text-[11px] tw:font-semibold tw:text-[var(--memo-muted)]">{primary.body || primary.checklist.join("、")}</span></div>;
+    return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-[var(--memo-line)] tw:p-3" style={{ background: noteBg(primary.color) }}><b className="tw:truncate tw:text-sm">{primary.title}</b><span className="tw:mt-1 tw:truncate tw:text-[11px] tw:font-semibold tw:text-[var(--memo-muted)]">{primary.body || primary.checklist.join(t("delimiter.list"))}</span></div>;
   }
   if (sizeId === "4x2") {
-    return <div className="tw:grid tw:h-full tw:w-full tw:grid-cols-[1fr_1fr] tw:gap-2.5 tw:rounded-[20px] tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:p-3"><NoteCard memo={primary} /><div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">{memos.slice(1, 4).map((memo) => <MemoRow key={memo.id} memo={memo} />)}</div></div>;
+    return <div className="tw:grid tw:h-full tw:w-full tw:grid-cols-[1fr_1fr] tw:gap-2.5 tw:rounded-[20px] tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:p-3"><NoteCard memo={primary} /><div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">{memos.slice(1, 4).map((memo) => <MemoRow key={memo.id} memo={memo} t={t} />)}</div></div>;
   }
   return <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:gap-2 tw:rounded-[20px] tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:p-3"><NoteCard memo={primary} />{settings.showChecklist && primary.checklist.slice(0, 2).map((item) => <span className="tw:truncate tw:text-[11px] tw:font-semibold tw:text-[var(--memo-muted)]" key={item}>○ {item}</span>)}</div>;
 }
 
-function FullView({ memos, selected, query, setQuery, setSelectedId, onAdd, onDelete, onUpdate, settings }: { memos: MemoItem[]; selected?: MemoItem; query: string; setQuery: (value: string) => void; setSelectedId: (id: string) => void; onAdd: () => void; onDelete: () => void; onUpdate: (patch: Partial<MemoItem>) => void; settings: MemoSettings }) {
+function FullView({ memos, selected, query, setQuery, setSelectedId, onAdd, onDelete, onUpdate, settings, t }: { memos: MemoItem[]; selected?: MemoItem; query: string; setQuery: (value: string) => void; setSelectedId: (id: string) => void; onAdd: () => void; onDelete: () => void; onUpdate: (patch: Partial<MemoItem>) => void; settings: MemoSettings; t: WidgetTranslationFn }) {
   return (
     <div className="tw:grid tw:h-full tw:grid-cols-[290px_minmax(0,1fr)] tw:overflow-hidden tw:rounded-[18px] tw:bg-[var(--memo-bg)] tw:[@container(max-width:700px)]:grid-cols-1">
       <aside className="tw:flex tw:min-w-0 tw:flex-col tw:gap-3 tw:border-r tw:border-[var(--memo-line)] tw:bg-[var(--memo-soft)] tw:p-4 tw:[@container(max-width:700px)]:hidden">
-        <div className="tw:flex tw:items-center tw:justify-between"><h1 className="tw:m-0 tw:text-[28px] tw:font-[780]">备忘录</h1><button className="tw:rounded-full tw:border-0 tw:bg-[#007aff] tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-white" type="button" onClick={onAdd}>新建</button></div>
-        <input className="tw:w-full tw:rounded-xl tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:px-3 tw:py-2 tw:text-sm tw:font-semibold tw:text-[var(--memo-fg)] tw:outline-none" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索备忘录" />
+        <div className="tw:flex tw:items-center tw:justify-between"><h1 className="tw:m-0 tw:text-[28px] tw:font-[780]">{t("title")}</h1><button className="tw:rounded-full tw:border-0 tw:bg-[#007aff] tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-white" type="button" onClick={onAdd}>{t("action.add")}</button></div>
+        <input className="tw:w-full tw:rounded-xl tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:px-3 tw:py-2 tw:text-sm tw:font-semibold tw:text-[var(--memo-fg)] tw:outline-none" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("placeholder.search")} />
         <div className="tw:flex tw:min-h-0 tw:flex-col tw:gap-2 tw:overflow-auto">
-          {memos.map((memo) => <button className="tw:min-w-0 tw:cursor-pointer tw:rounded-[14px] tw:border-0 tw:bg-[var(--memo-panel)] tw:p-3 tw:text-left tw:text-[var(--memo-fg)]" key={memo.id} type="button" onClick={() => setSelectedId(memo.id)}><MemoRow memo={memo} /></button>)}
+          {memos.map((memo) => <button className="tw:min-w-0 tw:cursor-pointer tw:rounded-[14px] tw:border-0 tw:bg-[var(--memo-panel)] tw:p-3 tw:text-left tw:text-[var(--memo-fg)]" key={memo.id} type="button" onClick={() => setSelectedId(memo.id)}><MemoRow memo={memo} t={t} /></button>)}
         </div>
       </aside>
       <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-3 tw:p-5">
         {selected ? (
           <>
-            <div className="tw:flex tw:items-center tw:gap-2"><input className="tw:min-w-0 tw:flex-1 tw:border-0 tw:bg-transparent tw:text-[30px] tw:font-[780] tw:text-[var(--memo-fg)] tw:outline-none" value={selected.title} onChange={(event) => onUpdate({ title: event.target.value })} /><button className="tw:rounded-full tw:border-0 tw:bg-[var(--memo-soft)] tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-[var(--memo-fg)]" type="button" onClick={() => onUpdate({ pinned: !selected.pinned })}>{selected.pinned ? "取消置顶" : "置顶"}</button><button className="tw:rounded-full tw:border-0 tw:bg-[var(--memo-soft)] tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-[var(--memo-fg)]" type="button" onClick={onDelete}>删除</button></div>
+            <div className="tw:flex tw:items-center tw:gap-2"><input className="tw:min-w-0 tw:flex-1 tw:border-0 tw:bg-transparent tw:text-[30px] tw:font-[780] tw:text-[var(--memo-fg)] tw:outline-none" value={selected.title} onChange={(event) => onUpdate({ title: event.target.value })} /><button className="tw:rounded-full tw:border-0 tw:bg-[var(--memo-soft)] tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-[var(--memo-fg)]" type="button" onClick={() => onUpdate({ pinned: !selected.pinned })}>{selected.pinned ? t("action.unpin") : t("action.pin")}</button><button className="tw:rounded-full tw:border-0 tw:bg-[var(--memo-soft)] tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-[var(--memo-fg)]" type="button" onClick={onDelete}>{t("action.delete")}</button></div>
             <textarea className="tw:min-h-[260px] tw:flex-1 tw:resize-none tw:rounded-[20px] tw:border tw:border-[var(--memo-line)] tw:p-4 tw:text-[16px] tw:font-medium tw:leading-6 tw:text-[var(--memo-fg)] tw:outline-none" style={{ background: noteBg(selected.color) }} value={selected.body} onChange={(event) => onUpdate({ body: event.target.value })} />
-            {settings.showChecklist && <input className="tw:rounded-xl tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:px-3 tw:py-2 tw:text-sm tw:text-[var(--memo-fg)] tw:outline-none" value={selected.checklist.join("，")} onChange={(event) => onUpdate({ checklist: event.target.value.split(/[，,]/).map((item) => item.trim()).filter(Boolean) })} placeholder="清单项，用逗号分隔" />}
+            {settings.showChecklist && <input className="tw:rounded-xl tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)] tw:px-3 tw:py-2 tw:text-sm tw:text-[var(--memo-fg)] tw:outline-none" value={selected.checklist.join(t("delimiter.list"))} onChange={(event) => onUpdate({ checklist: event.target.value.split(/[，,]/).map((item) => item.trim()).filter(Boolean) })} placeholder={t("placeholder.checklist")} />}
           </>
-        ) : <div className="tw:m-auto tw:text-sm tw:font-bold tw:text-[var(--memo-muted)]">暂无备忘录</div>}
+        ) : <div className="tw:m-auto tw:text-sm tw:font-bold tw:text-[var(--memo-muted)]">{t("empty.noMemo")}</div>}
       </section>
     </div>
   );
 }
 
-function SettingsView({ settings, onChange }: { settings: MemoSettings; onChange: (settings: MemoSettings) => void }) {
+function SettingsView({ settings, onChange, t }: { settings: MemoSettings; onChange: (settings: MemoSettings) => void; t: WidgetTranslationFn }) {
   return (
     <div className="tw:h-full tw:overflow-auto tw:p-6">
-      <h1 className="tw:m-0 tw:mb-4 tw:text-[30px] tw:font-[780]">备忘录设置</h1>
+      <h1 className="tw:m-0 tw:mb-4 tw:text-[30px] tw:font-[780]">{t("settings.title")}</h1>
       <div className="tw:overflow-hidden tw:rounded-3xl tw:border tw:border-[var(--memo-line)] tw:bg-[var(--memo-panel)]">
-        <SettingRow label="默认颜色"><select value={settings.defaultColor} onChange={(event) => onChange({ ...settings, defaultColor: event.target.value as MemoColor })}><option value="yellow">黄色</option><option value="white">白色</option><option value="blue">蓝色</option><option value="green">绿色</option></select></SettingRow>
-        <SettingRow label="排序方式"><select value={settings.sortMode} onChange={(event) => onChange({ ...settings, sortMode: event.target.value as MemoSettings["sortMode"] })}><option value="updated">最近编辑</option><option value="title">标题</option></select></SettingRow>
-        <SettingRow label="显示清单"><input type="checkbox" checked={settings.showChecklist} onChange={(event) => onChange({ ...settings, showChecklist: event.target.checked })} /></SettingRow>
+        <SettingRow label={t("settings.color")}><select value={settings.defaultColor} onChange={(event) => onChange({ ...settings, defaultColor: event.target.value as MemoColor })}><option value="yellow">{t("color.yellow")}</option><option value="white">{t("color.white")}</option><option value="blue">{t("color.blue")}</option><option value="green">{t("color.green")}</option></select></SettingRow>
+        <SettingRow label={t("settings.sort")}><select value={settings.sortMode} onChange={(event) => onChange({ ...settings, sortMode: event.target.value as MemoSettings["sortMode"] })}><option value="updated">{t("sort.updated")}</option><option value="title">{t("sort.title")}</option></select></SettingRow>
+        <SettingRow label={t("settings.showList")}><input type="checkbox" checked={settings.showChecklist} onChange={(event) => onChange({ ...settings, showChecklist: event.target.checked })} /></SettingRow>
       </div>
     </div>
   );
@@ -200,8 +205,8 @@ function NoteCard({ memo }: { memo: MemoItem }) {
   return <div className="tw:min-h-0 tw:overflow-hidden tw:rounded-[18px] tw:p-3 tw:text-[#1d1d1f]" style={{ background: noteBg(memo.color) }}><b className="tw:block tw:truncate tw:text-sm">{memo.pinned ? "● " : ""}{memo.title}</b><p className="tw:m-0 tw:mt-2 tw:line-clamp-3 tw:text-[12px] tw:font-semibold tw:leading-4 tw:text-[#3a3a3c]">{memo.body}</p></div>;
 }
 
-function MemoRow({ memo }: { memo: MemoItem }) {
-  return <div className="tw:min-w-0"><b className="tw:block tw:truncate tw:text-sm">{memo.pinned ? "● " : ""}{memo.title}</b><span className="tw:mt-1 tw:block tw:truncate tw:text-[11px] tw:font-semibold tw:text-[var(--memo-muted)]">{memo.body || memo.checklist.join("、")}</span></div>;
+function MemoRow({ memo, t }: { memo: MemoItem; t: WidgetTranslationFn }) {
+  return <div className="tw:min-w-0"><b className="tw:block tw:truncate tw:text-sm">{memo.pinned ? "● " : ""}{memo.title}</b><span className="tw:mt-1 tw:block tw:truncate tw:text-[11px] tw:font-semibold tw:text-[var(--memo-muted)]">{memo.body || memo.checklist.join(t("delimiter.list"))}</span></div>;
 }
 
 function SettingRow({ label, children }: { label: string; children: ReactNode }) {

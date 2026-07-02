@@ -17,7 +17,7 @@ const path = (value: string): Direction[] =>
 export const LEVELS: LevelConfig[] = [
   {
     id: "level-01",
-    name: "蓝色通路",
+    name: "Blue Route",
     difficulty: 1,
     rows: 4,
     cols: 4,
@@ -31,7 +31,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-02",
-    name: "绕开灰区",
+    name: "Around the Gray",
     difficulty: 2,
     rows: 5,
     cols: 5,
@@ -51,7 +51,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-03",
-    name: "横向管道",
+    name: "Horizontal Pipe",
     difficulty: 3,
     rows: 5,
     cols: 6,
@@ -92,7 +92,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-04",
-    name: "竖向管道",
+    name: "Vertical Pipe",
     difficulty: 4,
     rows: 6,
     cols: 5,
@@ -133,7 +133,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-05",
-    name: "第一只弯管",
+    name: "First Bend",
     difficulty: 5,
     rows: 5,
     cols: 5,
@@ -155,7 +155,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-06",
-    name: "组合接口",
+    name: "Mixed Ports",
     difficulty: 6,
     rows: 5,
     cols: 6,
@@ -181,7 +181,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-07",
-    name: "旋转直管",
+    name: "Rotating Straight",
     difficulty: 7,
     rows: 3,
     cols: 5,
@@ -202,7 +202,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-08",
-    name: "旋转弯管",
+    name: "Rotating Bend",
     difficulty: 8,
     rows: 5,
     cols: 5,
@@ -224,7 +224,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-09",
-    name: "三点采集",
+    name: "Three Beacons",
     difficulty: 9,
     rows: 6,
     cols: 6,
@@ -249,7 +249,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-10",
-    name: "折线管廊",
+    name: "Zigzag Corridor",
     difficulty: 10,
     rows: 6,
     cols: 6,
@@ -277,7 +277,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-11",
-    name: "双重旋转",
+    name: "Double Rotation",
     difficulty: 11,
     rows: 6,
     cols: 6,
@@ -307,7 +307,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     id: "level-12",
-    name: "终端矩阵",
+    name: "Terminal Matrix",
     difficulty: 12,
     rows: 6,
     cols: 6,

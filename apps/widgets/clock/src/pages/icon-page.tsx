@@ -1,9 +1,9 @@
-import { WEEK_LABELS } from "../constants";
 import { AnalogClock, ProgressRows, TimeText, WeekStrip, WorldTimes } from "../components/ClockPrimitives";
 import { cn } from "../styles";
-import { dayProgress, formatDate, getTimeInZone, greet, pad, yearProgress } from "../time";
+import { dayProgress, formatCompactDate, formatDate, getTimeInZone, greet, pad, yearProgress } from "../time";
 import { useWeekDays, useWorldTimes } from "../hooks";
 import type { ClockSettings } from "../types";
+import type { WidgetLanguage, WidgetTranslationFn } from "../i18n";
 
 type IconSizeClasses = {
   card: string;
@@ -88,7 +88,7 @@ const ICON_SIZE_CLASSES: Record<string, IconSizeClasses> = {
   },
 };
 
-export function IconPage({ now, settings, sizeId }: { now: Date; settings: ClockSettings; sizeId: string }) {
+export function IconPage({ now, settings, sizeId, language, t }: { now: Date; settings: ClockSettings; sizeId: string; language: WidgetLanguage; t: WidgetTranslationFn }) {
   const displayNow = getTimeInZone(settings.timezone, now);
   const h24 = displayNow.getHours();
   const h = settings.timeFormat === "12h" ? pad(((h24 + 11) % 12) + 1) : pad(h24);
@@ -96,10 +96,10 @@ export function IconPage({ now, settings, sizeId }: { now: Date; settings: Clock
   const s = pad(displayNow.getSeconds());
   const dayPct = dayProgress(displayNow);
   const yearPct = yearProgress(displayNow);
-  const weekDays = useWeekDays(displayNow);
-  const worldTimes = useWorldTimes(now, settings);
-  const compactDate = `${displayNow.getMonth() + 1}月${displayNow.getDate()}日 周${WEEK_LABELS[displayNow.getDay()]}`;
-  const dateText = sizeId === "1x1" || sizeId === "2x1" || sizeId === "2x2" ? compactDate : formatDate(displayNow);
+  const weekDays = useWeekDays(displayNow, language);
+  const worldTimes = useWorldTimes(now, settings, language, t);
+  const compactDate = formatCompactDate(displayNow, language);
+  const dateText = sizeId === "1x1" || sizeId === "2x1" || sizeId === "2x2" ? compactDate : formatDate(displayNow, language);
   const showTextSeconds = settings.showSeconds && (sizeId === "3x2" || sizeId === "4x2");
   const showAnalogSeconds = settings.showSeconds;
   const sizeClasses = ICON_SIZE_CLASSES[sizeId] ?? ICON_SIZE_CLASSES["2x2"];
@@ -122,12 +122,12 @@ export function IconPage({ now, settings, sizeId }: { now: Date; settings: Clock
             showNumbers={sizeClasses.showNumbers}
           />
           <div className={cn("tw:min-w-0", sizeClasses.copy)}>
-            <div className={cn("tw:truncate tw:text-xs tw:font-[750] tw:leading-[1.2] tw:text-[var(--clock-accent)]", sizeClasses.greeting)}>{greet(displayNow.getHours())}</div>
+            <div className={cn("tw:truncate tw:text-xs tw:font-[750] tw:leading-[1.2] tw:text-[var(--clock-accent)]", sizeClasses.greeting)}>{greet(displayNow.getHours(), t)}</div>
             <TimeText h={h} m={m} s={s} showSeconds={showTextSeconds} className={sizeClasses.time} />
             <div className={cn("tw:min-w-0 tw:truncate tw:text-xs tw:font-[650] tw:leading-tight tw:text-[var(--clock-fg-2)]", sizeClasses.date)}>{dateText}</div>
           </div>
         </div>
-        {settings.showProgress && sizeId === "2x2" && <ProgressRows dayPct={dayPct} yearPct={yearPct} compact={sizeClasses.compactProgress} />}
+        {settings.showProgress && sizeId === "2x2" && <ProgressRows dayPct={dayPct} yearPct={yearPct} t={t} compact={sizeClasses.compactProgress} />}
         {sizeId === "3x2" && <WeekStrip days={weekDays} responsiveCompact />}
         {sizeId === "4x2" && <WorldTimes items={worldTimes} dayPct={dayPct} showProgress={settings.showProgress} compact={sizeClasses.compactWorld} />}
       </div>

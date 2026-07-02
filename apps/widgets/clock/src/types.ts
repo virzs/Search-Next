@@ -2,6 +2,8 @@ export type WidgetMode = "icon" | "full" | "settings" | "appIcon";
 export type TimeFormat = "24h" | "12h";
 export type ClockView = "world" | "stopwatch" | "timer";
 
+import type { WidgetLocaleInfo } from "./i18n";
+
 export interface ClockSettings {
   timezone: string;
   timeFormat: TimeFormat;
@@ -36,6 +38,9 @@ export interface WidgetSDK {
   sizeId?: string;
   mode?: WidgetMode;
   theme?: WidgetThemeInfo;
+  locale?: WidgetLocaleInfo;
+  getLocale?: () => WidgetLocaleInfo;
+  onLocaleChange?: (handler: (locale: WidgetLocaleInfo) => void) => (() => void) | void;
   storage?: WidgetStorage;
   events?: WidgetEvents;
   toast?: {

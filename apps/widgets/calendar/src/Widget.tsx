@@ -15,8 +15,11 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
+import { enUS } from "date-fns/locale/en-US";
 import { zhCN } from "date-fns/locale/zh-CN";
 import { cn } from "@/lib/utils";
+import { resources, useWidgetI18n } from "./i18n";
+import type { WidgetLanguage, WidgetTranslationFn } from "./i18n";
 import type {
   CalendarEvent,
   CalendarSettings,
@@ -36,23 +39,18 @@ const SETTINGS_STORAGE_KEYS = ["weekStart", "accentColor", "eventDensity"] as co
 const EVENTS_STORAGE_KEY = "calendarEvents";
 
 const ACCENT_OPTIONS = [
-  { label: "蓝色", value: "#0071e3" },
-  { label: "绿色", value: "#16a34a" },
-  { label: "红色", value: "#dc2626" },
-  { label: "琥珀", value: "#f59e0b" },
-  { label: "紫色", value: "#8b5cf6" },
-  { label: "青色", value: "#06b6d4" },
+  { labelKey: "color.blue", value: "#0071e3" },
+  { labelKey: "color.green", value: "#16a34a" },
+  { labelKey: "color.red", value: "#dc2626" },
+  { labelKey: "color.amber", value: "#f59e0b" },
+  { labelKey: "color.purple", value: "#8b5cf6" },
+  { labelKey: "color.cyan", value: "#06b6d4" },
 ];
 
-const WEEK_LABELS: Record<WeekStart, string[]> = {
-  sun: ["日", "一", "二", "三", "四", "五", "六"],
-  mon: ["一", "二", "三", "四", "五", "六", "日"],
-};
-
-const DENSITY_OPTIONS: Array<{ label: string; value: EventDensity; description: string }> = [
-  { label: "紧凑", value: "compact", description: "只显示时间与标题" },
-  { label: "标准", value: "normal", description: "显示时间、标题" },
-  { label: "详细", value: "detailed", description: "显示地点信息" },
+const DENSITY_OPTIONS: Array<{ labelKey: string; value: EventDensity; descriptionKey: string }> = [
+  { labelKey: "density.compact.label", value: "compact", descriptionKey: "density.compact.desc" },
+  { labelKey: "density.normal.label", value: "normal", descriptionKey: "density.normal.desc" },
+  { labelKey: "density.detailed.label", value: "detailed", descriptionKey: "density.detailed.desc" },
 ];
 
 type NormalizedCalendarEvent = Omit<CalendarEvent, "startsAt" | "endsAt"> & {
@@ -103,14 +101,31 @@ const parseDateValue = (value: unknown) => {
   return null;
 };
 
-const monthLabel = (date: Date) => format(date, "yyyy年 M月", { locale: zhCN });
-const shortMonthLabel = (date: Date) => format(date, "M月", { locale: zhCN });
-const weekdayLabel = (date: Date) => format(date, "EEE", { locale: zhCN });
-const fullDateLabel = (date: Date) => format(date, "M月d日 EEE", { locale: zhCN });
+const dateLocale = (language: WidgetLanguage) => language === "en-US" ? enUS : zhCN;
 
-const formatEventTime = (date: Date, allDay?: boolean) => {
-  if (allDay) return "全天";
-  return format(date, "HH:mm", { locale: zhCN });
+const monthLabel = (date: Date, language: WidgetLanguage) =>
+  format(date, language === "en-US" ? "MMMM yyyy" : "yyyy年 M月", { locale: dateLocale(language) });
+const shortMonthLabel = (date: Date, language: WidgetLanguage) =>
+  format(date, language === "en-US" ? "MMM" : "M月", { locale: dateLocale(language) });
+const weekdayLabel = (date: Date, language: WidgetLanguage) =>
+  format(date, "EEE", { locale: dateLocale(language) });
+const fullDateLabel = (date: Date, language: WidgetLanguage) =>
+  format(date, language === "en-US" ? "EEE, MMM d" : "M月d日 EEE", { locale: dateLocale(language) });
+
+const formatEventTime = (
+  date: Date,
+  allDay: boolean | undefined,
+  language: WidgetLanguage,
+  t: WidgetTranslationFn,
+) => {
+  if (allDay) return t("allDay");
+  return format(date, language === "en-US" ? "h:mm a" : "HH:mm", { locale: dateLocale(language) });
+};
+
+const weekLabels = (weekStart: WeekStart, language: WidgetLanguage) => {
+  const sunday = new Date(2024, 0, 7);
+  const offsets = weekStart === "mon" ? [1, 2, 3, 4, 5, 6, 0] : [0, 1, 2, 3, 4, 5, 6];
+  return offsets.map((offset) => new Intl.DateTimeFormat(language, { weekday: "short" }).format(addDays(sunday, offset)));
 };
 
 const isCalendarEventLike = (value: unknown): value is CalendarEvent => {
@@ -213,7 +228,16 @@ const getThemeVars = (themeId: string, accentColor: string) =>
     "--calendar-shadow": themeId === "dark" ? "0 16px 34px rgba(0,0,0,0.42)" : "0 12px 28px rgba(0,0,0,0.10)",
   }) as CSSProperties;
 
-const useCalendarState = ({ sdk, initialDate, events }: Pick<WidgetProps, "sdk" | "initialDate" | "events">) => {
+const useCalendarState = ({
+  sdk,
+  initialDate,
+  events,
+  language,
+  t,
+}: Pick<WidgetProps, "sdk" | "initialDate" | "events"> & {
+  language: WidgetLanguage;
+  t: WidgetTranslationFn;
+}) => {
   const [now, setNow] = useState(() => parseDateValue(initialDate) || new Date());
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
   const [settings, setSettings] = useState<CalendarSettings>(DEFAULT_SETTINGS);
@@ -269,7 +293,7 @@ const useCalendarState = ({ sdk, initialDate, events }: Pick<WidgetProps, "sdk" 
     try {
       await sdk?.storage?.set(EVENTS_STORAGE_KEY, JSON.stringify(serializeEvents(nextEvents)));
     } catch (error) {
-      sdk?.toast?.error("日程保存失败", error instanceof Error ? error.message : "请稍后重试");
+      sdk?.toast?.error(t("toast.saveEventFailed"), error instanceof Error ? error.message : t("toast.retry"));
     }
   };
 
@@ -278,7 +302,7 @@ const useCalendarState = ({ sdk, initialDate, events }: Pick<WidgetProps, "sdk" 
     try {
       await sdk?.storage?.set(key, String(value));
     } catch (error) {
-      sdk?.toast?.error("保存失败", error instanceof Error ? error.message : "请稍后重试");
+      sdk?.toast?.error(t("toast.saveFailed"), error instanceof Error ? error.message : t("toast.retry"));
     }
   };
 
@@ -296,14 +320,17 @@ const useCalendarState = ({ sdk, initialDate, events }: Pick<WidgetProps, "sdk" 
       allDay: input.allDay,
     };
     await persistEvents([...storedEvents, nextEvent]);
-    sdk?.toast?.success("日程已添加", `${format(startsAt, "M月d日 HH:mm", { locale: zhCN })} ${title}`);
+    sdk?.toast?.success(
+      t("toast.added"),
+      `${format(startsAt, language === "en-US" ? "MMM d h:mm a" : "M月d日 HH:mm", { locale: dateLocale(language) })} ${title}`,
+    );
     return true;
   };
 
   const removeEvent = async (id: string) => {
     const nextEvents = storedEvents.filter((event) => event.id !== id);
     await persistEvents(nextEvents);
-    sdk?.toast?.success("日程已删除");
+    sdk?.toast?.success(t("toast.deleted"));
   };
 
   const propEvents = useMemo(() => normalizeEvents(events, false), [events]);
@@ -335,6 +362,7 @@ const useCalendarState = ({ sdk, initialDate, events }: Pick<WidgetProps, "sdk" 
 };
 
 const Widget = ({ mode = "icon", sdk, initialDate, events }: WidgetProps) => {
+  const { language, t } = useWidgetI18n(sdk, resources);
   const {
     now,
     themeId,
@@ -345,7 +373,7 @@ const Widget = ({ mode = "icon", sdk, initialDate, events }: WidgetProps) => {
     events: normalizedEvents,
     todayEvents,
     upcomingEvents,
-  } = useCalendarState({ sdk, initialDate, events });
+  } = useCalendarState({ sdk, initialDate, events, language, t });
   const isIcon = mode === "icon" || mode === "appIcon";
   const sizeId = sdk?.sizeId || "2x2";
   const themeVars = getThemeVars(themeId === "dark" ? "dark" : "light", settings.accentColor);
@@ -357,9 +385,9 @@ const Widget = ({ mode = "icon", sdk, initialDate, events }: WidgetProps) => {
   return (
     <div className={shellClassName} style={themeVars}>
       {mode === "settings" ? (
-        <SettingsPanel settings={settings} onSave={saveSetting} />
+        <SettingsPanel settings={settings} onSave={saveSetting} t={t} />
       ) : isIcon ? (
-        <IconCalendar date={now} sizeId={sizeId} settings={settings} todayEvents={todayEvents} upcomingEvents={upcomingEvents} />
+        <IconCalendar date={now} sizeId={sizeId} settings={settings} todayEvents={todayEvents} upcomingEvents={upcomingEvents} language={language} t={t} />
       ) : (
         <FullPanel
           date={now}
@@ -367,6 +395,8 @@ const Widget = ({ mode = "icon", sdk, initialDate, events }: WidgetProps) => {
           events={normalizedEvents}
           onAddEvent={addEvent}
           onRemoveEvent={removeEvent}
+          language={language}
+          t={t}
         />
       )}
     </div>
@@ -382,22 +412,26 @@ const IconCalendar = ({
   settings,
   todayEvents,
   upcomingEvents,
+  language,
+  t,
 }: {
   date: Date;
   sizeId: string;
   settings: CalendarSettings;
   todayEvents: NormalizedCalendarEvent[];
   upcomingEvents: NormalizedCalendarEvent[];
+  language: WidgetLanguage;
+  t: WidgetTranslationFn;
 }) => {
   const days = getMonthDays(date, settings.weekStart, upcomingEvents);
   const nextEvent = todayEvents[0] || upcomingEvents[0];
 
   if (sizeId === "1x1") {
     return (
-      <div className={cn(iconFrameClassName, "tw:flex tw:items-center tw:justify-center tw:rounded-[14px] tw:p-1")} aria-label={`${shortMonthLabel(date)}${format(date, "d")}日`}>
+      <div className={cn(iconFrameClassName, "tw:flex tw:items-center tw:justify-center tw:rounded-[14px] tw:p-1")} aria-label={`${shortMonthLabel(date, language)} ${format(date, "d")}`}>
         <div className="tw:text-center">
           <div className="tw:text-[25px] tw:font-[760] tw:leading-none tw:tracking-[0]">{format(date, "d")}</div>
-          <div className="tw:mt-1 tw:text-[9px] tw:font-[720] tw:leading-none tw:text-[var(--calendar-muted)]">{shortMonthLabel(date)}</div>
+          <div className="tw:mt-1 tw:text-[9px] tw:font-[720] tw:leading-none tw:text-[var(--calendar-muted)]">{shortMonthLabel(date, language)}</div>
         </div>
       </div>
     );
@@ -405,15 +439,15 @@ const IconCalendar = ({
 
   if (sizeId === "2x1") {
     return (
-      <div className={cn(iconFrameClassName, "tw:flex tw:items-center tw:rounded-[16px] tw:px-2.5 tw:py-2")} aria-label={`${weekdayLabel(date)} ${format(date, "d")}日`}>
+      <div className={cn(iconFrameClassName, "tw:flex tw:items-center tw:rounded-[16px] tw:px-2.5 tw:py-2")} aria-label={`${weekdayLabel(date, language)} ${format(date, "d")}`}>
         <div className="tw:flex tw:w-[48px] tw:flex-none tw:flex-col tw:items-center tw:justify-center tw:border-r tw:border-[var(--calendar-border)] tw:pr-2">
           <div className="tw:text-[22px] tw:font-[780] tw:leading-none">{format(date, "d")}</div>
-          <div className="tw:mt-0.5 tw:text-[10px] tw:font-[720] tw:text-[var(--calendar-muted)]">{weekdayLabel(date)}</div>
+          <div className="tw:mt-0.5 tw:text-[10px] tw:font-[720] tw:text-[var(--calendar-muted)]">{weekdayLabel(date, language)}</div>
         </div>
         <div className="tw:min-w-0 tw:flex-1 tw:pl-2.5">
-          <div className="tw:truncate tw:text-[11px] tw:font-[760] tw:leading-tight">{nextEvent ? nextEvent.title : "今日无日程"}</div>
+          <div className="tw:truncate tw:text-[11px] tw:font-[760] tw:leading-tight">{nextEvent ? nextEvent.title : t("empty.noTodayEvent")}</div>
           <div className="tw:mt-1 tw:truncate tw:text-[10px] tw:font-[620] tw:leading-tight tw:text-[var(--calendar-muted)]">
-            {nextEvent ? `${formatEventTime(nextEvent.startsAt, nextEvent.allDay)} ${nextEvent.location || ""}` : monthLabel(date)}
+            {nextEvent ? `${formatEventTime(nextEvent.startsAt, nextEvent.allDay, language, t)} ${nextEvent.location || ""}` : monthLabel(date, language)}
           </div>
         </div>
       </div>
@@ -425,25 +459,25 @@ const IconCalendar = ({
     return (
       <div className={cn(iconFrameClassName, "tw:grid tw:rounded-[18px] tw:p-2.5", isWide ? "tw:grid-cols-[164px_minmax(0,1fr)] tw:gap-3" : "tw:grid-cols-[1.08fr_.92fr] tw:gap-2.5")}>
         <div className="tw:min-w-0">
-          <MonthGrid date={date} days={days} weekStart={settings.weekStart} compact={!isWide} />
+          <MonthGrid date={date} days={days} weekStart={settings.weekStart} language={language} compact={!isWide} />
         </div>
-        <AgendaList events={upcomingEvents} density={settings.eventDensity} limit={isWide ? 4 : 3} compact emptyText="暂无日程" />
+        <AgendaList events={upcomingEvents} density={settings.eventDensity} limit={isWide ? 4 : 3} compact emptyText={t("empty.noEvent")} language={language} t={t} />
       </div>
     );
   }
 
   return (
     <div className={cn(iconFrameClassName, "tw:rounded-[18px] tw:p-2.5")}>
-      <MonthGrid date={date} days={days} weekStart={settings.weekStart} compact />
+      <MonthGrid date={date} days={days} weekStart={settings.weekStart} language={language} compact />
     </div>
   );
 };
 
-const MonthGrid = ({ date, days, weekStart, compact = false }: { date: Date; days: CalendarDay[]; weekStart: WeekStart; compact?: boolean }) => (
+const MonthGrid = ({ date, days, weekStart, language, compact = false }: { date: Date; days: CalendarDay[]; weekStart: WeekStart; language: WidgetLanguage; compact?: boolean }) => (
   <div className="tw:flex tw:h-full tw:min-w-0 tw:flex-col">
-    <div className={cn("tw:mb-1.5 tw:text-center tw:font-[760] tw:leading-none", compact ? "tw:text-[11px]" : "tw:text-[13px]")}>{monthLabel(date)}</div>
+    <div className={cn("tw:mb-1.5 tw:text-center tw:font-[760] tw:leading-none", compact ? "tw:text-[11px]" : "tw:text-[13px]")}>{monthLabel(date, language)}</div>
     <div className={cn("tw:grid tw:grid-cols-7 tw:gap-[2px] tw:text-center tw:text-[8px] tw:font-[680] tw:text-[var(--calendar-muted)]", !compact && "tw:text-[9px]")}>
-      {WEEK_LABELS[weekStart].map((label) => (
+      {weekLabels(weekStart, language).map((label) => (
         <span key={label}>{label}</span>
       ))}
     </div>
@@ -470,8 +504,10 @@ const AgendaList = ({
   density,
   limit,
   compact = false,
-  emptyText = "今日无日程",
+  emptyText,
   onDelete,
+  language,
+  t,
 }: {
   events: NormalizedCalendarEvent[];
   density: EventDensity;
@@ -479,21 +515,23 @@ const AgendaList = ({
   compact?: boolean;
   emptyText?: string;
   onDelete?: (id: string) => void;
+  language: WidgetLanguage;
+  t: WidgetTranslationFn;
 }) => {
   const visibleEvents = events.slice(0, limit);
 
   return (
     <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5">
-      <div className={cn("tw:text-[10px] tw:font-[760] tw:leading-none tw:text-[var(--calendar-muted)]", !compact && "tw:text-xs")}>日程</div>
+      <div className={cn("tw:text-[10px] tw:font-[760] tw:leading-none tw:text-[var(--calendar-muted)]", !compact && "tw:text-xs")}>{t("view.agenda")}</div>
       {visibleEvents.length ? (
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-1.5">
           {visibleEvents.map((event) => (
-            <EventRow event={event} density={density} compact={compact} key={event.id} onDelete={onDelete} />
+            <EventRow event={event} density={density} compact={compact} key={event.id} onDelete={onDelete} language={language} t={t} />
           ))}
         </div>
       ) : (
         <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-[10px] tw:border tw:border-dashed tw:border-[var(--calendar-border)] tw:px-2 tw:text-center tw:text-[11px] tw:font-[650] tw:leading-tight tw:text-[var(--calendar-muted)]">
-          {emptyText}
+          {emptyText ?? t("empty.noTodayEvent")}
         </div>
       )}
     </div>
@@ -505,16 +543,20 @@ const EventRow = ({
   density,
   compact = false,
   onDelete,
+  language,
+  t,
 }: {
   event: NormalizedCalendarEvent;
   density: EventDensity;
   compact?: boolean;
   onDelete?: (id: string) => void;
+  language: WidgetLanguage;
+  t: WidgetTranslationFn;
 }) => (
   <div className={cn("tw:min-w-0 tw:rounded-[9px] tw:bg-[var(--calendar-bg)] tw:px-2 tw:py-1.5 tw:shadow-[inset_0_0_0_1px_var(--calendar-border-soft)]", compact && "tw:px-1.5 tw:py-1")}>
     <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
       <i className="tw:h-1.5 tw:w-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--calendar-accent)]" />
-      <time className={cn("tw:flex-none tw:text-[10px] tw:font-[760] tw:text-[var(--calendar-accent)]", compact && "tw:text-[9px]")}>{formatEventTime(event.startsAt, event.allDay)}</time>
+      <time className={cn("tw:flex-none tw:text-[10px] tw:font-[760] tw:text-[var(--calendar-accent)]", compact && "tw:text-[9px]")}>{formatEventTime(event.startsAt, event.allDay, language, t)}</time>
       <span className={cn("tw:min-w-0 tw:flex-1 tw:truncate tw:text-[11px] tw:font-[720] tw:leading-tight", compact && "tw:text-[10px]")}>{event.title}</span>
       {onDelete && event.local && !compact && (
         <button
@@ -522,7 +564,7 @@ const EventRow = ({
           onClick={() => onDelete(event.id)}
           type="button"
         >
-          删除
+          {t("action.delete")}
         </button>
       )}
     </div>
@@ -536,12 +578,16 @@ const FullPanel = ({
   events,
   onAddEvent,
   onRemoveEvent,
+  language,
+  t,
 }: {
   date: Date;
   settings: CalendarSettings;
   events: NormalizedCalendarEvent[];
   onAddEvent: (input: AddEventInput) => Promise<boolean>;
   onRemoveEvent: (id: string) => Promise<void>;
+  language: WidgetLanguage;
+  t: WidgetTranslationFn;
 }) => {
   const [selectedDate, setSelectedDate] = useState(() => startOfDay(date));
   const [title, setTitle] = useState("");
@@ -564,17 +610,17 @@ const FullPanel = ({
     <div className="tw:flex tw:h-full tw:w-full tw:flex-col tw:overflow-hidden tw:bg-[var(--calendar-card)] tw:p-5 tw:[@container(max-width:680px)]:p-3 tw:[@container(max-width:500px)]:p-2.5">
       <header className="tw:flex tw:flex-none tw:items-center tw:justify-between tw:gap-4 tw:border-b tw:border-[var(--calendar-border-soft)] tw:pb-4 tw:[@container(max-width:680px)]:gap-2 tw:[@container(max-width:680px)]:pb-2">
         <div className="tw:min-w-0">
-          <h1 className="tw:m-0 tw:text-[32px] tw:font-[720] tw:leading-none tw:tracking-[0] tw:[@container(max-width:680px)]:text-[26px] tw:[@container(max-width:500px)]:text-[23px]">{monthLabel(date)}</h1>
-          <p className="tw:m-0 tw:mt-1 tw:text-sm tw:font-[650] tw:text-[var(--calendar-muted)] tw:[@container(max-width:680px)]:text-xs">{fullDateLabel(selectedDate)}</p>
+          <h1 className="tw:m-0 tw:text-[32px] tw:font-[720] tw:leading-none tw:tracking-[0] tw:[@container(max-width:680px)]:text-[26px] tw:[@container(max-width:500px)]:text-[23px]">{monthLabel(date, language)}</h1>
+          <p className="tw:m-0 tw:mt-1 tw:text-sm tw:font-[650] tw:text-[var(--calendar-muted)] tw:[@container(max-width:680px)]:text-xs">{fullDateLabel(selectedDate, language)}</p>
         </div>
         <button className="tw:inline-flex tw:h-9 tw:cursor-pointer tw:items-center tw:rounded-full tw:border-0 tw:bg-[var(--calendar-accent)] tw:px-4 tw:text-sm tw:font-[760] tw:text-white tw:[@container(max-width:680px)]:h-8 tw:[@container(max-width:680px)]:px-3 tw:[@container(max-width:680px)]:text-xs" onClick={() => setSelectedDate(startOfDay(date))} type="button">
-          今天
+          {t("action.today")}
         </button>
       </header>
       <main className="tw:grid tw:min-h-0 tw:flex-1 tw:grid-cols-[minmax(0,1fr)_280px] tw:gap-5 tw:overflow-hidden tw:pt-5 tw:[@container(max-width:680px)]:grid-cols-[minmax(0,1fr)_190px] tw:[@container(max-width:680px)]:gap-3 tw:[@container(max-width:680px)]:pt-2 tw:[@container(max-width:500px)]:grid-cols-1 tw:[@container(max-width:500px)]:overflow-auto">
         <section className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-col tw:[@container(max-width:500px)]:min-h-[260px]">
           <div className="tw:grid tw:grid-cols-7 tw:gap-1.5 tw:[@container(max-width:680px)]:gap-1">
-            {WEEK_LABELS[settings.weekStart].map((label) => (
+            {weekLabels(settings.weekStart, language).map((label) => (
               <div className="tw:py-2 tw:text-center tw:text-xs tw:font-[760] tw:text-[var(--calendar-muted)] tw:[@container(max-width:680px)]:py-1" key={label}>{label}</div>
             ))}
           </div>
@@ -599,21 +645,23 @@ const FullPanel = ({
           </div>
         </section>
         <aside className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-col tw:overflow-hidden tw:border-l tw:border-[var(--calendar-border-soft)] tw:pl-5 tw:[@container(max-width:680px)]:pl-3 tw:[@container(max-width:500px)]:border-l-0 tw:[@container(max-width:500px)]:border-t tw:[@container(max-width:500px)]:pl-0 tw:[@container(max-width:500px)]:pt-3">
-          <div className="tw:mb-3 tw:text-sm tw:font-[760] tw:text-[var(--calendar-muted)] tw:[@container(max-width:680px)]:mb-1.5 tw:[@container(max-width:680px)]:text-xs">{fullDateLabel(selectedDate)}</div>
+          <div className="tw:mb-3 tw:text-sm tw:font-[760] tw:text-[var(--calendar-muted)] tw:[@container(max-width:680px)]:mb-1.5 tw:[@container(max-width:680px)]:text-xs">{fullDateLabel(selectedDate, language)}</div>
           <div className="tw:min-h-0 tw:flex-1">
             <AgendaList
               events={selectedEvents}
               density={settings.eventDensity}
               limit={4}
-              emptyText="这天没有日程"
+              emptyText={t("empty.noDayEvent")}
               onDelete={(id) => void onRemoveEvent(id)}
+              language={language}
+              t={t}
             />
           </div>
           <form className="tw:mt-4 tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:rounded-[14px] tw:bg-[var(--calendar-bg)] tw:p-3 tw:shadow-[inset_0_0_0_1px_var(--calendar-border-soft)] tw:[@container(max-width:680px)]:mt-2 tw:[@container(max-width:680px)]:gap-1 tw:[@container(max-width:680px)]:rounded-[12px] tw:[@container(max-width:680px)]:p-1.5" onSubmit={submitEvent}>
             <input
               className="tw:h-9 tw:min-w-0 tw:rounded-[10px] tw:border tw:border-[var(--calendar-border-soft)] tw:bg-[var(--calendar-card)] tw:px-3 tw:text-sm tw:font-[650] tw:text-[var(--calendar-fg)] tw:outline-none tw:focus:border-[var(--calendar-accent)] tw:[@container(max-width:680px)]:h-7 tw:[@container(max-width:680px)]:px-2 tw:[@container(max-width:680px)]:text-xs"
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="添加日程"
+              placeholder={t("field.title")}
               value={title}
             />
             <div className="tw:grid tw:grid-cols-[1fr_auto] tw:gap-2">
@@ -626,17 +674,17 @@ const FullPanel = ({
               />
               <label className="tw:flex tw:h-9 tw:items-center tw:gap-1.5 tw:rounded-[10px] tw:bg-[var(--calendar-card)] tw:px-2 tw:text-xs tw:font-[720] tw:text-[var(--calendar-muted)] tw:[@container(max-width:680px)]:h-7">
                 <input checked={allDay} onChange={(event) => setAllDay(event.target.checked)} type="checkbox" />
-                全天
+                {t("allDay")}
               </label>
             </div>
             <input
               className="tw:h-9 tw:min-w-0 tw:rounded-[10px] tw:border tw:border-[var(--calendar-border-soft)] tw:bg-[var(--calendar-card)] tw:px-3 tw:text-sm tw:font-[650] tw:text-[var(--calendar-fg)] tw:outline-none tw:focus:border-[var(--calendar-accent)] tw:[@container(max-width:680px)]:h-7 tw:[@container(max-width:680px)]:px-2 tw:[@container(max-width:680px)]:text-xs"
               onChange={(event) => setLocation(event.target.value)}
-              placeholder="地点，可选"
+              placeholder={t("field.location")}
               value={location}
             />
             <button className="tw:h-9 tw:cursor-pointer tw:rounded-[10px] tw:border-0 tw:bg-[var(--calendar-accent)] tw:text-sm tw:font-[780] tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-45 tw:[@container(max-width:680px)]:h-7 tw:[@container(max-width:680px)]:text-xs" disabled={!title.trim()} type="submit">
-              添加
+              {t("action.add")}
             </button>
           </form>
         </aside>
@@ -648,32 +696,34 @@ const FullPanel = ({
 const SettingsPanel = ({
   settings,
   onSave,
+  t,
 }: {
   settings: CalendarSettings;
   onSave: <K extends keyof CalendarSettings>(key: K, value: CalendarSettings[K]) => Promise<void>;
+  t: WidgetTranslationFn;
 }) => (
   <div className="tw:h-full tw:w-full tw:overflow-auto tw:bg-[var(--calendar-card)] tw:p-5">
     <header className="tw:mb-5 tw:border-b tw:border-[var(--calendar-border-soft)] tw:pb-4">
-      <h1 className="tw:m-0 tw:text-[30px] tw:font-[720] tw:leading-none">日历设置</h1>
-      <p className="tw:m-0 tw:mt-2 tw:text-sm tw:font-[650] tw:text-[var(--calendar-muted)]">小组件显示偏好会自动保存</p>
+      <h1 className="tw:m-0 tw:text-[30px] tw:font-[720] tw:leading-none">{t("settings.title")}</h1>
+      <p className="tw:m-0 tw:mt-2 tw:text-sm tw:font-[650] tw:text-[var(--calendar-muted)]">{t("settings.subtitle")}</p>
     </header>
     <div className="tw:flex tw:flex-col tw:gap-4">
-      <SettingsGroup title="周起始日">
+      <SettingsGroup title={t("settings.weekStart")}>
         <SegmentedControl
           value={settings.weekStart}
           options={[
-            { label: "周日", value: "sun" },
-            { label: "周一", value: "mon" },
+            { label: t("week.sun"), value: "sun" },
+            { label: t("week.mon"), value: "mon" },
           ]}
           onChange={(value) => onSave("weekStart", value)}
         />
       </SettingsGroup>
 
-      <SettingsGroup title="强调色">
-        <div className="tw:flex tw:flex-wrap tw:gap-3" role="group" aria-label="强调色">
+      <SettingsGroup title={t("settings.accent")}>
+        <div className="tw:flex tw:flex-wrap tw:gap-3" role="group" aria-label={t("settings.accentAria")}>
           {ACCENT_OPTIONS.map((option) => (
             <button
-              aria-label={option.label}
+              aria-label={t(option.labelKey)}
               className={cn(
                 "tw:h-8 tw:w-8 tw:cursor-pointer tw:rounded-full tw:border-2 tw:border-transparent tw:outline-none tw:ring-offset-2 tw:ring-offset-[var(--calendar-card)] tw:transition tw:focus-visible:ring-2 tw:focus-visible:ring-[var(--calendar-accent)]",
                 option.value === settings.accentColor && "tw:border-[var(--calendar-fg)] tw:shadow-[0_0_0_2px_var(--calendar-card),0_0_0_4px_var(--calendar-fg)]",
@@ -687,7 +737,7 @@ const SettingsPanel = ({
         </div>
       </SettingsGroup>
 
-      <SettingsGroup title="事件密度">
+      <SettingsGroup title={t("settings.density")}>
         <div className="tw:flex tw:flex-col">
           {DENSITY_OPTIONS.map((option) => (
             <button
@@ -697,8 +747,8 @@ const SettingsPanel = ({
               type="button"
             >
               <span className="tw:min-w-0">
-                <span className="tw:block tw:text-[16px] tw:font-[720] tw:text-[var(--calendar-fg)]">{option.label}</span>
-                <span className="tw:mt-0.5 tw:block tw:text-xs tw:font-[600] tw:text-[var(--calendar-muted)]">{option.description}</span>
+                <span className="tw:block tw:text-[16px] tw:font-[720] tw:text-[var(--calendar-fg)]">{t(option.labelKey)}</span>
+                <span className="tw:mt-0.5 tw:block tw:text-xs tw:font-[600] tw:text-[var(--calendar-muted)]">{t(option.descriptionKey)}</span>
               </span>
               <span className={cn("tw:h-5 tw:w-5 tw:flex-none tw:rounded-full tw:border-2 tw:border-[var(--calendar-border)]", settings.eventDensity === option.value && "tw:border-[var(--calendar-accent)] tw:bg-[var(--calendar-accent)] tw:shadow-[inset_0_0_0_4px_var(--calendar-bg)]")} />
             </button>

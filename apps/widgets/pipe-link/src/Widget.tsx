@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BoardCanvas } from "./game/BoardCanvas";
 import { LEVELS, getLevelById, getNextLevel } from "./game/levels";
+import { resources, useWidgetI18n } from "./i18n";
+import type { WidgetTranslationFn } from "./i18n";
 import {
   applyMove,
   createGameState,
@@ -53,7 +55,7 @@ interface EditorDraft {
 }
 
 const DEFAULT_EDITOR_DRAFT: EditorDraft = {
-  name: "自定义关卡",
+  name: "custom-level",
   start: { row: 0, col: 0 },
   finish: { row: 5, col: 5 },
   targets: [{ row: 2, col: 2 }],
@@ -61,6 +63,8 @@ const DEFAULT_EDITOR_DRAFT: EditorDraft = {
   rotators: [],
   pipes: [],
 };
+
+const LEGACY_DEFAULT_EDITOR_NAME = "\u81ea\u5b9a\u4e49\u5173\u5361";
 
 const EDITOR_PIPE_TOOLS: Record<string, PipeShape> = {
   "pipe-horizontal": "horizontal",
@@ -71,19 +75,19 @@ const EDITOR_PIPE_TOOLS: Record<string, PipeShape> = {
   "pipe-curve-lu": "curve-lu",
 };
 
-const EDITOR_TOOLS: Array<{ id: EditorTool; label: string; mark: string }> = [
-  { id: "normal", label: "普通", mark: "·" },
-  { id: "start", label: "起点", mark: "S" },
-  { id: "finish", label: "终点", mark: "E" },
-  { id: "target", label: "目标", mark: "◆" },
-  { id: "block", label: "错误", mark: "X" },
-  { id: "rotate", label: "旋转", mark: "↻" },
-  { id: "pipe-horizontal", label: "横管", mark: "─" },
-  { id: "pipe-vertical", label: "竖管", mark: "│" },
-  { id: "pipe-curve-ur", label: "上右", mark: "└" },
-  { id: "pipe-curve-rd", label: "右下", mark: "┌" },
-  { id: "pipe-curve-dl", label: "下左", mark: "┐" },
-  { id: "pipe-curve-lu", label: "左上", mark: "┘" },
+const EDITOR_TOOLS: Array<{ id: EditorTool; labelKey: string; mark: string }> = [
+  { id: "normal", labelKey: "tool.normal", mark: "·" },
+  { id: "start", labelKey: "tool.start", mark: "S" },
+  { id: "finish", labelKey: "tool.finish", mark: "E" },
+  { id: "target", labelKey: "tool.target", mark: "◆" },
+  { id: "block", labelKey: "tool.block", mark: "X" },
+  { id: "rotate", labelKey: "tool.rotate", mark: "↻" },
+  { id: "pipe-horizontal", labelKey: "tool.pipeH", mark: "─" },
+  { id: "pipe-vertical", labelKey: "tool.pipeV", mark: "│" },
+  { id: "pipe-curve-ur", labelKey: "tool.curveUr", mark: "└" },
+  { id: "pipe-curve-rd", labelKey: "tool.curveRd", mark: "┌" },
+  { id: "pipe-curve-dl", labelKey: "tool.curveDl", mark: "┐" },
+  { id: "pipe-curve-lu", labelKey: "tool.curveLu", mark: "┘" },
 ];
 
 const createDefaultProgress = (): ProgressState => ({
@@ -129,6 +133,13 @@ const dedupePoints = (value: unknown, blockedKeys = new Set<string>()) => {
     seen.add(key);
     return true;
   });
+};
+
+const normalizeEditorName = (value: unknown) => {
+  if (typeof value !== "string") return DEFAULT_EDITOR_DRAFT.name;
+  const name = value.trim();
+  if (!name || name === LEGACY_DEFAULT_EDITOR_NAME) return DEFAULT_EDITOR_DRAFT.name;
+  return name;
 };
 
 const parseEditorDraft = (value: unknown): EditorDraft => {
@@ -180,7 +191,7 @@ const parseEditorDraft = (value: unknown): EditorDraft => {
     : [];
 
   return {
-    name: typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : DEFAULT_EDITOR_DRAFT.name,
+    name: normalizeEditorName(raw.name),
     start,
     finish,
     targets,
@@ -294,14 +305,23 @@ const getUnlockedLevelIds = (progress: ProgressState) => {
 const getLevelNumber = (level: LevelConfig) =>
   LEVELS.findIndex((item) => item.id === level.id) >= 0
     ? String(LEVELS.findIndex((item) => item.id === level.id) + 1).padStart(2, "0")
-    : "自定义";
+    : "custom";
+
+const getLevelName = (level: LevelConfig, t: WidgetTranslationFn) => {
+  const index = LEVELS.findIndex((item) => item.id === level.id);
+  if (index >= 0) return t(`level.name.${String(index + 1).padStart(2, "0")}`);
+  return level.name === DEFAULT_EDITOR_DRAFT.name ? t("editor.defaultName") : level.name;
+};
+
+const stepText = (steps: number, t: WidgetTranslationFn) =>
+  t("game.step", { steps });
 
 const isBuiltInLevel = (levelId: string) =>
   LEVELS.some((item) => item.id === levelId);
 
 const createEditorLevel = (draft: EditorDraft): LevelConfig => ({
   id: "custom-editor",
-  name: draft.name.trim() || "自定义关卡",
+  name: draft.name.trim() || DEFAULT_EDITOR_DRAFT.name,
   difficulty: 0,
   rows: EDITOR_SIZE,
   cols: EDITOR_SIZE,
@@ -336,7 +356,9 @@ const clearEditorPoint = (draft: EditorDraft, point: Point): EditorDraft => {
   };
 };
 
-const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) => {
+const PipeLink = ({ mode = "icon", title, sdk }: WidgetProps) => {
+  const { t } = useWidgetI18n(sdk, resources);
+  const displayTitle = title || t("title");
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
   const [settings, setSettings] = useState<PipeLinkSettings>(DEFAULT_SETTINGS);
   const [progress, setProgress] = useState<ProgressState>(() => createDefaultProgress());
@@ -509,7 +531,7 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
 
   const playEditorLevel = useCallback(() => {
     if (sameEditorPoint(editorDraft.start, editorDraft.finish)) {
-      setEditorMessage("起点和终点不能在同一格");
+      setEditorMessage(t("editor.samePoint"));
       return;
     }
     const nextLevel = createEditorLevel(editorDraft);
@@ -517,30 +539,30 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
     setGameState(createGameState(nextLevel));
     setDialogView(null);
     setActiveView("game");
-  }, [editorDraft]);
+  }, [editorDraft, t]);
 
   const exportCurrentEditorLevel = useCallback(() => {
     setEditorTransfer(exportEditorDraft(editorDraft));
     setEditorTransferOpen(true);
-    setEditorMessage("配置已生成，可复制分享");
-  }, [editorDraft]);
+    setEditorMessage(t("editor.transfer.ready"));
+  }, [editorDraft, t]);
 
   const importEditorLevel = useCallback(() => {
     if (!editorTransferOpen) {
       setEditorTransferOpen(true);
-      setEditorMessage("粘贴关卡 JSON 后再次点击导入");
+      setEditorMessage(t("editor.import.ready"));
       return;
     }
     const parsed = safeParseJson(editorTransfer);
     if (!parsed) {
-      setEditorMessage("导入失败：配置不是有效 JSON");
+      setEditorMessage(t("editor.import.fail"));
       return;
     }
     const nextDraft = parseEditorDraft(parsed);
     persistEditorDraft(nextDraft);
     setEditorTransfer(exportEditorDraft(nextDraft));
-    setEditorMessage("导入成功，可以继续编辑或试玩");
-  }, [editorTransfer, persistEditorDraft]);
+    setEditorMessage(t("editor.import.success"));
+  }, [editorTransfer, persistEditorDraft, t]);
 
   const selectLevel = useCallback(
     (nextLevel: LevelConfig, nextView: PipeLinkView = "game") => {
@@ -578,7 +600,7 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
   const recordCompletion = useCallback(
     (completedState: GameState) => {
       if (!isBuiltInLevel(level.id)) {
-        sdk?.toast?.success("试玩通过", `${level.name} 用了 ${completedState.steps} 步`);
+        sdk?.toast?.success(t("game.toastTrial"), `${getLevelName(level, t)} · ${stepText(completedState.steps, t)}`);
         return;
       }
       const previousBest = progress.bestSteps[level.id];
@@ -596,9 +618,9 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
         activeLevelId: level.id,
       };
       persistProgress(nextProgress);
-      sdk?.toast?.success("关卡完成", `${level.name} 用了 ${completedState.steps} 步`);
+      sdk?.toast?.success(t("game.toastDone"), `${getLevelName(level, t)} · ${stepText(completedState.steps, t)}`);
     },
-    [level.id, level.name, persistProgress, progress, sdk],
+    [level, persistProgress, progress, sdk, t],
   );
 
   const move = useCallback(
@@ -611,14 +633,14 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
             setDialogView("complete");
           } else {
             setDialogView(null);
-            setEditorMessage(`试玩通过：${result.state.steps} 步`);
+            setEditorMessage(t("editor.play.success", { steps: result.state.steps }));
             setActiveView("editor");
           }
         }
         return result.state;
       });
     },
-    [level, recordCompletion],
+    [level, recordCompletion, t],
   );
 
   const nextLevel = useCallback(() => {
@@ -633,8 +655,8 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
     setGameState(createGameState(firstLevel));
     setDialogView(null);
     setActiveView("home");
-    sdk?.toast?.success("进度已清除");
-  }, [persistProgress, sdk]);
+    sdk?.toast?.success(t("action.clear"));
+  }, [persistProgress, sdk, t]);
 
   const isIcon = mode === "icon" || mode === "appIcon";
   const isAppIcon = mode === "appIcon";
@@ -660,6 +682,8 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
             animation={settings.animation}
             interactive={false}
             compact
+            label={getLevelName(level, t)}
+            t={t}
           />
           <div className="pipe-link-icon__badge">
             <span>{completedCount}</span>
@@ -667,8 +691,8 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
           </div>
           {!isAppIcon && !isTinyIcon && (
             <div className="pipe-link-icon__meta">
-              <strong>{title}</strong>
-              <span>第 {getLevelNumber(level)} 关</span>
+              <strong>{displayTitle}</strong>
+              <span>{t("game.level", { level: getLevelNumber(level) })}</span>
             </div>
           )}
         </div>
@@ -682,15 +706,15 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
         <div className="pipe-link-settings">
           <header className="pipe-link-panel-header">
             <div>
-              <p>设置</p>
-              <h1>{title}</h1>
+              <p>{t("settings.title")}</p>
+              <h1>{displayTitle}</h1>
             </div>
             <span>{completedCount}/{LEVELS.length}</span>
           </header>
 
           <section className="pipe-link-settings__group">
             <label className="pipe-link-field">
-              <span>动画强度</span>
+                <span>{t("settings.animation.title")}</span>
               <select
                 value={settings.animation}
                 onChange={(event) =>
@@ -700,13 +724,13 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                   })
                 }
               >
-                <option value="low">低</option>
-                <option value="normal">标准</option>
-                <option value="high">高</option>
+                <option value="low">{t("animation.low")}</option>
+                <option value="normal">{t("animation.normal")}</option>
+                <option value="high">{t("animation.high")}</option>
               </select>
             </label>
             <label className="pipe-link-toggle">
-              <span>显示键盘提示</span>
+              <span>{t("settings.hints.title")}</span>
               <input
                 type="checkbox"
                 checked={settings.showHints}
@@ -719,7 +743,7 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
               />
             </label>
             {settings.showHints && (
-              <div className="pipe-link-key-hints" aria-label="按键提示">
+              <div className="pipe-link-key-hints" aria-label={t("aria.keyHints")}>
                 <span>W / ↑</span>
                 <span>A / ←</span>
                 <span>S / ↓</span>
@@ -732,13 +756,13 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
             <div className="pipe-link-progress-list">
               {LEVELS.map((item) => (
                 <div key={item.id} className="pipe-link-progress-row">
-                  <span>{getLevelNumber(item)} {item.name}</span>
+                  <span>{getLevelNumber(item)} {getLevelName(item, t)}</span>
                   <strong>
                     {progress.bestSteps[item.id]
-                      ? `${progress.bestSteps[item.id]} 步`
+                      ? stepText(progress.bestSteps[item.id], t)
                       : progress.completedLevelIds.includes(item.id)
-                        ? "已完成"
-                        : "未完成"}
+                        ? t("level.done")
+                        : t("level.notDone")}
                   </strong>
                 </div>
               ))}
@@ -746,7 +770,7 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
           </section>
 
           <Button type="button" variant="secondary" onClick={clearProgress}>
-            清除通关记录
+            {t("action.clearRecord")}
           </Button>
         </div>
       </div>
@@ -780,27 +804,27 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
             </div>
             <div className="pipe-link-title-screen">
               <div className="pipe-link-title-copy">
-                <h1 className="pipe-link-art-title" data-text={title}>
-                  {title}
+                <h1 className="pipe-link-art-title" data-text={displayTitle}>
+                  {displayTitle}
                 </h1>
-                <span>接入所有信标，避开故障节点，重构通往终端的唯一线路。</span>
+                <span>{t("subtitle")}</span>
               </div>
 
-              <div className="pipe-link-title-menu" aria-label="主菜单">
+              <div className="pipe-link-title-menu" aria-label={t("aria.mainMenu")}>
                 <button type="button" className="pipe-link-title-button pipe-link-title-button--primary" onClick={continueGame}>
-                  开始游戏
+                  {t("menu.start")}
                 </button>
                 <button type="button" className="pipe-link-title-button" onClick={startNewGame}>
-                  新游戏
+                  {t("menu.new")}
                 </button>
                 <button type="button" className="pipe-link-title-button" onClick={() => setActiveView("levels")}>
-                  选择关卡
+                  {t("menu.levels")}
                 </button>
                 <button type="button" className="pipe-link-title-button" onClick={() => setActiveView("editor")}>
-                  关卡编辑器
+                  {t("menu.editor")}
                 </button>
                 <button type="button" className="pipe-link-title-button" onClick={() => setActiveView("settings")}>
-                  设置
+                  {t("action.settings")}
                 </button>
               </div>
             </div>
@@ -813,8 +837,8 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                   <div className="pipe-link-view-title">
                     <div>
                       <h2 className="pipe-link-level-heading">
-                        <span>{isBuiltInLevel(level.id) ? `第 ${activeLevelNumber} 关` : "自定义关卡"}</span>
-                        {level.name}
+                        <span>{isBuiltInLevel(level.id) ? t("game.level", { level: activeLevelNumber }) : t("game.custom")}</span>
+                        {getLevelName(level, t)}
                       </h2>
                     </div>
                   </div>
@@ -827,22 +851,30 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                     animation={settings.animation}
                     interactive={dialogView === null}
                     onMove={move}
+                    label={getLevelName(level, t)}
+                    t={t}
                   />
                 </div>
+
+                {gameState.message && (
+                  <p className="pipe-link-game-message" role="status">
+                    {t(gameState.message)}
+                  </p>
+                )}
 
                 {dialogView && (
                   <div className="pipe-link-dialog-layer" role="dialog" aria-modal="true">
                     {dialogView === "pause" ? (
                       <section className="pipe-link-dialog">
-                        <p>暂停菜单</p>
-                        <h3>暂停</h3>
-                        <span>当前进度已保留</span>
+                        <p>{t("dialog.pause")}</p>
+                        <h3>{t("dialog.pause")}</h3>
+                        <span>{t("dialog.pauseHint")}</span>
                         <div className="pipe-link-dialog-actions">
                           <Button type="button" onClick={() => setDialogView(null)}>
-                            继续游戏
+                            {t("action.continue")}
                           </Button>
                           <Button type="button" variant="secondary" onClick={restart}>
-                            重新开始
+                            {t("action.restart")}
                           </Button>
                           <Button
                             type="button"
@@ -852,7 +884,7 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                               setActiveView("settings");
                             }}
                           >
-                            设置
+                            {t("action.settings")}
                           </Button>
                           <Button
                             type="button"
@@ -862,15 +894,15 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                               setActiveView("home");
                             }}
                           >
-                            返回主菜单
+                            {t("action.backHome")}
                           </Button>
                         </div>
                       </section>
                     ) : (
                       <section className="pipe-link-dialog">
-                        <p>{isBuiltInLevel(level.id) ? `第 ${activeLevelNumber} 关` : "自定义关卡"}</p>
-                        <h3>通关完成</h3>
-                        <span>{level.name} · {gameState.steps} 步</span>
+                        <p>{isBuiltInLevel(level.id) ? t("game.level", { level: activeLevelNumber }) : t("game.custom")}</p>
+                        <h3>{t("dialog.complete")}</h3>
+                        <span>{getLevelName(level, t)} · {stepText(gameState.steps, t)}</span>
                         <div className="pipe-link-dialog-actions pipe-link-dialog-actions--complete">
                           <Button
                             type="button"
@@ -880,13 +912,13 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                               setActiveView("home");
                             }}
                           >
-                            主菜单
+                            {t("action.menu")}
                           </Button>
                           <Button type="button" onClick={nextLevel}>
-                            下一关
+                            {t("action.next")}
                           </Button>
                           <Button type="button" variant="secondary" onClick={restart}>
-                            重玩
+                            {t("action.replay")}
                           </Button>
                         </div>
                       </section>
@@ -901,14 +933,14 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                 <header className="pipe-link-view-header">
                   <div className="pipe-link-view-title">
                     <div>
-                      <p>内置关卡</p>
-                      <h2>选择关卡</h2>
+                      <p>{t("level.builtIn")}</p>
+                      <h2>{t("level.select")}</h2>
                     </div>
                   </div>
-                  <span>{progressLabel} 已完成</span>
+                  <span>{t("level.summaryDone", { progress: progressLabel })}</span>
                 </header>
 
-                <div className="pipe-link-level-grid" aria-label="选择关卡">
+                <div className="pipe-link-level-grid" aria-label={t("level.select")}>
                   {LEVELS.map((item) => {
                     const unlocked = unlockedLevelIds.has(item.id);
                     const completed = progress.completedLevelIds.includes(item.id);
@@ -925,15 +957,15 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                         onClick={() => selectLevel(item)}
                       >
                         <span>{getLevelNumber(item)}</span>
-                        <strong>{item.name}</strong>
+                        <strong>{getLevelName(item, t)}</strong>
                         <small>
                           {completed
                             ? progress.bestSteps[item.id]
-                              ? `${progress.bestSteps[item.id]} 步`
-                              : "已通关"
+                              ? stepText(progress.bestSteps[item.id], t)
+                              : t("level.completed")
                             : unlocked
-                              ? `难度 ${item.difficulty}`
-                              : "锁定"}
+                              ? t("level.difficulty", { count: item.difficulty })
+                              : t("level.locked")}
                         </small>
                       </button>
                     );
@@ -947,35 +979,37 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                 <header className="pipe-link-view-header">
                   <div className="pipe-link-view-title">
                     <div>
-                      <p>自定义关卡</p>
-                      <h2>关卡编辑器</h2>
+                      <p>{t("editor.type")}</p>
+                      <h2>{t("editor.title")}</h2>
                     </div>
                   </div>
                 </header>
 
                 <section className="tw:grid tw:min-h-0 tw:grid-cols-[minmax(0,1fr)_minmax(210px,34%)] tw:gap-2 tw:overflow-hidden max-[760px]:tw:grid-cols-1 max-[760px]:tw:overflow-auto">
-                  <div className="pipe-link-board-shell tw:cursor-crosshair" aria-label="编辑关卡棋盘">
+                  <div className="pipe-link-board-shell tw:cursor-crosshair" aria-label={t("aria.editorBoard")}>
                     <BoardCanvas
                       level={editorLevel}
                       state={editorPreviewState}
                       animation={settings.animation}
                       interactive={false}
+                      label={getLevelName(editorLevel, t)}
                       onCellClick={applyEditorTool}
+                      t={t}
                     />
                   </div>
 
                   <aside className="tw:grid tw:min-h-0 tw:min-w-0 tw:content-start tw:gap-1.5 tw:overflow-auto tw:pr-0.5 max-[760px]:tw:overflow-visible">
                     <label className="tw:grid tw:gap-1 tw:text-[13px] tw:font-black tw:text-[var(--pipe-fg)]">
-                      <span>关卡名</span>
+                      <span>{t("editor.name")}</span>
                       <input
                         className="tw:h-8 tw:w-full tw:min-w-0 tw:rounded-lg tw:border tw:border-[var(--pipe-border)] tw:bg-[var(--pipe-panel-strong)] tw:px-2.5 tw:text-[var(--pipe-fg)] tw:outline-none"
-                        value={editorDraft.name}
+                        value={editorDraft.name === DEFAULT_EDITOR_DRAFT.name ? t("editor.defaultName") : editorDraft.name}
                         maxLength={18}
                         onChange={(event) => updateEditorName(event.target.value)}
                       />
                     </label>
 
-                    <div className="tw:grid tw:grid-cols-4 tw:gap-1.5 max-[520px]:tw:grid-cols-3" aria-label="编辑工具">
+                    <div className="tw:grid tw:grid-cols-4 tw:gap-1.5 max-[520px]:tw:grid-cols-3" aria-label={t("aria.tools")}>
                       {EDITOR_TOOLS.map((tool) => (
                         <button
                           key={tool.id}
@@ -987,20 +1021,20 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                           onClick={() => setEditorTool(tool.id)}
                         >
                           <strong className="tw:text-[13px] tw:leading-none">{tool.mark}</strong>
-                          <span className="tw:text-[10px] tw:font-black tw:leading-none">{tool.label}</span>
+                          <span className="tw:text-[10px] tw:font-black tw:leading-none">{t(tool.labelKey)}</span>
                         </button>
                       ))}
                     </div>
 
                     <div className="tw:grid tw:grid-cols-3 tw:gap-1.5 max-[520px]:tw:grid-cols-1">
                       <Button type="button" size="sm" onClick={playEditorLevel}>
-                        试玩
+                        {t("action.play")}
                       </Button>
                       <Button type="button" size="sm" variant="secondary" onClick={exportCurrentEditorLevel}>
-                        导出
+                        {t("action.export")}
                       </Button>
                       <Button type="button" size="sm" variant="secondary" onClick={importEditorLevel}>
-                        导入
+                        {t("action.import")}
                       </Button>
                     </div>
 
@@ -1009,7 +1043,7 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                         className="tw:min-h-[70px] tw:w-full tw:min-w-0 tw:resize-y tw:rounded-lg tw:border tw:border-[var(--pipe-border)] tw:bg-[var(--pipe-panel-strong)] tw:px-2.5 tw:py-2 tw:text-[11px] tw:leading-snug tw:text-[var(--pipe-fg)] tw:outline-none"
                         value={editorTransfer}
                         onChange={(event) => setEditorTransfer(event.target.value)}
-                        placeholder="粘贴别人分享的关卡 JSON，或点击导出生成当前配置"
+                        placeholder={t("editor.placeholder")}
                       />
                     )}
                     {editorMessage && (
@@ -1027,19 +1061,19 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                 <header className="pipe-link-view-header">
                   <div className="pipe-link-view-title">
                     <div>
-                      <p>偏好设置</p>
-                      <h2>设置</h2>
+                      <p>{t("settings.pref")}</p>
+                      <h2>{t("settings.title")}</h2>
                     </div>
                   </div>
                   <Button type="button" size="sm" variant="secondary" onClick={clearProgress}>
-                    清除进度
+                    {t("action.clear")}
                   </Button>
                 </header>
 
                 <section className="pipe-link-settings-grid">
                   <label className="pipe-link-setting-card">
-                    <span>动画强度</span>
-                    <small>控制路径高亮和管道脉冲动画</small>
+                    <span>{t("settings.animation.title")}</span>
+                    <small>{t("settings.animation.desc")}</small>
                     <select
                       value={settings.animation}
                       onChange={(event) =>
@@ -1049,15 +1083,15 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
                         })
                       }
                     >
-                      <option value="low">低</option>
-                      <option value="normal">标准</option>
-                      <option value="high">高</option>
+                      <option value="low">{t("animation.low")}</option>
+                      <option value="normal">{t("animation.normal")}</option>
+                      <option value="high">{t("animation.high")}</option>
                     </select>
                   </label>
 
                   <label className="pipe-link-setting-card pipe-link-setting-card--inline">
-                    <span>显示键盘提示</span>
-                    <small>在设置页显示移动按键说明</small>
+                    <span>{t("settings.hints.title")}</span>
+                    <small>{t("settings.hints.desc")}</small>
                     <input
                       type="checkbox"
                       checked={settings.showHints}
@@ -1072,28 +1106,28 @@ const PipeLink = ({ mode = "icon", title = "终端回路", sdk }: WidgetProps) =
 
                   {settings.showHints && (
                     <section className="pipe-link-setting-card pipe-link-setting-card--wide">
-                      <span>按键提示</span>
-                      <div className="pipe-link-key-hints" aria-label="按键提示">
-                        <span>W / ↑ 上移</span>
-                        <span>A / ← 左移</span>
-                        <span>S / ↓ 下移</span>
-                        <span>D / → 右移</span>
+                      <span>{t("aria.keyHints")}</span>
+                      <div className="pipe-link-key-hints" aria-label={t("aria.keyHints")}>
+                        <span>{t("key.up")}</span>
+                        <span>{t("key.left")}</span>
+                        <span>{t("key.down")}</span>
+                        <span>{t("key.right")}</span>
                       </div>
                     </section>
                   )}
 
                   <section className="pipe-link-setting-card pipe-link-setting-card--wide">
-                    <span>通关记录</span>
+                      <span>{t("progress.title")}</span>
                     <div className="pipe-link-progress-list">
                       {LEVELS.map((item) => (
                         <div key={item.id} className="pipe-link-progress-row">
-                          <span>{getLevelNumber(item)} {item.name}</span>
+                          <span>{getLevelNumber(item)} {getLevelName(item, t)}</span>
                           <strong>
                             {progress.bestSteps[item.id]
-                              ? `${progress.bestSteps[item.id]} 步`
+                              ? stepText(progress.bestSteps[item.id], t)
                               : progress.completedLevelIds.includes(item.id)
-                                ? "已完成"
-                                : "未完成"}
+                                ? t("level.done")
+                                : t("level.notDone")}
                           </strong>
                         </div>
                       ))}
