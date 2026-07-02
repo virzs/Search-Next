@@ -157,6 +157,9 @@ interface ParsedSearchQuery {
 }
 
 const SEARCH_PAGE_SIZE = 6;
+const SEARCH_DEBOUNCE_WAIT = 300;
+const DESKTOP_CLOSE_ANIMATION_MS = 220;
+const SPOTLIGHT_CLOSE_ANIMATION_MS = 180;
 const SUGGESTIONS_PER_ENGINE_LIMIT = 3;
 const SUGGESTIONS_TOTAL_LIMIT = 6;
 const TITLE_EXACT_MATCH_SCORE = 100;
@@ -468,6 +471,11 @@ const UnifiedSearch = ({
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [desktopFocused, setDesktopFocused] = useState(false);
+  const [desktopClosing, setDesktopClosing] = useState(false);
+  const [desktopPanelMounted, setDesktopPanelMounted] = useState(false);
+  const [desktopClearAfterClose, setDesktopClearAfterClose] = useState(false);
+  const [spotlightMounted, setSpotlightMounted] = useState(open);
+  const [spotlightClosing, setSpotlightClosing] = useState(false);
   const {
     widgets,
     loading: widgetsLoading,
@@ -501,22 +509,21 @@ const UnifiedSearch = ({
     () => parseSearchQuery(debouncedQuery),
     [debouncedQuery],
   );
-  const trimmedQuery = parsedQuery.text;
+  const currentQueryText = parsedQuery.text;
+  const trimmedQuery = debouncedParsedQuery.text;
   const rawQuery = query.trim();
-  const normalizedDebouncedQuery = debouncedParsedQuery.text;
-  const searchScope = parsedQuery.scope;
-  const debouncedSearchScope = debouncedParsedQuery.scope;
+  const normalizedDebouncedQuery = trimmedQuery;
+  const currentSearchScope = parsedQuery.scope;
+  const searchScope = debouncedParsedQuery.scope;
   const shouldSearchWeb = searchScope === "all" || searchScope === "web-search";
-  const shouldSearchWebDebounced =
-    debouncedSearchScope === "all" || debouncedSearchScope === "web-search";
   const shouldSearchWebsites =
     searchScope === "all" || searchScope === "website";
-  const shouldSearchWebsitesDebounced =
-    debouncedSearchScope === "all" || debouncedSearchScope === "website";
   const shouldSearchApps = searchScope === "all" || searchScope === "app";
   const shouldSearchPages = searchScope === "all";
   const shouldSearchSettings =
     searchScope === "all" || searchScope === "setting";
+  const isSearchDebouncing =
+    Boolean(currentQueryText) && currentQueryText !== trimmedQuery;
   const routeSearchItems = useMemo(
     () =>
       getDefaultAppRouteSearchItems({
@@ -533,10 +540,20 @@ const UnifiedSearch = ({
   const showShortcutSuggestions =
     rawQuery.startsWith("@") &&
     !rawQuery.startsWith("@@") &&
-    (!parsedQuery.shortcut || !trimmedQuery);
+    (!parsedQuery.shortcut || !currentQueryText);
+  const desktopPanelShouldOpen =
+    Boolean(currentQueryText) || showShortcutSuggestions || showStartPanel;
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedQuery(query), 240);
+    if (!parseSearchQuery(query).text) {
+      setDebouncedQuery(query);
+      return;
+    }
+
+    const timer = window.setTimeout(
+      () => setDebouncedQuery(query),
+      SEARCH_DEBOUNCE_WAIT,
+    );
     return () => window.clearTimeout(timer);
   }, [query]);
 
@@ -568,7 +585,7 @@ const UnifiedSearch = ({
   }, [engines, selectedEngineIds]);
 
   useEffect(() => {
-    if (!normalizedDebouncedQuery || !shouldSearchWebDebounced) {
+    if (!normalizedDebouncedQuery || !shouldSearchWeb) {
       setSuggestionGroups([]);
       setSuggestionsLoading(false);
       return;
@@ -607,10 +624,10 @@ const UnifiedSearch = ({
     return () => {
       cancelled = true;
     };
-  }, [normalizedDebouncedQuery, primaryEngines, shouldSearchWebDebounced]);
+  }, [normalizedDebouncedQuery, primaryEngines, shouldSearchWeb]);
 
   useEffect(() => {
-    if (!normalizedDebouncedQuery || !shouldSearchWebsitesDebounced) return;
+    if (!normalizedDebouncedQuery || !shouldSearchWebsites) return;
     runWebsiteSearch({
       page: 1,
       pageSize: SEARCH_PAGE_SIZE,
@@ -619,7 +636,7 @@ const UnifiedSearch = ({
   }, [
     normalizedDebouncedQuery,
     runWebsiteSearch,
-    shouldSearchWebsitesDebounced,
+    shouldSearchWebsites,
   ]);
 
   useEffect(() => {
@@ -627,6 +644,68 @@ const UnifiedSearch = ({
     const timer = window.setTimeout(() => inputRef.current?.focus(), 40);
     return () => window.clearTimeout(timer);
   }, [autoFocus, open]);
+
+  useEffect(() => {
+    if (!desktopClosing) return;
+
+    const timer = window.setTimeout(() => {
+      if (desktopClearAfterClose) {
+        setQuery("");
+        setDebouncedQuery("");
+      }
+      setDesktopFocused(false);
+      setDesktopClosing(false);
+      setDesktopPanelMounted(false);
+      setDesktopClearAfterClose(false);
+      setActiveItemId(null);
+    }, DESKTOP_CLOSE_ANIMATION_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [desktopClearAfterClose, desktopClosing]);
+
+  useEffect(() => {
+    if (variant !== "desktop") return;
+
+    if (desktopPanelShouldOpen) {
+      setDesktopPanelMounted(true);
+      if (desktopClosing && !desktopClearAfterClose) {
+        setDesktopClosing(false);
+      }
+      return;
+    }
+
+    if (desktopPanelMounted && !desktopClosing) {
+      setDesktopClearAfterClose(false);
+      setDesktopClosing(true);
+    }
+  }, [
+    desktopClearAfterClose,
+    desktopClosing,
+    desktopPanelMounted,
+    desktopPanelShouldOpen,
+    variant,
+  ]);
+
+  useEffect(() => {
+    if (variant !== "spotlight") return;
+
+    if (open) {
+      setSpotlightMounted(true);
+      setSpotlightClosing(false);
+      return;
+    }
+
+    if (!spotlightMounted) return;
+    setSpotlightClosing(true);
+
+    const timer = window.setTimeout(() => {
+      setSpotlightMounted(false);
+      setSpotlightClosing(false);
+      setActiveItemId(null);
+    }, SPOTLIGHT_CLOSE_ANIMATION_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [open, spotlightMounted, variant]);
 
   useEffect(() => {
     setActiveItemId(null);
@@ -903,6 +982,7 @@ const UnifiedSearch = ({
         shortcut,
       });
     }
+    if (isSearchDebouncing) return items;
     items.push(...strongInternalItems);
     if (trimmedQuery && shouldSearchWeb && primaryEngines.length) {
       items.push({ id: "action:selected", type: "selected-search" });
@@ -922,6 +1002,7 @@ const UnifiedSearch = ({
     return items;
   }, [
     primaryEngines.length,
+    isSearchDebouncing,
     shouldSearchWeb,
     strongInternalItems,
     trimmedQuery,
@@ -1105,6 +1186,35 @@ const UnifiedSearch = ({
     setActiveItemId(null);
   }, [onClose, variant]);
 
+  const closeUnifiedSearch = useCallback(() => {
+    setActiveItemId(null);
+    setExpandedSuggestionEngineIds([]);
+
+    if (variant === "spotlight") {
+      onClose?.();
+      return;
+    }
+
+    setDesktopPanelMounted(true);
+    setDesktopClearAfterClose(true);
+    setDesktopClosing(true);
+    inputRef.current?.blur();
+  }, [onClose, variant]);
+
+  useEffect(() => {
+    if (variant !== "desktop" || (!desktopFocused && !query.trim())) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && rootRef.current?.contains(target)) return;
+      closeUnifiedSearch();
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown, true);
+    return () =>
+      window.removeEventListener("pointerdown", handlePointerDown, true);
+  }, [closeUnifiedSearch, desktopFocused, query, variant]);
+
   const recordHistory = useCallback((item: Omit<SearchHistoryItem, "updatedAt">) => {
     setSearchHistory((current) => {
       const nextItem = { ...item, updatedAt: Date.now() };
@@ -1192,14 +1302,17 @@ const UnifiedSearch = ({
         (!showShortcutSuggestions && !shouldSearchWeb
           ? (focusableItems[0] ?? null)
           : null);
-      const defaultSearchText = trimmedQuery || rawQuery;
+      const actionSearchText = currentQueryText || trimmedQuery;
+      const currentShouldSearchWeb =
+        currentSearchScope === "all" || currentSearchScope === "web-search";
+      const defaultSearchText = actionSearchText || rawQuery;
       const primaryEngineNames = primaryEngines
         .map((engine) => engine.name)
         .join("、");
 
       if (!targetItem) {
         if (
-          (shouldSearchWeb || !trimmedQuery) &&
+          (currentShouldSearchWeb || !currentQueryText) &&
           openWithEngines(primaryEngines, defaultSearchText)
         ) {
           recordHistory({
@@ -1276,41 +1389,41 @@ const UnifiedSearch = ({
         return;
       }
       if (targetItem.type === "selected-search") {
-        if (openWithEngines(primaryEngines, trimmedQuery)) {
+        if (openWithEngines(primaryEngines, actionSearchText)) {
           recordHistory({
-            id: `search:selected:${trimmedQuery}`,
+            id: `search:selected:${actionSearchText}`,
             kind: "search",
-            title: trimmedQuery,
+            title: actionSearchText,
             description: primaryEngineNames
               ? `用 ${primaryEngineNames} 搜索`
               : "网页搜索",
-            query: trimmedQuery,
+            query: actionSearchText,
           });
           closeSpotlight();
         }
         return;
       }
       if (targetItem.type === "all-search") {
-        if (openWithEngines(engines, trimmedQuery)) {
+        if (openWithEngines(engines, actionSearchText)) {
           recordHistory({
-            id: `search:all:${trimmedQuery}`,
+            id: `search:all:${actionSearchText}`,
             kind: "search",
-            title: trimmedQuery,
+            title: actionSearchText,
             description: "打开全部搜索引擎",
-            query: trimmedQuery,
+            query: actionSearchText,
           });
           closeSpotlight();
         }
         return;
       }
       if (targetItem.type === "engine-search") {
-        if (openWithEngines([targetItem.engine], trimmedQuery)) {
+        if (openWithEngines([targetItem.engine], actionSearchText)) {
           recordHistory({
-            id: `search:${targetItem.engine._id}:${trimmedQuery}`,
+            id: `search:${targetItem.engine._id}:${actionSearchText}`,
             kind: "search",
-            title: trimmedQuery,
+            title: actionSearchText,
             description: `用 ${targetItem.engine.name} 搜索`,
-            query: trimmedQuery,
+            query: actionSearchText,
           });
           closeSpotlight();
         }
@@ -1387,9 +1500,10 @@ const UnifiedSearch = ({
       openWebsite,
       openWithEngines,
       primaryEngines,
+      currentQueryText,
+      currentSearchScope,
       rawQuery,
       recordHistory,
-      shouldSearchWeb,
       showShortcutSuggestions,
       trimmedQuery,
       widgets,
@@ -1424,11 +1538,9 @@ const UnifiedSearch = ({
 
   const handleInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Escape") {
-      if (variant === "spotlight") {
-        event.preventDefault();
-        event.stopPropagation();
-        closeSpotlight();
-      }
+      event.preventDefault();
+      event.stopPropagation();
+      closeUnifiedSearch();
       return;
     }
 
@@ -1456,9 +1568,9 @@ const UnifiedSearch = ({
   };
 
   const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Escape" || variant !== "spotlight") return;
+    if (event.key !== "Escape") return;
     event.preventDefault();
-    closeSpotlight();
+    closeUnifiedSearch();
   };
 
   const renderSearchInput = () => (
@@ -1475,9 +1587,23 @@ const UnifiedSearch = ({
       <input
         ref={inputRef}
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => {
+          if (desktopClosing) {
+            setDesktopClosing(false);
+            setDesktopClearAfterClose(false);
+          }
+          setDesktopPanelMounted(true);
+          setQuery(event.target.value);
+        }}
         onKeyDown={handleInputKeyDown}
-        onFocus={() => setDesktopFocused(true)}
+        onFocus={() => {
+          if (desktopClosing) {
+            setDesktopClosing(false);
+            setDesktopClearAfterClose(false);
+          }
+          setDesktopPanelMounted(true);
+          setDesktopFocused(true);
+        }}
         autoComplete="off"
         spellCheck={false}
         placeholder="搜索网页、网站、应用、设置，输入 @ 查看命令"
@@ -1633,7 +1759,10 @@ const UnifiedSearch = ({
   };
 
   const renderActionSection = () => {
-    if (!trimmedQuery || !shouldSearchWeb || !primaryEngines.length) return null;
+    const actionSearchText = currentQueryText || trimmedQuery;
+    if (!actionSearchText || !shouldSearchWeb || !primaryEngines.length) {
+      return null;
+    }
     return (
       <SearchSection title="搜索">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1642,7 +1771,7 @@ const UnifiedSearch = ({
             active={activeItemId === "action:selected"}
             icon={<RiSearchLine size={17} />}
             title={`用 ${primaryEngines.map((engine) => engine.name).join("、")} 搜索`}
-            description={trimmedQuery}
+            description={actionSearchText}
             compact
             onClick={() =>
               runFocusableItem({ id: "action:selected", type: "selected-search" })
@@ -1932,9 +2061,15 @@ const UnifiedSearch = ({
         (shouldSearchApps && widgetsLoading) ||
         (shouldSearchWeb && suggestionsLoading)));
   const desktopSearchActive =
-    variant === "desktop" && (desktopFocused || Boolean(query.trim()));
+    variant === "desktop" &&
+    (desktopFocused ||
+      desktopClosing ||
+      desktopPanelMounted ||
+      Boolean(query.trim()));
   const showPanel =
-    Boolean(trimmedQuery) || showShortcutSuggestions || showStartPanel;
+    variant === "desktop"
+      ? desktopPanelShouldOpen || desktopPanelMounted || desktopClosing
+      : desktopPanelShouldOpen;
 
   const renderPanel = () => {
     const enginePicker = renderEnginePicker();
@@ -1947,69 +2082,88 @@ const UnifiedSearch = ({
           variant === "desktop"
             ? unifiedSearchDesktopPanelClassName
             : unifiedSearchSpotlightPanelClassName,
+          variant === "desktop" && desktopClosing
+            ? unifiedSearchDesktopPanelClosingClassName
+            : null,
         )}
       >
-        {showPanelHeader ? (
-          <div className="flex items-center justify-between gap-3 px-1 pb-3">
-            {enginePicker}
-            {variant === "spotlight" ? (
-              <Button
-                type="text"
-                size="small"
-                shape="circle"
-                aria-label="关闭"
-                icon={<RiCloseLine size={17} />}
-                onClick={closeSpotlight}
-              />
-            ) : null}
-          </div>
-        ) : null}
-        <div
-          className={cx(
-            unifiedSearchPanelBodyClassName,
-            variant === "desktop"
-              ? unifiedSearchDesktopPanelBodyClassName
-            : unifiedSearchSpotlightPanelBodyClassName,
-          )}
-        >
-          {renderHistory()}
-          {renderShortcutSuggestions()}
-          {renderWebsites(websiteResultGroups.strong, {
-            title: "网站",
-            showLoading: true,
-          })}
-          {renderApps(appResultGroups.strong, {
-            title: "应用",
-            showLoading: true,
-          })}
-          {renderRoutes(routeResultGroups.strong, "页面")}
-          {renderSettings(settingResultGroups.strong, "设置")}
-          {renderActionSection()}
-          {renderSuggestions()}
-          {renderWebsites(websiteResultGroups.weak, { title: "更多网站" })}
-          {renderApps(appResultGroups.weak, { title: "更多应用" })}
-          {renderRoutes(routeResultGroups.weak, "更多页面")}
-          {renderSettings(settingResultGroups.weak, "更多设置")}
-          {trimmedQuery && !hasResults ? (
-            <div className="py-8">
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="没有匹配内容"
-              />
+        <div className={unifiedSearchPanelContentClassName}>
+          {showPanelHeader ? (
+            <div className="flex items-center justify-between gap-3 px-1 pb-3">
+              {enginePicker}
+              {variant === "spotlight" ? (
+                <Button
+                  type="text"
+                  size="small"
+                  shape="circle"
+                  aria-label="关闭"
+                  icon={<RiCloseLine size={17} />}
+                  onClick={closeUnifiedSearch}
+                />
+              ) : null}
             </div>
           ) : null}
+          <div
+            className={cx(
+              unifiedSearchPanelBodyClassName,
+              variant === "desktop"
+                ? unifiedSearchDesktopPanelBodyClassName
+                : unifiedSearchSpotlightPanelBodyClassName,
+            )}
+          >
+            {renderHistory()}
+            {renderShortcutSuggestions()}
+            {isSearchDebouncing ? (
+              <SearchSection title="搜索">
+                <div className="flex h-14 items-center justify-center">
+                  <Spin size="small" />
+                </div>
+              </SearchSection>
+            ) : (
+              <>
+                {renderWebsites(websiteResultGroups.strong, {
+                  title: "网站",
+                  showLoading: true,
+                })}
+                {renderApps(appResultGroups.strong, {
+                  title: "应用",
+                  showLoading: true,
+                })}
+                {renderRoutes(routeResultGroups.strong, "页面")}
+                {renderSettings(settingResultGroups.strong, "设置")}
+                {renderActionSection()}
+                {renderSuggestions()}
+                {renderWebsites(websiteResultGroups.weak, { title: "更多网站" })}
+                {renderApps(appResultGroups.weak, { title: "更多应用" })}
+                {renderRoutes(routeResultGroups.weak, "更多页面")}
+                {renderSettings(settingResultGroups.weak, "更多设置")}
+              </>
+            )}
+            {currentQueryText && !isSearchDebouncing && !hasResults ? (
+              <div className="py-8">
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="没有匹配内容"
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     );
   };
 
-  if (!open) return null;
+  const shouldRender = variant === "spotlight" ? spotlightMounted : open;
+  if (!shouldRender) return null;
 
   if (variant === "spotlight") {
     return (
       <div
-        className={unifiedSearchOverlayClassName}
-        onMouseDown={closeSpotlight}
+        className={cx(
+          unifiedSearchOverlayClassName,
+          spotlightClosing ? unifiedSearchOverlayClosingClassName : null,
+        )}
+        onMouseDown={closeUnifiedSearch}
       >
         <div
           ref={rootRef}
@@ -2018,6 +2172,7 @@ const UnifiedSearch = ({
           className={cx(
             unifiedSearchIntegratedSurfaceClassName,
             unifiedSearchSpotlightClassName,
+            spotlightClosing ? unifiedSearchSpotlightClosingClassName : null,
             className,
           )}
           onKeyDown={handleDialogKeyDown}
@@ -2034,6 +2189,7 @@ const UnifiedSearch = ({
     <div
       ref={rootRef}
       className={cx(unifiedSearchDesktopClassName, className)}
+      onKeyDown={handleDialogKeyDown}
       onBlur={(event) => {
         if (!rootRef.current?.contains(event.relatedTarget as Node | null)) {
           setDesktopFocused(false);
@@ -2207,6 +2363,21 @@ const unifiedSearchSpotlightClassName = css`
   display: grid;
   gap: 0;
   padding: 0;
+  transform-origin: top center;
+  animation: unified-search-spotlight-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1)
+    both;
+
+  @keyframes unified-search-spotlight-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.985);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 `;
 
 const unifiedSearchOverlayClassName = css`
@@ -2219,6 +2390,50 @@ const unifiedSearchOverlayClassName = css`
   padding-top: min(10vh, 84px);
   background: rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(6px) saturate(1.04);
+  animation: unified-search-overlay-in 160ms ease-out both;
+
+  @keyframes unified-search-overlay-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+`;
+
+const unifiedSearchOverlayClosingClassName = css`
+  pointer-events: none;
+  animation: unified-search-overlay-out ${SPOTLIGHT_CLOSE_ANIMATION_MS}ms ease
+    both;
+
+  @keyframes unified-search-overlay-out {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+`;
+
+const unifiedSearchSpotlightClosingClassName = css`
+  animation: unified-search-spotlight-out ${SPOTLIGHT_CLOSE_ANIMATION_MS}ms
+    cubic-bezier(0.4, 0, 1, 1) both;
+
+  @keyframes unified-search-spotlight-out {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.985);
+    }
+  }
 `;
 
 const unifiedSearchInputClassName = css`
@@ -2329,11 +2544,18 @@ const unifiedSearchSpotlightInputClassName = css`
 `;
 
 const unifiedSearchPanelClassName = css`
+  display: grid;
+  grid-template-rows: 1fr;
   width: 100%;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.62);
   padding: 14px;
   backdrop-filter: blur(30px) saturate(1.18);
+`;
+
+const unifiedSearchPanelContentClassName = css`
+  min-height: 0;
+  overflow: hidden;
 `;
 
 const unifiedSearchDesktopPanelClassName = css`
@@ -2348,6 +2570,30 @@ const unifiedSearchDesktopPanelClassName = css`
     border-color: transparent;
     background: transparent;
     box-shadow: none;
+  }
+`;
+
+const unifiedSearchDesktopPanelClosingClassName = css`
+  pointer-events: none;
+  overflow: hidden;
+  transform-origin: top center;
+  animation: unified-search-desktop-panel-out ${DESKTOP_CLOSE_ANIMATION_MS}ms
+    cubic-bezier(0.4, 0, 0.2, 1) both;
+
+  @keyframes unified-search-desktop-panel-out {
+    from {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    to {
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transform: translateY(-8px);
+      padding-top: 0;
+      padding-bottom: 0;
+    }
   }
 `;
 
