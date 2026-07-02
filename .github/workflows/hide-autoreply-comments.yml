@@ -1,0 +1,55 @@
+name: Hide auto-reply issue comments
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+env:
+  # Add one phrase per line.
+  SPAM_COMMENT_PHRASES: |
+    您好，我已收到您发送的邮件，等待我查看内容后给您回复。
+
+jobs:
+  hide-autoreply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check comment body
+        id: spam-check
+        shell: bash
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          matched=false
+
+          while IFS= read -r phrase; do
+            if [ -z "$phrase" ]; then
+              continue
+            fi
+
+            if [[ "$COMMENT_BODY" == *"$phrase"* ]]; then
+              matched=true
+              break
+            fi
+          done <<'PHRASES'
+          ${{ env.SPAM_COMMENT_PHRASES }}
+          PHRASES
+
+          echo "matched=${matched}" >> "$GITHUB_OUTPUT"
+
+      - name: Minimize matched comment
+        if: steps.spam-check.outputs.matched == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_NODE_ID: ${{ github.event.comment.node_id }}
+        run: |
+          curl -fsSL -X POST https://api.github.com/graphql \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -d @- <<GRAPHQL
+          {"query":"mutation MinimizeComment(\$subjectId: ID!) { minimizeComment(input: { subjectId: \$subjectId, classifier: SPAM }) { minimizedComment { isMinimized minimizedReason } } }","variables":{"subjectId":"${COMMENT_NODE_ID}"}}
+          GRAPHQL
