@@ -51,7 +51,13 @@ import {
   getUnifiedSearchShortcutParts,
   type UnifiedSearchShortcut,
 } from "./shortcut";
-import { useI18n } from "@/i18n";
+import {
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+  useI18n,
+  type AppLanguage,
+} from "@/i18n";
 export {
   defaultUnifiedSearchPreferences,
   readUnifiedSearchPreferences,
@@ -391,7 +397,8 @@ const splitInternalResults = <T,>(results: StandardizedSearchResult<T>[]) => ({
   weak: results.filter((result) => result.section === "weak-internal"),
 });
 
-const getWidgetTags = (widget: WidgetApiItem) => [
+const getWidgetTags = (widget: WidgetApiItem, language: AppLanguage) => [
+  ...resolveWidgetTags(widget, language),
   ...(widget.tags ?? []),
   ...((widget.configSnapshot?.tags as string[] | undefined) ?? []),
 ];
@@ -456,7 +463,7 @@ const UnifiedSearch = ({
 }: UnifiedSearchProps) => {
   const navigate = useNavigate();
   const { message } = AntdApp.useApp();
-  const { t, routeTextResolver } = useI18n();
+  const { t, routeTextResolver, language } = useI18n();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [query, setQuery] = useState("");
@@ -826,27 +833,30 @@ const UnifiedSearch = ({
     return sortScoredResults(
       (widgets ?? [])
         .filter(supportsAppMode)
-        .map((widget) =>
-          withSearchResultSection({
+        .map((widget) => {
+          const displayName = resolveWidgetDisplayName(widget, language);
+          const description = resolveWidgetDescription(widget, language);
+          return withSearchResultSection({
             id: `app:${widget._id}`,
             kind: "app",
             score: getTextMatchScore(
               trimmedQuery,
-              [widget.name],
+              [displayName, widget.name],
               [
+                description,
                 widget.description,
                 widget.author,
                 widget.version,
                 widget.classify?.name,
-                ...getWidgetTags(widget),
+                ...getWidgetTags(widget, language),
               ],
             ),
             item: widget,
-          }),
-        )
+          });
+        })
         .filter((result) => result.score > 0),
     );
-  }, [shouldSearchApps, trimmedQuery, widgets]);
+  }, [language, shouldSearchApps, trimmedQuery, widgets]);
 
   const scoredRouteResults = useMemo(() => {
     if (!trimmedQuery || !shouldSearchPages) return [];
@@ -1462,11 +1472,19 @@ const UnifiedSearch = ({
         return;
       }
       if (targetItem.type === "app") {
+        const displayName = resolveWidgetDisplayName(
+          targetItem.widget,
+          language,
+        );
+        const description = resolveWidgetDescription(
+          targetItem.widget,
+          language,
+        );
         recordHistory({
           id: `app:${targetItem.widget._id}`,
           kind: "app",
-          title: targetItem.widget.name,
-          description: targetItem.widget.description || t("ui.app"),
+          title: displayName,
+          description: description || t("ui.app"),
           widgetId: targetItem.widget._id,
         });
         openApp(targetItem.widget);
@@ -1498,6 +1516,7 @@ const UnifiedSearch = ({
       closeSpotlight,
       engines,
       focusableItems,
+      language,
       message,
       navigate,
       openApp,
@@ -1955,6 +1974,8 @@ const UnifiedSearch = ({
           {results.map((result) => {
             const widget = result.item;
             const iconUrl = getAppIconUrl(widget);
+            const displayName = resolveWidgetDisplayName(widget, language);
+            const description = resolveWidgetDescription(widget, language);
             return (
               <SearchResultButton
                 key={result.id}
@@ -1964,15 +1985,15 @@ const UnifiedSearch = ({
                   iconUrl ? (
                     <img
                       src={iconUrl}
-                      alt={widget.name}
+                      alt={displayName}
                       className="h-full w-full rounded-lg object-contain p-1"
                     />
                   ) : (
                     <RiApps2Line size={17} />
                   )
                 }
-                title={widget.name}
-                description={widget.description || t("ui.app")}
+                title={displayName}
+                description={description || t("ui.app")}
                 tag={widget.version ? `v${widget.version}` : undefined}
                 onClick={() =>
                   runFocusableItem({

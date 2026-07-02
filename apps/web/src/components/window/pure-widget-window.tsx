@@ -4,7 +4,7 @@ import { DesktopNextBaseModal } from "zs_library";
 import PureWidget, { PureWidgetConfig } from "../micro-frontend/pure-widget";
 import type { WidgetMode, WidgetSDK } from "@/sdk";
 import type { WidgetConfig } from "@/types";
-import { useI18n } from "@/i18n";
+import { resolveLocalizedText, useI18n } from "@/i18n";
 
 interface PureWidgetWindowProps {
   config: PureWidgetConfig;
@@ -30,7 +30,7 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   sdk,
   createSdk,
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [viewMode, setViewMode] = useState<"full" | "settings">("full");
   const [widgetBackVisible, setWidgetBackVisible] = useState(false);
 
@@ -42,7 +42,14 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   }, [config.entry, visible]);
 
   const settingsRoutePath = widgetConfig?.pagePaths?.settings;
-  const widgetTitle = title || widgetConfig?.name || t("ui.widget");
+  const widgetTitle =
+    title ||
+    resolveLocalizedText(
+      widgetConfig?.displayNameI18n,
+      language,
+      widgetConfig?.name,
+    ) ||
+    t("ui.widget");
   const hasSettings = Boolean(widgetConfig?.id && settingsRoutePath);
   const contentHeight = typeof height === "number" ? height : undefined;
   const windowHeight = typeof height === "number" ? height + 46 : height;

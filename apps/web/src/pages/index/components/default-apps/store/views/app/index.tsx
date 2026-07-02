@@ -8,7 +8,12 @@ import type { StoreAddPayload } from "../../index";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import PureWidget from "@/components/micro-frontend/pure-widget";
 import { css } from "@emotion/css";
-import { useI18n } from "@/i18n";
+import {
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+  useI18n,
+} from "@/i18n";
 
 const appViewClassName = css`
   .apple-store-get-button.ant-btn {
@@ -29,12 +34,14 @@ interface AppIconPreviewProps {
   widget: WidgetApiItem;
   entryUrl: string | null;
   iconUrl: string | null;
+  displayName: string;
 }
 
 const AppIconPreview: React.FC<AppIconPreviewProps> = ({
   widget,
   entryUrl,
   iconUrl,
+  displayName,
 }) => {
   const appIcon = getAppIcon(widget);
   if (appIcon?.type === "custom" && entryUrl) {
@@ -42,7 +49,7 @@ const AppIconPreview: React.FC<AppIconPreviewProps> = ({
       <PureWidget
         config={{
           entry: entryUrl,
-          props: { title: widget.name },
+          props: { title: displayName },
           mode: "appIcon",
         }}
         className="h-full w-full"
@@ -54,7 +61,7 @@ const AppIconPreview: React.FC<AppIconPreviewProps> = ({
     return (
       <img
         src={iconUrl}
-        alt={widget.name}
+        alt={displayName}
         className="h-full w-full object-contain p-3"
         loading="lazy"
       />
@@ -70,7 +77,7 @@ interface AppViewProps {
 }
 
 const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const {
     widgets,
     loading,
@@ -89,11 +96,14 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
       .filter(supportsAppMode)
       .filter((w) => {
         if (!q) return true;
+        const name = resolveWidgetDisplayName(w, language);
+        const description = resolveWidgetDescription(w, language);
+        const tags = resolveWidgetTags(w, language);
         const haystack =
-          `${w.name} ${w.description || ""} ${w.tags?.join(" ") || ""}`.toLowerCase();
+          `${name} ${w.name} ${description || ""} ${w.description || ""} ${tags.join(" ")} ${w.tags?.join(" ") || ""}`.toLowerCase();
         return haystack.includes(q);
       });
-  }, [query, widgets]);
+  }, [language, query, widgets]);
 
   const handleAdd = (widget: WidgetApiItem) => {
     onAddStoreItem?.({ kind: "app", widgetId: widget._id });
@@ -129,6 +139,8 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
               {filteredApps.map((widget) => {
                 const iconUrl = getAppIconUrl(widget);
                 const entryUrl = getEntryUrl(widget);
+                const displayName = resolveWidgetDisplayName(widget, language);
+                const description = resolveWidgetDescription(widget, language);
                 return (
                   <article
                     key={widget._id}
@@ -140,15 +152,16 @@ const AppView: React.FC<AppViewProps> = ({ onAddStoreItem, query }) => {
                           widget={widget}
                           entryUrl={entryUrl}
                           iconUrl={iconUrl}
+                          displayName={displayName}
                         />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-base font-bold tracking-normal text-gray-950 dark:text-gray-50">
-                          {widget.name}
+                          {displayName}
                         </div>
-                        {widget.description ? (
+                        {description ? (
                           <div className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-gray-500 dark:text-gray-400">
-                            {widget.description}
+                            {description}
                           </div>
                         ) : null}
                       </div>

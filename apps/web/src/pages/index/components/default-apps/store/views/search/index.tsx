@@ -16,7 +16,12 @@ import { getTabsWebsitePublic } from "@/services/website";
 import { useWidget } from "@/hooks/useWidget";
 import type { WidgetApiItem } from "@/types";
 import { css } from "@emotion/css";
-import { useI18n } from "@/i18n";
+import {
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+  useI18n,
+} from "@/i18n";
 
 type SearchKind = "all" | "website" | "app" | "widget";
 
@@ -51,8 +56,8 @@ const toTagLabel = (tag: unknown) => {
   return "";
 };
 
-const getWidgetTags = (item: WidgetApiItem) => {
-  const tags = item.configSnapshot?.tags ?? item.tags ?? [];
+const getWidgetTags = (item: WidgetApiItem, language: "zh-CN" | "en-US") => {
+  const tags = resolveWidgetTags(item, language);
   return tags.map(toTagLabel).filter(Boolean);
 };
 
@@ -68,16 +73,22 @@ const supportsAppMode = (item: WidgetApiItem) =>
 const supportsIconMode = (item: WidgetApiItem) =>
   Boolean(item.configSnapshot?.supportIconMode ?? item.supportIconMode);
 
-const matchesQuery = (item: any, query: string) => {
+const matchesQuery = (item: any, query: string, language: "zh-CN" | "en-US") => {
   const q = query.trim().toLowerCase();
   if (!q) return false;
+  const displayName = resolveWidgetDisplayName(item, language);
+  const description = resolveWidgetDescription(item, language);
+  const tags = getWidgetTags(item, language);
   const haystack = [
+    displayName,
     item.name,
+    description,
     item.url,
     item.description,
     item.author,
     item.version,
     item.classify?.name,
+    ...tags,
     ...(Array.isArray(item.tags) ? item.tags.map(toTagLabel) : []),
     ...(Array.isArray(item.configSnapshot?.tags)
       ? item.configSnapshot.tags.map(toTagLabel)
@@ -128,14 +139,17 @@ const WidgetResultCard = ({
   iconUrl?: string | null;
   onAdd?: (widget: WidgetApiItem, sizeId?: string) => void;
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const displayName = resolveWidgetDisplayName(item, language);
+  const description = resolveWidgetDescription(item, language);
+  const tags = getWidgetTags(item, language);
   return (
   <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
     <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
       {iconUrl ? (
         <img
           src={iconUrl}
-          alt={item.name}
+          alt={displayName}
           className="h-full w-full object-contain p-2.5"
           loading="lazy"
         />
@@ -145,16 +159,16 @@ const WidgetResultCard = ({
     </div>
     <div className="min-w-0 flex-1">
       <div className="truncate text-sm font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
-        {item.name}
+        {displayName}
       </div>
       <div className="mt-1 line-clamp-2 text-xs font-medium leading-5 text-gray-500 dark:text-gray-400">
-        {item.description}
+        {description}
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
           {getWidgetDefaultSizeId(item)}
         </Tag>
-        {getWidgetTags(item)
+        {tags
           .slice(0, 3)
           .map((tag) => (
             <Tag
@@ -188,14 +202,17 @@ const AppResultCard = ({
   iconUrl?: string | null;
   onAdd?: (widget: WidgetApiItem) => void;
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const displayName = resolveWidgetDisplayName(item, language);
+  const description = resolveWidgetDescription(item, language);
+  const tags = getWidgetTags(item, language);
   return (
   <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
     <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
       {iconUrl ? (
         <img
           src={iconUrl}
-          alt={item.name}
+          alt={displayName}
           className="h-full w-full object-contain p-2.5"
           loading="lazy"
         />
@@ -205,16 +222,16 @@ const AppResultCard = ({
     </div>
     <div className="min-w-0 flex-1">
       <div className="truncate text-sm font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
-        {item.name}
+        {displayName}
       </div>
       <div className="mt-1 line-clamp-2 text-xs font-medium leading-5 text-gray-500 dark:text-gray-400">
-        {item.description}
+        {description}
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
           {t("ui.app")}
         </Tag>
-        {getWidgetTags(item)
+        {tags
           .slice(0, 3)
           .map((tag) => (
             <Tag
@@ -240,7 +257,7 @@ const AppResultCard = ({
 };
 
 const StoreSearchView = () => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { query, setQuery, onAddStoreItem } =
     useAppRouteContext<StoreOutletContext>();
   const {
@@ -321,17 +338,17 @@ const StoreSearchView = () => {
     if (!normalizedQuery) return [];
     return searchableWidgets
       .filter(supportsIconMode)
-      .filter((item) => matchesQuery(item, normalizedQuery))
+      .filter((item) => matchesQuery(item, normalizedQuery, language))
       .slice(0, SEARCH_PAGE_SIZE);
-  }, [normalizedQuery, searchableWidgets]);
+  }, [language, normalizedQuery, searchableWidgets]);
 
   const appResults = useMemo(() => {
     if (!normalizedQuery) return [];
     return (widgets ?? [])
       .filter(supportsAppMode)
-      .filter((item) => matchesQuery(item, normalizedQuery))
+      .filter((item) => matchesQuery(item, normalizedQuery, language))
       .slice(0, SEARCH_PAGE_SIZE);
-  }, [normalizedQuery, widgets]);
+  }, [language, normalizedQuery, widgets]);
 
   const resultCount =
     (showWebsites ? websiteResults.length : 0) +

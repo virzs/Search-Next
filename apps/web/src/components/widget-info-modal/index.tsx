@@ -9,7 +9,7 @@ import {
   formatWidgetStorageSize,
   getWidgetStorageStats,
 } from "@/utils/widget-storage";
-import { useI18n } from "@/i18n";
+import { resolveLocalizedText, useI18n } from "@/i18n";
 
 interface WidgetInfoModalProps {
   visible: boolean;
@@ -35,11 +35,21 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
   widgetName,
   widgetConfig,
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { message } = App.useApp();
   const [, setVersion] = useState(0);
   const stats = getWidgetStorageStats(widgetId);
-  const title = widgetName || widgetConfig?.name || t("ui.app");
+  const title =
+    resolveLocalizedText(
+      widgetConfig?.displayNameI18n,
+      language,
+      widgetName || widgetConfig?.name,
+    ) || t("ui.app");
+  const description = resolveLocalizedText(
+    widgetConfig?.descriptionI18n,
+    language,
+    widgetConfig?.description,
+  );
   const appIconType =
     widgetConfig?.appIcon?.type === "custom" ? t("ui.customElement") : t("ui.image");
 
@@ -66,9 +76,9 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
             <div className="truncate text-[21px] font-semibold tracking-normal text-[#1d1d1f]">
               {title}
             </div>
-            {widgetConfig?.description ? (
+            {description ? (
               <div className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-[#6e6e73]">
-                {widgetConfig.description}
+                {description}
               </div>
             ) : null}
           </div>

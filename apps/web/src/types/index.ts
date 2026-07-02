@@ -8,9 +8,15 @@ export type WidgetAppIcon =
   | { type: "image"; src?: string }
   | { type: "custom" };
 
+export type SupportedLocale = "zh-CN" | "en-US";
+export type LocalizedText = Partial<Record<SupportedLocale, string>>;
+export type LocalizedStringList = Partial<Record<SupportedLocale, string[]>>;
+
 export interface WidgetConfig {
   id: string;
   name: string;
+  displayName?: string;
+  displayNameI18n?: LocalizedText;
   entry: string;
   container?: string;
   props?: Record<string, unknown>;
@@ -26,6 +32,9 @@ export interface WidgetConfig {
   version?: string;
   author?: string;
   description?: string;
+  descriptionI18n?: LocalizedText;
+  tags?: string[];
+  tagsI18n?: LocalizedStringList;
 }
 
 // 桌面项目数据接口
@@ -89,7 +98,10 @@ export interface WidgetSettingsField {
 export interface WidgetApiItem {
   _id: string;
   name: string;
+  displayName?: string;
+  displayNameI18n?: LocalizedText;
   description?: string;
+  descriptionI18n?: LocalizedText;
   previewImages?: Resource[];
   files?: Resource[];
   entryFileName: string;
@@ -106,6 +118,7 @@ export interface WidgetApiItem {
   appIcon?: WidgetAppIcon;
   appIconUrl?: string | null;
   tags: string[];
+  tagsI18n?: LocalizedStringList;
   sortOrder: number;
   settingsSchema?: WidgetSettingsField[]; // 设置表单Schema
   pagePaths?: WidgetPagePaths;
@@ -115,6 +128,11 @@ export interface WidgetApiItem {
   iconUrl?: string;
   screenshots?: WidgetScreenshot[];
   configSnapshot?: {
+    name?: string;
+    displayName?: string;
+    displayNameI18n?: LocalizedText;
+    description?: string;
+    descriptionI18n?: LocalizedText;
     sizeConfigs?: WidgetSizeConfig[];
     defaultSizeId?: string;
     supportIconMode?: boolean;
@@ -127,6 +145,7 @@ export interface WidgetApiItem {
     version?: string;
     author?: string;
     screenshots?: WidgetScreenshot[];
+    tagsI18n?: LocalizedStringList;
     [key: string]: unknown;
   };
   createdAt?: string;

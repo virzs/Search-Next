@@ -69,7 +69,13 @@ import {
   SearchSpotlight,
   useUnifiedSearchPreferences,
 } from "@/components/unified-search";
-import { getCurrentWidgetLocale, useI18n } from "@/i18n";
+import {
+  getCurrentWidgetLocale,
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+  useI18n,
+} from "@/i18n";
 
 type DesktopItem = DndSortItem<DesktopItemData>;
 type DesktopPage = DndPageItem<DesktopItemData> & {
@@ -293,7 +299,7 @@ function Index() {
   const [spotlightOpen, setSpotlightOpen] = useState(false);
 
   const { message } = App.useApp();
-  const { t, locale } = useI18n();
+  const { t, locale, language } = useI18n();
   const { coverGradientCss, user, isAuthenticated } = useAuth();
   const { userLimit } = useConfig();
   const {
@@ -459,17 +465,30 @@ function Index() {
       const entry = getEntryUrl(widget) || fallback?.entry;
       if (!entry) return fallback;
       const snapshot = widget.configSnapshot;
+      const name = resolveWidgetDisplayName(widget, language, fallback);
+      const description = resolveWidgetDescription(widget, language, fallback);
+      const tags = resolveWidgetTags(widget, language, fallback);
 
       return {
         ...(fallback ?? {}),
         id: widget._id,
-        name: widget.name,
+        name,
         entry,
         props: {
           ...(fallback?.props ?? {}),
-          title: widget.name,
+          title: name,
         },
         ...definedProps({
+          displayName: firstDefined(
+            snapshot?.displayName,
+            widget.displayName,
+            fallback?.displayName,
+          ),
+          displayNameI18n: firstDefined(
+            snapshot?.displayNameI18n,
+            widget.displayNameI18n,
+            fallback?.displayNameI18n,
+          ),
           settingsSchema: firstDefined(
             snapshot?.settingsSchema,
             widget.settingsSchema,
@@ -508,11 +527,22 @@ function Index() {
             fallback?.version,
           ),
           author: firstDefined(snapshot?.author, widget.author, fallback?.author),
-          description: firstDefined(widget.description, fallback?.description),
+          description,
+          descriptionI18n: firstDefined(
+            snapshot?.descriptionI18n,
+            widget.descriptionI18n,
+            fallback?.descriptionI18n,
+          ),
+          tags,
+          tagsI18n: firstDefined(
+            snapshot?.tagsI18n,
+            widget.tagsI18n,
+            fallback?.tagsI18n,
+          ),
         }),
       };
     },
-    [getAppIconUrl, getEntryUrl],
+    [getAppIconUrl, getEntryUrl, language],
   );
 
   const resolveWidgetConfig = useCallback(
@@ -1140,22 +1170,22 @@ function Index() {
 
       setInfoTarget({
         widgetId,
-        widgetName:
-          latestWidget?.name ??
-          latestDevWidget?.name ??
-          widgetConfig?.name ??
-          item.data?.name ??
-          t("ui.widget"),
+        widgetName: latestWidget
+          ? resolveWidgetDisplayName(latestWidget, language, widgetConfig)
+          : latestDevWidget?.name ??
+            widgetConfig?.name ??
+            item.data?.name ??
+            t("ui.widget"),
         widgetConfig: {
           ...(widgetConfig ?? {}),
           ...(latestConfig ?? {}),
           id: widgetId,
-          name:
-            latestWidget?.name ??
-            latestDevWidget?.name ??
-            widgetConfig?.name ??
-            item.data?.name ??
-            t("ui.widget"),
+          name: latestWidget
+            ? resolveWidgetDisplayName(latestWidget, language, widgetConfig)
+            : latestDevWidget?.name ??
+              widgetConfig?.name ??
+              item.data?.name ??
+              t("ui.widget"),
           entry:
             latestConfig?.entry ??
             latestDevWidget?.entry ??
@@ -1164,7 +1194,7 @@ function Index() {
         },
       });
     },
-    [createWidgetConfigFromApi, devWidgets, t, widgets],
+    [createWidgetConfigFromApi, devWidgets, language, t, widgets],
   );
 
   const handleOpenSearchApp = useCallback(
@@ -1174,7 +1204,7 @@ function Index() {
       void openWidgetWindow({
         widgetId: widget._id,
         widgetConfig,
-        fallbackTitle: widget.name || t("ui.app"),
+        fallbackTitle: widgetConfig.name || t("ui.app"),
       });
     },
     [createWidgetConfigFromApi, openWidgetWindow, t],
@@ -1269,7 +1299,7 @@ function Index() {
                     void openWidgetWindow({
                       widgetId,
                       widgetConfig,
-                      fallbackTitle: item.data?.name || t("ui.widget"),
+                      fallbackTitle: widgetConfig.name || item.data?.name || t("ui.widget"),
                     });
                   }}
                 />

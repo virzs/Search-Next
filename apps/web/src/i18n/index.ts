@@ -20,6 +20,13 @@ export {
   type WidgetLocaleInfo,
 } from "./languages";
 export { default as i18n } from "./instance";
+export {
+  resolveLocalizedStringList,
+  resolveLocalizedText,
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+} from "./widget-metadata";
 
 type TranslationParams = TOptions & Record<string, unknown>;
 

@@ -6,7 +6,13 @@ import {
   getWidgetIconUrl,
   getWidgetAppIconUrl,
 } from "@/services/widget";
-import type { WidgetApiItem, WidgetAppIcon, WidgetPagePaths, WidgetSettingsField, WidgetSizeConfig } from "@/types";
+import type { WidgetApiItem, WidgetAppIcon, WidgetConfig, WidgetPagePaths, WidgetSettingsField, WidgetSizeConfig } from "@/types";
+import {
+  getCurrentAppLanguage,
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+} from "@/i18n";
 import {
   DEV_MODE_STORAGE_KEY,
   DEV_WIDGETS_STORAGE_KEY,
@@ -32,22 +38,7 @@ type DesktopItemForWidget = {
   data: {
     name: string;
     icon?: string;
-    widgetConfig?: {
-      id: string;
-      name: string;
-      entry: string;
-      props: { title: string };
-      settingsSchema?: WidgetSettingsField[];
-      defaultSizeId?: string;
-      pagePaths?: WidgetPagePaths;
-      supportAppMode?: boolean;
-      appIcon?: WidgetAppIcon;
-      appIconUrl?: string | null;
-      sourceType?: "legacy" | "snwidget";
-      version?: string;
-      author?: string;
-      description?: string;
-    };
+    widgetConfig?: WidgetConfig & { props: { title: string } };
   };
 };
 
@@ -72,6 +63,14 @@ type RemoveDesktopItemsByType = (dataType: string) => void;
 type AddWidgetToDesktopOptions = {
   sizeId?: string;
 };
+type WidgetConfigMetadata = Pick<
+  WidgetConfig,
+  | "displayName"
+  | "displayNameI18n"
+  | "descriptionI18n"
+  | "tags"
+  | "tagsI18n"
+>;
 
 interface WidgetContextValue {
   widgets: WidgetApiItem[];
@@ -193,6 +192,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     let supportAppMode = false;
     let appIcon: WidgetAppIcon | undefined;
     let appIconUrl: string | null = null;
+    let metadata: Partial<WidgetConfigMetadata> = {};
 
     if (devMatch) {
       entryUrl = devMatch.entry;
@@ -201,18 +201,27 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
     } else {
       const widget = (widgetsRef.current ?? []).find((w) => w._id === widgetId);
       if (!widget) return null;
+      const language = getCurrentAppLanguage();
+      const snapshot = widget.configSnapshot;
       entryUrl = buildWidgetEntryUrl(widget);
-      widgetName = widget.name;
-      description = widget.description;
-      version = (widget.configSnapshot?.version as string | undefined) ?? widget.version;
-      author = (widget.configSnapshot?.author as string | undefined) ?? widget.author;
+      widgetName = resolveWidgetDisplayName(widget, language);
+      description = resolveWidgetDescription(widget, language);
+      version = (snapshot?.version as string | undefined) ?? widget.version;
+      author = (snapshot?.author as string | undefined) ?? widget.author;
       sourceType = widget.sourceType;
-      settingsSchema = widget.configSnapshot?.settingsSchema || widget.settingsSchema;
-      defaultSizeId = options?.sizeId || widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2";
-      pagePaths = widget.configSnapshot?.pagePaths ?? widget.pagePaths;
-      supportAppMode = Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode);
-      appIcon = widget.configSnapshot?.appIcon ?? widget.appIcon;
+      settingsSchema = snapshot?.settingsSchema || widget.settingsSchema;
+      defaultSizeId = options?.sizeId || snapshot?.defaultSizeId || widget.defaultSizeId || "2x2";
+      pagePaths = snapshot?.pagePaths ?? widget.pagePaths;
+      supportAppMode = Boolean(snapshot?.supportAppMode ?? widget.supportAppMode);
+      appIcon = snapshot?.appIcon ?? widget.appIcon;
       appIconUrl = getWidgetAppIconUrl(widget);
+      metadata = {
+        displayName: snapshot?.displayName ?? widget.displayName,
+        displayNameI18n: snapshot?.displayNameI18n ?? widget.displayNameI18n,
+        descriptionI18n: snapshot?.descriptionI18n ?? widget.descriptionI18n,
+        tags: resolveWidgetTags(widget, language),
+        tagsI18n: snapshot?.tagsI18n ?? widget.tagsI18n,
+      };
     }
 
     if (!entryUrl) return null;
@@ -240,6 +249,7 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
           version,
           author,
           description,
+          ...metadata,
         },
       },
     };
@@ -248,11 +258,13 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
   const buildDesktopAppItem = useCallback((widgetId: string) => {
     const widget = (widgetsRef.current ?? []).find((w) => w._id === widgetId);
     if (!widget) return null;
+    const language = getCurrentAppLanguage();
+    const snapshot = widget.configSnapshot;
     const entryUrl = buildWidgetEntryUrl(widget);
     if (!entryUrl) return null;
 
-    const widgetName = widget.name;
-    const appIcon = widget.configSnapshot?.appIcon ?? widget.appIcon;
+    const widgetName = resolveWidgetDisplayName(widget, language);
+    const appIcon = snapshot?.appIcon ?? widget.appIcon;
     const appIconUrl = getWidgetAppIconUrl(widget);
     const widgetType = `widget-app:${widgetId}`;
     return {
@@ -267,16 +279,21 @@ export const WidgetProvider: React.FC<WidgetProviderProps> = ({ children }) => {
           name: widgetName,
           entry: entryUrl,
           props: { title: widgetName },
-          settingsSchema: widget.configSnapshot?.settingsSchema || widget.settingsSchema,
-          defaultSizeId: widget.configSnapshot?.defaultSizeId || widget.defaultSizeId || "2x2",
-          pagePaths: widget.configSnapshot?.pagePaths ?? widget.pagePaths,
-          supportAppMode: Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode),
+          displayName: snapshot?.displayName ?? widget.displayName,
+          displayNameI18n: snapshot?.displayNameI18n ?? widget.displayNameI18n,
+          settingsSchema: snapshot?.settingsSchema || widget.settingsSchema,
+          defaultSizeId: snapshot?.defaultSizeId || widget.defaultSizeId || "2x2",
+          pagePaths: snapshot?.pagePaths ?? widget.pagePaths,
+          supportAppMode: Boolean(snapshot?.supportAppMode ?? widget.supportAppMode),
           appIcon,
           appIconUrl,
           sourceType: widget.sourceType,
-          version: (widget.configSnapshot?.version as string | undefined) ?? widget.version,
-          author: (widget.configSnapshot?.author as string | undefined) ?? widget.author,
-          description: widget.description,
+          version: (snapshot?.version as string | undefined) ?? widget.version,
+          author: (snapshot?.author as string | undefined) ?? widget.author,
+          description: resolveWidgetDescription(widget, language),
+          descriptionI18n: snapshot?.descriptionI18n ?? widget.descriptionI18n,
+          tags: resolveWidgetTags(widget, language),
+          tagsI18n: snapshot?.tagsI18n ?? widget.tagsI18n,
         },
       },
     };

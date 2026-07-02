@@ -12,7 +12,12 @@ import type { StoreAddPayload } from "../../index";
 import { toBackendAssetUrl } from "@/utils/utils";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import { css } from "@emotion/css";
-import { useI18n } from "@/i18n";
+import {
+  resolveWidgetDescription,
+  resolveWidgetDisplayName,
+  resolveWidgetTags,
+  useI18n,
+} from "@/i18n";
 
 type PreviewTheme = "light" | "dark";
 
@@ -158,7 +163,7 @@ interface WidgetViewProps {
 }
 
 const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { widgets, loading, refresh, getIconUrl } = useWidget();
   const [previewTheme, setPreviewTheme] = React.useState<PreviewTheme>("light");
   const previewThemeOptions = useMemo(
@@ -179,10 +184,14 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
     return widgets.filter((w) => {
       if (!supportsIconMode(w)) return false;
       if (!q) return true;
-      const haystack = `${w.name} ${w.description || ""} ${w.tags?.join(" ") || ""}`.toLowerCase();
+      const name = resolveWidgetDisplayName(w, language);
+      const description = resolveWidgetDescription(w, language);
+      const tags = resolveWidgetTags(w, language);
+      const haystack =
+        `${name} ${w.name} ${description || ""} ${w.description || ""} ${tags.join(" ")}`.toLowerCase();
       return haystack.includes(q);
     });
-  }, [query, widgets]);
+  }, [language, query, widgets]);
 
   const handleAdd = (widget: WidgetApiItem, sizeId?: string) => {
     onAddStoreItem?.({ kind: "widget", widgetId: widget._id, sizeId });
@@ -228,6 +237,9 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
               {filteredWidgets.map((widget) => {
                 const iconUrl = getIconUrl(widget);
                 const previewItems = getPreviewItems(widget, previewTheme);
+                const displayName = resolveWidgetDisplayName(widget, language);
+                const description = resolveWidgetDescription(widget, language);
+                const tags = resolveWidgetTags(widget, language);
                 const hasScreenshots = previewItems.some(
                   (item) => item.screenshot,
                 );
@@ -242,7 +254,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                         {iconUrl ? (
                           <img
                             src={iconUrl}
-                            alt={widget.name}
+                            alt={displayName}
                             className="h-full w-full object-contain p-3"
                             loading="lazy"
                           />
@@ -255,11 +267,11 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="truncate text-base font-bold tracking-normal text-gray-950 dark:text-gray-50">
-                              {widget.name}
+                              {displayName}
                             </div>
-                            {widget.description ? (
+                            {description ? (
                               <div className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-gray-500 dark:text-gray-400">
-                                {widget.description}
+                                {description}
                               </div>
                             ) : null}
                           </div>
@@ -277,8 +289,8 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                         </div>
 
                         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#8e8e93]">
-                          {widget.tags?.length ? (
-                            widget.tags.slice(0, 4).map((tag) => (
+                          {tags.length ? (
+                            tags.slice(0, 4).map((tag) => (
                               <Tag
                                 key={tag}
                                 className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!"
@@ -319,7 +331,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                                 {item.screenshot ? (
                                   <img
                                     src={getScreenshotUrl(item.screenshot)}
-                                    alt={`${widget.name} ${item.label}`}
+                                    alt={`${displayName} ${item.label}`}
                                     className="max-h-full max-w-full object-contain"
                                     loading="lazy"
                                   />
@@ -336,7 +348,7 @@ const WidgetView: React.FC<WidgetViewProps> = ({ onAddStoreItem, query }) => {
                                   size="small"
                                   className="apple-store-get-link h-5! px-0! text-[11px]! font-bold!"
                                   aria-label={t("ui.addNameLabel", {
-                                    name: widget.name,
+                                    name: displayName,
                                     label: item.label,
                                   })}
                                   onClick={() => handleAdd(widget, item.sizeId)}
