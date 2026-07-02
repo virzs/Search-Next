@@ -1,94 +1,189 @@
-# Search 导航页
+# Search Next
 
-![stars](https://img.shields.io/github/stars/virzs/Search-Next) ![forks](https://img.shields.io/github/forks/virzs/Search-Next)
+Search Next 是一个桌面化的导航与搜索入口，支持网站收藏、应用/小组件、统一搜索、主题壁纸、用户数据同步与后台管理。当前仓库采用 pnpm workspace 组织，前端、后台、后端 API 与内置小组件都在同一个仓库中维护。
 
+## 预览
+
+![桌面预览](docs/images/preview-desktop.png)
+
+![搜索面板预览](docs/images/preview-search.png)
+
+## 项目结构
+
+- `apps/web`：用户侧主站，Vite + React。
+- `apps/admin`：管理后台，Vite + React。
+- `apps/api`：后端 API，NestJS + MongoDB + Redis。
+- `apps/widgets/*`：内置小组件，每个目录是一个独立小组件工程。
+- `apps/docs`：文档站点。
+- `packages/*`：共享包。
+- `scripts`：小组件脚手架、打包、截图等脚本。
+
+## 本地运行指南
+
+### 环境要求
+
+- Node.js 20.19+ 或 22 LTS+。
+- pnpm 10.x，仓库声明版本为 `pnpm@10.23.0`。
+- MongoDB 与 Redis。后端启动时会连接两者，Redis 也用于缓存和登录状态。
+
+可用 Corepack 启用对应 pnpm 版本：
+
+```bash
+corepack enable
+corepack prepare pnpm@10.23.0 --activate
 ```
-公共组件库 🎉    公共后端接口 🎉    公共后台 🎉    第三方组件库 ⏳
-      |                  |                  |                  |
-      |                  |                  |                  |
-      +------------------+------------------+------------------+
-                         |
-                         |
-                         v
-                    本项目 🚧
 
-```
+### 安装依赖
 
-> 状态说明：
->
-> - 🚧 开发中
-> - ⏳ 等待中
-> - 🎉 已完成
->
-> 公共组件库地址：https://zs-library.virs.xyz/
-
-## 在线地址
-
-<https://search_next.virs.xyz/>
-
-2x 正在开发中，查看历史版本请切换至 1x 分支
-
-## 功能说明
-
-- 账号 🎉
-- 图标排序配置 🎉
-- 搜索建议 🎉
-- 添加自定义网站 🎉
-- 自定义主题 🚧
-- 自定义壁纸 🚧
-- 数据同步 🎉
-- 插件系统 🎉
-- 移动端支持 ⏳
-- AI 搜索 ⏳
-
-## 版本说明
-
-- 1.x 分支 1.x
-- 2.x 分支 2.x
-
-## 在线交流
-
-Discord: https://discord.gg/NRMxAmqG
-
-QQ 群：859791575
-
-欢迎提供意见或建议
-
-## 启动项目
-
-需要 nodejs（版本不限，建议最新）、pnpm。当前仓库已调整为 pnpm workspace，多项目依赖统一在仓库根目录安装。
-
-项目目录说明：
-
-- `apps/web`：主站前端（用户侧）
-- `apps/admin`：管理后台前端
-- `apps/api`：后端 API（NestJS）
-- `apps/widgets/*`：内置小组件（每个目录一个小组件工程）
-- `apps/docs`：文档站点
-- `packages/*`：共享包（通用工具/类型/组件等）
-- `scripts`：小组件脚手架、打包、截图等脚本
-
-安装依赖：
+在仓库根目录执行：
 
 ```bash
 pnpm install
 ```
 
-启动项目：
+### 配置后端环境变量
+
+复制后端环境变量模板，并按本机服务填写 MongoDB、Redis、邮箱、存储等配置：
 
 ```bash
-pnpm dev
+cp apps/api/.env.example apps/api/.env
 ```
 
-编译项目：
+最小本地配置通常只需要先确认这些值：
+
+```dotenv
+PORT=5151
+mongo_host=127.0.0.1
+mongo_port=27017
+mongo_username=
+mongo_password=
+mongo_database=search_next
+redis_host=127.0.0.1
+redis_port=6379
+redis_password=
+redis_db=0
+storage_service=local
+local_storage_path=./assets/uploads
+```
+
+不要把真实密码、API Key、云存储密钥提交到仓库。
+
+### 启动开发服务
+
+分别启动：
+
+```bash
+pnpm dev:api
+pnpm dev
+pnpm dev:admin
+```
+
+或一次启动 API、主站和后台：
+
+```bash
+pnpm dev:all
+```
+
+默认地址：
+
+- 主站：`http://localhost:8132`
+- 管理后台：`http://localhost:8133`
+- API：`http://localhost:5151`
+- API 文档：`http://localhost:5151/doc`
+
+开发环境下，主站和后台会把 `/api` 请求代理到 `http://localhost:5151`。如需改代理目标，可在启动前设置 `VITE_API_PROXY_TARGET`，或为对应前端应用补充本地 env 文件。
+
+### 构建与预览
 
 ```bash
 pnpm build
+pnpm preview
 ```
 
-## 小组件开发
+后台与 API 单独构建：
 
-项目内置 `apps/widgets/<name>` 小组件工作流。小组件需要导出 `mount(container, props = {})`，并返回清理函数；打包产物入口固定为 `index.js`，清单文件 `widget.config.json` 的 `entry` 也应保持为 `index.js`。
+```bash
+pnpm build:admin
+pnpm build:api
+```
+
+内置小组件构建：
+
+```bash
+pnpm build:widgets
+```
+
+## 部署指南
+
+推荐部署形态：
+
+- `apps/api` 作为常驻 Node.js 服务运行，连接生产 MongoDB 与 Redis。
+- `apps/web/dist` 作为主站静态资源部署。
+- `apps/admin/dist` 作为后台静态资源部署，建议使用独立域名或子域名。
+- 使用 Nginx、Caddy 或平台网关把 `/api` 反向代理到 API 服务，并把 `/static` 转发到 API 的静态文件服务。
+
+### 生产构建
+
+在服务器或 CI 中执行：
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build:api
+pnpm build
+pnpm build:admin
+pnpm build:widgets
+```
+
+启动 API：
+
+```bash
+pnpm --filter search-next-api start:prod
+```
+
+生产环境请在 `apps/api/.env` 中配置真实的 MongoDB、Redis、邮箱、存储服务和 `PORT`。如果使用本地存储，`local_storage_path` 应放在持久化目录中，并纳入备份。
+
+### 反向代理示例
+
+主站和 API 同域部署时，可参考下面的 Nginx 配置。重点是 `/api/` 代理到后端时去掉 `/api` 前缀，因为后端路由本身不带该前缀。
+
+```nginx
+server {
+  listen 80;
+  server_name search.example.com;
+
+  root /var/www/search-next/web;
+  index index.html;
+
+  location /api/ {
+    proxy_pass http://127.0.0.1:5151/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location /static/ {
+    proxy_pass http://127.0.0.1:5151/static/;
+    proxy_set_header Host $host;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
+```
+
+后台可用另一份静态站点配置，把 `root` 指向 `apps/admin/dist` 的部署目录。若前端和 API 不同域，需要同时处理 CORS、Cookie/鉴权策略与 `/api` 请求转发策略。
+
+### 上线检查
+
+- API 进程已连接生产 MongoDB 与 Redis。
+- `/api` 能正确转发到后端，`/static` 能访问上传资源。
+- 主站和后台刷新任意路由都能回退到 `index.html`。
+- 上传目录、MongoDB、Redis 中的重要数据已配置备份。
+- 生产环境不使用仓库中的示例密钥、个人密钥或开发环境配置。
+
+## 小组件开发
 
 创建脚手架：
 
@@ -98,35 +193,25 @@ pnpm widget:create vue my-widget
 pnpm widget:create solid my-widget
 ```
 
-脚手架会生成 `apps/widgets/<name>/package.json`、`tsconfig.json`、`vite.config.js`、`widget.config.json`、`src/index`、组件、样式、图标和本地开发页。React 模板默认使用 TypeScript/TSX、Tailwind CSS utilities 和 shadcn/ui 风格的本地组件；React、Vue 和 Solid 模板都按各自框架的标准组件写法开发，并随小组件打包各自运行时，避免不同框架或不同版本依赖在宿主页面中互相冲突。React 模板只引入带 `tw:` 前缀的 Tailwind utilities，不引入全局 preflight/base，并把样式注入到小组件容器内，减少组件之间和宿主页面之间的样式串扰。模板细节见 `scripts/widget-templates/README.md`。
-
-安装依赖并启动某个小组件：
+启动某个小组件：
 
 ```bash
-pnpm install
 pnpm --filter my-widget-widget dev
 ```
 
-构建某个小组件：
+构建并打包：
 
 ```bash
 pnpm --filter my-widget-widget build
-```
-
-构建输出位于 `dist/widget-build/<name>/index.js`，并在 `dist/widget-build/<name>/screenshots/icon` 生成 icon 模式下每个 `sizeConfigs` 与浅/深主题组合的截图；`screenshots/manifest.json` 会记录截图清单。生成 `.snwidget`：
-
-```bash
 pnpm widget:pack my-widget
 ```
 
-该命令会通过 pnpm workspace 执行对应小组件的 `build`，复制 `widget.config.json`，确保截图清单已生成，并把 `screenshots` 目录一起写入 `dist/widgets/<name>-<version>.snwidget`。生成后可在开发者小组件页面填写后端解压后的远程入口进行调试。
+小组件入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的小组件。
 
-注意：小组件入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的小组件。
+## 免责声明
 
-## 常见问题说明
+本项目主要用于个人使用、学习与二次开发参考，不承诺适用于任何特定生产场景。部署、开放注册、接入第三方搜索、AI 服务、邮件服务或云存储前，请自行完成安全评估、权限隔离、限流、备份、隐私合规与成本控制。
 
-待更新
+项目中涉及的第三方图标、网站入口、搜索服务、AI 模型、云存储及其他外部资源，均受对应服务商协议约束。使用者应自行确认授权、额度、数据处理方式和当地法律法规要求。
 
-## 引用资源
-
------none------
+任何因部署、配置、二次开发、加载不可信小组件或使用第三方服务造成的数据丢失、隐私泄露、账号风险、费用损失或服务不可用，由使用者自行承担。生产环境请勿提交或复用示例密钥、个人密钥和开发环境配置。
