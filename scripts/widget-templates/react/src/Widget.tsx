@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { resources, useWidgetI18n } from "./i18n";
 import type { WidgetProps } from "./types";
 
 const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
+  const { t } = useWidgetI18n(sdk, resources);
   const [themeId, setThemeId] = useState(sdk?.theme?.activeThemeId || "light");
 
   useEffect(() => {
@@ -23,20 +25,18 @@ const Widget = ({ mode = "icon", sdk }: WidgetProps) => {
   return (
     <div className={shellClassName}>
       <div className="tw:text-[11px] tw:font-bold tw:uppercase tw:tracking-[0.08em] tw:opacity-75">
-        {isSettings ? "Settings Page" : "React Widget"}
+        {isSettings ? t("label.settings") : t("label.widget")}
       </div>
       <div className="tw:text-[22px] tw:font-extrabold tw:leading-tight">__WIDGET_DISPLAY_NAME__</div>
       {!isIcon && (
         <p className="tw:m-0 tw:text-[13px] tw:leading-normal tw:opacity-80">
-          {isSettings
-            ? "这是由小组件自行渲染的设置页。可通过 props.sdk.storage 保存偏好。"
-            : "通过 props.sdk 获取宿主能力，支持 icon/appIcon/full/settings 模式。"}
+          {!sdk ? t("copy.standalone") : isSettings ? t("copy.settings") : t("copy.host")}
         </p>
       )}
       {!isIcon && (
         <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
           <Button size="sm" variant={themeId === "dark" ? "ghost" : "secondary"} type="button">
-            shadcn/ui Button
+            {t("action.button")}
           </Button>
         </div>
       )}

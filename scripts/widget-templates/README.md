@@ -8,6 +8,7 @@
 - Tailwind CSS 使用 `tw:` 前缀，只导入 `theme` 与 `utilities`，不导入全局 preflight/base。
 - shadcn/ui 组件放在 `src/components/ui`，通用 `cn` 工具放在 `src/lib/utils.ts`，并通过 `@/*` alias 引用。
 - Vue 与 Solid 模板保持各自框架的标准组件写法；需要 Tailwind 或 shadcn 风格组件时，可参考 React 模板的样式隔离和组件目录约定迁移。
+- 模板内置基于 `i18next` 的本地 i18n 文件。资源放在 `src/i18n/locales/zh-CN.*` 与 `src/i18n/locales/en-US.*`，key 使用简短英文结构 key。
 
 ## 组件协议
 
@@ -16,7 +17,9 @@
 - `props.mode`: `icon` / `full` / `settings`
 - `props.pagePath`: 设置页等内部路由路径
 - `props.title`: 展示名称
-- `props.sdk`: 主题、storage、事件、toast 等宿主能力
+- `props.sdk`: 主题、语言、storage、事件、toast 等宿主能力
+
+宿主会通过 `props.sdk.locale`、`props.sdk.getLocale()` 或 `props.sdk.onLocaleChange(callback)` 传入当前语言；没有宿主 SDK 的独立网页部署会读取 URL `lang`/`locale`、本地存储和浏览器语言，并且需要自行把 storage、事件、toast 等 SDK 相关能力视为不可用或 no-op。
 
 React 模板入口会把编译后的 Tailwind 样式注入小组件容器，避免污染宿主页面或其他小组件。
 

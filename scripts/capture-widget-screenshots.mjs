@@ -104,6 +104,7 @@ const createPreviewHtml = ({ config, entryUrl, size, sizeId, themeId, width, hei
   const defaults = Object.fromEntries(
     (config.settingsSchema || []).map((field) => [field.key, field.default ?? null]),
   );
+  const title = config.displayNameI18n?.["zh-CN"] || config.displayName || config.name;
   return `<!doctype html>
 <html>
   <head>
@@ -131,6 +132,7 @@ const createPreviewHtml = ({ config, entryUrl, size, sizeId, themeId, width, hei
       const defaults = ${JSON.stringify(defaults)};
       const storage = new Map(Object.entries(defaults));
       const noop = () => undefined;
+      const locale = { language: "zh-CN", direction: "ltr" };
       const mount = widgetModule.mount || widgetModule.default;
       const sdk = {
         widgetId: ${JSON.stringify(`screenshot-${sizeId}-${themeId}`)},
@@ -139,6 +141,9 @@ const createPreviewHtml = ({ config, entryUrl, size, sizeId, themeId, width, hei
         size: ${JSON.stringify(size)},
         config,
         theme: { activeThemeId: ${JSON.stringify(themeId)} },
+        locale,
+        getLocale: () => locale,
+        onLocaleChange: () => noop,
         storage: {
           get: (key) => Promise.resolve(storage.has(key) ? storage.get(key) : null),
           set: (key, value) => {
@@ -171,7 +176,7 @@ const createPreviewHtml = ({ config, entryUrl, size, sizeId, themeId, width, hei
 
       mount(document.getElementById("root"), {
         mode: "icon",
-        title: config.displayName || config.name,
+        title: ${JSON.stringify(title)},
         sdk,
       });
       window.__WIDGET_SCREENSHOT_READY__ = true;
