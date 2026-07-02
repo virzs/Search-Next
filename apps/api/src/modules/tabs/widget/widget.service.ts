@@ -22,6 +22,9 @@ type WidgetSettingsType = 'input' | 'select' | 'switch' | 'textarea' | 'number';
 type PopulatedResource = { name?: string; url?: string };
 type WidgetAppIcon = { type: 'image' | 'custom'; src?: string };
 type WidgetPagePaths = { settings?: string };
+type WidgetLanguage = 'zh-CN' | 'en-US';
+type LocalizedText = Partial<Record<WidgetLanguage, string>>;
+type LocalizedStringList = Partial<Record<WidgetLanguage, string[]>>;
 type WidgetScreenshot = {
   mode?: string;
   themeId: string;
@@ -43,13 +46,16 @@ type WidgetPackageConfig = {
   schemaVersion?: string;
   name: string;
   displayName?: string;
+  displayNameI18n?: LocalizedText;
   version: string;
   description?: string;
+  descriptionI18n?: LocalizedText;
   author?: string;
   entry: string;
   icon?: string;
   appIcon?: WidgetAppIcon;
   tags?: string[];
+  tagsI18n?: LocalizedStringList;
   sizeConfigs: WidgetSizeConfig[];
   defaultSizeId: string;
   supportIconMode?: boolean;
@@ -571,6 +577,41 @@ export class WidgetService {
     return Object.keys(normalized).length ? normalized : undefined;
   }
 
+  private normalizeLocalizedText(value: unknown): LocalizedText | undefined {
+    if (value == null) return undefined;
+    if (!this.isRecord(value)) {
+      throw new BadRequestException('多语言文案配置必须为对象');
+    }
+    const normalized: LocalizedText = {};
+    (['zh-CN', 'en-US'] as WidgetLanguage[]).forEach((language) => {
+      const text = value[language];
+      if (this.isNonEmptyString(text)) {
+        normalized[language] = text.trim();
+      }
+    });
+    return Object.keys(normalized).length ? normalized : undefined;
+  }
+
+  private normalizeLocalizedStringList(
+    value: unknown,
+  ): LocalizedStringList | undefined {
+    if (value == null) return undefined;
+    if (!this.isRecord(value)) {
+      throw new BadRequestException('多语言标签配置必须为对象');
+    }
+    const normalized: LocalizedStringList = {};
+    (['zh-CN', 'en-US'] as WidgetLanguage[]).forEach((language) => {
+      const list = value[language];
+      if (Array.isArray(list)) {
+        const tags = list
+          .filter((tag): tag is string => this.isNonEmptyString(tag))
+          .map((tag) => tag.trim());
+        if (tags.length) normalized[language] = tags;
+      }
+    });
+    return Object.keys(normalized).length ? normalized : undefined;
+  }
+
   private normalizeRoutePath(value: string) {
     const routePath = value.trim();
     if (
@@ -647,12 +688,15 @@ export class WidgetService {
       schemaVersion: config.schemaVersion,
       name: config.name,
       displayName: config.displayName,
+      displayNameI18n: this.normalizeLocalizedText(config.displayNameI18n),
       version: config.version,
       description: config.description,
+      descriptionI18n: this.normalizeLocalizedText(config.descriptionI18n),
       author: config.author,
       entry: config.entry,
       icon: config.icon,
       tags: Array.isArray(config.tags) ? config.tags : [],
+      tagsI18n: this.normalizeLocalizedStringList(config.tagsI18n),
       sizeConfigs: config.sizeConfigs ?? [],
       defaultSizeId: config.defaultSizeId ?? '',
       supportIconMode: config.supportIconMode ?? false,
@@ -673,12 +717,15 @@ export class WidgetService {
       schemaVersion: config.schemaVersion,
       name: config.name,
       displayName: config.displayName,
+      displayNameI18n: config.displayNameI18n,
       version: config.version,
       description: config.description,
+      descriptionI18n: config.descriptionI18n,
       author: config.author,
       entry: config.entry,
       icon: config.icon,
       tags: config.tags ?? [],
+      tagsI18n: config.tagsI18n,
       sizeConfigs: config.sizeConfigs,
       defaultSizeId: config.defaultSizeId,
       supportIconMode: config.supportIconMode ?? false,
