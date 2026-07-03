@@ -1,0 +1,32 @@
+{
+  "name": "soldier-rush-3d-widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build && pnpm run screenshots",
+    "screenshots": "node ../../../scripts/capture-widget-screenshots.mjs soldier-rush-3d",
+    "preview": "vite preview --host"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "i18next": "^24.2.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^2.6.0",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/three": "^0.185.0",
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "tailwindcss": "^4.1.17",
+    "typescript": "~5.7.2",
+    "vite": "^7.1.12"
+  }
+}

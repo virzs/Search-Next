@@ -1,0 +1,36 @@
+{
+  "name": "soldier-rush-3d",
+  "displayName": "士兵冲锋 3D",
+  "displayNameI18n": {
+    "zh-CN": "士兵冲锋 3D",
+    "en-US": "Soldier Rush 3D"
+  },
+  "version": "0.1.0",
+  "description": "控制低多边形小队自动前进射击，在左右增益门中选择肉鸽强化并挑战递增难度的 3D 跑酷射击游戏",
+  "descriptionI18n": {
+    "zh-CN": "控制低多边形小队自动前进射击，在左右增益门中选择肉鸽强化并挑战递增难度的 3D 跑酷射击游戏",
+    "en-US": "A low-poly 3D runner shooter with roguelite upgrade gates, scaling enemy waves, and persistent final scores"
+  },
+  "author": "Search-Next",
+  "entry": "index.js",
+  "icon": "icon.svg",
+  "tags": ["游戏", "3D", "射击", "肉鸽", "跑酷"],
+  "tagsI18n": {
+    "zh-CN": ["游戏", "3D", "射击", "肉鸽", "跑酷"],
+    "en-US": ["Game", "3D", "Shooter", "Roguelite", "Runner"]
+  },
+  "sizeConfigs": [
+    { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
+  ],
+  "defaultSizeId": "1x1",
+  "supportIconMode": false,
+  "supportAppMode": true,
+  "appIcon": { "type": "image", "src": "icon.svg" },
+  "pagePaths": {
+    "settings": "/settings"
+  },
+  "settingsSchema": [
+    { "key": "musicVolume", "type": "number", "label": "音乐音量", "default": 0.28 },
+    { "key": "effectsVolume", "type": "number", "label": "音效音量", "default": 0.52 }
+  ]
+}

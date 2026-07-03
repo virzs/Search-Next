@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <clipPath id="round">
+      <rect width="64" height="64" rx="15" />
+    </clipPath>
+    <linearGradient id="sky" x1="32" x2="32" y1="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#56c7f1" />
+      <stop offset="0.43" stop-color="#7ee1c2" />
+      <stop offset="0.44" stop-color="#40bf68" />
+      <stop offset="1" stop-color="#168653" />
+    </linearGradient>
+    <linearGradient id="road" x1="32" x2="32" y1="5" y2="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff6b8" />
+      <stop offset="0.48" stop-color="#f8d26c" />
+      <stop offset="1" stop-color="#b96827" />
+    </linearGradient>
+    <linearGradient id="suit" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#38c7ff" />
+      <stop offset="1" stop-color="#1257ad" />
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#07121c" flood-opacity="0.3" />
+    </filter>
+    <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="1.6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="64" height="64" fill="url(#sky)" />
+    <circle cx="32" cy="9" r="18" fill="#ffffff" opacity="0.36" />
+    <circle cx="8" cy="64" r="25" fill="#166534" opacity="0.34" />
+    <circle cx="58" cy="62" r="27" fill="#166534" opacity="0.36" />
+
+    <path d="M25 5h14l24 63H1L25 5Z" fill="url(#road)" filter="url(#shadow)" />
+    <path d="M25 5h1.6L12.8 64h-2L25 5ZM37.4 5H39l14.2 59h-2L37.4 5Z" fill="#fff8dc" opacity="0.68" />
+    <rect x="30.4" y="11" width="3.2" height="7.2" rx="1.6" fill="#fffef1" opacity="0.58" />
+    <rect x="30" y="26" width="4" height="8.6" rx="2" fill="#fffef1" opacity="0.8" />
+    <rect x="29.7" y="45" width="4.6" height="10.5" rx="2.3" fill="#fffef1" />
+
+    <g filter="url(#shadow)">
+      <rect x="6" y="12" width="13" height="21" rx="5" fill="#16a34a" stroke="#ecfdf5" stroke-width="2" />
+      <path d="M12.5 17.5v10M7.9 22.5h9.2" stroke="#ecfdf5" stroke-width="2.4" stroke-linecap="round" />
+      <rect x="45" y="12" width="13" height="21" rx="5" fill="#ea580c" stroke="#fff7ed" stroke-width="2" />
+      <path d="M49 19h5M48.2 23h6.6M49 27h5" stroke="#fff7ed" stroke-width="2.3" stroke-linecap="round" />
+    </g>
+
+    <g filter="url(#glow)">
+      <rect x="26.8" y="27" width="3.5" height="13.5" rx="1.75" fill="#fff3a3" />
+      <rect x="31.1" y="22" width="3.8" height="15" rx="1.9" fill="#fff3a3" />
+      <rect x="35.7" y="27" width="3.5" height="13.5" rx="1.75" fill="#fff3a3" />
+    </g>
+
+    <g filter="url(#shadow)">
+      <g transform="translate(14.5 40.5) scale(.9)">
+        <rect x="3" y="8" width="8" height="13.5" rx="2.5" fill="url(#suit)" />
+        <rect x="3.5" y="2.2" width="7" height="5" rx="2" fill="#ffd1a8" />
+        <rect x="3" y=".2" width="8" height="3" rx="1.5" fill="#0f3f85" />
+        <rect x="10" y="11" width="7" height="2.2" rx="1.1" fill="#111827" transform="rotate(-8 10 11)" />
+        <path d="M4.2 21.5h2.1v5H4.2zM7.8 21.5h2.1v5H7.8z" fill="#172033" />
+      </g>
+      <g transform="translate(26 36.4)">
+        <rect x="2.5" y="8" width="9" height="17" rx="2.8" fill="url(#suit)" />
+        <path d="M4 10.5h6" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity=".5" />
+        <rect x="3.1" y="1.9" width="7.8" height="5.7" rx="2.2" fill="#ffd1a8" />
+        <rect x="2.4" y="0" width="9.2" height="3.4" rx="1.7" fill="#0f3f85" />
+        <rect x="10.8" y="12.2" width="8" height="2.4" rx="1.2" fill="#111827" transform="rotate(-8 10.8 12.2)" />
+        <path d="M4.2 25h2.4v5.7H4.2zM8 25h2.4v5.7H8z" fill="#172033" />
+      </g>
+      <g transform="translate(43 40.5) scale(.9)">
+        <rect x="3" y="8" width="8" height="13.5" rx="2.5" fill="url(#suit)" />
+        <rect x="3.5" y="2.2" width="7" height="5" rx="2" fill="#ffd1a8" />
+        <rect x="3" y=".2" width="8" height="3" rx="1.5" fill="#0f3f85" />
+        <rect x="10" y="11" width="7" height="2.2" rx="1.1" fill="#111827" transform="rotate(-8 10 11)" />
+        <path d="M4.2 21.5h2.1v5H4.2zM7.8 21.5h2.1v5H7.8z" fill="#172033" />
+      </g>
+    </g>
+
+    <rect width="64" height="64" fill="none" stroke="#ffffff" stroke-opacity="0.36" stroke-width="2" />
+  </g>
+</svg>
