@@ -45,7 +45,7 @@ export class SearchProviderController {
   }
 
   @Get()
-  @ApiOperation({ summary: '获取所有搜索提供商' })
+  @ApiOperation({ summary: '搜索提供商列表' })
   @ApiResponse({
     status: 200,
     description: '获取成功',
@@ -57,7 +57,7 @@ export class SearchProviderController {
   }
 
   @Get('enabled')
-  @ApiOperation({ summary: '获取启用的搜索提供商' })
+  @ApiOperation({ summary: '启用搜索提供商' })
   @ApiResponse({
     status: 200,
     description: '获取成功',
@@ -69,7 +69,7 @@ export class SearchProviderController {
   }
 
   @Get('default')
-  @ApiOperation({ summary: '获取默认搜索提供商' })
+  @ApiOperation({ summary: '默认搜索提供商' })
   @ApiResponse({
     status: 200,
     description: '获取成功',
@@ -84,7 +84,7 @@ export class SearchProviderController {
   }
 
   @Get('stats')
-  @ApiOperation({ summary: '获取提供商统计信息' })
+  @ApiOperation({ summary: '搜索提供商统计' })
   @ApiResponse({ status: 200, description: '获取成功' })
   async getProviderStats() {
     const stats = await this.searchProviderService.getProviderStats();
@@ -92,7 +92,7 @@ export class SearchProviderController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: '根据ID获取搜索提供商' })
+  @ApiOperation({ summary: '搜索提供商详情' })
   @ApiParam({ name: 'id', description: '提供商ID' })
   @ApiResponse({
     status: 200,
@@ -156,7 +156,7 @@ export class SearchProviderController {
   }
 
   @Get('name/:name')
-  @ApiOperation({ summary: '根据名称获取搜索提供商' })
+  @ApiOperation({ summary: '按名称查询搜索提供商' })
   @ApiParam({ name: 'name', description: '提供商名称' })
   @ApiResponse({
     status: 200,
@@ -172,7 +172,7 @@ export class SearchProviderController {
   }
 
   @Post('seed/init')
-  @ApiOperation({ summary: '初始化默认搜索提供商配置' })
+  @ApiOperation({ summary: '初始化默认搜索提供商' })
   @ApiResponse({ status: 200, description: '初始化成功' })
   async initDefaultProviders() {
     await this.defaultProvidersSeed.seedDefaultProviders();
@@ -180,7 +180,7 @@ export class SearchProviderController {
   }
 
   @Post('seed/reset')
-  @ApiOperation({ summary: '重置所有搜索提供商配置' })
+  @ApiOperation({ summary: '重置搜索提供商配置' })
   @ApiResponse({ status: 200, description: '重置成功' })
   async resetProviders() {
     await this.defaultProvidersSeed.resetProviders();

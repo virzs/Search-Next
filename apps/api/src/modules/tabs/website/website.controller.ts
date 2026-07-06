@@ -28,7 +28,7 @@ export class WebsiteController {
   constructor(private readonly websiteService: WebsiteService) {}
 
   @Get('/')
-  @ApiOperation({ summary: '网站分页 (后台)' })
+  @ApiOperation({ summary: '网站分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   getWebsite(@Query() query: WebsiteForAdminDto) {
@@ -36,7 +36,7 @@ export class WebsiteController {
   }
 
   @Get('/user')
-  @ApiOperation({ summary: '网站分页 (用户)' })
+  @ApiOperation({ summary: '用户网站分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   @ApiParam({ name: 'classify', description: '分类', example: ['123'] })
@@ -48,7 +48,7 @@ export class WebsiteController {
 
   @Get('/public')
   @RequireLogin()
-  @ApiOperation({ summary: '公开网站分页（精简字段）' })
+  @ApiOperation({ summary: '公开网站分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   @ApiParam({ name: 'classify', description: '分类', required: false })

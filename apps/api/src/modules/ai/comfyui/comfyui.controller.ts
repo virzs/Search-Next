@@ -51,21 +51,21 @@ export class ComfyuiController {
 
   @Post('/relay/job/update')
   @RequireLogin()
-  @ApiOperation({ summary: '中转服务回调：同步任务状态' })
+  @ApiOperation({ summary: '同步任务状态回调' })
   async relayUpdate(@Body() body: JobStatusUpdateDto) {
     return await this.service.updateFromRelay(body);
   }
 
   @Post('/relay/health')
   @RequireLogin()
-  @ApiOperation({ summary: '中转服务回调：同步ComfyUI连接状态' })
+  @ApiOperation({ summary: '同步 ComfyUI 连接回调' })
   async relayHealth(@Body() body: { connected: boolean }) {
     return this.service.setComfyHealth(!!body.connected);
   }
 
   @Get('/health')
   @RequireLogin()
-  @ApiOperation({ summary: '查询ComfyUI连接状态' })
+  @ApiOperation({ summary: 'ComfyUI 连接状态' })
   async health() {
     return this.service.getComfyHealth();
   }

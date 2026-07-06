@@ -37,7 +37,7 @@ export class AuthController {
     return this.authService.login(body, headers);
   }
 
-  @ApiOperation({ summary: '刷新token' })
+  @ApiOperation({ summary: '刷新 Token' })
   @ApiBody({ type: RefreshTokenDto })
   @Post('refresh-token')
   @RequireLogin()

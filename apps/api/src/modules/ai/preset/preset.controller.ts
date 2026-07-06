@@ -22,7 +22,7 @@ export class AiPresetController {
   constructor(private readonly aiPresetService: AiPresetService) {}
 
   @Post()
-  @ApiOperation({ summary: '创建AI配置' })
+  @ApiOperation({ summary: '创建 AI 配置' })
   @ApiResponse({ status: 201, description: '创建成功', type: AiPreset })
   async create(
     @Body() createPresetDto: CreateAiPresetDto,
@@ -32,7 +32,7 @@ export class AiPresetController {
   }
 
   @Get()
-  @ApiOperation({ summary: '获取AI配置列表' })
+  @ApiOperation({ summary: 'AI 配置列表' })
   @ApiResponse({ status: 200, description: '获取成功' })
   async findAll(@Query() query: PageDto & any) {
     const { data, total } = await this.aiPresetService.findAll(query);
@@ -40,21 +40,21 @@ export class AiPresetController {
   }
 
   @Get('list')
-  @ApiOperation({ summary: '获取AI配置简单列表（不分页）' })
+  @ApiOperation({ summary: 'AI 配置选项' })
   @ApiResponse({ status: 200, description: '获取成功' })
   async findSimpleList(): Promise<{ _id: string; name: string }[]> {
     return this.aiPresetService.findSimpleList();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: '获取AI配置详情' })
+  @ApiOperation({ summary: 'AI 配置详情' })
   @ApiResponse({ status: 200, description: '获取成功', type: AiPreset })
   async findOne(@Param('id') id: string): Promise<AiPreset> {
     return this.aiPresetService.findOne(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: '更新AI配置' })
+  @ApiOperation({ summary: '更新 AI 配置' })
   @ApiResponse({ status: 200, description: '更新成功', type: AiPreset })
   async update(
     @Param('id') id: string,
@@ -65,14 +65,14 @@ export class AiPresetController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: '删除AI配置' })
+  @ApiOperation({ summary: '删除 AI 配置' })
   @ApiResponse({ status: 200, description: '删除成功' })
   async remove(@Param('id') id: string): Promise<void> {
     return this.aiPresetService.remove(id);
   }
 
   @Put(':id/toggle')
-  @ApiOperation({ summary: '切换AI配置启用状态' })
+  @ApiOperation({ summary: '切换 AI 配置启用状态' })
   @ApiResponse({ status: 200, description: '切换成功', type: AiPreset })
   async toggleEnabled(@Param('id') id: string): Promise<AiPreset> {
     return this.aiPresetService.toggleEnabled(id);

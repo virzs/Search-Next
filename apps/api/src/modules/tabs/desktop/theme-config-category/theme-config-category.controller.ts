@@ -34,7 +34,7 @@ export class ThemeConfigCategoryController {
 
   @Get('/user')
   @RequireLogin()
-  @ApiOperation({ summary: '用户获取启用且有主题的分类列表' })
+  @ApiOperation({ summary: '用户主题分类列表' })
   getUserThemeCategories() {
     return this.themeConfigCategoryService.getUserThemeCategories();
   }

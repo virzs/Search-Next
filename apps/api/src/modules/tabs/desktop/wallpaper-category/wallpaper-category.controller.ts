@@ -34,13 +34,13 @@ export class WallpaperCategoryController {
 
   @Get('/user')
   @RequireLogin()
-  @ApiOperation({ summary: '用户获取启用且有壁纸的分类列表' })
+  @ApiOperation({ summary: '用户壁纸分类列表' })
   getUserWallpaperCategories() {
     return this.wallpaperCategoryService.getUserWallpaperCategories();
   }
 
   @Get('/admin/enabled')
-  @ApiOperation({ summary: '管理员获取全部启用分类列表' })
+  @ApiOperation({ summary: '启用壁纸分类列表' })
   getAdminEnabledWallpaperCategories() {
     return this.wallpaperCategoryService.getAdminEnabledWallpaperCategories();
   }

@@ -123,11 +123,15 @@ export class UsersService {
       return true;
     }
 
-    const permissions = result.roles
-      .map((i) => i.permissions)
+    const permissions = (result.roles ?? [])
+      .map((i) => i.permissions ?? [])
       .flat()
+      .filter((item) => item && !item.isStale)
       .filter((item, index, self) => {
-        return index === self.findIndex((t) => t._id === item._id);
+        return (
+          index ===
+          self.findIndex((t) => t._id?.toString() === item._id?.toString())
+        );
       });
 
     return permissions;

@@ -26,14 +26,14 @@ export class CollectionController {
 
   @Get('/public/list')
   @RequireLogin()
-  @ApiOperation({ summary: '获取所有合集列表（截取绑定前15个网站）' })
+  @ApiOperation({ summary: '公开合集列表' })
   getAllCollectionsForPublic() {
     return this.collectionService.getAllForPublic();
   }
 
   @Get('/public/:id/websites')
   @RequireLogin()
-  @ApiOperation({ summary: '合集详情网站分页（公开）' })
+  @ApiOperation({ summary: '合集网站分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   getCollectionWebsitesPage(
@@ -44,7 +44,7 @@ export class CollectionController {
   }
 
   @Get('/')
-  @ApiOperation({ summary: '合集分页 (后台)' })
+  @ApiOperation({ summary: '合集分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   @ApiParam({ name: 'search', description: '搜索标题', required: false })
@@ -59,7 +59,7 @@ export class CollectionController {
   }
 
   @Post('/preview_dynamic')
-  @ApiOperation({ summary: '动态合集规则预览（后台）' })
+  @ApiOperation({ summary: '动态合集预览' })
   previewDynamic(@Body() body: WebsiteCollectionPreviewDynamicDto) {
     return this.collectionService.previewDynamic(body);
   }

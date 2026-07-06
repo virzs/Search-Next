@@ -96,7 +96,7 @@ export class ResourceController {
 
   // 批量获取访问链接
   @Get('/urls')
-  @ApiOperation({ summary: '批量获取访问链接' })
+  @ApiOperation({ summary: '批量访问链接' })
   async getVisitUrls(@Query() query: GetVisitUrlsDto) {
     const result = await this.resourceService.getVisitUrls(query.ids);
     return result;
@@ -104,7 +104,7 @@ export class ResourceController {
 
   // 获取访问链接
   @Get('/url/:id')
-  @ApiOperation({ summary: '获取访问链接' })
+  @ApiOperation({ summary: '资源访问链接' })
   async getVisitUrl(@Param('id') id: string) {
     const result = await this.resourceService.getVisitUrl(id);
     return result;
@@ -126,7 +126,7 @@ export class ResourceController {
 
   // 删除资源，不可恢复
   @Delete('/recycle/:id')
-  @ApiOperation({ summary: '删除资源，不可恢复' })
+  @ApiOperation({ summary: '永久删除资源' })
   async deletePermanent(@Param('id') id: string) {
     return await this.resourceService.deleteFilePermanent(id);
   }
@@ -149,7 +149,7 @@ export class ResourceController {
 
   // 列表
   @Get()
-  @ApiOperation({ summary: '列表' })
+  @ApiOperation({ summary: '资源列表' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   async listAll(@Query() query: PageDto) {
@@ -158,7 +158,7 @@ export class ResourceController {
 
   // 按服务筛选列表
   @Get('/:service')
-  @ApiOperation({ summary: '列表（按服务）' })
+  @ApiOperation({ summary: '按服务查询资源' })
   @ApiParam({ name: 'service', description: '服务标识', example: 'blog' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
@@ -171,7 +171,7 @@ export class ResourceController {
 
   // 获取单个资源所有关联数据
   @Get('/association/:id')
-  @ApiOperation({ summary: '获取单个资源所有关联数据' })
+  @ApiOperation({ summary: '资源关联数据' })
   async getAssociation(@Param('id') id: string) {
     return await this.resourceService.getAssociatedData(id);
   }

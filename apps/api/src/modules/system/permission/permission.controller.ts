@@ -20,7 +20,7 @@ export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Get('tree')
-  @ApiOperation({ summary: '权限' })
+  @ApiOperation({ summary: '权限树' })
   tree(@Query() query: TreeDto) {
     return this.permissionService.treeInfo(query);
   }

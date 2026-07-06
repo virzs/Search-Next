@@ -12,7 +12,9 @@ import { AiSearchService } from './ai-search.service';
 import { AiSearchDto, AiSearchResponseDto } from './dto/ai-search.dto';
 import { User } from 'src/public/decorator/route-user.decoratpr';
 import { Response } from 'src/utils/response';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('AI搜索')
 @Controller('ai-search')
 export class AiSearchController {
   constructor(private readonly aiSearchService: AiSearchService) {}
@@ -21,6 +23,7 @@ export class AiSearchController {
    * 执行AI搜索
    */
   @Post('search')
+  @ApiOperation({ summary: '执行 AI 搜索' })
   async performSearch(
     @Body(ValidationPipe) searchDto: AiSearchDto,
     @User('_id') userId: string,
@@ -32,6 +35,7 @@ export class AiSearchController {
    * 获取用户搜索历史（分页）
    */
   @Get('history')
+  @ApiOperation({ summary: 'AI 搜索历史' })
   async getUserSearchHistory(
     @User('_id') userId: string,
     @Query('page') page: number = 1,
@@ -54,6 +58,7 @@ export class AiSearchController {
    * 根据ID获取搜索记录详情
    */
   @Get('record/:id')
+  @ApiOperation({ summary: 'AI 搜索记录详情' })
   async getSearchRecordById(@Param('id') recordId: string) {
     const record = await this.aiSearchService.getSearchRecordById(recordId);
     if (!record) {

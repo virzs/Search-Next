@@ -29,7 +29,7 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Get('/')
-  @ApiOperation({ summary: '标签分页 (后台)' })
+  @ApiOperation({ summary: '标签分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   @ApiParam({ name: 'search', description: '搜索关键词', required: false })
@@ -40,7 +40,7 @@ export class TagController {
   }
 
   @Get('/user')
-  @ApiOperation({ summary: '标签分页 (用户)' })
+  @ApiOperation({ summary: '用户标签分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   @ApiParam({ name: 'search', description: '搜索关键词', required: false })
@@ -49,20 +49,20 @@ export class TagController {
   }
 
   @Get('/all')
-  @ApiOperation({ summary: '获取所有启用的标签' })
+  @ApiOperation({ summary: '启用标签列表' })
   getAllEnabledTags() {
     return this.tagService.getAllEnabledTags();
   }
 
   @Get('/search')
-  @ApiOperation({ summary: '根据名称搜索标签列表' })
+  @ApiOperation({ summary: '搜索标签' })
   @ApiParam({ name: 'search', description: '搜索关键词' })
   searchTagsByName(@Query() query: SearchTagDto) {
     return this.tagService.searchTagsByName(query);
   }
 
   @Post('/quick')
-  @ApiOperation({ summary: '快速创建标签（只需名称）' })
+  @ApiOperation({ summary: '快速创建标签' })
   @RequireLogin()
   quickCreateTag(@Body() body: QuickCreateTagDto, @User('_id') user: string) {
     return this.tagService.quickCreateTag(body, user);
@@ -83,14 +83,14 @@ export class TagController {
   }
 
   @Post('/relation')
-  @ApiOperation({ summary: '添加标签与网站的关联关系' })
+  @ApiOperation({ summary: '添加网站标签' })
   @RequireLogin()
   addTagWebsiteRelation(@Body() body: TagWebsiteRelationDto) {
     return this.tagService.manageTagWebsiteRelation(body, 'add');
   }
 
   @Delete('/relation')
-  @ApiOperation({ summary: '移除标签与网站的关联关系' })
+  @ApiOperation({ summary: '移除网站标签' })
   @RequireLogin()
   removeTagWebsiteRelation(@Body() body: TagWebsiteRelationDto) {
     return this.tagService.manageTagWebsiteRelation(body, 'remove');

@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { UsersService } from 'src/modules/users/users.service';
+import { normalizePermissionPath } from 'src/modules/system/permission/permission-route.util';
 
 declare module 'express' {
   interface Request {
@@ -59,7 +60,7 @@ export class PermissionGuard implements CanActivate {
     }
 
     const { path, methods } = route;
-    console.log(path, methods, user);
+    const routePath = normalizePermissionPath(path);
     const permissions = await this.userService.getPermissions(user);
 
     if (permissions === true) {
@@ -71,7 +72,11 @@ export class PermissionGuard implements CanActivate {
         .filter((i) => i[1])
         .map((d) => d[0]);
 
-      return i.url === path && routeMethods.includes(i.method.toLowerCase());
+      return (
+        !i.isStale &&
+        normalizePermissionPath(i.url) === routePath &&
+        routeMethods.includes(i.method?.toLowerCase())
+      );
     });
 
     if (!hasPermission) {

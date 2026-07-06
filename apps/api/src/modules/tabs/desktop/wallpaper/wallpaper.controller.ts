@@ -33,14 +33,14 @@ export class WallpaperController {
 
   @Get('/upload/active')
   @RequireLogin()
-  @ApiOperation({ summary: '用户获取启用的壁纸分页（支持分类筛选）' })
+  @ApiOperation({ summary: '用户壁纸分页' })
   getActiveWallpapers(@Query() query: PageDto & { categoryId?: string }) {
     return this.wallpaperService.getActiveWallpapers(query);
   }
 
   @Get('/groups')
   @RequireLogin()
-  @ApiOperation({ summary: '用户按分组获取壁纸（自行上传）' })
+  @ApiOperation({ summary: '用户分组壁纸' })
   async getWallpaperGroups(@Query() query: WallpaperGroupQueryDto) {
     const uploads =
       await this.wallpaperService.getActiveWallpaperCategoryGroups(query);
@@ -48,7 +48,7 @@ export class WallpaperController {
   }
 
   @Post('/upload')
-  @ApiOperation({ summary: '创建壁纸（自行上传）' })
+  @ApiOperation({ summary: '创建壁纸' })
   createWallpaper(@Body() body: CreateWallpaperDto, @User('_id') user: string) {
     return this.wallpaperService.createWallpaper(body, user);
   }

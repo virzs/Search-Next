@@ -16,7 +16,7 @@ export class PlaygroundController {
    */
   @All()
   @All('*')
-  @ApiOperation({ summary: 'OpenAI通用代理接口' })
+  @ApiOperation({ summary: 'OpenAI 通用代理' })
   @ApiResponse({ status: 200, description: '成功' })
   async universalProxy(
     @Req() req: Request,

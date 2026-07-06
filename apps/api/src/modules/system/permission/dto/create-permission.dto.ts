@@ -31,7 +31,7 @@ export class CreatePermissionDto {
 
   @ApiProperty({ description: '请求方法' })
   @ValidateIf((o) => !!o.parent && [2].includes(o.level))
-  @IsIn(['GET', 'POST', 'PUT', 'DELETE'])
+  @IsIn(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
   @Expose()
   method: string;
 

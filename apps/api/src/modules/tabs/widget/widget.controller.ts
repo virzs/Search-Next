@@ -26,7 +26,7 @@ export class WidgetController {
   // 获取公开可见的小组件列表（无需登录）
   @Get('/public')
   @RequireLogin()
-  @ApiOperation({ summary: '获取所有已启用的小组件列表（公开接口）' })
+  @ApiOperation({ summary: '公开小组件列表' })
   listPublic() {
     return this.widgetService.listPublic();
   }
@@ -34,7 +34,7 @@ export class WidgetController {
   // 获取公开可见的小组件详情（无需登录）
   @Get('/public/:id')
   @RequireLogin()
-  @ApiOperation({ summary: '获取小组件详情（公开接口）' })
+  @ApiOperation({ summary: '公开小组件详情' })
   detailPublic(@Param('id') id: string) {
     return this.widgetService.detailPublic(id);
   }
@@ -63,7 +63,7 @@ export class WidgetController {
   @Post('/package')
   @RequireLogin()
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: '导入.snwidget小组件包' })
+  @ApiOperation({ summary: '导入小组件包' })
   importPackage(
     @UploadedFile() file: Express.Multer.File,
     @Query('widgetId') widgetId: string,
@@ -74,7 +74,7 @@ export class WidgetController {
 
   @Put('/:id/versions/:versionId/publish')
   @RequireLogin()
-  @ApiOperation({ summary: '发布指定小组件版本' })
+  @ApiOperation({ summary: '发布小组件版本' })
   publishVersion(
     @Param('id') id: string,
     @Param('versionId') versionId: string,
@@ -103,7 +103,7 @@ export class WidgetController {
 
   @Delete('/:id')
   @RequireLogin()
-  @ApiOperation({ summary: '删除小组件（软删除）' })
+  @ApiOperation({ summary: '删除小组件' })
   delete(@Param('id') id: string) {
     return this.widgetService.delete(id);
   }

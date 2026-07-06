@@ -33,7 +33,7 @@ export class ThemeConfigController {
 
   @Get('/active')
   @RequireLogin()
-  @ApiOperation({ summary: '获取所有启用的主题配置（支持分类筛选）' })
+  @ApiOperation({ summary: '启用主题配置列表' })
   getActiveThemeConfigs(@Query() query: ActiveThemeConfigQueryDto) {
     return this.themeConfigService.getActiveThemeConfigs(query);
   }

@@ -13,13 +13,13 @@ export class AiGatewayController {
   constructor(private readonly aiGatewayService: AiGatewayService) {}
 
   @Get('models')
-  @ApiOperation({ summary: 'OpenAI-compatible 模型列表' })
+  @ApiOperation({ summary: 'OpenAI 兼容模型列表' })
   listModels(@Req() req: Request) {
     return this.aiGatewayService.listModels(req.aiConsumerKey);
   }
 
   @Post('chat/completions')
-  @ApiOperation({ summary: 'OpenAI-compatible Chat Completions' })
+  @ApiOperation({ summary: 'OpenAI 兼容对话补全' })
   async chatCompletions(
     @Body() body: any,
     @Req() req: Request,

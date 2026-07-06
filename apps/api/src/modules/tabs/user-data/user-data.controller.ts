@@ -17,14 +17,14 @@ export class UserDataController {
 
   @Get('/sync')
   @SkipPermission()
-  @ApiOperation({ summary: '获取当前用户云同步数据' })
+  @ApiOperation({ summary: '当前用户云同步数据' })
   getSync(@User('_id') userId: string, @User('roles') roles: any[]) {
     return this.userDataService.getSync(userId, roles);
   }
 
   @Put('/sync')
   @SkipPermission()
-  @ApiOperation({ summary: '覆盖保存当前用户云同步数据' })
+  @ApiOperation({ summary: '保存用户云同步数据' })
   saveSync(
     @User('_id') userId: string,
     @User('roles') roles: any[],
@@ -39,7 +39,7 @@ export class UserDataController {
 
   @Put('/sync/:id/name')
   @SkipPermission()
-  @ApiOperation({ summary: '修改当前用户云备份名称' })
+  @ApiOperation({ summary: '修改云备份名称' })
   renameSyncBackup(
     @Param('id') id: string,
     @User('_id') userId: string,
@@ -55,19 +55,19 @@ export class UserDataController {
   }
 
   @Get('/sync/admin')
-  @ApiOperation({ summary: '管理员查看用户同步元信息' })
+  @ApiOperation({ summary: '用户同步元信息' })
   getAdminSyncList(@Query() query: UserDataSyncAdminQueryDto) {
     return this.userDataService.getAdminSyncList(query);
   }
 
   @Get('/sync/admin/:userId/versions')
-  @ApiOperation({ summary: '管理员查看某用户云备份版本元信息' })
+  @ApiOperation({ summary: '云备份版本元信息' })
   getAdminUserVersions(@Param() params: UserDataSyncAdminVersionsQueryDto) {
     return this.userDataService.getAdminUserVersions(params.userId);
   }
 
   @Delete('/sync/admin/versions/:id')
-  @ApiOperation({ summary: '管理员删除用户云备份版本' })
+  @ApiOperation({ summary: '删除云备份版本' })
   deleteAdminVersion(@Param('id') id: string) {
     return this.userDataService.deleteAdminVersion(id);
   }

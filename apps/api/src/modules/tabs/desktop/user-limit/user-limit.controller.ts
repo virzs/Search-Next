@@ -14,14 +14,14 @@ export class UserLimitController {
   constructor(private readonly userLimitService: UserLimitService) {}
 
   @Get('/')
-  @ApiOperation({ summary: '获取用户配置限制' })
+  @ApiOperation({ summary: '用户配置限制' })
   getUserConfigLimit() {
     return this.userLimitService.getUserConfigLimit();
   }
 
   @Get('/public')
   @OptionalLogin()
-  @ApiOperation({ summary: '获取用户配置限制（无需登录）' })
+  @ApiOperation({ summary: '公开用户配置限制' })
   async getUserConfigLimitPublic(@User('roles') roles) {
     return this.userLimitService.getUserLimitForRoles(roles);
   }

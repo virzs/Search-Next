@@ -6,6 +6,8 @@ import BaseSchema, {
 import mongoose from 'mongoose';
 import { PermissionName } from './ref-names';
 
+export type PermissionSource = 'manual' | 'auto';
+
 @Schema({ timestamps: true })
 export class Permission extends BaseSchema {
   @Prop({ type: String, required: true })
@@ -35,9 +37,27 @@ export class Permission extends BaseSchema {
 
   @Prop({ type: Number })
   level?: number;
+
+  @Prop({ type: String, enum: ['manual', 'auto'], default: 'manual' })
+  source?: PermissionSource;
+
+  @Prop({ type: String })
+  syncKey?: string;
+
+  @Prop({ type: Boolean, default: false })
+  isStale?: boolean;
+
+  @Prop({ type: Date })
+  lastSyncedAt?: Date;
+
+  @Prop({ type: Date })
+  staleSince?: Date;
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);
+
+PermissionSchema.index({ syncKey: 1 }, { unique: true, sparse: true });
+PermissionSchema.index({ parent: 1 });
 
 PermissionSchema.pre('find', baseSchemaPreFind);
 

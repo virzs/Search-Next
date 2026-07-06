@@ -31,7 +31,7 @@ export class WidgetClassifyController {
   }
 
   @Get('/all')
-  @ApiOperation({ summary: '获取所有启用的小组件分类' })
+  @ApiOperation({ summary: '启用小组件分类' })
   getAllEnabled() {
     return this.categoryService.listEnabled();
   }
@@ -63,7 +63,7 @@ export class WidgetClassifyController {
 
   @Delete('/:id')
   @RequireLogin()
-  @ApiOperation({ summary: '删除小组件分类（软删除）' })
+  @ApiOperation({ summary: '删除小组件分类' })
   delete(@Param('id') id: string) {
     return this.categoryService.delete(id);
   }

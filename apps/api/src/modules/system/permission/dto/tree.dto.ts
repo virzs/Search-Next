@@ -8,4 +8,15 @@ export class TreeDto {
   @IsOptional()
   @Expose()
   name: string;
+
+  @ApiProperty({ description: '搜索关键词', required: false })
+  @IsString()
+  @IsOptional()
+  @Expose()
+  search?: string;
+
+  @ApiProperty({ description: '是否只返回树展示必要字段', required: false })
+  @IsOptional()
+  @Expose()
+  simple?: boolean;
 }

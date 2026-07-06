@@ -10,7 +10,7 @@ export class InvitationCodeController {
   constructor(private readonly invitationCodeService: InvitationCodeService) {}
 
   @Get('/')
-  @ApiOperation({ summary: '列表' })
+  @ApiOperation({ summary: '邀请码列表' })
   getCode(@User('_id') user: string) {
     return this.invitationCodeService.codeList(user);
   }
@@ -34,7 +34,7 @@ export class InvitationCodeController {
   }
 
   @Put('/forbidden/:id')
-  @ApiOperation({ summary: '禁用' })
+  @ApiOperation({ summary: '禁用邀请码' })
   changeStatus(@Param('id') id: string) {
     return this.invitationCodeService.changeStatus(id);
   }

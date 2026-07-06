@@ -34,7 +34,7 @@ export class MessageController {
   }
 
   @Post('send/:userId')
-  @ApiOperation({ summary: '发送消息给指定用户' })
+  @ApiOperation({ summary: '发送用户消息' })
   sendToUser(@Param('userId') userId: string, @Body() message: MessageData) {
     this.messageService.sendMessageToUser(userId, message);
     return { success: true };
@@ -49,7 +49,7 @@ export class MessageController {
 
   @Get('latest/:userId')
   @SkipPermission()
-  @ApiOperation({ summary: '获取用户最新50条消息' })
+  @ApiOperation({ summary: '用户最新消息' })
   async getLatestMessages(
     @Param('userId') userId: string,
     @Query() query: MessageQueryDto,
@@ -59,7 +59,7 @@ export class MessageController {
 
   @Get('list/:userId')
   @SkipPermission()
-  @ApiOperation({ summary: '分页获取用户消息列表' })
+  @ApiOperation({ summary: '用户消息分页' })
   async getUserMessages(
     @Param('userId') userId: string,
     @Query() query: MessageQueryDto,
@@ -77,7 +77,7 @@ export class MessageController {
 
   @Get('unread/:userId')
   @SkipPermission()
-  @ApiOperation({ summary: '获取未读消息数量' })
+  @ApiOperation({ summary: '未读消息数量' })
   async getUnreadCount(
     @Param('userId') userId: string,
     @Query() query: MessageQueryDto,

@@ -33,7 +33,7 @@ export class SearchEngineController {
 
   @Get('/enabled')
   @RequireLogin()
-  @ApiOperation({ summary: '获取全部启用的搜索引擎' })
+  @ApiOperation({ summary: '启用搜索引擎列表' })
   getEnabledList() {
     return this.searchEngineService.listEnabled();
   }
@@ -55,7 +55,7 @@ export class SearchEngineController {
   }
 
   @Put('/:id/enable')
-  @ApiOperation({ summary: '切换启用状态（当前启用则改为禁用，反之亦然）' })
+  @ApiOperation({ summary: '切换搜索引擎启用状态' })
   toggleEnable(
     @Param('id') id: string,
     @User('_id') user: string,

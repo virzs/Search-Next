@@ -6,6 +6,29 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { TreeDto } from './dto/tree.dto';
 
+type PermissionTreeNode = Record<string, any> & {
+  _id: any;
+  parent?: any;
+  children?: PermissionTreeNode[] | null;
+  level?: number;
+  createdAt?: Date;
+};
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const getIdString = (value: any): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value === 'object' && value._id) {
+    return value._id.toString();
+  }
+
+  return value.toString();
+};
+
 @Injectable()
 export class PermissionService {
   constructor(
@@ -18,32 +41,142 @@ export class PermissionService {
   }
 
   async getTree(params?: TreeDto, parentId = null, level = 0) {
-    const result = await this.permissionModel.find({
-      parent: parentId,
-      name: new RegExp(params?.name ?? '', 'i'),
-    });
-    for (let i = 0; i < result.length; i++) {
-      result[i].level = level;
-      const children = await this.getTree(params, result[i]._id, level + 1);
-      if (children.length > 0) {
-        // children 排序，如果有 children 则按创建时间排到前面，如果没有 则按创建时间排序
-        children.sort((a, b) => {
-          if (a.children && b.children) {
-            return a.createdAt.getTime() - b.createdAt.getTime();
-          } else if (a.children && !b.children) {
-            return -1;
-          } else if (!a.children && b.children) {
-            return 1;
-          } else {
-            return a.createdAt.getTime() - b.createdAt.getTime();
+    const keyword = (params?.name || params?.search || '').trim();
+    const isSimple = params?.simple === true || `${params?.simple}` === 'true';
+    const projection = isSimple
+      ? '_id name parent type source isStale createdAt updatedAt'
+      : '-__v -isDelete';
+    const docs = (await this.permissionModel
+      .find({})
+      .select(projection)
+      .sort({ createdAt: 1 })
+      .lean()
+      .exec()) as PermissionTreeNode[];
+
+    const nodes = docs.map((doc) => ({ ...doc }));
+    const nodeMap = new Map(nodes.map((node) => [getIdString(node._id), node]));
+    const visibleIds = new Set<string>();
+
+    if (keyword) {
+      const matcher = new RegExp(escapeRegExp(keyword), 'i');
+      const childIdsByParent = new Map<string, string[]>();
+
+      for (const node of nodes) {
+        const nodeId = getIdString(node._id);
+        const parentKey = getIdString(node.parent);
+
+        if (!nodeId || !parentKey) {
+          continue;
+        }
+
+        const childIds = childIdsByParent.get(parentKey) ?? [];
+        childIds.push(nodeId);
+        childIdsByParent.set(parentKey, childIds);
+      }
+
+      const addAncestors = (node: PermissionTreeNode) => {
+        let current: PermissionTreeNode | undefined = node;
+        while (current) {
+          const currentId = getIdString(current._id);
+          if (!currentId || visibleIds.has(currentId)) {
+            break;
           }
-        });
-        result[i].children = children;
-      } else {
-        result[i].children = null;
+          visibleIds.add(currentId);
+          current = nodeMap.get(getIdString(current.parent));
+        }
+      };
+
+      const addDescendants = (node: PermissionTreeNode) => {
+        const nodeId = getIdString(node._id);
+        if (!nodeId) {
+          return;
+        }
+        visibleIds.add(nodeId);
+        for (const childId of childIdsByParent.get(nodeId) ?? []) {
+          const child = nodeMap.get(childId);
+          if (child) {
+            addDescendants(child);
+          }
+        }
+      };
+
+      for (const node of nodes) {
+        if (matcher.test(node.name ?? '')) {
+          addAncestors(node);
+          addDescendants(node);
+        }
+      }
+    } else {
+      for (const node of nodes) {
+        const nodeId = getIdString(node._id);
+        if (nodeId) {
+          visibleIds.add(nodeId);
+        }
       }
     }
-    return result;
+
+    const childrenByParent = new Map<string, PermissionTreeNode[]>();
+    const rootNodes: PermissionTreeNode[] = [];
+
+    for (const node of nodes) {
+      const nodeId = getIdString(node._id);
+      if (!nodeId || !visibleIds.has(nodeId)) {
+        continue;
+      }
+
+      node.children = null;
+      const parentKey = getIdString(node.parent);
+      if (parentKey && visibleIds.has(parentKey)) {
+        const children = childrenByParent.get(parentKey) ?? [];
+        children.push(node);
+        childrenByParent.set(parentKey, children);
+      } else {
+        rootNodes.push(node);
+      }
+    }
+
+    const sortNodes = (items: PermissionTreeNode[]) => {
+      items.sort((a, b) => {
+        const aHasChildren = Boolean(a.children?.length);
+        const bHasChildren = Boolean(b.children?.length);
+
+        if (aHasChildren !== bHasChildren) {
+          return aHasChildren ? -1 : 1;
+        }
+
+        return (
+          new Date(a.createdAt ?? 0).getTime() -
+          new Date(b.createdAt ?? 0).getTime()
+        );
+      });
+    };
+
+    const attachChildren = (node: PermissionTreeNode, currentLevel: number) => {
+      node.level = currentLevel;
+      const nodeId = getIdString(node._id);
+      const children = nodeId ? childrenByParent.get(nodeId) : undefined;
+      if (!children?.length) {
+        node.children = null;
+        return;
+      }
+
+      node.children = children;
+      for (const child of children) {
+        attachChildren(child, currentLevel + 1);
+      }
+      sortNodes(children);
+    };
+
+    for (const root of rootNodes) {
+      attachChildren(root, level);
+    }
+    sortNodes(rootNodes);
+
+    if (parentId) {
+      return childrenByParent.get(getIdString(parentId)) ?? [];
+    }
+
+    return rootNodes;
   }
 
   async treeInfo(query: TreeDto) {

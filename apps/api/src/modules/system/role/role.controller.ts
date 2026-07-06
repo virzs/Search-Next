@@ -46,7 +46,7 @@ export class RoleController {
   }
 
   @Get('/permissions/:id')
-  @ApiOperation({ summary: '角色权限id详情' })
+  @ApiOperation({ summary: '角色权限详情' })
   detailPermissions(@Param('id') id: string) {
     return this.roleService.detailPermissions(id);
   }

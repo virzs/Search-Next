@@ -25,14 +25,14 @@ export class NoticeController {
 
   @Get('/public/list')
   @RequireLogin()
-  @ApiOperation({ summary: '获取生效通知（无需登录）' })
+  @ApiOperation({ summary: '生效通知列表' })
   @ApiQuery({ name: 'key', description: '模块Key（如 tabs）', required: true })
   getAllForPublic(@Query() query: SystemNoticePublicQueryDto) {
     return this.noticeService.getAllForPublic(query.key);
   }
 
   @Get('/')
-  @ApiOperation({ summary: '通知分页 (后台)' })
+  @ApiOperation({ summary: '通知分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   page(@Query() query: SystemNoticeForAdminDto) {

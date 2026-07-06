@@ -37,7 +37,7 @@ export class DesktopConfigController {
 
   @Get('/admin/active')
   @RequireLogin()
-  @ApiOperation({ summary: '获取当前激活的管理员配置' })
+  @ApiOperation({ summary: '当前激活管理员配置' })
   getActiveAdminConfig() {
     return this.desktopConfigService.getActiveAdminConfig();
   }
@@ -91,7 +91,7 @@ export class DesktopConfigController {
 
   @Get('/user/default')
   @RequireLogin()
-  @ApiOperation({ summary: '获取用户默认配置（未登录时返回系统激活配置）' })
+  @ApiOperation({ summary: '用户默认配置' })
   getUserDefaultConfig(@User('_id') userId?: string) {
     if (!userId) {
       // 未登录用户返回系统激活配置

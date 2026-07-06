@@ -10,7 +10,7 @@ export class IntegralController {
   constructor(private readonly integralService: IntegralService) {}
 
   @Get('/')
-  @ApiOperation({ summary: '列表' })
+  @ApiOperation({ summary: '积分流水列表' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   async list(@Query() query: PageDto, @User('_id') user: string) {

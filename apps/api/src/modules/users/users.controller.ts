@@ -20,7 +20,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('/')
-  @ApiOperation({ summary: '用户' })
+  @ApiOperation({ summary: '用户分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   getNormalUser(@Query() query: PageDto) {
@@ -41,31 +41,31 @@ export class UsersController {
   }
 
   @Post('/')
-  @ApiOperation({ summary: '新增' })
+  @ApiOperation({ summary: '创建用户' })
   create(@Body() body: CreateUserDto) {
     return this.usersService.create(body);
   }
 
   @Put('/:id')
-  @ApiOperation({ summary: '更新' })
+  @ApiOperation({ summary: '更新用户' })
   update(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.usersService.update(id, body);
   }
 
   @Delete('/:id')
-  @ApiOperation({ summary: '删除' })
+  @ApiOperation({ summary: '删除用户' })
   remove(@Param('id') id: string) {
     return this.usersService.delete(id);
   }
 
   @Get('/:id')
-  @ApiOperation({ summary: '详情' })
+  @ApiOperation({ summary: '用户详情' })
   detail(@Param('id') id: string) {
     return this.usersService.detail(id);
   }
 
   @Put('/enable/:id')
-  @ApiOperation({ summary: '启用/禁用' })
+  @ApiOperation({ summary: '切换用户启用状态' })
   changeEnable(@Param('id') id: string) {
     return this.usersService.changeEnable(id);
   }
