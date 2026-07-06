@@ -1,0 +1,103 @@
+{
+  "name": "clock",
+  "displayName": "时钟",
+  "displayNameI18n": {
+    "zh-CN": "时钟",
+    "en-US": "Clock"
+  },
+  "version": "0.1.2",
+  "description": "简洁实时时钟应用，支持世界时区切换",
+  "descriptionI18n": {
+    "zh-CN": "简洁实时时钟应用，支持世界时区切换",
+    "en-US": "Clean real-time clock app with world time zone support"
+  },
+  "author": "Search-Next",
+  "entry": "index.js",
+  "icon": "icon.svg",
+  "tags": ["工具", "时钟", "时间"],
+  "tagsI18n": {
+    "zh-CN": ["工具", "时钟", "时间"],
+    "en-US": ["Tools", "Clock", "Time"]
+  },
+  "sizeConfigs": [
+    { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
+    { "row": 2, "col": 4, "name": "4x2", "id": "4x2" },
+    { "row": 2, "col": 3, "name": "3x2", "id": "3x2" },
+    { "row": 1, "col": 2, "name": "2x1", "id": "2x1" },
+    { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
+  ],
+  "defaultSizeId": "2x2",
+  "supportIconMode": true,
+  "supportAppMode": true,
+  "appIcon": { "type": "image", "src": "icon.svg" },
+  "pagePaths": {
+    "settings": "/settings"
+  },
+  "settingsSchema": [
+    {
+      "key": "timezone",
+      "label": "主时区",
+      "type": "select",
+      "default": "",
+      "description": "选择应用显示的主时区，默认跟随当前设备",
+      "options": [
+        { "label": "本地时间", "value": "" },
+        { "label": "UTC", "value": "UTC" },
+        { "label": "北京 (UTC+8)", "value": "Asia/Shanghai" },
+        { "label": "东京 (UTC+9)", "value": "Asia/Tokyo" },
+        { "label": "纽约 (UTC-5)", "value": "America/New_York" },
+        { "label": "伦敦 (UTC+0)", "value": "Europe/London" },
+        { "label": "巴黎 (UTC+1)", "value": "Europe/Paris" },
+        { "label": "悉尼 (UTC+11)", "value": "Australia/Sydney" },
+        { "label": "洛杉矶 (UTC-8)", "value": "America/Los_Angeles" },
+        { "label": "迪拜 (UTC+4)", "value": "Asia/Dubai" },
+        { "label": "莫斯科 (UTC+3)", "value": "Europe/Moscow" },
+        { "label": "新加坡 (UTC+8)", "value": "Asia/Singapore" }
+      ]
+    },
+    {
+      "key": "timeFormat",
+      "label": "时间制式",
+      "type": "select",
+      "default": "24h",
+      "description": "选择 24 小时制或 12 小时制",
+      "options": [
+        { "label": "24 小时制", "value": "24h" },
+        { "label": "12 小时制", "value": "12h" }
+      ]
+    },
+    {
+      "key": "showSeconds",
+      "label": "显示秒数",
+      "type": "switch",
+      "default": true,
+      "description": "关闭后时间更简洁，也更适合较小布局"
+    },
+    {
+      "key": "showProgress",
+      "label": "显示进度",
+      "type": "switch",
+      "default": true,
+      "description": "显示今日/今年进度和 4x2 进度条"
+    },
+    {
+      "key": "defaultView",
+      "label": "默认页面",
+      "type": "select",
+      "default": "world",
+      "description": "展开时默认显示世界时钟、秒表或计时器",
+      "options": [
+        { "label": "世界时钟", "value": "world" },
+        { "label": "秒表", "value": "stopwatch" },
+        { "label": "计时器", "value": "timer" }
+      ]
+    },
+    {
+      "key": "timerPresetMinutes",
+      "label": "默认计时器",
+      "type": "number",
+      "default": 25,
+      "description": "计时器默认分钟数，范围 1-240"
+    }
+  ]
+}
