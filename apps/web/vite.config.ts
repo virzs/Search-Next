@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss()],
     server: {
       port: 8132,
+      strictPort: true,
       proxy: {
         "/api": {
           target: proxyTarget,
