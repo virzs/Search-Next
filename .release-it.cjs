@@ -1,7 +1,6 @@
 const { resolveReleaseProject } = require("./scripts/release-projects.cjs");
 
 const project = resolveReleaseProject(process.cwd());
-const draft = process.env.RELEASE_DRAFT === "true";
 const releaseBranch = process.env.RELEASE_BRANCH || "release";
 
 module.exports = {
@@ -20,13 +19,9 @@ module.exports = {
   },
   npm: false,
   github: {
-    release: true,
-    releaseName: project.releaseName,
-    releaseNotes: null,
-    draft,
-    tokenRef: "GITHUB_TOKEN",
+    release: false,
   },
   hooks: {
-    "after:release": `echo Released ${project.id} v\${version}. GitHub Actions will build and upload release assets.`,
+    "after:release": `echo Tagged ${project.id} v\${version}. GitHub Actions will create the GitHub Release and upload assets.`,
   },
 };

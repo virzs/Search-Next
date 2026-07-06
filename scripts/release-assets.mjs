@@ -12,7 +12,12 @@ const { resolveReleaseProject } = require("./release-projects.cjs");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
 const command = args[0] || "prepare";
-const project = resolveReleaseProject(root);
+
+const normalizeValue = (value, fallback = "") => {
+  if (value === undefined || value === null) return fallback;
+  if (value === "null" || value === "undefined") return fallback;
+  return value || fallback;
+};
 
 const getArgValue = (name, fallback = "") => {
   const exact = args.find((arg) => arg.startsWith(`${name}=`));
@@ -22,11 +27,7 @@ const getArgValue = (name, fallback = "") => {
   return normalizeValue(args[index + 1], fallback);
 };
 
-const normalizeValue = (value, fallback = "") => {
-  if (value === undefined || value === null) return fallback;
-  if (value === "null" || value === "undefined") return fallback;
-  return value || fallback;
-};
+const project = resolveReleaseProject(root, getArgValue("--project", process.env.RELEASE_PROJECT || "all"));
 
 const exists = async (file) => {
   try {
@@ -265,6 +266,6 @@ if (command === "prepare") {
 } else if (command === "notes") {
   notes();
 } else {
-  console.error("Usage: node scripts/release-assets.mjs <prepare|notes>");
+  console.error("Usage: node scripts/release-assets.mjs <prepare|notes> [--project <name>] [--version <semver>]");
   process.exit(1);
 }

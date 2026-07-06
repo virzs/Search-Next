@@ -1,8 +1,10 @@
 name: Build release assets
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
+      - "*-v*"
 
 permissions:
   contents: write
@@ -19,26 +21,33 @@ jobs:
         id: release
         shell: bash
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
 
           tag="${RELEASE_TAG}"
           project="all"
           version=""
+          release_name=""
+          tag_match=""
 
           if [[ "$tag" =~ ^v(.+)$ ]]; then
             project="all"
             version="${BASH_REMATCH[1]}"
+            release_name="Search Next v${version}"
+            tag_match="v*"
           elif [[ "$tag" =~ ^(.+)-v(.+)$ ]]; then
             prefix="${BASH_REMATCH[1]}"
             version="${BASH_REMATCH[2]}"
+            tag_match="${prefix}-v*"
             case "$prefix" in
               api|web|admin|docs|widgets)
                 project="$prefix"
+                release_name="${prefix} v${version}"
                 ;;
               *)
                 project="widget:$prefix"
+                release_name="${prefix} v${version}"
                 ;;
             esac
           else
@@ -49,6 +58,8 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "project=$project" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "release_name=$release_name" >> "$GITHUB_OUTPUT"
+          echo "tag_match=$tag_match" >> "$GITHUB_OUTPUT"
 
       - name: Checkout release tag
         uses: actions/checkout@v4
@@ -103,15 +114,41 @@ jobs:
             touch apps/web/prod.env
           fi
 
-      - name: Build release assets
+      - name: Prepare release notes
+        shell: bash
         env:
           RELEASE_PROJECT: ${{ steps.release.outputs.project }}
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
-          WIDGET_SCREENSHOT_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
-        run: pnpm release:prepare
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          TAG_MATCH: ${{ steps.release.outputs.tag_match }}
+        run: |
+          set -euo pipefail
 
-      - name: Upload assets to GitHub Release
+          tag_commit="$(git rev-list -n 1 "${RELEASE_TAG}")"
+          previous_tag="$(git describe --tags --match "${TAG_MATCH}" --abbrev=0 "${tag_commit}^" 2>/dev/null || true)"
+          args=(notes --project "${RELEASE_PROJECT}" --to "${RELEASE_TAG}")
+          if [[ -n "${previous_tag}" ]]; then
+            args+=(--from "${previous_tag}")
+          fi
+
+          node scripts/release-assets.mjs "${args[@]}" > "${RUNNER_TEMP}/release-notes.md"
+          cat "${RUNNER_TEMP}/release-notes.md"
+
+      - name: Build release assets
+        env:
+          WIDGET_SCREENSHOT_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: pnpm release:prepare -- --project "${{ steps.release.outputs.project }}" --version "${{ steps.release.outputs.version }}"
+
+      - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
-        run: gh release upload "$RELEASE_TAG" dist/releases/* --clobber
+          RELEASE_NAME: ${{ steps.release.outputs.release_name }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --title "$RELEASE_NAME" --notes-file "${RUNNER_TEMP}/release-notes.md"
+            gh release upload "$RELEASE_TAG" dist/releases/* --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/releases/* --title "$RELEASE_NAME" --notes-file "${RUNNER_TEMP}/release-notes.md" --verify-tag
+          fi

@@ -29,9 +29,10 @@
     "widget:pack:clock": "node scripts/pack-widget.mjs clock",
     "widget:pack:todo": "node scripts/pack-widget.mjs todo",
     "build:widgets": "pnpm --filter './apps/widgets/*' build",
-    "release": "release-it --config .release-it.cjs",
-    "release:changes": "release-it --config .release-it.cjs --changelog --no-git.requireCleanWorkingDir --no-git.requireBranch --no-github.release",
-    "release:dry": "release-it --config .release-it.cjs --dry-run --ci --no-git.requireCleanWorkingDir --no-git.requireBranch --no-github.release",
+    "release": "node scripts/release.cjs release",
+    "release:changes": "node scripts/release.cjs changes",
+    "release:dry": "node scripts/release.cjs dry",
+    "release:notes": "node scripts/release-assets.mjs notes",
     "release:prepare": "node scripts/release-assets.mjs prepare",
     "lint": "pnpm -r --if-present lint"
   },
