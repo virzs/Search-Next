@@ -5,12 +5,12 @@ import BaseSchema, {
 } from 'src/public/schema/base.schema';
 import { ResourceName } from 'src/modules/resource/schemas/ref-names';
 
-export type WidgetClassifyDocument = WidgetClassify & Document;
+export type AppClassifyDocument = AppClassify & Document;
 
-export const WidgetClassifyName = 'WidgetClassify';
+export const AppClassifyName = 'AppClassify';
 
 @Schema({ timestamps: true })
-export class WidgetClassify extends BaseSchema {
+export class AppClassify extends BaseSchema {
   @Prop({ type: String, required: true })
   name: string;
 
@@ -27,6 +27,6 @@ export class WidgetClassify extends BaseSchema {
   icon?: mongoose.Types.ObjectId;
 }
 
-export const WidgetClassifySchema =
-  SchemaFactory.createForClass(WidgetClassify);
-baseSchemaMiddleware(WidgetClassifySchema);
+export const AppClassifySchema =
+  SchemaFactory.createForClass(AppClassify);
+baseSchemaMiddleware(AppClassifySchema);

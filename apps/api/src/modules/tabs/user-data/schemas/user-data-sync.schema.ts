@@ -11,7 +11,7 @@ export const UserDataSyncName = 'UserDataSync';
 
 const UserDataPluginSummarySchema = new mongoose.Schema(
   {
-    widgetId: { type: String, required: true },
+    appId: { type: String, required: true },
     name: { type: String },
     version: { type: String },
     count: { type: Number, required: true, default: 0 },
@@ -43,7 +43,7 @@ export class UserDataSync extends BaseSchema {
 
   @Prop({ type: [UserDataPluginSummarySchema], default: [] })
   pluginSummary: Array<{
-    widgetId: string;
+    appId: string;
     name?: string;
     version?: string;
     count: number;

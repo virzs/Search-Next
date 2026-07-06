@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { PageDto } from 'src/public/dto/page';
 
-export class WidgetClassifyDto {
+export class AppClassifyDto {
   @ApiProperty({ description: '分类名称' })
   @IsString()
   @Expose()
@@ -42,7 +42,7 @@ export class WidgetClassifyDto {
   enable?: boolean;
 }
 
-export class WidgetClassifyQueryDto extends PageDto {
+export class AppClassifyQueryDto extends PageDto {
   @ApiPropertyOptional({ description: '搜索名称关键词' })
   @IsOptional()
   @IsString()

@@ -35,7 +35,6 @@ export class CollectionService {
 
   private async getDynamicWebsiteIds(collection: WebsiteCollection) {
     const classifyIds = (collection as any)?.dynamic?.classifyIds ?? [];
-    const tagIds = (collection as any)?.dynamic?.tags ?? [];
     const sortBy = (collection as any)?.dynamic?.sortBy ?? 'createdAt';
     const sortOrder = (collection as any)?.dynamic?.sortOrder ?? 'desc';
     const limit = Number((collection as any)?.dynamic?.limit ?? 200) || 200;
@@ -51,6 +50,7 @@ export class CollectionService {
       };
     }
 
+    const tagIds = (collection as any)?.dynamic?.tags ?? [];
     if (Array.isArray(tagIds) && tagIds.length > 0) {
       finder.tags = {
         $in: tagIds.filter((v: any) => typeof v === 'string' && v.trim()),
@@ -230,18 +230,21 @@ export class CollectionService {
           },
         ],
       })
-      .sort({ sort: 1, createdAt: -1 })
+      .sort({ featured: -1, sort: 1, createdAt: -1 })
       .exec();
 
     if (collections.length === 0) return collections;
 
     const idsToFetch = new Set<string>();
     const collectionWebsiteIds: Record<string, string[]> = {};
+    const collectionTotalById: Record<string, number> = {};
 
     for (const c of collections as any[]) {
       const websiteIds = await this.getCollectionWebsiteIds(c);
-      const sliced = websiteIds.slice(0, 15);
+      const itemLimit = Math.max(1, Number((c as any)?.itemLimit ?? 8) || 8);
+      const sliced = websiteIds.slice(0, itemLimit);
       collectionWebsiteIds[(c as any)._id.toString()] = sliced;
+      collectionTotalById[(c as any)._id.toString()] = websiteIds.length;
       for (const wid of sliced) {
         idsToFetch.add(wid);
       }
@@ -270,6 +273,8 @@ export class CollectionService {
       return {
         ...(typeof (c as any)?.toObject === 'function' ? (c as any).toObject() : c),
         websites: ordered,
+        previewWebsites: ordered,
+        total: collectionTotalById[cid] ?? ordered.length,
       };
     });
   }

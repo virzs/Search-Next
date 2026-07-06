@@ -11,10 +11,10 @@ import { UserLimitService } from '../desktop/user-limit/user-limit.service';
 
 const DESKTOP_LIST_STORAGE_KEY = 'SEARCH_NEXT_DESKTOP_LIST';
 const USER_DATA_SYNC_MODEL_NAME = 'UserDataSync';
-const WIDGET_MODEL_NAME = 'Widget';
+const APP_MODEL_NAME = 'App';
 
 export type UserDataPluginSummary = {
-  widgetId: string;
+  appId: string;
   name?: string;
   version?: string;
   count: number;
@@ -25,8 +25,8 @@ export class UserDataService {
   constructor(
     @InjectModel(USER_DATA_SYNC_MODEL_NAME)
     private readonly syncModel: Model<any>,
-    @InjectModel(WIDGET_MODEL_NAME)
-    private readonly widgetModel: Model<any>,
+    @InjectModel(APP_MODEL_NAME)
+    private readonly appModel: Model<any>,
     @InjectModel(UsersName)
     private readonly userModel: Model<any>,
     private readonly userLimitService: UserLimitService,
@@ -326,9 +326,9 @@ export class UserDataService {
       }
 
       const record = node as Record<string, any>;
-      const widgetId = this.resolveBackendWidgetId(record);
-      if (widgetId) {
-        counts.set(widgetId, (counts.get(widgetId) ?? 0) + 1);
+      const appId = this.resolveBackendAppId(record);
+      if (appId) {
+        counts.set(appId, (counts.get(appId) ?? 0) + 1);
       }
 
       if (Array.isArray(record.children)) {
@@ -339,34 +339,35 @@ export class UserDataService {
     visit(desktopList);
     if (!counts.size) return [];
 
-    const widgetIds = [...counts.keys()];
-    const widgets = await this.widgetModel
-      .find({ _id: { $in: widgetIds } })
+    const appIds = [...counts.keys()];
+    const apps = await this.appModel
+      .find({ _id: { $in: appIds } })
       .select('name version')
       .lean()
       .exec();
-    const widgetMap = new Map(
-      widgets.map((widget: any) => [String(widget._id), widget]),
+    const appMap = new Map(
+      apps.map((app: any) => [String(app._id), app]),
     );
 
     const summary: UserDataPluginSummary[] = [];
-    for (const widgetId of widgetIds) {
-      const widget = widgetMap.get(widgetId);
-      if (!widget) continue;
+    for (const appId of appIds) {
+      const app = appMap.get(appId);
+      if (!app) continue;
       summary.push({
-        widgetId,
-        name: widget.name,
-        version: widget.version,
-        count: counts.get(widgetId) ?? 0,
+        appId,
+        name: app.name,
+        version: app.version,
+        count: counts.get(appId) ?? 0,
       });
     }
     return summary;
   }
 
-  private resolveBackendWidgetId(item: Record<string, any>) {
+  private resolveBackendAppId(item: Record<string, any>) {
     const candidates = [
-      this.stripWidgetPrefix(item.type),
-      this.stripWidgetPrefix(item.dataType),
+      this.stripAppPrefix(item.type),
+      this.stripAppPrefix(item.dataType),
+      item.data?.appConfig?.id,
       item.data?.widgetConfig?.id,
     ];
 
@@ -377,8 +378,15 @@ export class UserDataService {
     return id ? String(id) : null;
   }
 
-  private stripWidgetPrefix(value: unknown) {
+  private stripAppPrefix(value: unknown) {
     if (typeof value !== 'string') return null;
+    if (value.startsWith('app-launcher:')) {
+      return value.slice('app-launcher:'.length);
+    }
+    if (value.startsWith('app:')) return value.slice('app:'.length);
+    if (value.startsWith('widget-app:')) {
+      return value.slice('widget-app:'.length);
+    }
     return value.startsWith('widget:') ? value.slice('widget:'.length) : null;
   }
 

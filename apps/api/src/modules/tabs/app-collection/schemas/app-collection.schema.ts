@@ -1,13 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import BaseSchema, { baseSchemaMiddleware } from 'src/public/schema/base.schema';
-import { WebsiteName } from './ref-names';
-import { Website } from './website';
-import { Resource } from 'src/modules/resource/schemas/resource';
+import { AppName } from '../../app/schemas/app.schema';
+
+export type AppCollectionDocument = AppCollection & Document;
+
+export const AppCollectionName = 'AppCollection';
 
 @Schema({ timestamps: true })
-export class WebsiteCollection extends BaseSchema {
+export class AppCollection extends BaseSchema {
   @ApiProperty({ description: '标题', type: String, required: true })
   @Prop({ type: String, required: true })
   title: string;
@@ -20,9 +22,9 @@ export class WebsiteCollection extends BaseSchema {
   @Prop({ type: String })
   kicker?: string;
 
-  @ApiProperty({ description: '封面图', type: Resource, required: false })
+  @ApiProperty({ description: '封面图', type: Object, required: false })
   @Prop({ type: mongoose.Schema.Types.Mixed })
-  cover?: Resource;
+  cover?: Record<string, unknown>;
 
   @ApiProperty({ description: '强调色', type: String, required: false })
   @Prop({ type: String })
@@ -60,12 +62,12 @@ export class WebsiteCollection extends BaseSchema {
   @Prop({ type: Number, default: 0 })
   sort: number;
 
-  @ApiProperty({ description: '绑定网站', type: [Website] })
+  @ApiProperty({ description: '绑定应用', type: [Object] })
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: WebsiteName }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: AppName }],
     default: [],
   })
-  websites: Website[];
+  apps: mongoose.Types.ObjectId[];
 
   @ApiProperty({
     description: '合集类型：static=手动绑定，dynamic=按规则自动生成',
@@ -75,15 +77,10 @@ export class WebsiteCollection extends BaseSchema {
   @Prop({ type: String, default: 'static' })
   type: 'static' | 'dynamic';
 
-  @ApiProperty({
-    description: '动态合集规则',
-    required: false,
-    type: Object,
-  })
+  @ApiProperty({ description: '动态合集规则', required: false, type: Object })
   @Prop({
     type: {
       classifyIds: { type: [String], default: [] },
-      tags: { type: [String], default: [] },
       sortBy: { type: String, default: 'createdAt' },
       sortOrder: { type: String, default: 'desc' },
       limit: { type: Number, default: 200 },
@@ -91,8 +88,7 @@ export class WebsiteCollection extends BaseSchema {
   })
   dynamic?: {
     classifyIds?: string[];
-    tags?: string[];
-    sortBy?: 'createdAt' | 'updatedAt' | 'click';
+    sortBy?: 'createdAt' | 'updatedAt';
     sortOrder?: 'asc' | 'desc';
     limit?: number;
   };
@@ -101,16 +97,16 @@ export class WebsiteCollection extends BaseSchema {
   @Prop({ type: Number, default: 300 })
   updateIntervalSec?: number;
 
-  @ApiProperty({ description: '动态合集缓存的站点ID列表', required: false, type: [String] })
+  @ApiProperty({ description: '动态合集缓存的应用ID列表', required: false, type: [String] })
   @Prop({ type: [mongoose.Schema.Types.ObjectId], default: [] })
-  cachedWebsiteIds?: mongoose.Schema.Types.ObjectId[];
+  cachedAppIds?: mongoose.Schema.Types.ObjectId[];
 
   @ApiProperty({ description: '动态合集缓存刷新时间', required: false, type: Date })
   @Prop({ type: Date })
   cachedAt?: Date;
 }
 
-export const WebsiteCollectionSchema =
-  SchemaFactory.createForClass(WebsiteCollection);
+export const AppCollectionSchema =
+  SchemaFactory.createForClass(AppCollection);
 
-baseSchemaMiddleware(WebsiteCollectionSchema);
+baseSchemaMiddleware(AppCollectionSchema);

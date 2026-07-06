@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersName } from '../../users/schemas/ref-names';
 import { UsersSchema } from '../../users/schemas/user';
-import { WidgetName, WidgetSchema } from '../widget/schemas/widget.schema';
+import { AppName, AppSchema } from '../app/schemas/app.schema';
 import { UserLimitModule } from '../desktop/user-limit/user-limit.module';
 import { UserDataService } from './user-data.service';
 import { UserDataController } from './user-data.controller';
@@ -15,7 +15,7 @@ import {
   imports: [
     MongooseModule.forFeature([
       { name: UserDataSyncName, schema: UserDataSyncSchema },
-      { name: WidgetName, schema: WidgetSchema },
+      { name: AppName, schema: AppSchema },
       { name: UsersName, schema: UsersSchema },
     ]),
     UserLimitModule,

@@ -4,13 +4,13 @@ import BaseSchema, {
   baseSchemaMiddleware,
 } from 'src/public/schema/base.schema';
 import { ResourceName } from 'src/modules/resource/schemas/ref-names';
-import { WidgetClassifyName } from '../../widget-classify/schemas/widget-classify.schema';
+import { AppClassifyName } from '../../app-classify/schemas/app-classify.schema';
 
-export type WidgetDocument = Widget & Document;
+export type AppDocument = App & Document;
 
-export const WidgetName = 'Widget';
+export const AppName = 'App';
 
-const WidgetAppIconSchema = new mongoose.Schema(
+const AppIconSchema = new mongoose.Schema(
   {
     type: { type: String, enum: ['image', 'custom'], required: true },
     src: { type: String },
@@ -18,12 +18,12 @@ const WidgetAppIconSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const WidgetPagePathsSchema = {
+const AppPagePathsSchema = {
   _id: false,
   settings: { type: String },
 };
 
-const WidgetScreenshotSchema = {
+const AppScreenshotSchema = {
   mode: { type: String },
   themeId: { type: String, required: true },
   sizeId: { type: String, required: true },
@@ -34,7 +34,7 @@ const WidgetScreenshotSchema = {
 };
 
 @Schema({ timestamps: true })
-export class Widget extends BaseSchema {
+export class App extends BaseSchema {
   @Prop({ type: String, required: true })
   name: string;
 
@@ -62,18 +62,18 @@ export class Widget extends BaseSchema {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: ResourceName })
   icon?: mongoose.Types.ObjectId;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: WidgetClassifyName })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: AppClassifyName })
   classify?: mongoose.Types.ObjectId;
 
   @Prop({ type: Boolean, default: true })
   enable: boolean;
 
-  // 小组件版本号
+  // 应用版本号
   @Prop({ type: String })
   version?: string;
 
-  @Prop({ type: String, enum: ['legacy', 'snwidget'], default: 'legacy' })
-  sourceType: 'legacy' | 'snwidget';
+  @Prop({ type: String, enum: ['legacy', 'snapp'], default: 'legacy' })
+  sourceType: 'legacy' | 'snapp';
 
   @Prop({ type: String })
   packageName?: string;
@@ -81,7 +81,7 @@ export class Widget extends BaseSchema {
   @Prop({ type: String })
   packageSourceName?: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'WidgetVersion' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'AppVersion' })
   activeVersion?: mongoose.Types.ObjectId;
 
   @Prop({ type: String })
@@ -90,7 +90,7 @@ export class Widget extends BaseSchema {
   @Prop({ type: String })
   iconUrl?: string;
 
-  @Prop({ type: [WidgetScreenshotSchema], default: [] })
+  @Prop({ type: [AppScreenshotSchema], default: [] })
   screenshots: Array<{
     mode?: string;
     themeId: string;
@@ -104,11 +104,11 @@ export class Widget extends BaseSchema {
   @Prop({ type: mongoose.Schema.Types.Mixed })
   configSnapshot?: Record<string, any>;
 
-  // 小组件作者
+  // 应用作者
   @Prop({ type: String })
   author?: string;
 
-  // 尺寸配置列表，定义该小组件支持的桌面尺寸
+  // 尺寸配置列表，定义该应用支持的桌面尺寸
   @Prop({
     type: [
       {
@@ -135,13 +135,13 @@ export class Widget extends BaseSchema {
   supportAppMode: boolean;
 
   // 应用图标配置。image 使用 appIconUrl/custom 使用入口 appIcon 模式渲染
-  @Prop({ type: WidgetAppIconSchema })
+  @Prop({ type: AppIconSchema })
   appIcon?: { type: 'image' | 'custom'; src?: string };
 
   @Prop({ type: String })
   appIconUrl?: string;
 
-  @Prop({ type: WidgetPagePathsSchema })
+  @Prop({ type: AppPagePathsSchema })
   pagePaths?: { settings?: string };
 
   // 标签列表，用于搜索和分类
@@ -152,10 +152,10 @@ export class Widget extends BaseSchema {
   @Prop({ type: Number, default: 0 })
   sortOrder: number;
 
-  // 小组件设置表单 schema，以 antd 表单格式描述可配置项
+  // 应用设置表单 schema，以 antd 表单格式描述可配置项
   @Prop({ type: [mongoose.Schema.Types.Mixed], default: [] })
   settingsSchema: Array<Record<string, any>>;
 }
 
-export const WidgetSchema = SchemaFactory.createForClass(Widget);
-baseSchemaMiddleware(WidgetSchema);
+export const AppSchema = SchemaFactory.createForClass(App);
+baseSchemaMiddleware(AppSchema);

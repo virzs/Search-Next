@@ -9,23 +9,27 @@ import AdmZip from 'adm-zip';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Response } from 'src/utils/response';
-import { Widget, WidgetName } from './schemas/widget.schema';
+import { App, AppName } from './schemas/app.schema';
 import { ResourceService } from 'src/modules/resource/resource.service';
-import { WidgetDto, WidgetQueryDto } from './dto/widget.dto';
 import {
-  WidgetVersion,
-  WidgetVersionName,
-} from './schemas/widget-version.schema';
+  AppDto,
+  AppPublicQueryDto,
+  AppQueryDto,
+} from './dto/app.dto';
+import {
+  AppVersion,
+  AppVersionName,
+} from './schemas/app-version.schema';
 
-type WidgetSizeConfig = { row: number; col: number; name: string; id: string };
-type WidgetSettingsType = 'input' | 'select' | 'switch' | 'textarea' | 'number';
+type AppSizeConfig = { row: number; col: number; name: string; id: string };
+type AppSettingsType = 'input' | 'select' | 'switch' | 'textarea' | 'number';
 type PopulatedResource = { name?: string; url?: string };
-type WidgetAppIcon = { type: 'image' | 'custom'; src?: string };
-type WidgetPagePaths = { settings?: string };
-type WidgetLanguage = 'zh-CN' | 'en-US';
-type LocalizedText = Partial<Record<WidgetLanguage, string>>;
-type LocalizedStringList = Partial<Record<WidgetLanguage, string[]>>;
-type WidgetScreenshot = {
+type AppIcon = { type: 'image' | 'custom'; src?: string };
+type AppPagePaths = { settings?: string };
+type AppLanguage = 'zh-CN' | 'en-US';
+type LocalizedText = Partial<Record<AppLanguage, string>>;
+type LocalizedStringList = Partial<Record<AppLanguage, string[]>>;
+type AppScreenshot = {
   mode?: string;
   themeId: string;
   sizeId: string;
@@ -34,7 +38,7 @@ type WidgetScreenshot = {
   file: string;
   url: string;
 };
-type WidgetScreenshotManifestCapture = {
+type AppScreenshotManifestCapture = {
   mode?: unknown;
   themeId?: unknown;
   sizeId?: unknown;
@@ -42,7 +46,7 @@ type WidgetScreenshotManifestCapture = {
   height?: unknown;
   file?: unknown;
 };
-type WidgetPackageConfig = {
+type AppPackageConfig = {
   schemaVersion?: string;
   name: string;
   displayName?: string;
@@ -53,20 +57,20 @@ type WidgetPackageConfig = {
   author?: string;
   entry: string;
   icon?: string;
-  appIcon?: WidgetAppIcon;
+  appIcon?: AppIcon;
   tags?: string[];
   tagsI18n?: LocalizedStringList;
-  sizeConfigs: WidgetSizeConfig[];
+  sizeConfigs: AppSizeConfig[];
   defaultSizeId: string;
   supportIconMode?: boolean;
   supportAppMode?: boolean;
   appIconUrl?: string;
-  pagePaths?: WidgetPagePaths;
+  pagePaths?: AppPagePaths;
   settingsEntry?: string;
   settingsSchema?: Record<string, unknown>[];
 };
-type WidgetVersionPayload = {
-  widget: unknown;
+type AppVersionPayload = {
+  app: unknown;
   name: string;
   version: string;
   packageName: string;
@@ -75,44 +79,45 @@ type WidgetVersionPayload = {
   entryFileName: string;
   entryUrl: string;
   iconUrl?: string;
-  appIcon?: WidgetAppIcon;
+  appIcon?: AppIcon;
   appIconUrl?: string;
-  screenshots: WidgetScreenshot[];
+  screenshots: AppScreenshot[];
   configSnapshot: Record<string, unknown>;
 };
-type WidgetConfigPayload = {
+type AppConfigPayload = {
   entryFileName?: unknown;
   files?: unknown;
-  sizeConfigs?: Partial<WidgetSizeConfig>[];
+  sizeConfigs?: Partial<AppSizeConfig>[];
   defaultSizeId?: unknown;
   appIcon?: unknown;
   pagePaths?: unknown;
   settingsSchema?: unknown;
 };
-type WidgetListQuery = WidgetQueryDto & {
+type AppListQuery = (AppQueryDto | AppPublicQueryDto) & {
   page?: number;
   pageSize?: number;
   classify?: string;
   search?: string;
   tag?: string;
+  publicPage?: boolean;
 };
-type WidgetPublicResponse = Record<string, unknown> & {
+type AppPublicResponse = Record<string, unknown> & {
   entryFileName?: string;
   dir?: string;
   files?: PopulatedResource[];
   icon?: PopulatedResource;
-  sizeConfigs?: WidgetSizeConfig[];
+  sizeConfigs?: AppSizeConfig[];
   defaultSizeId?: string;
   supportIconMode?: boolean;
   supportAppMode?: boolean;
-  appIcon?: WidgetAppIcon;
+  appIcon?: AppIcon;
   appIconUrl?: string;
-  pagePaths?: WidgetPagePaths;
+  pagePaths?: AppPagePaths;
   settingsSchema?: Record<string, unknown>[];
   tags?: string[];
   version?: string;
   author?: string;
-  screenshots?: WidgetScreenshot[];
+  screenshots?: AppScreenshot[];
   packageSourceName?: string;
   packageName?: string;
   entryUrl?: string;
@@ -120,9 +125,9 @@ type WidgetPublicResponse = Record<string, unknown> & {
   configSnapshot?: Record<string, unknown>;
 };
 
-const WIDGET_PACKAGE_CONFIG_FILE = 'widget.config.json';
-const WIDGET_SCREENSHOTS_MANIFEST_FILE = 'screenshots/manifest.json';
-const SNWIDGET_EXT = '.snwidget';
+const APP_PACKAGE_CONFIG_FILE = 'app.config.json';
+const APP_SCREENSHOTS_MANIFEST_FILE = 'screenshots/manifest.json';
+const SNAPP_EXT = '.snapp';
 const SCREENSHOT_IMAGE_EXTENSIONS = new Set([
   '.png',
   '.jpg',
@@ -132,17 +137,17 @@ const SCREENSHOT_IMAGE_EXTENSIONS = new Set([
 ]);
 
 @Injectable()
-export class WidgetService {
+export class AppService {
   constructor(
-    @InjectModel(WidgetName) private readonly widgetModel: Model<Widget>,
-    @InjectModel(WidgetVersionName)
-    private readonly widgetVersionModel: Model<WidgetVersion>,
+    @InjectModel(AppName) private readonly appModel: Model<App>,
+    @InjectModel(AppVersionName)
+    private readonly appVersionModel: Model<AppVersion>,
     private readonly resourceService: ResourceService,
   ) {}
 
-  async list(query: WidgetQueryDto) {
+  async list(query: AppQueryDto) {
     const { page = 1, pageSize = 10, classify, search, tag } =
-      query as WidgetListQuery;
+      query as AppListQuery;
 
     // 构建分页查询条件
     const conditions: any = {};
@@ -151,7 +156,7 @@ export class WidgetService {
     // 支持按标签精确筛选
     if (tag) conditions.tags = tag;
 
-    const list = await this.widgetModel
+    const list = await this.appModel
       .find(conditions)
       .skip((page - 1) * pageSize)
       .limit(pageSize)
@@ -159,54 +164,87 @@ export class WidgetService {
       .populate('icon', 'url')
       .exec();
 
-    const total = await this.widgetModel.countDocuments(conditions);
+    const total = await this.appModel.countDocuments(conditions);
     return Response.page(list, { page, pageSize, total });
   }
 
   /**
-   * 获取所有已启用的小组件列表（公开接口，供前端应用调用）
+   * 获取所有已启用的应用列表（公开接口，供前端应用调用）
    * 按 sortOrder 升序、创建时间降序排列
    */
-  async listPublic() {
-    const list = await this.widgetModel
-      .find({ enable: true })
+  async listPublic(query: AppPublicQueryDto = {}) {
+    const { page, pageSize, classify, search } = query as AppListQuery;
+    const conditions: any = { enable: true };
+    if (classify) conditions.classify = classify;
+    if (search) {
+      conditions.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const shouldPage =
+      page !== undefined ||
+      pageSize !== undefined ||
+      Boolean(classify) ||
+      Boolean(search);
+    const nextPage = Number(page ?? 1);
+    const nextPageSize = Number(pageSize ?? 20);
+
+    const queryBuilder = this.appModel
+      .find(conditions)
       .populate('classify', 'name')
       .populate('icon', 'url')
       .populate('previewImages', 'name url key mimetype size')
       .populate('files', 'name url key mimetype size')
       .sort({ sortOrder: 1, createdAt: -1 })
-      .lean()
-      .exec();
+      .lean();
 
-    return Promise.all(
+    if (shouldPage) {
+      queryBuilder.skip((nextPage - 1) * nextPageSize).limit(nextPageSize);
+    }
+
+    const list = await queryBuilder.exec();
+
+    const data = await Promise.all(
       list.map((item) =>
-        this.withPublicResponseFields(item as WidgetPublicResponse),
+        this.withPublicResponseFields(item as AppPublicResponse),
       ),
     );
+
+    if (!shouldPage) return data;
+
+    const total = await this.appModel.countDocuments(conditions);
+    return Response.page(data, {
+      page: nextPage,
+      pageSize: nextPageSize,
+      total,
+    });
   }
 
-  async listVersions(widgetId: string) {
-    await this.ensureWidget(widgetId);
-    const versions = await this.widgetVersionModel
-      .find({ widget: widgetId })
+  async listVersions(appId: string) {
+    await this.ensureApp(appId);
+    const versions = await this.appVersionModel
+      .find({ app: appId })
       .sort({ active: -1, updatedAt: -1, createdAt: -1 })
       .exec();
     return this.dedupeVersionRows(versions);
   }
 
-  async importPackage(file: Express.Multer.File, user?: string, widgetId?: string) {
-    if (!file) throw new BadRequestException('请上传.snwidget包');
-    if (!file.originalname?.endsWith(SNWIDGET_EXT)) {
-      throw new BadRequestException('仅支持.snwidget后缀的小组件包');
+  async importPackage(file: Express.Multer.File, user?: string, appId?: string) {
+    if (!file) throw new BadRequestException('请上传.snapp包');
+    if (!file.originalname?.endsWith(SNAPP_EXT)) {
+      throw new BadRequestException('仅支持.snapp后缀的应用包');
     }
 
     const zip = new AdmZip(file.buffer);
     const entries = zip.getEntries().filter((entry) => !entry.isDirectory);
     const configEntry = entries.find(
-      (entry) => this.normalizeZipPath(entry.entryName) === WIDGET_PACKAGE_CONFIG_FILE,
+      (entry) => this.normalizeZipPath(entry.entryName) === APP_PACKAGE_CONFIG_FILE,
     );
     if (!configEntry) {
-      throw new BadRequestException('小组件包缺少widget.config.json');
+      throw new BadRequestException('应用包缺少app.config.json');
     }
 
     const config = this.parsePackageConfig(configEntry.getData());
@@ -215,7 +253,7 @@ export class WidgetService {
       (entry) => this.normalizeZipPath(entry.entryName) === entryName,
     );
     if (!entryFile) {
-      throw new BadRequestException(`小组件包缺少入口文件: ${config.entry}`);
+      throw new BadRequestException(`应用包缺少入口文件: ${config.entry}`);
     }
     if (config.icon) {
       const iconName = this.normalizeZipPath(config.icon);
@@ -223,7 +261,7 @@ export class WidgetService {
         (entry) => this.normalizeZipPath(entry.entryName) === iconName,
       );
       if (!iconFile) {
-        throw new BadRequestException(`小组件包缺少图标文件: ${config.icon}`);
+        throw new BadRequestException(`应用包缺少图标文件: ${config.icon}`);
       }
     }
     const appIconPath = this.getPackageAppIconPath(config);
@@ -233,11 +271,11 @@ export class WidgetService {
         (entry) => this.normalizeZipPath(entry.entryName) === appIconPath,
       );
       if (!appIconFile) {
-        throw new BadRequestException(`小组件包缺少应用图标文件: ${appIconPath}`);
+        throw new BadRequestException(`应用包缺少应用图标文件: ${appIconPath}`);
       }
     }
 
-    const baseKey = `widgets/${config.name}/${config.version}`;
+    const baseKey = `apps/${config.name}/${config.version}`;
     await this.writePackageEntries(entries, baseKey);
 
     const screenshots = this.parsePackageScreenshots(entries, baseKey);
@@ -247,18 +285,18 @@ export class WidgetService {
       screenshots,
       appIconUrl,
     );
-    const widget = await this.upsertPackageWidget(
+    const app = await this.upsertPackageApp(
       config,
       screenshots,
       appIconUrl,
       `/static/${baseKey}/${entryName}`,
       config.icon ? `/static/${baseKey}/${this.normalizeZipPath(config.icon)}` : undefined,
       user,
-      widgetId,
+      appId,
     );
-    const packageName = `${config.name}-${config.version}${SNWIDGET_EXT}`;
+    const packageName = `${config.name}-${config.version}${SNAPP_EXT}`;
     const versionDoc = await this.upsertPackageVersion({
-      widget: widget._id,
+      app: app._id,
       name: config.name,
       version: config.version,
       packageName,
@@ -278,44 +316,44 @@ export class WidgetService {
       file.buffer,
     );
 
-    const publishedWidget = await this.publishVersion(
-      String(widget._id),
+    const publishedApp = await this.publishVersion(
+      String(app._id),
       String(versionDoc._id),
       user,
     );
 
-    const responseWidget = await this.withPublicResponseFields(
-      (typeof (publishedWidget as any).toObject === 'function'
-        ? (publishedWidget as any).toObject()
-        : publishedWidget) as WidgetPublicResponse,
+    const responseApp = await this.withPublicResponseFields(
+      (typeof (publishedApp as any).toObject === 'function'
+        ? (publishedApp as any).toObject()
+        : publishedApp) as AppPublicResponse,
     );
 
-    return { widget: responseWidget, version: versionDoc };
+    return { app: responseApp, version: versionDoc };
   }
 
-  async publishVersion(widgetId: string, versionId: string, user?: string) {
-    const widget = await this.ensureWidget(widgetId);
-    const version = await this.widgetVersionModel
-      .findOne({ _id: versionId, widget: widgetId })
+  async publishVersion(appId: string, versionId: string, user?: string) {
+    const app = await this.ensureApp(appId);
+    const version = await this.appVersionModel
+      .findOne({ _id: versionId, app: appId })
       .exec();
-    if (!version) throw new NotFoundException('小组件版本不存在');
+    if (!version) throw new NotFoundException('应用版本不存在');
 
-    await this.widgetVersionModel.updateMany(
-      { widget: widgetId },
+    await this.appVersionModel.updateMany(
+      { app: appId },
       { active: false, updater: user },
     );
-    await this.widgetVersionModel.findByIdAndUpdate(versionId, {
+    await this.appVersionModel.findByIdAndUpdate(versionId, {
       active: true,
       updater: user,
     });
 
-    const snapshot = version.configSnapshot as WidgetPackageConfig;
-    return this.widgetModel.findByIdAndUpdate(
-      widget._id,
+    const snapshot = version.configSnapshot as AppPackageConfig;
+    return this.appModel.findByIdAndUpdate(
+      app._id,
       {
         version: version.version,
         activeVersion: version._id,
-        sourceType: 'snwidget',
+        sourceType: 'snapp',
         packageName: version.packageName,
         entryFileName: version.entryFileName,
         entryUrl: version.entryUrl,
@@ -339,11 +377,11 @@ export class WidgetService {
   }
 
   /**
-   * 获取单个小组件详情（公开接口）
+   * 获取单个应用详情（公开接口）
    * 包含完整的资源URL信息
    */
   async detailPublic(id: string) {
-    const item = await this.widgetModel
+    const item = await this.appModel
       .findOne({ _id: id, enable: true })
       .populate('classify', 'name')
       .populate('icon', 'url')
@@ -351,37 +389,37 @@ export class WidgetService {
       .populate('files', 'name url key mimetype size')
       .lean()
       .exec();
-    if (!item) throw new NotFoundException('小组件不存在或未启用');
-    return this.withPublicResponseFields(item as WidgetPublicResponse);
+    if (!item) throw new NotFoundException('应用不存在或未启用');
+    return this.withPublicResponseFields(item as AppPublicResponse);
   }
 
-  async create(dto: WidgetDto, user?: string) {
-    this.validateWidgetConfig(dto, true);
-    const created = await this.widgetModel.create({ ...dto, creator: user });
+  async create(dto: AppDto, user?: string) {
+    this.validateAppConfig(dto, true);
+    const created = await this.appModel.create({ ...dto, creator: user });
     const resourceIds = [...(dto.previewImages ?? []), ...(dto.files ?? [])];
     if (resourceIds.length) {
       await this.resourceService.associateDataAndResource({
         resourceIds,
         associatedDataId: String(created._id),
-        associatedDataFrom: WidgetName,
+        associatedDataFrom: AppName,
       });
     }
     return created;
   }
 
-  async update(id: string, dto: Partial<WidgetDto>, user?: string) {
-    const old = await this.widgetModel.findById(id).exec();
-    if (!old) throw new NotFoundException('小组件不存在');
-    this.validateWidgetConfig(
-      { ...old.toObject(), ...dto } as WidgetConfigPayload,
+  async update(id: string, dto: Partial<AppDto>, user?: string) {
+    const old = await this.appModel.findById(id).exec();
+    if (!old) throw new NotFoundException('应用不存在');
+    this.validateAppConfig(
+      { ...old.toObject(), ...dto } as AppConfigPayload,
       false,
     );
-    const updated = await this.widgetModel.findByIdAndUpdate(
+    const updated = await this.appModel.findByIdAndUpdate(
       id,
       { ...dto, updater: user },
       { new: true },
     );
-    if (!updated) throw new NotFoundException('小组件不存在');
+    if (!updated) throw new NotFoundException('应用不存在');
 
     const oldPreview = (old.previewImages ?? []).map((v: any) => String(v));
     const oldFiles = (old.files ?? []).map((v: any) => String(v));
@@ -409,7 +447,7 @@ export class WidgetService {
       await this.resourceService.associateDataAndResource({
         resourceIds: added,
         associatedDataId: String(id),
-        associatedDataFrom: WidgetName,
+        associatedDataFrom: AppName,
       });
     }
 
@@ -417,26 +455,26 @@ export class WidgetService {
   }
 
   async detail(id: string) {
-    const item = await this.widgetModel
+    const item = await this.appModel
       .findById(id)
       .populate('icon', 'url')
       .populate('previewImages', 'name url key mimetype size')
       .populate('files', 'name url key mimetype size')
       .lean()
       .exec();
-    if (!item) throw new NotFoundException('小组件不存在');
-    return this.withPublicResponseFields(item as WidgetPublicResponse);
+    if (!item) throw new NotFoundException('应用不存在');
+    return this.withPublicResponseFields(item as AppPublicResponse);
   }
 
   async delete(id: string) {
-    const res = await this.widgetModel.findByIdAndUpdate(id, {
+    const res = await this.appModel.findByIdAndUpdate(id, {
       isDelete: true,
     });
-    if (!res) throw new NotFoundException('小组件不存在');
+    if (!res) throw new NotFoundException('应用不存在');
     return res;
   }
 
-  private validateWidgetConfig(dto: WidgetConfigPayload, isCreate: boolean) {
+  private validateAppConfig(dto: AppConfigPayload, isCreate: boolean) {
     if (isCreate || dto.entryFileName !== undefined) {
       if (!this.isNonEmptyString(dto.entryFileName)) {
         throw new BadRequestException('入口文件名称不能为空');
@@ -484,7 +522,7 @@ export class WidgetService {
     }
   }
 
-  private validateSizeConfigs(sizeConfigs: Partial<WidgetSizeConfig>[]) {
+  private validateSizeConfigs(sizeConfigs: Partial<AppSizeConfig>[]) {
     if (!Array.isArray(sizeConfigs) || sizeConfigs.length === 0) {
       throw new BadRequestException('尺寸配置不能为空');
     }
@@ -510,7 +548,7 @@ export class WidgetService {
       throw new BadRequestException('设置表单Schema必须为数组');
     }
 
-    const validTypes: WidgetSettingsType[] = [
+    const validTypes: AppSettingsType[] = [
       'input',
       'select',
       'switch',
@@ -526,7 +564,7 @@ export class WidgetService {
         !this.isNonEmptyString(item.key) ||
         !this.isNonEmptyString(item.label) ||
         !this.isNonEmptyString(item.type) ||
-        !validTypes.includes(item.type as WidgetSettingsType)
+        !validTypes.includes(item.type as AppSettingsType)
       ) {
         throw new BadRequestException(
           '设置表单Schema项必须包含有效的key、label和type',
@@ -541,7 +579,7 @@ export class WidgetService {
   private normalizeAppIcon(
     appIcon: unknown,
     supportAppMode = false,
-  ): WidgetAppIcon | undefined {
+  ): AppIcon | undefined {
     if (appIcon == null) {
       return supportAppMode ? { type: 'image' } : undefined;
     }
@@ -560,13 +598,13 @@ export class WidgetService {
     throw new BadRequestException('应用图标类型仅支持image或custom');
   }
 
-  private normalizePagePaths(pagePaths: unknown): WidgetPagePaths | undefined {
+  private normalizePagePaths(pagePaths: unknown): AppPagePaths | undefined {
     if (pagePaths == null) return undefined;
     if (!this.isRecord(pagePaths)) {
       throw new BadRequestException('页面路径配置必须为对象');
     }
 
-    const normalized: WidgetPagePaths = {};
+    const normalized: AppPagePaths = {};
     if (pagePaths.settings !== undefined) {
       if (!this.isNonEmptyString(pagePaths.settings)) {
         throw new BadRequestException('设置页面路径不能为空');
@@ -583,7 +621,7 @@ export class WidgetService {
       throw new BadRequestException('多语言文案配置必须为对象');
     }
     const normalized: LocalizedText = {};
-    (['zh-CN', 'en-US'] as WidgetLanguage[]).forEach((language) => {
+    (['zh-CN', 'en-US'] as AppLanguage[]).forEach((language) => {
       const text = value[language];
       if (this.isNonEmptyString(text)) {
         normalized[language] = text.trim();
@@ -600,7 +638,7 @@ export class WidgetService {
       throw new BadRequestException('多语言标签配置必须为对象');
     }
     const normalized: LocalizedStringList = {};
-    (['zh-CN', 'en-US'] as WidgetLanguage[]).forEach((language) => {
+    (['zh-CN', 'en-US'] as AppLanguage[]).forEach((language) => {
       const list = value[language];
       if (Array.isArray(list)) {
         const tags = list
@@ -628,7 +666,7 @@ export class WidgetService {
     return routePath;
   }
 
-  private getPackageAppIconPath(config: WidgetPackageConfig) {
+  private getPackageAppIconPath(config: AppPackageConfig) {
     if (config.appIcon?.type !== 'image') return undefined;
     const appIconSrc = this.isNonEmptyString(config.appIcon.src)
       ? config.appIcon.src
@@ -638,31 +676,31 @@ export class WidgetService {
       : undefined;
   }
 
-  private getPackageAppIconUrl(config: WidgetPackageConfig, baseKey: string) {
+  private getPackageAppIconUrl(config: AppPackageConfig, baseKey: string) {
     const appIconPath = this.getPackageAppIconPath(config);
     return appIconPath ? `/static/${baseKey}/${appIconPath}` : undefined;
   }
 
-  private parsePackageConfig(buffer: Buffer): WidgetPackageConfig {
+  private parsePackageConfig(buffer: Buffer): AppPackageConfig {
     let raw: unknown;
     try {
       raw = JSON.parse(buffer.toString('utf8'));
     } catch {
-      throw new BadRequestException('widget.config.json格式不正确');
+      throw new BadRequestException('app.config.json格式不正确');
     }
     if (!this.isRecord(raw)) {
-      throw new BadRequestException('widget.config.json必须为对象');
+      throw new BadRequestException('app.config.json必须为对象');
     }
 
-    const config = raw as Partial<WidgetPackageConfig>;
+    const config = raw as Partial<AppPackageConfig>;
     if (!this.isNonEmptyString(config.name)) {
-      throw new BadRequestException('widget.config.json缺少name');
+      throw new BadRequestException('app.config.json缺少name');
     }
     if (!this.isNonEmptyString(config.version)) {
-      throw new BadRequestException('widget.config.json缺少version');
+      throw new BadRequestException('app.config.json缺少version');
     }
     if (!this.isNonEmptyString(config.entry)) {
-      throw new BadRequestException('widget.config.json缺少entry');
+      throw new BadRequestException('app.config.json缺少entry');
     }
     this.assertSafeRelativePath(config.entry);
     if (config.icon) this.assertSafeRelativePath(config.icon);
@@ -674,7 +712,7 @@ export class WidgetService {
       this.assertSafeRelativePath(appIcon.src);
     }
 
-    this.validateWidgetConfig(
+    this.validateAppConfig(
       {
         entryFileName: config.entry,
         sizeConfigs: config.sizeConfigs,
@@ -709,8 +747,8 @@ export class WidgetService {
   }
 
   private buildConfigSnapshot(
-    config: WidgetPackageConfig,
-    screenshots: WidgetScreenshot[] = [],
+    config: AppPackageConfig,
+    screenshots: AppScreenshot[] = [],
     appIconUrl?: string,
   ) {
     return {
@@ -751,17 +789,17 @@ export class WidgetService {
   }
 
   private async upsertPackageVersion(
-    payload: WidgetVersionPayload,
+    payload: AppVersionPayload,
     user?: string,
   ) {
-    const existingVersions = await this.widgetVersionModel
-      .find({ widget: payload.widget, version: payload.version })
+    const existingVersions = await this.appVersionModel
+      .find({ app: payload.app, version: payload.version })
       .sort({ active: -1, updatedAt: -1, createdAt: -1 })
       .exec();
     const existing = existingVersions[0];
 
     if (existing) {
-      const updated = await this.widgetVersionModel
+      const updated = await this.appVersionModel
         .findByIdAndUpdate(
           existing._id,
           {
@@ -772,11 +810,11 @@ export class WidgetService {
           { new: true },
         )
         .exec();
-      if (!updated) throw new NotFoundException('小组件版本不存在');
+      if (!updated) throw new NotFoundException('应用版本不存在');
 
       const duplicateIds = existingVersions.slice(1).map((item) => item._id);
       if (duplicateIds.length) {
-        await this.widgetVersionModel
+        await this.appVersionModel
           .updateMany(
             { _id: { $in: duplicateIds } },
             { active: false, isDelete: true, updater: user },
@@ -786,34 +824,34 @@ export class WidgetService {
       return updated;
     }
 
-    return this.widgetVersionModel.create({
+    return this.appVersionModel.create({
       ...payload,
       active: false,
       creator: user,
     });
   }
 
-  private async upsertPackageWidget(
-    config: WidgetPackageConfig,
-    screenshots: WidgetScreenshot[],
+  private async upsertPackageApp(
+    config: AppPackageConfig,
+    screenshots: AppScreenshot[],
     appIconUrl: string | undefined,
     entryUrl: string,
     iconUrl: string | undefined,
     user?: string,
-    widgetId?: string,
+    appId?: string,
   ) {
-    const existing = widgetId
-      ? await this.ensureWidget(widgetId)
-      : await this.widgetModel.findOne({ packageSourceName: config.name }).exec();
+    const existing = appId
+      ? await this.ensureApp(appId)
+      : await this.appModel.findOne({ packageSourceName: config.name }).exec();
     const payload = {
       name: config.displayName || config.name,
       description: config.description,
       entryFileName: config.entry,
       version: config.version,
       author: config.author,
-      sourceType: 'snwidget',
+      sourceType: 'snapp',
       packageSourceName: config.name,
-      packageName: `${config.name}-${config.version}${SNWIDGET_EXT}`,
+      packageName: `${config.name}-${config.version}${SNAPP_EXT}`,
       entryUrl,
       iconUrl,
       sizeConfigs: config.sizeConfigs,
@@ -829,25 +867,25 @@ export class WidgetService {
       configSnapshot: this.buildConfigSnapshot(config, screenshots, appIconUrl),
     };
     if (existing) {
-      const updated = await this.widgetModel.findByIdAndUpdate(
+      const updated = await this.appModel.findByIdAndUpdate(
         existing._id,
         { ...payload, updater: user },
         { new: true },
       );
-      if (!updated) throw new NotFoundException('小组件不存在');
+      if (!updated) throw new NotFoundException('应用不存在');
       return updated;
     }
-    return this.widgetModel.create({ ...payload, creator: user });
+    return this.appModel.create({ ...payload, creator: user });
   }
 
   private parsePackageScreenshots(
     entries: AdmZip.IZipEntry[],
     baseKey: string,
-  ): WidgetScreenshot[] {
+  ): AppScreenshot[] {
     const entryMap = new Map(
       entries.map((entry) => [this.normalizeZipPath(entry.entryName), entry]),
     );
-    const manifestEntry = entryMap.get(WIDGET_SCREENSHOTS_MANIFEST_FILE);
+    const manifestEntry = entryMap.get(APP_SCREENSHOTS_MANIFEST_FILE);
     if (manifestEntry) {
       return this.parseScreenshotManifest(
         manifestEntry.getData(),
@@ -863,7 +901,7 @@ export class WidgetService {
     buffer: Buffer,
     entryMap: Map<string, AdmZip.IZipEntry>,
     baseKey: string,
-  ): WidgetScreenshot[] {
+  ): AppScreenshot[] {
     let raw: unknown;
     try {
       raw = JSON.parse(buffer.toString('utf8'));
@@ -875,17 +913,17 @@ export class WidgetService {
     }
 
     return raw.captures
-      .map((capture: WidgetScreenshotManifestCapture) =>
+      .map((capture: AppScreenshotManifestCapture) =>
         this.normalizeScreenshotCapture(capture, entryMap, baseKey),
       )
-      .filter((capture): capture is WidgetScreenshot => Boolean(capture));
+      .filter((capture): capture is AppScreenshot => Boolean(capture));
   }
 
   private normalizeScreenshotCapture(
-    capture: WidgetScreenshotManifestCapture,
+    capture: AppScreenshotManifestCapture,
     entryMap: Map<string, AdmZip.IZipEntry>,
     baseKey: string,
-  ): WidgetScreenshot | null {
+  ): AppScreenshot | null {
     if (!this.isRecord(capture)) return null;
     if (
       !this.isNonEmptyString(capture.file) ||
@@ -901,7 +939,7 @@ export class WidgetService {
       throw new BadRequestException(`截图文件不存在: ${file}`);
     }
 
-    const normalized: WidgetScreenshot = {
+    const normalized: AppScreenshot = {
       mode: this.isNonEmptyString(capture.mode) ? capture.mode : undefined,
       themeId: capture.themeId,
       sizeId: capture.sizeId,
@@ -914,9 +952,9 @@ export class WidgetService {
   }
 
   private normalizeStoredScreenshotCapture(
-    capture: WidgetScreenshotManifestCapture,
+    capture: AppScreenshotManifestCapture,
     baseKey: string,
-  ): WidgetScreenshot | null {
+  ): AppScreenshot | null {
     if (!this.isRecord(capture)) return null;
     if (
       !this.isNonEmptyString(capture.file) ||
@@ -929,7 +967,7 @@ export class WidgetService {
     const file = this.normalizeZipPath(capture.file);
     this.assertSafeRelativePath(file);
 
-    const normalized: WidgetScreenshot = {
+    const normalized: AppScreenshot = {
       mode: this.isNonEmptyString(capture.mode) ? capture.mode : undefined,
       themeId: capture.themeId,
       sizeId: capture.sizeId,
@@ -944,21 +982,21 @@ export class WidgetService {
   private inferScreenshotsFromFiles(
     entries: AdmZip.IZipEntry[],
     baseKey: string,
-  ): WidgetScreenshot[] {
+  ): AppScreenshot[] {
     return entries
       .map((entry) => this.normalizeZipPath(entry.entryName))
       .filter((file) => {
         const ext = path.extname(file).toLowerCase();
         return file.startsWith('screenshots/') && SCREENSHOT_IMAGE_EXTENSIONS.has(ext);
       })
-      .map((file): WidgetScreenshot | null => {
+      .map((file): AppScreenshot | null => {
         this.assertSafeRelativePath(file);
         const basename = path.basename(file, path.extname(file));
         const themeMatch = basename.match(/(?:^|-)(light|dark)(?:$|-)/i);
         const sizeMatch = basename.match(/(\d+x\d+)/i);
         if (!sizeMatch) return null;
 
-        const screenshot: WidgetScreenshot = {
+        const screenshot: AppScreenshot = {
           mode: file.split('/')[1],
           themeId: themeMatch?.[1]?.toLowerCase() ?? 'light',
           sizeId: sizeMatch[1].toLowerCase(),
@@ -967,16 +1005,16 @@ export class WidgetService {
         };
         return screenshot;
       })
-      .filter((capture): capture is WidgetScreenshot => Boolean(capture));
+      .filter((capture): capture is AppScreenshot => Boolean(capture));
   }
 
-  private async ensureWidget(widgetId: string) {
-    if (!Types.ObjectId.isValid(widgetId)) {
-      throw new BadRequestException('小组件ID不正确');
+  private async ensureApp(appId: string) {
+    if (!Types.ObjectId.isValid(appId)) {
+      throw new BadRequestException('应用ID不正确');
     }
-    const widget = await this.widgetModel.findById(widgetId).exec();
-    if (!widget) throw new NotFoundException('小组件不存在');
-    return widget;
+    const app = await this.appModel.findById(appId).exec();
+    if (!app) throw new NotFoundException('应用不存在');
+    return app;
   }
 
   private async writePackageEntries(entries: AdmZip.IZipEntry[], baseKey: string) {
@@ -1011,13 +1049,13 @@ export class WidgetService {
       normalized.includes('..') ||
       path.isAbsolute(normalized)
     ) {
-      throw new BadRequestException('小组件包包含非法路径');
+      throw new BadRequestException('应用包包含非法路径');
     }
   }
 
   private async withPublicResponseFields(
-    item: WidgetPublicResponse,
-  ): Promise<WidgetPublicResponse> {
+    item: AppPublicResponse,
+  ): Promise<AppPublicResponse> {
     const snapshot = this.isRecord(item.configSnapshot)
       ? item.configSnapshot
       : {};
@@ -1046,7 +1084,7 @@ export class WidgetService {
     const appIcon =
       item.appIcon ??
       (this.isRecord(snapshot.appIcon)
-        ? (snapshot.appIcon as WidgetAppIcon)
+        ? (snapshot.appIcon as AppIcon)
         : undefined);
     const iconUrl = snapshotIconUrl ?? item.iconUrl ?? item.icon?.url;
     const appIconUrl =
@@ -1058,7 +1096,7 @@ export class WidgetService {
     const pagePaths =
       item.pagePaths ??
       (this.isRecord(snapshot.pagePaths)
-        ? (snapshot.pagePaths as WidgetPagePaths)
+        ? (snapshot.pagePaths as AppPagePaths)
         : undefined);
     return {
       ...item,
@@ -1088,8 +1126,8 @@ export class WidgetService {
   }
 
   private async loadStoredPackageScreenshots(
-    item: WidgetPublicResponse,
-  ): Promise<WidgetScreenshot[]> {
+    item: AppPublicResponse,
+  ): Promise<AppScreenshot[]> {
     const baseKey = this.resolvePackageBaseKey(item);
     if (!baseKey) return [];
 
@@ -1097,7 +1135,7 @@ export class WidgetService {
     try {
       const buffer = await fs.readFile(
         this.getLocalStoragePath(
-          `${baseKey}/${WIDGET_SCREENSHOTS_MANIFEST_FILE}`,
+          `${baseKey}/${APP_SCREENSHOTS_MANIFEST_FILE}`,
         ),
       );
       raw = JSON.parse(buffer.toString('utf8'));
@@ -1107,16 +1145,16 @@ export class WidgetService {
 
     if (!this.isRecord(raw) || !Array.isArray(raw.captures)) return [];
     return raw.captures
-      .map((capture: WidgetScreenshotManifestCapture) =>
+      .map((capture: AppScreenshotManifestCapture) =>
         this.normalizeStoredScreenshotCapture(capture, baseKey),
       )
-      .filter((capture): capture is WidgetScreenshot => Boolean(capture));
+      .filter((capture): capture is AppScreenshot => Boolean(capture));
   }
 
-  private resolvePackageBaseKey(item: WidgetPublicResponse) {
+  private resolvePackageBaseKey(item: AppPublicResponse) {
     if (this.isNonEmptyString(item.entryUrl)) {
       const normalized = this.normalizeZipPath(item.entryUrl);
-      if (normalized.startsWith('/static/widgets/')) {
+      if (normalized.startsWith('/static/apps/')) {
         const withoutPrefix = normalized.replace(/^\/static\//, '');
         return path.dirname(withoutPrefix);
       }
@@ -1136,11 +1174,11 @@ export class WidgetService {
         ? snapshot.version
         : undefined;
 
-    return sourceName && version ? `widgets/${sourceName}/${version}` : undefined;
+    return sourceName && version ? `apps/${sourceName}/${version}` : undefined;
   }
 
   private resolveSnapshotPackageBaseKey(
-    item: WidgetPublicResponse,
+    item: AppPublicResponse,
     snapshot: Record<string, unknown>,
   ) {
     const name = this.isNonEmptyString(snapshot.name)
@@ -1151,13 +1189,13 @@ export class WidgetService {
       this.isNonEmptyString(name) &&
       this.isNonEmptyString(version)
     ) {
-      return `widgets/${name}/${version}`;
+      return `apps/${name}/${version}`;
     }
     return undefined;
   }
 
   private resolvePackageVersion(
-    item: WidgetPublicResponse,
+    item: AppPublicResponse,
     snapshot: Record<string, unknown>,
   ) {
     const name = this.isNonEmptyString(snapshot.name)
@@ -1168,10 +1206,10 @@ export class WidgetService {
       this.isNonEmptyString(item.packageName)
     ) {
       const prefix = `${name}-`;
-      if (item.packageName.startsWith(prefix) && item.packageName.endsWith(SNWIDGET_EXT)) {
+      if (item.packageName.startsWith(prefix) && item.packageName.endsWith(SNAPP_EXT)) {
         const version = item.packageName.slice(
           prefix.length,
-          -SNWIDGET_EXT.length,
+          -SNAPP_EXT.length,
         );
         if (this.isNonEmptyString(version)) return version;
       }
@@ -1195,10 +1233,10 @@ export class WidgetService {
   }
 
   async toggleEnable(id: string, user?: string) {
-    const doc = await this.widgetModel.findById(id).exec();
-    if (!doc) throw new NotFoundException('小组件不存在');
+    const doc = await this.appModel.findById(id).exec();
+    if (!doc) throw new NotFoundException('应用不存在');
     const next = !doc.enable;
-    return this.widgetModel.findByIdAndUpdate(
+    return this.appModel.findByIdAndUpdate(
       id,
       { enable: next, updater: user },
       { new: true },

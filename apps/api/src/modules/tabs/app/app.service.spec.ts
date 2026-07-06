@@ -1,12 +1,12 @@
 import { BadRequestException } from '@nestjs/common';
-import { WidgetService } from './widget.service';
+import { AppService } from './app.service';
 
-describe('WidgetService app mode manifest parsing', () => {
-  let service: WidgetService;
+describe('AppService app mode manifest parsing', () => {
+  let service: AppService;
 
   const parsePackageConfig = (override: Record<string, unknown> = {}) => {
     const manifest = {
-      name: 'sample-widget',
+      name: 'sample-app',
       version: '1.0.0',
       entry: 'index.js',
       icon: 'icon.svg',
@@ -22,7 +22,7 @@ describe('WidgetService app mode manifest parsing', () => {
   };
 
   beforeEach(() => {
-    service = new WidgetService({} as any, {} as any, {} as any);
+    service = new AppService({} as any, {} as any, {} as any);
   });
 
   it('requires explicit supportAppMode for app menu eligibility', () => {
@@ -96,12 +96,12 @@ describe('WidgetService app mode manifest parsing', () => {
     ).toThrow(BadRequestException);
   });
 
-  it('prefers snapshot package paths over stale widget entry URLs', async () => {
+  it('prefers snapshot package paths over stale app entry URLs', async () => {
     const response = await (service as any).withPublicResponseFields({
       entryFileName: 'index.js',
-      entryUrl: '/static/widgets/sample-widget/0.9.0/index.js',
-      iconUrl: '/static/widgets/sample-widget/0.9.0/icon.svg',
-      packageName: 'sample-widget-1.0.0.snwidget',
+      entryUrl: '/static/apps/sample-app/0.9.0/index.js',
+      iconUrl: '/static/apps/sample-app/0.9.0/icon.svg',
+      packageName: 'sample-app-1.0.0.snapp',
       supportIconMode: true,
       supportAppMode: true,
       version: '0.9.0',
@@ -112,11 +112,11 @@ describe('WidgetService app mode manifest parsing', () => {
           themeId: 'light',
           sizeId: '2x2',
           file: 'screenshots/icon/icon-2x2-light.png',
-          url: '/static/widgets/sample-widget/1.0.0/screenshots/icon/icon-2x2-light.png',
+          url: '/static/apps/sample-app/1.0.0/screenshots/icon/icon-2x2-light.png',
         },
       ],
       configSnapshot: {
-        name: 'sample-widget',
+        name: 'sample-app',
         version: '0.9.0',
         entry: 'index.js',
         icon: 'icon.svg',
@@ -126,8 +126,8 @@ describe('WidgetService app mode manifest parsing', () => {
       },
     });
 
-    expect(response.entryUrl).toBe('/static/widgets/sample-widget/1.0.0/index.js');
-    expect(response.iconUrl).toBe('/static/widgets/sample-widget/1.0.0/icon.svg');
+    expect(response.entryUrl).toBe('/static/apps/sample-app/1.0.0/index.js');
+    expect(response.iconUrl).toBe('/static/apps/sample-app/1.0.0/icon.svg');
     expect(response.version).toBe('1.0.0');
     expect(response.configSnapshot.version).toBe('1.0.0');
     expect(response.pagePaths).toEqual({ settings: '/settings' });

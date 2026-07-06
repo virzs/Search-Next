@@ -147,7 +147,7 @@ export class DesktopConfigJsonDto {
         type: 'page',
         config: { sizeId: '2x2' },
         data: { title: '首页' },
-        children: [{ id: 'w_1', type: 'widget', data: { name: 'todo' } }],
+        children: [{ id: 'app_1', type: 'app:todo', data: { name: 'todo' } }],
       },
     ],
   })

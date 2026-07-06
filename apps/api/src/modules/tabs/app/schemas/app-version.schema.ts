@@ -3,13 +3,13 @@ import mongoose, { Document } from 'mongoose';
 import BaseSchema, {
   baseSchemaMiddleware,
 } from 'src/public/schema/base.schema';
-import { WidgetName } from './widget.schema';
+import { AppName } from './app.schema';
 
-export type WidgetVersionDocument = WidgetVersion & Document;
+export type AppVersionDocument = AppVersion & Document;
 
-export const WidgetVersionName = 'WidgetVersion';
+export const AppVersionName = 'AppVersion';
 
-const WidgetAppIconSchema = new mongoose.Schema(
+const AppIconSchema = new mongoose.Schema(
   {
     type: { type: String, enum: ['image', 'custom'], required: true },
     src: { type: String },
@@ -17,7 +17,7 @@ const WidgetAppIconSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const WidgetScreenshotSchema = {
+const AppScreenshotSchema = {
   mode: { type: String },
   themeId: { type: String, required: true },
   sizeId: { type: String, required: true },
@@ -28,9 +28,9 @@ const WidgetScreenshotSchema = {
 };
 
 @Schema({ timestamps: true })
-export class WidgetVersion extends BaseSchema {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: WidgetName, required: true })
-  widget: mongoose.Types.ObjectId;
+export class AppVersion extends BaseSchema {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: AppName, required: true })
+  app: mongoose.Types.ObjectId;
 
   @Prop({ type: String, required: true })
   name: string;
@@ -56,13 +56,13 @@ export class WidgetVersion extends BaseSchema {
   @Prop({ type: String })
   iconUrl?: string;
 
-  @Prop({ type: WidgetAppIconSchema })
+  @Prop({ type: AppIconSchema })
   appIcon?: { type: 'image' | 'custom'; src?: string };
 
   @Prop({ type: String })
   appIconUrl?: string;
 
-  @Prop({ type: [WidgetScreenshotSchema], default: [] })
+  @Prop({ type: [AppScreenshotSchema], default: [] })
   screenshots: Array<{
     mode?: string;
     themeId: string;
@@ -80,6 +80,6 @@ export class WidgetVersion extends BaseSchema {
   active: boolean;
 }
 
-export const WidgetVersionSchema = SchemaFactory.createForClass(WidgetVersion);
-WidgetVersionSchema.index({ widget: 1, version: 1 });
-baseSchemaMiddleware(WidgetVersionSchema);
+export const AppVersionSchema = SchemaFactory.createForClass(AppVersion);
+AppVersionSchema.index({ app: 1, version: 1 });
+baseSchemaMiddleware(AppVersionSchema);

@@ -8,7 +8,7 @@ import { UserLimitService } from '../desktop/user-limit/user-limit.service';
 describe('UserDataService', () => {
   let service: UserDataService;
   let syncModel: any;
-  let widgetModel: any;
+  let appModel: any;
   let userModel: any;
   let userLimitService: any;
 
@@ -31,7 +31,7 @@ describe('UserDataService', () => {
       create: jest.fn(),
       findByIdAndUpdate: jest.fn(),
     };
-    widgetModel = {
+    appModel = {
       find: jest.fn(),
     };
     userModel = {
@@ -51,7 +51,7 @@ describe('UserDataService', () => {
       providers: [
         UserDataService,
         { provide: getModelToken('UserDataSync'), useValue: syncModel },
-        { provide: getModelToken('Widget'), useValue: widgetModel },
+        { provide: getModelToken('App'), useValue: appModel },
         { provide: getModelToken(UsersName), useValue: userModel },
         { provide: UserLimitService, useValue: userLimitService },
       ],
@@ -66,7 +66,7 @@ describe('UserDataService', () => {
 
   it('creates a sync backup version and calculates metadata server-side', async () => {
     const userId = new Types.ObjectId().toHexString();
-    const widgetId = new Types.ObjectId().toHexString();
+    const appId = new Types.ObjectId().toHexString();
     const payload = {
       version: 1,
       createdAt: '2026-06-24T00:00:00.000Z',
@@ -75,9 +75,9 @@ describe('UserDataService', () => {
           {
             id: 'dock',
             children: [
-              { type: `widget:${widgetId}` },
-              { dataType: `widget:${widgetId}` },
-              { type: 'widget:dev_local' },
+              { type: `app:${appId}` },
+              { dataType: `app:${appId}` },
+              { type: 'app:dev_local' },
             ],
           },
         ]),
@@ -85,8 +85,8 @@ describe('UserDataService', () => {
       },
     };
 
-    widgetModel.find.mockReturnValue(
-      chain([{ _id: widgetId, name: 'Clock', version: '1.0.0' }]),
+    appModel.find.mockReturnValue(
+      chain([{ _id: appId, name: 'Clock', version: '1.0.0' }]),
     );
     syncModel.countDocuments.mockResolvedValue(0);
     syncModel.create.mockResolvedValue({
@@ -102,7 +102,7 @@ describe('UserDataService', () => {
           itemCount: 2,
           pluginSummary: [
             {
-              widgetId,
+              appId,
               name: 'Clock',
               version: '1.0.0',
               count: 2,
@@ -124,7 +124,7 @@ describe('UserDataService', () => {
         itemCount: 2,
         pluginSummary: [
           {
-            widgetId,
+            appId,
             name: 'Clock',
             version: '1.0.0',
             count: 2,
@@ -140,7 +140,7 @@ describe('UserDataService', () => {
     expect(result.payload).toEqual(payload);
     expect(result.backups[0].pluginSummary).toEqual([
       {
-        widgetId,
+        appId,
         name: 'Clock',
         version: '1.0.0',
         count: 2,
@@ -152,7 +152,7 @@ describe('UserDataService', () => {
     const userId = new Types.ObjectId().toHexString();
     const backupId = new Types.ObjectId().toHexString();
     const payload = { version: 1, createdAt: 'now', items: {} };
-    widgetModel.find.mockReturnValue(chain([]));
+    appModel.find.mockReturnValue(chain([]));
     syncModel.findOneAndUpdate.mockReturnValue(
       chain({
         _id: backupId,

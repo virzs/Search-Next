@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 import { PageDto } from 'src/public/dto/page';
 
-export class WebsiteCollectionForAdminDto extends PageDto {
+export class AppCollectionForAdminDto extends PageDto {
   @ApiProperty({ description: '搜索标题', required: false })
   @IsString()
   @IsOptional()
@@ -27,7 +27,7 @@ export class WebsiteCollectionForAdminDto extends PageDto {
   active?: string;
 }
 
-export class WebsiteCollectionDynamicDto {
+export class AppCollectionDynamicDto {
   @ApiProperty({ description: '分类ID列表', required: false, type: [String] })
   @IsMongoId({ each: true })
   @IsArray()
@@ -35,23 +35,16 @@ export class WebsiteCollectionDynamicDto {
   @Expose()
   classifyIds?: string[];
 
-  @ApiProperty({ description: '标签ID列表', required: false, type: [String] })
-  @IsMongoId({ each: true })
-  @IsArray()
-  @IsOptional()
-  @Expose()
-  tags?: string[];
-
   @ApiProperty({
     description: '排序字段',
     required: false,
-    enum: ['createdAt', 'updatedAt', 'click'],
+    enum: ['createdAt', 'updatedAt'],
     default: 'createdAt',
   })
   @IsString()
   @IsOptional()
   @Expose()
-  sortBy?: 'createdAt' | 'updatedAt' | 'click';
+  sortBy?: 'createdAt' | 'updatedAt';
 
   @ApiProperty({
     description: '排序方向',
@@ -71,7 +64,7 @@ export class WebsiteCollectionDynamicDto {
   limit?: number;
 }
 
-export class WebsiteCollectionDto {
+export class AppCollectionDto {
   @ApiProperty({ description: '标题' })
   @IsString()
   @Expose()
@@ -162,13 +155,13 @@ export class WebsiteCollectionDto {
   @ApiProperty({
     description: '动态合集规则',
     required: false,
-    type: WebsiteCollectionDynamicDto,
+    type: AppCollectionDynamicDto,
   })
   @ValidateNested()
-  @Type(() => WebsiteCollectionDynamicDto)
+  @Type(() => AppCollectionDynamicDto)
   @IsOptional()
   @Expose()
-  dynamic?: WebsiteCollectionDynamicDto;
+  dynamic?: AppCollectionDynamicDto;
 
   @ApiProperty({ description: '动态合集刷新频率（秒）', required: false, default: 300 })
   @IsNumber()
@@ -176,24 +169,24 @@ export class WebsiteCollectionDto {
   @Expose()
   updateIntervalSec?: number;
 
-  @ApiProperty({ description: '绑定的网站ID列表', required: false })
+  @ApiProperty({ description: '绑定的应用ID列表', required: false })
   @IsMongoId({ each: true })
   @IsArray()
   @IsOptional()
   @Expose()
-  websites?: string[];
+  apps?: string[];
 }
 
-export class WebsiteCollectionPreviewDynamicDto {
+export class AppCollectionPreviewDynamicDto {
   @ApiProperty({
     description: '动态合集规则',
     required: true,
-    type: WebsiteCollectionDynamicDto,
+    type: AppCollectionDynamicDto,
   })
   @ValidateNested()
-  @Type(() => WebsiteCollectionDynamicDto)
+  @Type(() => AppCollectionDynamicDto)
   @Expose()
-  dynamic: WebsiteCollectionDynamicDto;
+  dynamic: AppCollectionDynamicDto;
 }
 
-export class WebsiteCollectionWebsitesPageDto extends PageDto {}
+export class AppCollectionAppsPageDto extends PageDto {}

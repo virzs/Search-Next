@@ -10,11 +10,12 @@ import {
   ValidateNested,
   IsBoolean,
   IsObject,
+  IsNumberString,
 } from 'class-validator';
 import { PageDto } from 'src/public/dto/page';
 
-export class WidgetDto {
-  @ApiProperty({ description: '小组件名称' })
+export class AppDto {
+  @ApiProperty({ description: '应用名称' })
   @IsString()
   @Expose()
   name: string;
@@ -86,21 +87,21 @@ export class WidgetDto {
   @Expose()
   enable?: boolean;
 
-  // 小组件版本号
+  // 应用版本号
   @ApiPropertyOptional({ description: '版本号' })
   @IsOptional()
   @IsString()
   @Expose()
   version?: string;
 
-  // 小组件作者
+  // 应用作者
   @ApiPropertyOptional({ description: '作者' })
   @IsOptional()
   @IsString()
   @Expose()
   author?: string;
 
-  // 小组件支持的尺寸配置列表
+  // 应用支持的尺寸配置列表
   @ApiPropertyOptional({ description: '尺寸配置列表', type: 'array' })
   @IsOptional()
   @IsArray()
@@ -144,7 +145,7 @@ export class WidgetDto {
   appIconUrl?: string;
 
   @ApiPropertyOptional({
-    description: '组件页面路由',
+    description: '应用页面路由',
     example: { settings: '/settings' },
   })
   @IsOptional()
@@ -168,7 +169,7 @@ export class WidgetDto {
   @Expose()
   sortOrder?: number;
 
-  // 小组件设置表单 schema，以 antd 表单格式描述可配置项
+  // 应用设置表单 schema，以 antd 表单格式描述可配置项
   @ApiPropertyOptional({ description: '设置表单Schema', type: 'array' })
   @IsOptional()
   @IsArray()
@@ -176,7 +177,7 @@ export class WidgetDto {
   settingsSchema?: Array<Record<string, any>>;
 }
 
-export class WidgetQueryDto extends PageDto {
+export class AppQueryDto extends PageDto {
   @ApiPropertyOptional({ description: '分类ID' })
   @IsOptional()
   @IsMongoId()
@@ -202,4 +203,40 @@ export class WidgetQueryDto extends PageDto {
   @Min(0)
   @Expose()
   sortOrder?: number;
+}
+
+export class AppPublicQueryDto {
+  @ApiPropertyOptional({ description: '页码' })
+  @IsOptional()
+  @IsNumberString(undefined, {
+    message: '页码必须是数字',
+  })
+  @Expose()
+  page?: number;
+
+  @ApiPropertyOptional({ description: '每页数量' })
+  @IsOptional()
+  @IsNumberString(undefined, {
+    message: '每页数量必须是数字',
+  })
+  @Expose()
+  pageSize?: number;
+
+  @ApiPropertyOptional({ description: '分类ID' })
+  @IsOptional()
+  @IsMongoId()
+  @Expose()
+  classify?: string;
+
+  @ApiPropertyOptional({ description: '搜索名称关键词' })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  search?: string;
+
+  @ApiPropertyOptional({ description: '标签筛选' })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  tag?: string;
 }

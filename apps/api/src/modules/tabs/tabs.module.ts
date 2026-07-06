@@ -7,7 +7,8 @@ import { SearchEngineModule } from './search-engine/search-engine.module';
 import { AiSearchModule } from './ai-search/ai-search.module';
 import { SearchProviderModule } from './search-provider/search-provider.module';
 import { DesktopModule } from './desktop/desktop.module';
-import { WidgetModule } from './widget/widget.module';
+import { AppModule } from './app/app.module';
+import { AppCollectionModule } from './app-collection/app-collection.module';
 
 @Module({
   controllers: [TabsController],
@@ -19,7 +20,8 @@ import { WidgetModule } from './widget/widget.module';
     AiSearchModule,
     SearchProviderModule,
     DesktopModule,
-    WidgetModule,
+    AppModule,
+    AppCollectionModule,
   ],
 })
 export class TabsModule {}
