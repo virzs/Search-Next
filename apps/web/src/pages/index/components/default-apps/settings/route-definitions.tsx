@@ -147,10 +147,10 @@ export const settingsRouteDefinitions: DefaultAppRouteDefinition[] = [
     path: settingsRoute.path.developer,
     meta: {
       title: "开发者",
-      description: "小组件开发入口",
+      description: "应用开发入口",
       icon: <RiCodeSSlashLine size={16} />,
       activeIcon: <RiCodeSSlashFill size={16} />,
-      keywords: ["dev", "widget", "esm", "开发", "小组件"],
+      keywords: ["dev", "app", "esm", "开发", "应用"],
     },
     sidebar: { enabled: true },
     search: { enabled: true, group: "setting" },

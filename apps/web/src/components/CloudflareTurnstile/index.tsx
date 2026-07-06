@@ -13,7 +13,7 @@ declare global {
           "error-callback"?: () => void;
         },
       ) => string;
-      remove?: (widgetId: string) => void;
+      remove?: (appId: string) => void;
     };
   }
 }
@@ -75,7 +75,7 @@ const CloudflareTurnstile = ({
   onError,
 }: CloudflareTurnstileProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | undefined>(undefined);
+  const appIdRef = useRef<string | undefined>(undefined);
   const onVerifyRef = useRef(onVerify);
   const onExpireRef = useRef(onExpire);
   const onErrorRef = useRef(onError);
@@ -95,12 +95,12 @@ const CloudflareTurnstile = ({
       .then(() => {
         if (!mounted || !containerRef.current || !window.turnstile) return;
 
-        if (widgetIdRef.current && window.turnstile.remove) {
-          window.turnstile.remove(widgetIdRef.current);
+        if (appIdRef.current && window.turnstile.remove) {
+          window.turnstile.remove(appIdRef.current);
         }
         containerRef.current.innerHTML = "";
 
-        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+        appIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
           callback: (token) => onVerifyRef.current(token),
           "expired-callback": () => onExpireRef.current?.(),
@@ -116,10 +116,10 @@ const CloudflareTurnstile = ({
 
     return () => {
       mounted = false;
-      if (widgetIdRef.current && window.turnstile?.remove) {
-        window.turnstile.remove(widgetIdRef.current);
+      if (appIdRef.current && window.turnstile?.remove) {
+        window.turnstile.remove(appIdRef.current);
       }
-      widgetIdRef.current = undefined;
+      appIdRef.current = undefined;
     };
   }, [siteKey, resetKey]);
 

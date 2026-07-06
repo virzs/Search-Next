@@ -15,7 +15,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AppConfigProvider } from "./contexts/ConfigContext";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 import { DesktopThemeProvider } from "./contexts/DesktopThemeContext";
-import { WidgetProvider } from "./contexts/WidgetContext";
+import { AppProvider } from "./contexts/AppContext";
 import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 import useDesktopTheme from "./hooks/useDesktopTheme";
 import { i18n, useI18n, type AppLanguage } from "./i18n";
@@ -59,9 +59,9 @@ createRoot(document.getElementById("root")!).render(
         <DesktopThemeProvider>
           <ThemedConfigProvider>
             <GlobalNotificationProvider />
-            <WidgetProvider>
+            <AppProvider>
               <RouterProvider router={router} />
-            </WidgetProvider>
+            </AppProvider>
           </ThemedConfigProvider>
         </DesktopThemeProvider>
       </AppConfigProvider>
@@ -69,7 +69,7 @@ createRoot(document.getElementById("root")!).render(
   </I18nextProvider>,
 );
 
-// 让外部纯 JS 小组件复用宿主项目的 React 和 ReactDOM
+// 让外部纯 JS 应用复用宿主项目的 React 和 ReactDOM
 // 避免重复打包 React，确保共享同一实例
 (globalThis as any).React = (globalThis as any).React || React;
 (globalThis as any).ReactDOM = (globalThis as any).ReactDOM || ReactDOMClient;

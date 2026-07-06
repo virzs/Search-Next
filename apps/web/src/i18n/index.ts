@@ -5,7 +5,7 @@ import type { RouteTextResolver } from "@/pages/index/components/default-apps/ro
 import i18n from "./instance";
 import {
   APP_LANGUAGES,
-  getWidgetLocaleInfo,
+  getAppLocaleInfo,
   normalizeAppLanguage,
   type AppLanguage,
 } from "./languages";
@@ -13,20 +13,20 @@ import {
 export {
   APP_LANGUAGES,
   DEFAULT_APP_LANGUAGE,
-  getWidgetLocaleInfo,
+  getAppLocaleInfo,
   isAppLanguage,
   normalizeAppLanguage,
   type AppLanguage,
-  type WidgetLocaleInfo,
+  type AppLocaleInfo,
 } from "./languages";
 export { default as i18n } from "./instance";
 export {
   resolveLocalizedStringList,
   resolveLocalizedText,
-  resolveWidgetDescription,
-  resolveWidgetDisplayName,
-  resolveWidgetTags,
-} from "./widget-metadata";
+  resolveAppDescription,
+  resolveAppDisplayName,
+  resolveAppTags,
+} from "./app-metadata";
 
 type TranslationParams = TOptions & Record<string, unknown>;
 
@@ -64,7 +64,7 @@ export const useI18n = () => {
     [t],
   );
 
-  const locale = useMemo(() => getWidgetLocaleInfo(language), [language]);
+  const locale = useMemo(() => getAppLocaleInfo(language), [language]);
 
   return {
     language,
@@ -79,5 +79,5 @@ export const useI18n = () => {
 export const getCurrentAppLanguage = () =>
   normalizeAppLanguage(i18n.resolvedLanguage ?? i18n.language);
 
-export const getCurrentWidgetLocale = () =>
-  getWidgetLocaleInfo(getCurrentAppLanguage());
+export const getCurrentAppLocale = () =>
+  getAppLocaleInfo(getCurrentAppLanguage());

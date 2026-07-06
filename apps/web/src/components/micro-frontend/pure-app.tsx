@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import type { WidgetMode, WidgetSDK } from "@/sdk";
+import type { AppMode, AppSDK } from "@/sdk";
 import { useI18n } from "@/i18n";
 
-export interface PureWidgetConfig {
+export interface PureAppConfig {
   entry: string;
   props?: Record<string, unknown>;
-  mode?: WidgetMode;
-  /** 小组件 SDK 实例（由宿主创建并注入） */
-  sdk?: WidgetSDK;
+  mode?: AppMode;
+  /** 应用 SDK 实例（由宿主创建并注入） */
+  sdk?: AppSDK;
 }
 
-interface PureWidgetProps {
-  config: PureWidgetConfig;
+interface PureAppProps {
+  config: PureAppConfig;
   className?: string;
   style?: React.CSSProperties;
   onClick?: () => void;
@@ -19,12 +19,12 @@ interface PureWidgetProps {
 
 const createShadowMount = (container: HTMLElement) => {
   const shadowRoot = container.shadowRoot || container.attachShadow({ mode: "open" });
-  shadowRoot.querySelectorAll('[data-pure-widget-mount="true"]').forEach((node) => node.remove());
+  shadowRoot.querySelectorAll('[data-pure-app-mount="true"]').forEach((node) => node.remove());
   const mountHost = document.createElement("div");
   const mountPoint = document.createElement("div");
 
   mountHost.className = "w-full h-full";
-  mountHost.dataset.pureWidgetMount = "true";
+  mountHost.dataset.pureAppMount = "true";
   mountHost.style.width = "100%";
   mountHost.style.height = "100%";
   mountPoint.className = "w-full h-full";
@@ -39,7 +39,7 @@ const createShadowMount = (container: HTMLElement) => {
   };
 };
 
-const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onClick }) => {
+const PureApp: React.FC<PureAppProps> = ({ config, className, style, onClick }) => {
   const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +108,7 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
         ) => (() => void) | void;
 
         if (!mount || typeof mount !== "function") {
-          throw new Error("Widget module does not export mount/default function");
+          throw new Error("App module does not export mount/default function");
         }
 
         if (containerRef.current) {
@@ -135,7 +135,7 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
         }
         const msg = e instanceof Error ? e.message : String(e);
         setError(msg);
-        console.error("Failed to load widget:", msg);
+        console.error("Failed to load app:", msg);
       }
     };
 
@@ -155,7 +155,7 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
     return (
       <div className={className} style={style}>
         <div className="flex items-center justify-center w-full h-full text-red-500 text-xs">
-          {t("widget.loadFailed")}
+          {t("app.loadFailed")}
         </div>
       </div>
     );
@@ -164,4 +164,4 @@ const PureWidget: React.FC<PureWidgetProps> = ({ config, className, style, onCli
   return <div ref={containerRef} className={className} style={style} onClick={onClick} />;
 };
 
-export default PureWidget;
+export default PureApp;

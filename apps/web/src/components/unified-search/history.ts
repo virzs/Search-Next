@@ -25,7 +25,7 @@ export interface SearchHistoryItem {
   description?: string;
   query?: string;
   url?: string;
-  widgetId?: string;
+  appId?: string;
   routePath?: string;
   settingPath?: string;
   shortcutCode?: string;

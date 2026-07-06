@@ -24,9 +24,9 @@ import {
   APP_LANGUAGE_STORAGE_KEY,
   DESKTOP_LIST_MODIFIED_STORAGE_KEY,
   DESKTOP_LIST_STORAGE_KEY,
+  DEV_APPS_STORAGE_KEY,
   DEV_MODE_STORAGE_KEY,
-  DEV_WIDGETS_STORAGE_KEY,
-  INSTALLED_WIDGETS_STORAGE_KEY,
+  INSTALLED_APPS_STORAGE_KEY,
   MY_THEMES_STORAGE_KEY,
   MY_WALLPAPERS_STORAGE_KEY,
   NOTICE_READ_IDS_STORAGE_KEY,
@@ -42,7 +42,7 @@ import {
   stringifyStorageBackup,
   type StorageBackupV1,
 } from "@/utils/storage";
-import { isWidgetStorageKey } from "@/utils/widget-storage";
+import { isAppStorageKey } from "@/utils/app-storage";
 import {
   getUserDataSync,
   putUserDataSync,
@@ -83,7 +83,7 @@ type StorageIconTone = "blue" | "green" | "orange" | "red" | "purple" | "gray";
 type StorageCategoryId =
   | "desktop"
   | "personalization"
-  | "widgets"
+  | "apps"
   | "search"
   | "language"
   | "developer"
@@ -115,7 +115,7 @@ interface StorageUsageSummary {
 const STORAGE_CATEGORY_ORDER: StorageCategoryId[] = [
   "desktop",
   "personalization",
-  "widgets",
+  "apps",
   "search",
   "language",
   "developer",
@@ -139,9 +139,9 @@ const STORAGE_CATEGORY_META: Record<StorageCategoryId, StorageCategoryMeta> = {
     tone: "orange",
     icon: <RiBrushLine size={16} />,
   },
-  widgets: {
-    label: "ui.widget",
-    description: "ui.backup.widgetDescription",
+  apps: {
+    label: "ui.app",
+    description: "ui.backup.appDescription",
     color: "#ffcc00",
     tone: "orange",
     icon: <RiApps2Line size={16} />,
@@ -162,7 +162,7 @@ const STORAGE_CATEGORY_META: Record<StorageCategoryId, StorageCategoryMeta> = {
   },
   developer: {
     label: "ui.developer",
-    description: "ui.developerModeAndLocalWidgetEntries",
+    description: "ui.developerModeAndLocalAppEntries",
     color: "#af52de",
     tone: "purple",
     icon: <RiCodeSSlashLine size={16} />,
@@ -199,7 +199,7 @@ const getBackupEntryByteSize = (key: string, value: string | null) => {
 };
 
 const classifyBackupStorageKey = (key: string): StorageCategoryId => {
-  if (isWidgetStorageKey(key)) return "widgets";
+  if (isAppStorageKey(key)) return "apps";
 
   switch (key) {
     case DESKTOP_LIST_STORAGE_KEY:
@@ -209,8 +209,8 @@ const classifyBackupStorageKey = (key: string): StorageCategoryId => {
     case MY_WALLPAPERS_STORAGE_KEY:
     case MY_THEMES_STORAGE_KEY:
       return "personalization";
-    case INSTALLED_WIDGETS_STORAGE_KEY:
-      return "widgets";
+    case INSTALLED_APPS_STORAGE_KEY:
+      return "apps";
     case UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY:
     case SEARCH_SELECTED_ENGINES_STORAGE_KEY:
     case SEARCH_HISTORY_STORAGE_KEY:
@@ -218,7 +218,7 @@ const classifyBackupStorageKey = (key: string): StorageCategoryId => {
     case APP_LANGUAGE_STORAGE_KEY:
       return "language";
     case DEV_MODE_STORAGE_KEY:
-    case DEV_WIDGETS_STORAGE_KEY:
+    case DEV_APPS_STORAGE_KEY:
       return "developer";
     case NOTICE_READ_IDS_STORAGE_KEY:
       return "notice";

@@ -5,6 +5,11 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  DesktopNextBaseModal,
+  desktopNextThemeDark,
+  desktopNextThemeLight,
+} from "zs_library";
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react";
 import { App as AntdApp, Button, Empty, Spin, Tag } from "antd";
 import { css, cx } from "@emotion/css";
@@ -24,8 +29,9 @@ import {
   getEnabledSearchEngines,
   type SearchEngineItem,
 } from "@/services/search-engine";
-import { useWidget } from "@/hooks/useWidget";
-import type { WidgetApiItem } from "@/types";
+import { useApp } from "@/hooks/useApp";
+import useDesktopTheme from "@/hooks/useDesktopTheme";
+import type { AppApiItem } from "@/types";
 import {
   getWebsiteIconUrl,
   getWebsiteId,
@@ -52,9 +58,9 @@ import {
   type UnifiedSearchShortcut,
 } from "./shortcut";
 import {
-  resolveWidgetDescription,
-  resolveWidgetDisplayName,
-  resolveWidgetTags,
+  resolveAppDescription,
+  resolveAppDisplayName,
+  resolveAppTags,
   useI18n,
   type AppLanguage,
 } from "@/i18n";
@@ -92,7 +98,7 @@ interface UnifiedSearchProps {
   className?: string;
   open?: boolean;
   onClose?: () => void;
-  onOpenApp?: (widget: WidgetApiItem) => void;
+  onOpenApp?: (app: AppApiItem) => void;
   autoFocus?: boolean;
   showShortcutHint?: boolean;
   shortcut?: UnifiedSearchShortcut;
@@ -138,7 +144,7 @@ type FocusableItem =
       engine: SearchEngineItem;
     }
   | { id: string; type: "website"; website: any }
-  | { id: string; type: "app"; widget: WidgetApiItem }
+  | { id: string; type: "app"; app: AppApiItem }
   | { id: string; type: "route"; route: RouteSearchItem }
   | { id: string; type: "setting"; setting: RouteSearchItem };
 
@@ -397,14 +403,14 @@ const splitInternalResults = <T,>(results: StandardizedSearchResult<T>[]) => ({
   weak: results.filter((result) => result.section === "weak-internal"),
 });
 
-const getWidgetTags = (widget: WidgetApiItem, language: AppLanguage) => [
-  ...resolveWidgetTags(widget, language),
-  ...(widget.tags ?? []),
-  ...((widget.configSnapshot?.tags as string[] | undefined) ?? []),
+const getAppTags = (app: AppApiItem, language: AppLanguage) => [
+  ...resolveAppTags(app, language),
+  ...(app.tags ?? []),
+  ...((app.configSnapshot?.tags as string[] | undefined) ?? []),
 ];
 
-const supportsAppMode = (widget: WidgetApiItem) =>
-  Boolean(widget.configSnapshot?.supportAppMode ?? widget.supportAppMode);
+const supportsAppMode = (app: AppApiItem) =>
+  Boolean(app.configSnapshot?.supportAppMode ?? app.supportAppMode);
 
 const resolveHttpUrl = (rawUrl: string | undefined) => {
   if (!rawUrl) return null;
@@ -464,6 +470,14 @@ const UnifiedSearch = ({
   const navigate = useNavigate();
   const { message } = AntdApp.useApp();
   const { t, routeTextResolver, language } = useI18n();
+  const { resolvedColorScheme } = useDesktopTheme();
+  const modalTheme = useMemo(
+    () =>
+      resolvedColorScheme === "dark"
+        ? desktopNextThemeDark
+        : desktopNextThemeLight,
+    [resolvedColorScheme],
+  );
   const inputRef = useRef<HTMLInputElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [query, setQuery] = useState("");
@@ -485,12 +499,15 @@ const UnifiedSearch = ({
   const [desktopClearAfterClose, setDesktopClearAfterClose] = useState(false);
   const [spotlightMounted, setSpotlightMounted] = useState(open);
   const [spotlightClosing, setSpotlightClosing] = useState(false);
+  const [unavailableAppModal, setUnavailableAppModal] = useState<{
+    name?: string;
+  } | null>(null);
   const {
-    widgets,
-    loading: widgetsLoading,
+    apps,
+    loading: appsLoading,
     getAppIconUrl,
     devModeEnabled,
-  } = useWidget();
+  } = useApp();
 
   const { data: enginesData, loading: enginesLoading } = useRequest(
     getEnabledSearchEngines,
@@ -831,32 +848,32 @@ const UnifiedSearch = ({
   const scoredAppResults = useMemo(() => {
     if (!trimmedQuery || !shouldSearchApps) return [];
     return sortScoredResults(
-      (widgets ?? [])
+      (apps ?? [])
         .filter(supportsAppMode)
-        .map((widget) => {
-          const displayName = resolveWidgetDisplayName(widget, language);
-          const description = resolveWidgetDescription(widget, language);
+        .map((app) => {
+          const displayName = resolveAppDisplayName(app, language);
+          const description = resolveAppDescription(app, language);
           return withSearchResultSection({
-            id: `app:${widget._id}`,
+            id: `app:${app._id}`,
             kind: "app",
             score: getTextMatchScore(
               trimmedQuery,
-              [displayName, widget.name],
+              [displayName, app.name],
               [
                 description,
-                widget.description,
-                widget.author,
-                widget.version,
-                widget.classify?.name,
-                ...getWidgetTags(widget, language),
+                app.description,
+                app.author,
+                app.version,
+                app.classify?.name,
+                ...getAppTags(app, language),
               ],
             ),
-            item: widget,
+            item: app,
           });
         })
         .filter((result) => result.score > 0),
     );
-  }, [language, shouldSearchApps, trimmedQuery, widgets]);
+  }, [language, shouldSearchApps, trimmedQuery, apps]);
 
   const scoredRouteResults = useMemo(() => {
     if (!trimmedQuery || !shouldSearchPages) return [];
@@ -927,7 +944,7 @@ const UnifiedSearch = ({
       ...appResultGroups.strong.map((result) => ({
         id: result.id,
         type: "app" as const,
-        widget: result.item,
+        app: result.item,
       })),
       ...routeResultGroups.strong.map((result) => ({
         id: result.id,
@@ -958,7 +975,7 @@ const UnifiedSearch = ({
       ...appResultGroups.weak.map((result) => ({
         id: result.id,
         type: "app" as const,
-        widget: result.item,
+        app: result.item,
       })),
       ...routeResultGroups.weak.map((result) => ({
         id: result.id,
@@ -1278,9 +1295,9 @@ const UnifiedSearch = ({
   );
 
   const openApp = useCallback(
-    (widget: WidgetApiItem) => {
+    (app: AppApiItem) => {
       if (onOpenApp) {
-        onOpenApp(widget);
+        onOpenApp(app);
       } else {
         navigate(storeRoute.path.app);
       }
@@ -1369,14 +1386,13 @@ const UnifiedSearch = ({
           return;
         }
         if (history.kind === "app") {
-          const widget = (widgets ?? []).find(
-            (item) => item._id === history.widgetId,
+          const app = (apps ?? []).find(
+            (item) => item._id === history.appId,
           );
-          if (widget) {
-            openApp(widget);
+          if (app) {
+            openApp(app);
           } else {
-            navigate(storeRoute.path.app);
-            closeSpotlight();
+            setUnavailableAppModal({ name: history.title });
           }
           return;
         }
@@ -1472,22 +1488,22 @@ const UnifiedSearch = ({
         return;
       }
       if (targetItem.type === "app") {
-        const displayName = resolveWidgetDisplayName(
-          targetItem.widget,
+        const displayName = resolveAppDisplayName(
+          targetItem.app,
           language,
         );
-        const description = resolveWidgetDescription(
-          targetItem.widget,
+        const description = resolveAppDescription(
+          targetItem.app,
           language,
         );
         recordHistory({
-          id: `app:${targetItem.widget._id}`,
+          id: `app:${targetItem.app._id}`,
           kind: "app",
           title: displayName,
           description: description || t("ui.app"),
-          widgetId: targetItem.widget._id,
+          appId: targetItem.app._id,
         });
-        openApp(targetItem.widget);
+        openApp(targetItem.app);
         return;
       }
       if (targetItem.type === "route") {
@@ -1532,7 +1548,7 @@ const UnifiedSearch = ({
       showShortcutSuggestions,
       t,
       trimmedQuery,
-      widgets,
+      apps,
     ],
   );
 
@@ -1954,11 +1970,11 @@ const UnifiedSearch = ({
   };
 
   const renderApps = (
-    results: StandardizedSearchResult<WidgetApiItem>[],
+    results: StandardizedSearchResult<AppApiItem>[],
     options?: { title?: string; showLoading?: boolean },
   ) => {
     if (!trimmedQuery || !shouldSearchApps) return null;
-    if (options?.showLoading && widgetsLoading && !scoredAppResults.length) {
+    if (options?.showLoading && appsLoading && !scoredAppResults.length) {
       return (
         <SearchSection title={t(options.title ?? "ui.app")}>
           <div className="flex h-14 items-center justify-center">
@@ -1972,10 +1988,10 @@ const UnifiedSearch = ({
       <SearchSection title={t(options?.title ?? "ui.app")}>
         <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
           {results.map((result) => {
-            const widget = result.item;
-            const iconUrl = getAppIconUrl(widget);
-            const displayName = resolveWidgetDisplayName(widget, language);
-            const description = resolveWidgetDescription(widget, language);
+            const app = result.item;
+            const iconUrl = getAppIconUrl(app);
+            const displayName = resolveAppDisplayName(app, language);
+            const description = resolveAppDescription(app, language);
             return (
               <SearchResultButton
                 key={result.id}
@@ -1994,12 +2010,12 @@ const UnifiedSearch = ({
                 }
                 title={displayName}
                 description={description || t("ui.app")}
-                tag={widget.version ? `v${widget.version}` : undefined}
+                tag={app.version ? `v${app.version}` : undefined}
                 onClick={() =>
                   runFocusableItem({
                     id: result.id,
                     type: "app",
-                    widget,
+                    app,
                   })
                 }
               />
@@ -2088,7 +2104,7 @@ const UnifiedSearch = ({
         scoredRouteResults.length > 0 ||
         scoredSettingResults.length > 0 ||
         (shouldSearchWebsites && websiteLoading) ||
-        (shouldSearchApps && widgetsLoading) ||
+        (shouldSearchApps && appsLoading) ||
         (shouldSearchWeb && suggestionsLoading)));
   const desktopSearchActive =
     variant === "desktop" &&
@@ -2183,6 +2199,53 @@ const UnifiedSearch = ({
     );
   };
 
+  const renderUnavailableAppModal = () =>
+    unavailableAppModal ? (
+      <DesktopNextBaseModal
+        visible
+        onClose={() => setUnavailableAppModal(null)}
+        width={390}
+        destroyOnClose
+        theme={modalTheme}
+        styles={{
+          panel: {
+            background:
+              resolvedColorScheme === "dark" ? "#1c1c1e" : "#ffffff",
+            border:
+              resolvedColorScheme === "dark"
+                ? "1px solid rgba(255,255,255,0.10)"
+                : "1px solid rgba(60,60,67,0.10)",
+            boxShadow:
+              resolvedColorScheme === "dark"
+                ? "0 24px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 24px 60px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.9)",
+          },
+          body: {
+            padding: "28px 24px 24px",
+          },
+        }}
+      >
+        <div className="flex flex-col items-center text-center text-[#1d1d1f] dark:text-[#f5f5f7]">
+          <div className="relative flex h-[78px] w-[78px] items-center justify-center rounded-[22px] border border-black/5 bg-[#f2f2f7] text-[#8e8e93] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:text-[#aeaeb2] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
+            <RiApps2Line size={31} />
+          </div>
+          <div className="mt-5 max-w-full truncate text-[21px] font-semibold tracking-normal">
+            {unavailableAppModal.name || t("ui.app")}
+          </div>
+          <div className="mt-2 max-w-[306px] text-sm font-medium leading-6 text-[#6e6e73] dark:text-[#c7c7cc]">
+            {t("ui.appUnavailableMessage")}
+          </div>
+          <button
+            type="button"
+            className="mt-6 rounded-full border border-white/20 bg-[#007aff] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(0,122,255,0.24)] transition hover:bg-[#0a84ff] active:scale-[0.98]"
+            onClick={() => setUnavailableAppModal(null)}
+          >
+            {t("ui.close")}
+          </button>
+        </div>
+      </DesktopNextBaseModal>
+    ) : null;
+
   const shouldRender = variant === "spotlight" ? spotlightMounted : open;
   if (!shouldRender) return null;
 
@@ -2211,6 +2274,7 @@ const UnifiedSearch = ({
           {renderSearchInput()}
           {renderPanel()}
         </div>
+        {renderUnavailableAppModal()}
       </div>
     );
   }
@@ -2237,6 +2301,7 @@ const UnifiedSearch = ({
         {renderSearchInput()}
         {showPanel ? renderPanel() : null}
       </div>
+      {renderUnavailableAppModal()}
     </div>
   );
 };

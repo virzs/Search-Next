@@ -7,21 +7,21 @@ import StoreNotFoundRoute from "./views/not-found";
 import WebsiteView from "./views/website";
 import StoreModalRoute, { type StoreOutletContext } from "./index";
 import { Navigate } from "react-router";
-import WidgetView from "./views/widget";
 import AppView from "./views/app";
+import AppCollectionRoute from "./views/app/collection";
 import DevView from "./views/dev";
 import { storeRouteDefinitions } from "./route-definitions";
 import { storeRoute } from "./route-paths";
 import StoreSearchView from "./views/search";
 
-const WidgetRoute = () => {
-  const { query, onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
-  return <WidgetView query={query} onAddStoreItem={onAddStoreItem} />;
-};
-
 const AppRoute = () => {
   const { query, onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
-  return <AppView query={query} onAddStoreItem={onAddStoreItem} />;
+  return <AppView variant="app" query={query} onAddStoreItem={onAddStoreItem} />;
+};
+
+const WidgetRoute = () => {
+  const { query, onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
+  return <AppView variant="widget" query={query} onAddStoreItem={onAddStoreItem} />;
 };
 
 const storeRouteElements = {
@@ -31,6 +31,7 @@ const storeRouteElements = {
   "store.search": <StoreSearchView />,
   "store.app": <AppRoute />,
   "store.widget": <WidgetRoute />,
+  "store.app-collection": <AppCollectionRoute />,
   "store.dev": <DevView />,
 } satisfies Record<string, ReactNode>;
 

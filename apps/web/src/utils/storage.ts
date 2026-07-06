@@ -1,8 +1,8 @@
 import {
-  isWidgetStorageKey,
-  listWidgetStorageKeys,
-  migrateAllLegacyWidgetStorage,
-} from "./widget-storage";
+  isAppStorageKey,
+  listAppStorageKeys,
+  migrateAllLegacyAppStorage,
+} from "./app-storage";
 
 /**
  * 本地存储桌面配置 key
@@ -35,9 +35,9 @@ export const MY_WALLPAPERS_STORAGE_KEY = "SEARCH_NEXT_MY_WALLPAPERS";
 export const MY_THEMES_STORAGE_KEY = "SEARCH_NEXT_MY_THEMES";
 
 /**
- * 已安装小组件列表
+ * 已安装应用列表
  */
-export const INSTALLED_WIDGETS_STORAGE_KEY = "SEARCH_NEXT_INSTALLED_WIDGETS";
+export const INSTALLED_APPS_STORAGE_KEY = "SEARCH_NEXT_INSTALLED_APPS";
 
 /**
  * 开发者模式开关
@@ -45,9 +45,27 @@ export const INSTALLED_WIDGETS_STORAGE_KEY = "SEARCH_NEXT_INSTALLED_WIDGETS";
 export const DEV_MODE_STORAGE_KEY = "SEARCH_NEXT_DEV_MODE";
 
 /**
- * 开发者自定义小组件列表
+ * 开发者自定义应用列表
  */
-export const DEV_WIDGETS_STORAGE_KEY = "SEARCH_NEXT_DEV_WIDGETS";
+export const DEV_APPS_STORAGE_KEY = "SEARCH_NEXT_DEV_APPS";
+
+const LEGACY_INSTALLED_APPS_STORAGE_KEY = "SEARCH_NEXT_INSTALLED_WIDGETS";
+const LEGACY_DEV_APPS_STORAGE_KEY = "SEARCH_NEXT_DEV_WIDGETS";
+
+export const migrateLegacyAppKeys = (storage: Storage = localStorage) => {
+  const pairs: Array<[string, string]> = [
+    [LEGACY_INSTALLED_APPS_STORAGE_KEY, INSTALLED_APPS_STORAGE_KEY],
+    [LEGACY_DEV_APPS_STORAGE_KEY, DEV_APPS_STORAGE_KEY],
+  ];
+
+  for (const [oldKey, newKey] of pairs) {
+    const oldValue = storage.getItem(oldKey);
+    if (oldValue !== null && storage.getItem(newKey) === null) {
+      storage.setItem(newKey, oldValue);
+    }
+    if (oldValue !== null) storage.removeItem(oldKey);
+  }
+};
 
 /**
  * 界面语言设置
@@ -78,9 +96,9 @@ export const SEARCH_NEXT_STORAGE_KEYS = [
   NOTICE_READ_IDS_STORAGE_KEY,
   MY_WALLPAPERS_STORAGE_KEY,
   MY_THEMES_STORAGE_KEY,
-  INSTALLED_WIDGETS_STORAGE_KEY,
+  INSTALLED_APPS_STORAGE_KEY,
   DEV_MODE_STORAGE_KEY,
-  DEV_WIDGETS_STORAGE_KEY,
+  DEV_APPS_STORAGE_KEY,
   APP_LANGUAGE_STORAGE_KEY,
   UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
   SEARCH_SELECTED_ENGINES_STORAGE_KEY,
@@ -90,13 +108,14 @@ export const SEARCH_NEXT_STORAGE_KEYS = [
 export const isSearchNextBackupKey = (key: string) =>
   SEARCH_NEXT_STORAGE_KEYS.includes(
     key as (typeof SEARCH_NEXT_STORAGE_KEYS)[number],
-  ) || isWidgetStorageKey(key);
+  ) || isAppStorageKey(key);
 
 export const getSearchNextStorageKeys = (
   storage: Storage = localStorage,
 ): string[] => {
-  migrateAllLegacyWidgetStorage(storage);
-  return [...SEARCH_NEXT_STORAGE_KEYS, ...listWidgetStorageKeys(storage)];
+  migrateLegacyAppKeys(storage);
+  migrateAllLegacyAppStorage(storage);
+  return [...SEARCH_NEXT_STORAGE_KEYS, ...listAppStorageKeys(storage)];
 };
 
 export const SEARCH_NEXT_BACKUP_FILE_MAGIC = "SEARCH_NEXT_BACKUP_V1";
@@ -225,11 +244,25 @@ export const applySearchNextStorageBackup = (
   storage: Storage = localStorage,
   options?: { mode?: "strict" | "merge" },
 ) => {
-  migrateAllLegacyWidgetStorage(storage);
-  const backupWidgetKeys = Object.keys(backup.items).filter(isWidgetStorageKey);
+  migrateLegacyAppKeys(storage);
+  migrateAllLegacyAppStorage(storage);
+  if (
+    backup.items[LEGACY_INSTALLED_APPS_STORAGE_KEY] !== undefined &&
+    backup.items[INSTALLED_APPS_STORAGE_KEY] === undefined
+  ) {
+    backup.items[INSTALLED_APPS_STORAGE_KEY] =
+      backup.items[LEGACY_INSTALLED_APPS_STORAGE_KEY];
+  }
+  if (
+    backup.items[LEGACY_DEV_APPS_STORAGE_KEY] !== undefined &&
+    backup.items[DEV_APPS_STORAGE_KEY] === undefined
+  ) {
+    backup.items[DEV_APPS_STORAGE_KEY] = backup.items[LEGACY_DEV_APPS_STORAGE_KEY];
+  }
+  const backupAppKeys = Object.keys(backup.items).filter(isAppStorageKey);
   const keys = [
     ...SEARCH_NEXT_STORAGE_KEYS,
-    ...new Set([...listWidgetStorageKeys(storage), ...backupWidgetKeys]),
+    ...new Set([...listAppStorageKeys(storage), ...backupAppKeys]),
   ];
   applyStorageBackup(backup, keys, storage, options);
 };

@@ -20,7 +20,7 @@ export const storeRootRouteDefinition: DefaultAppRouteDefinition = {
   path: storeRoute.path.root,
   meta: {
     title: "应用商店",
-    description: "发现网站、应用与桌面小组件",
+    description: "发现网站、应用与小组件",
     icon: <RiStore2Line size={16} />,
     activeIcon: <RiStore2Fill size={16} />,
     keywords: ["store", "market", "应用市场", "商店"],
@@ -104,10 +104,22 @@ export const storeRouteDefinitions: DefaultAppRouteDefinition[] = [
       description: "添加桌面小组件",
       icon: <RiAppsLine size={16} />,
       activeIcon: <RiAppsFill size={16} />,
-      keywords: ["widget", "widgets", "组件", "桌面组件"],
+      keywords: ["widget", "widgets", "小组件", "桌面组件"],
     },
     sidebar: { enabled: true },
     search: { enabled: true, group: "page" },
+  },
+  {
+    key: "store.app-collection",
+    segment: `${storeRoute.segment.app}/${storeRoute.segment.appCollection}`,
+    path: "/store/app/collection/:id",
+    meta: {
+      title: "应用合集",
+      description: "查看应用合集",
+      keywords: ["app", "collection", "合集", "应用合集"],
+    },
+    sidebar: false,
+    search: false,
   },
   {
     key: "store.dev",
@@ -115,10 +127,10 @@ export const storeRouteDefinitions: DefaultAppRouteDefinition[] = [
     path: storeRoute.path.dev,
     meta: {
       title: "开发者",
-      description: "测试自定义小组件和本地 ESM 入口",
+      description: "测试自定义应用和本地 ESM 入口",
       icon: <RiCodeSSlashLine size={16} />,
       activeIcon: <RiCodeSSlashFill size={16} />,
-      keywords: ["dev", "developer", "widget", "esm", "开发"],
+      keywords: ["dev", "developer", "app", "esm", "开发"],
     },
     sidebar: {
       enabled: true,

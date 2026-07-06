@@ -1,9 +1,9 @@
-import type { WidgetEventBus } from './types';
+import type { AppEventBus } from './types';
 
 /**
- * 小组件共享事件总线实现：用于跨小组件广播事件。
+ * 应用共享事件总线实现：用于跨应用广播事件。
  */
-export class WidgetEventBusImpl implements WidgetEventBus {
+export class AppEventBusImpl implements AppEventBus {
   /** 按事件名维护处理函数集合，便于去重与快速增删。 */
   private listeners = new Map<string, Set<(...args: any[]) => void>>();
 
@@ -42,5 +42,5 @@ export class WidgetEventBusImpl implements WidgetEventBus {
   }
 }
 
-/** 共享单例：供宿主和全部小组件使用同一总线实现跨组件通信。 */
-export const sharedEventBus: WidgetEventBus = new WidgetEventBusImpl();
+/** 共享单例：供宿主和全部应用使用同一总线实现跨应用通信。 */
+export const sharedEventBus: AppEventBus = new AppEventBusImpl();

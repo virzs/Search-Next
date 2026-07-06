@@ -33,11 +33,18 @@ export interface WebsiteCollectionPublicItem {
   _id: string;
   title: string;
   description?: string;
+  kicker?: string;
+  accentColor?: string;
+  layout?: "story" | "compact";
+  featured?: boolean;
+  itemLimit?: number;
+  total?: number;
   enable: boolean;
   effectiveStart?: string | null;
   effectiveEnd?: string | null;
   sort?: number;
   websites?: any[];
+  previewWebsites?: any[];
 }
 
 // /tabs/website_collection/public/list get

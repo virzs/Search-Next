@@ -5,7 +5,7 @@ import { useI18n } from "@/i18n";
 interface StoreHeroCardProps {
   title: string;
   description: string;
-  tone?: "website" | "widget" | "dev";
+  tone?: "website" | "app" | "widget" | "dev";
   className?: string;
 }
 
@@ -61,6 +61,9 @@ const heroBaseClassName = css`
 const heroToneClassName = {
   website: css`
     background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 58%, #f2f2f7 100%);
+  `,
+  app: css`
+    background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 58%, #f4f2ff 100%);
   `,
   widget: css`
     background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 58%, #f4f2ff 100%);

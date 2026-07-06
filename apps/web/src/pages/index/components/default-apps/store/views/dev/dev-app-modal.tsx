@@ -2,8 +2,8 @@ import { DesktopNextBaseModal } from "zs_library";
 import { Button, Form, Input, InputNumber } from "antd";
 import { RiAddLine, RiCloseLine } from "@remixicon/react";
 import type { FC } from "react";
-import type { DevWidget } from "@/contexts/WidgetContext";
-import type { WidgetSizeConfig } from "@/types";
+import type { DevApp } from "@/contexts/AppContext";
+import type { AppSizeConfig } from "@/types";
 import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
 
@@ -15,7 +15,7 @@ interface SizeFormItem {
   name: string;
 }
 
-export interface DevWidgetFormValues {
+export interface DevAppFormValues {
   name: string;
   entry: string;
   sizes: SizeFormItem[];
@@ -101,8 +101,8 @@ const SizeConfigList: FC<{
 
 // ====== 尺寸配置转换工具 ======
 
-/** 表单数据 → WidgetSizeConfig */
-export const toSizeConfigs = (sizes: SizeFormItem[]): WidgetSizeConfig[] =>
+/** 表单数据 → AppSizeConfig */
+export const toSizeConfigs = (sizes: SizeFormItem[]): AppSizeConfig[] =>
   sizes.map((s) => ({
     col: s.col,
     row: s.row,
@@ -110,39 +110,39 @@ export const toSizeConfigs = (sizes: SizeFormItem[]): WidgetSizeConfig[] =>
     id: `${s.col}x${s.row}`,
   }));
 
-/** WidgetSizeConfig → 表单数据 */
-export const fromSizeConfigs = (configs: WidgetSizeConfig[]): SizeFormItem[] =>
+/** AppSizeConfig → 表单数据 */
+export const fromSizeConfigs = (configs: AppSizeConfig[]): SizeFormItem[] =>
   configs.map((c) => ({ col: c.col, row: c.row, name: c.name || `${c.col}x${c.row}` }));
 
 // ====== 弹窗组件 ======
 
-export interface DevWidgetModalProps {
+export interface DevAppModalProps {
   /** 弹窗是否可见 */
   open: boolean;
   /** 关闭弹窗回调 */
   onClose: () => void;
-  /** 正在编辑的小组件（null 表示新增模式） */
-  editingWidget: DevWidget | null;
+  /** 正在编辑的应用（null 表示新增模式） */
+  editingApp: DevApp | null;
   /** 提交回调，返回表单值和转换后的尺寸配置 */
-  onSubmit: (values: DevWidgetFormValues, sizeConfigs: WidgetSizeConfig[]) => void;
+  onSubmit: (values: DevAppFormValues, sizeConfigs: AppSizeConfig[]) => void;
 }
 
-const DevWidgetModal: FC<DevWidgetModalProps> = ({
+const DevAppModal: FC<DevAppModalProps> = ({
   open,
   onClose,
-  editingWidget,
+  editingApp,
   onSubmit,
 }) => {
   const { t } = useI18n();
-  const [form] = Form.useForm<DevWidgetFormValues>();
+  const [form] = Form.useForm<DevAppFormValues>();
 
   /** 弹窗打开时，若为编辑模式则回填表单 */
   const handleAfterOpen = () => {
-    if (editingWidget) {
+    if (editingApp) {
       (form as any).setFieldsValue({
-        name: editingWidget.name,
-        entry: editingWidget.entry,
-        sizes: fromSizeConfigs(editingWidget.sizeConfigs),
+        name: editingApp.name,
+        entry: editingApp.entry,
+        sizes: fromSizeConfigs(editingApp.sizeConfigs),
       });
     } else {
       (form as any).resetFields();
@@ -173,14 +173,14 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
       }}
     >
       <div
-        className={`w-full min-h-full ${appleDevWidgetModalClassName}`}
+        className={`w-full min-h-full ${appleDevAppModalClassName}`}
         // 弹窗渲染完成后回填表单
         ref={(el) => {
           if (el && open) handleAfterOpen();
         }}
       >
         <div className="mb-4 text-[21px] font-semibold tracking-tight text-[#1d1d1f]">
-          {editingWidget ? t("ui.editWidget") : t("ui.addWidget")}
+          {editingApp ? t("ui.editApp") : t("ui.addApp")}
         </div>
 
         <Form
@@ -196,7 +196,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
           <Form.Item
             name="name"
             label={t("ui.name")}
-            rules={[{ required: true, message: t("ui.enterAWidgetName") }]}
+            rules={[{ required: true, message: t("ui.enterAAppName") }]}
           >
             <Input placeholder={t("ui.exampleMyClock")} />
           </Form.Item>
@@ -237,7 +237,7 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
               className="apple-primary"
               onClick={() => (form as any).submit()}
             >
-              {editingWidget ? t("ui.save") : t("ui.addToDesktop")}
+              {editingApp ? t("ui.save") : t("ui.addToDesktop")}
             </Button>
           </div>
         </Form>
@@ -246,9 +246,9 @@ const DevWidgetModal: FC<DevWidgetModalProps> = ({
   );
 };
 
-export default DevWidgetModal;
+export default DevAppModal;
 
-const appleDevWidgetModalClassName = css`
+const appleDevAppModalClassName = css`
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(245, 245, 247, 0.82)),
     rgba(245, 245, 247, 0.72);

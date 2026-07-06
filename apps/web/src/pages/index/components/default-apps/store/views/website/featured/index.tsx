@@ -1,7 +1,7 @@
 import { Button, Empty, Skeleton } from "antd";
 import type React from "react";
 import StoreHeroCard from "../../../components/StoreHeroCard";
-import { getWebsiteId } from "../../../utils";
+import { getWebsiteIconUrl, getWebsiteId } from "../../../utils";
 import WebsiteCard from "../../../components/WebsiteCard";
 import { useI18n } from "@/i18n";
 
@@ -36,6 +36,65 @@ const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
   );
 };
 
+const CollectionArtwork = ({ items }: { items: any[] }) => {
+  const icons = items.map(getWebsiteIconUrl).filter(Boolean).slice(0, 6);
+  return (
+    <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[22px] bg-white/35 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+      {Array.from({ length: 4 }).map((_, idx) => {
+        const icon = icons[idx];
+        return (
+          <div
+            key={idx}
+            className="flex items-center justify-center overflow-hidden rounded-2xl bg-white/80 shadow-sm"
+          >
+            {icon ? (
+              <img src={icon} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div className="h-full w-full bg-white/60" />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const FeaturedCollectionCard = ({
+  collection,
+  onOpen,
+}: {
+  collection: any;
+  onOpen: (id: string) => void;
+}) => {
+  const items = collection.previewWebsites || collection.websites || [];
+  const accent = collection.accentColor || "#007aff";
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(collection._id)}
+      className="group flex min-h-[180px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[28px] border-0 p-5 text-left shadow-[0_18px_42px_rgba(15,23,42,0.13)] transition hover:-translate-y-0.5"
+      style={{
+        background: `linear-gradient(135deg, ${accent}, #0f172a)`,
+      }}
+    >
+      <div className="min-w-0 text-white">
+        <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white/72">
+          {collection.kicker || "Featured Collection"}
+        </div>
+        <div className="line-clamp-2 text-3xl font-extrabold leading-9 tracking-normal">
+          {collection.title}
+        </div>
+        {collection.description ? (
+          <div className="mt-2 line-clamp-2 max-w-md text-sm font-semibold leading-5 text-white/74">
+            {collection.description}
+          </div>
+        ) : null}
+      </div>
+      <CollectionArtwork items={items} />
+    </button>
+  );
+};
+
 const FeaturedView: React.FC<FeaturedViewProps> = ({
   featuredHomeScrollRef,
   collectionItems,
@@ -45,6 +104,12 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
   onOpenWebsiteDetail,
 }) => {
   const { t } = useI18n();
+  const featuredCollections = collectionItems
+    .filter((item: any) => item?.featured)
+    .slice(0, 2);
+  const normalCollections = collectionItems.filter(
+    (item: any) => !featuredCollections.some((c: any) => c._id === item._id),
+  );
   return (
     <div
       ref={featuredHomeScrollRef}
@@ -80,15 +145,33 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
               <Empty className="mt-4" description={t("ui.noCollections")} />
             ) : (
               <div className="flex flex-col gap-5">
-                {collectionItems.map((c: any) => (
+                {featuredCollections.length ? (
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                    {featuredCollections.map((c: any) => (
+                      <FeaturedCollectionCard
+                        key={c._id}
+                        collection={c}
+                        onOpen={onOpenCollection}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+
+                {normalCollections.map((c: any) => (
                   <div key={c._id}>
                     <div className="mb-3 flex items-end justify-between gap-3 px-1">
                       <div className="min-w-0">
+                        {c.kicker ? (
+                          <div className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#0071e3]">
+                            {c.kicker}
+                          </div>
+                        ) : null}
                         <div className="line-clamp-1 text-xl font-bold tracking-normal text-gray-950 dark:text-gray-50">
                           {c.title}
                         </div>
                         <div className="mt-1 line-clamp-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {c.description || " "}
+                          {c.description ||
+                            t("ui.storeItemCount", { count: c.total ?? (c.websites || []).length })}
                         </div>
                       </div>
                       <Button
@@ -100,7 +183,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                       </Button>
                     </div>
                     <div className="-mx-1 flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
-                      {(c.websites || []).map((item: any) => (
+                      {(c.previewWebsites || c.websites || []).map((item: any) => (
                         <div key={getWebsiteId(item)} className="w-64 shrink-0">
                           <WebsiteCard
                             item={item}
@@ -111,7 +194,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                           />
                         </div>
                       ))}
-                      {(c.websites || []).length === 0 && (
+                      {(c.previewWebsites || c.websites || []).length === 0 && (
                         <Empty className="mt-2" description={t("ui.noWebsites")} />
                       )}
                     </div>

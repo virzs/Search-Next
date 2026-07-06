@@ -2,7 +2,7 @@ import { baseGetRequest, basePutRequestNoId } from "@/utils/axios";
 import type { StorageBackupV1 } from "@/utils/storage";
 
 export interface UserDataPluginSummary {
-  widgetId: string;
+  appId: string;
   name?: string;
   version?: string;
   count: number;

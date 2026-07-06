@@ -2,7 +2,7 @@ import { FC, useMemo } from "react";
 import { RiSearchLine } from "@remixicon/react";
 import { AppRoutedOverlay } from "@/components";
 import { storeRoute } from "./route-paths";
-import { useWidget } from "@/hooks/useWidget";
+import { useApp } from "@/hooks/useApp";
 import { createSidebarMenuItems } from "../route-config";
 import {
   storeRootRouteDefinition,
@@ -19,8 +19,7 @@ export type StoreWebsitePayload = {
 
 export type StoreAddPayload =
   | { kind: "website"; site: StoreWebsitePayload }
-  | { kind: "widget"; widgetId: string; sizeId?: string }
-  | { kind: "app"; widgetId: string };
+  | { kind: "app"; appId: string; sizeId?: string };
 
 export type DesktopOutletContext = {
   onAddStoreItem?: (payload: StoreAddPayload) => void;
@@ -45,7 +44,7 @@ const buildStoreRouteContext = ({
 });
 
 const StoreModalRoute: FC = () => {
-  const { devModeEnabled } = useWidget();
+  const { devModeEnabled } = useApp();
   const { routeTextResolver, t } = useI18n();
 
   const menuItems = useMemo(

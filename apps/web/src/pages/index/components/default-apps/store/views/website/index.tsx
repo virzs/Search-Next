@@ -48,7 +48,7 @@ const WebsiteGridSkeleton: React.FC<{ count: number }> = ({ count }) => (
 
 const WebsiteView: React.FC = () => {
   const { t } = useI18n();
-  const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
+  const { onAddStoreItem, query } = useAppRouteContext<StoreOutletContext>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [addVisible, setAddVisible] = useState(false);
@@ -113,6 +113,7 @@ const WebsiteView: React.FC = () => {
     runList({
       page,
       pageSize,
+      search: query?.trim() || undefined,
       ...(activeCategory?.filter ?? {}),
     });
   }, [
@@ -122,6 +123,7 @@ const WebsiteView: React.FC = () => {
     pageSize,
     runList,
     activeCategory?.filter,
+    query,
   ]);
 
   const viewOptions = useMemo(() => {

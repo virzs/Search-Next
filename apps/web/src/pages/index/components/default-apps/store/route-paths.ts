@@ -5,6 +5,7 @@ export const storeRoute = {
     website: "website",
     app: "app",
     widget: "widget",
+    appCollection: "collection/:id",
     dev: "dev",
     websiteCollection: "collection/:id",
     websiteDetail: "detail/:id",
@@ -22,6 +23,8 @@ export const storeRoute = {
     },
     app: "/store/app",
     widget: "/store/widget",
+    appCollection: (collectionId: string) =>
+      `/store/app/collection/${encodeURIComponent(collectionId)}`,
     dev: "/store/dev",
   },
 } as const;

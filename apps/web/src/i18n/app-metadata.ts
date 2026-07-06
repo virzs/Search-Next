@@ -1,8 +1,8 @@
 import type {
   LocalizedStringList,
   LocalizedText,
-  WidgetApiItem,
-  WidgetConfig,
+  AppApiItem,
+  AppConfig,
 } from "@/types";
 import {
   DEFAULT_APP_LANGUAGE,
@@ -83,15 +83,15 @@ const englishText = (...values: unknown[]) => {
   return undefined;
 };
 
-export const resolveWidgetDisplayName = (
-  widget: WidgetApiItem,
+export const resolveAppDisplayName = (
+  app: AppApiItem,
   language: AppLanguage,
-  fallback?: WidgetConfig,
+  fallback?: AppConfig,
 ): string => {
-  const snapshot = widget.configSnapshot;
+  const snapshot = app.configSnapshot;
   const localizedName = resolveLocalizedText(
     snapshot?.displayNameI18n ??
-      widget.displayNameI18n ??
+      app.displayNameI18n ??
       fallback?.displayNameI18n,
     language,
   );
@@ -101,65 +101,65 @@ export const resolveWidgetDisplayName = (
     return (
       englishText(
         snapshot?.displayName,
-        widget.displayName,
-        widget.name,
+        app.displayName,
+        app.name,
         fallback?.displayName,
         fallback?.name,
       ) ??
       packageNameToTitle(snapshot?.name) ??
-      packageNameToTitle(widget.packageName) ??
+      packageNameToTitle(app.packageName) ??
       firstText(
         snapshot?.displayName,
-        widget.displayName,
-        widget.name,
+        app.displayName,
+        app.name,
         fallback?.name,
       ) ??
-      "Widget"
+      "App"
     );
   }
 
   return (
     firstText(
       snapshot?.displayName,
-      widget.displayName,
-      widget.name,
+      app.displayName,
+      app.name,
       fallback?.displayName,
       fallback?.name,
     ) ??
     packageNameToTitle(snapshot?.name) ??
-    packageNameToTitle(widget.packageName) ??
-    "小组件"
+    packageNameToTitle(app.packageName) ??
+    "应用"
   );
 };
 
-export const resolveWidgetDescription = (
-  widget: WidgetApiItem,
+export const resolveAppDescription = (
+  app: AppApiItem,
   language: AppLanguage,
-  fallback?: WidgetConfig,
+  fallback?: AppConfig,
 ): string | undefined => {
-  const snapshot = widget.configSnapshot;
+  const snapshot = app.configSnapshot;
   return resolveLocalizedText(
     snapshot?.descriptionI18n ??
-      widget.descriptionI18n ??
+      app.descriptionI18n ??
       fallback?.descriptionI18n,
     language,
-    firstText(snapshot?.description, widget.description, fallback?.description),
+    firstText(snapshot?.description, app.description, fallback?.description),
   );
 };
 
-export const resolveWidgetTags = (
-  widget: WidgetApiItem,
+export const resolveAppTags = (
+  app: AppApiItem,
   language: AppLanguage,
-  fallback?: WidgetConfig,
+  fallback?: AppConfig,
 ): string[] => {
-  const snapshot = widget.configSnapshot;
+  const snapshot = app.configSnapshot;
   const localizedTags = resolveLocalizedStringList(
-    snapshot?.tagsI18n ?? widget.tagsI18n ?? fallback?.tagsI18n,
+    snapshot?.tagsI18n ?? app.tagsI18n ?? fallback?.tagsI18n,
     language,
   );
   if (localizedTags.length) return localizedTags;
   return resolveLocalizedStringList(
-    snapshot?.tags ?? widget.tags,
+    snapshot?.tags ?? app.tags,
     language,
     fallback?.tags,
   );

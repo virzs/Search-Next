@@ -1,56 +1,56 @@
 import { useEffect, useMemo, useState } from "react";
 import { RiArrowLeftSLine, RiSettings3Line } from "@remixicon/react";
 import { DesktopNextBaseModal } from "zs_library";
-import PureWidget, { PureWidgetConfig } from "../micro-frontend/pure-widget";
-import type { WidgetMode, WidgetSDK } from "@/sdk";
-import type { WidgetConfig } from "@/types";
+import PureApp, { PureAppConfig } from "../micro-frontend/pure-app";
+import type { AppMode, AppSDK } from "@/sdk";
+import type { AppConfig } from "@/types";
 import { resolveLocalizedText, useI18n } from "@/i18n";
 
-interface PureWidgetWindowProps {
-  config: PureWidgetConfig;
+interface PureAppWindowProps {
+  config: PureAppConfig;
   visible: boolean;
   onClose: () => void;
   title?: string;
   width?: number | string;
   height?: number | string;
-  widgetConfig?: WidgetConfig;
-  /** 小组件 SDK 实例 */
-  sdk?: WidgetSDK;
-  createSdk?: (mode: WidgetMode, sizeId: string) => WidgetSDK | undefined;
+  appConfig?: AppConfig;
+  /** 应用 SDK 实例 */
+  sdk?: AppSDK;
+  createSdk?: (mode: AppMode, sizeId: string) => AppSDK | undefined;
 }
 
-const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
+const PureAppWindow: React.FC<PureAppWindowProps> = ({
   config,
   visible,
   onClose,
   title,
   width = 600,
   height = 400,
-  widgetConfig,
+  appConfig,
   sdk,
   createSdk,
 }) => {
   const { t, language } = useI18n();
   const [viewMode, setViewMode] = useState<"full" | "settings">("full");
-  const [widgetBackVisible, setWidgetBackVisible] = useState(false);
+  const [appBackVisible, setAppBackVisible] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setViewMode("full");
-      setWidgetBackVisible(false);
+      setAppBackVisible(false);
     }
   }, [config.entry, visible]);
 
-  const settingsRoutePath = widgetConfig?.pagePaths?.settings;
-  const widgetTitle =
+  const settingsRoutePath = appConfig?.pagePaths?.settings;
+  const appTitle =
     title ||
     resolveLocalizedText(
-      widgetConfig?.displayNameI18n,
+      appConfig?.displayNameI18n,
       language,
-      widgetConfig?.name,
+      appConfig?.name,
     ) ||
-    t("ui.widget");
-  const hasSettings = Boolean(widgetConfig?.id && settingsRoutePath);
+    t("ui.app");
+  const hasSettings = Boolean(appConfig?.id && settingsRoutePath);
   const contentHeight = typeof height === "number" ? height : undefined;
   const windowHeight = typeof height === "number" ? height + 46 : height;
   const currentSdk = useMemo(() => {
@@ -63,12 +63,12 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
       ...config,
       props: {
         ...(config.props ?? {}),
-        title: widgetTitle,
+        title: appTitle,
       },
-      mode: "full" as WidgetMode,
+      mode: "full" as AppMode,
       ...(currentSdk ? { sdk: currentSdk } : {}),
     }),
-    [config, currentSdk, widgetTitle],
+    [config, currentSdk, appTitle],
   );
 
   const settingsConfig = useMemo(
@@ -76,13 +76,13 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
       ...config,
       props: {
         ...(config.props ?? {}),
-        title: widgetTitle,
+        title: appTitle,
         pagePath: settingsRoutePath,
       },
-      mode: "settings" as WidgetMode,
+      mode: "settings" as AppMode,
       ...(currentSdk ? { sdk: currentSdk } : {}),
     }),
-    [config, currentSdk, settingsRoutePath, widgetTitle],
+    [config, currentSdk, settingsRoutePath, appTitle],
   );
 
   useEffect(() => {
@@ -91,31 +91,31 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
       viewMode !== "full" ||
       !currentSdk?.events
     ) {
-      setWidgetBackVisible(false);
+      setAppBackVisible(false);
       return undefined;
     }
 
     const handler = (payload: unknown) => {
       if (!payload || typeof payload !== "object") return;
-      const data = payload as { widgetId?: string; backVisible?: unknown };
-      if (data.widgetId && data.widgetId !== currentSdk.widgetId) return;
+      const data = payload as { appId?: string; backVisible?: unknown };
+      if (data.appId && data.appId !== currentSdk.appId) return;
       if (typeof data.backVisible === "boolean") {
-        setWidgetBackVisible(data.backVisible);
+        setAppBackVisible(data.backVisible);
       }
     };
 
-    currentSdk.events.on("widget:chrome", handler);
-    return () => currentSdk.events.off("widget:chrome", handler);
+    currentSdk.events.on("app:chrome", handler);
+    return () => currentSdk.events.off("app:chrome", handler);
   }, [currentSdk, viewMode, visible]);
 
-  const showBackButton = viewMode === "settings" || widgetBackVisible;
+  const showBackButton = viewMode === "settings" || appBackVisible;
   const handleHeaderBack = () => {
     if (viewMode === "settings") {
       setViewMode("full");
       return;
     }
-    currentSdk?.events.emit("widget:title-back", {
-      widgetId: currentSdk.widgetId,
+    currentSdk?.events.emit("app:title-back", {
+      appId: currentSdk.appId,
     });
   };
 
@@ -148,8 +148,8 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
           </div>
           <div className="min-w-0 truncate text-center text-[13px] font-semibold text-[#424245] dark:text-[#f5f5f7]">
             {viewMode === "settings"
-              ? t("ui.titleSettings", { title: widgetTitle })
-              : widgetTitle}
+              ? t("ui.titleSettings", { title: appTitle })
+              : appTitle}
           </div>
           <div className="flex items-center justify-end">
             {viewMode === "full" && hasSettings && (
@@ -170,9 +170,9 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
           style={contentHeight ? { height: contentHeight } : undefined}
         >
           {viewMode === "full" ? (
-            <PureWidget config={fullConfig} className="h-full w-full" />
+            <PureApp config={fullConfig} className="h-full w-full" />
           ) : settingsRoutePath ? (
-            <PureWidget config={settingsConfig} className="h-full w-full" />
+            <PureApp config={settingsConfig} className="h-full w-full" />
           ) : null}
         </div>
       </div>
@@ -180,4 +180,4 @@ const PureWidgetWindow: React.FC<PureWidgetWindowProps> = ({
   );
 };
 
-export default PureWidgetWindow;
+export default PureAppWindow;

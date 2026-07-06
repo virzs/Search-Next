@@ -15,7 +15,7 @@ export type AppLanguage = (typeof APP_LANGUAGES)[number]["code"];
 
 export const DEFAULT_APP_LANGUAGE: AppLanguage = "zh-CN";
 
-export interface WidgetLocaleInfo {
+export interface AppLocaleInfo {
   language: AppLanguage;
   direction: "ltr";
 }
@@ -30,9 +30,9 @@ export const normalizeAppLanguage = (value: unknown): AppLanguage => {
   return DEFAULT_APP_LANGUAGE;
 };
 
-export const getWidgetLocaleInfo = (
+export const getAppLocaleInfo = (
   language: AppLanguage,
-): WidgetLocaleInfo => ({
+): AppLocaleInfo => ({
   language,
   direction: "ltr",
 });

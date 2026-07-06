@@ -14,10 +14,10 @@ import {
 } from "@remixicon/react";
 import StoreHeroCard from "../../components/StoreHeroCard";
 import { DefaultAppView, useAppRouteContext } from "@/components";
-import { useWidget } from "@/hooks/useWidget";
-import type { DevWidget } from "@/contexts/WidgetContext";
-import DevWidgetModal, { toSizeConfigs } from "./dev-widget-modal";
-import type { DevWidgetFormValues } from "./dev-widget-modal";
+import { useApp } from "@/hooks/useApp";
+import type { DevApp } from "@/contexts/AppContext";
+import DevAppModal, { toSizeConfigs } from "./dev-app-modal";
+import type { DevAppFormValues } from "./dev-app-modal";
 import type { StoreOutletContext } from "../../index";
 import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
@@ -35,38 +35,38 @@ const DevView: React.FC = () => {
   const { t } = useI18n();
   const { message } = App.useApp();
   const {
-    devWidgets,
-    addDevWidget,
-    updateDevWidget,
-    removeDevWidget,
-  } = useWidget();
+    devApps,
+    addDevApp,
+    updateDevApp,
+    removeDevApp,
+  } = useApp();
   const { onAddStoreItem } = useAppRouteContext<StoreOutletContext>();
 
   // 弹窗状态
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingWidget, setEditingWidget] = useState<DevWidget | null>(null);
+  const [editingApp, setEditingApp] = useState<DevApp | null>(null);
 
   const openAddModal = () => {
-    setEditingWidget(null);
+    setEditingApp(null);
     setModalOpen(true);
   };
 
-  const openEditModal = (dw: DevWidget) => {
-    setEditingWidget(dw);
+  const openEditModal = (dw: DevApp) => {
+    setEditingApp(dw);
     setModalOpen(true);
   };
 
   const closeModal = () => {
     setModalOpen(false);
-    setEditingWidget(null);
+    setEditingApp(null);
   };
 
   // 弹窗提交回调
-  const handleSubmit = (values: DevWidgetFormValues, sizeConfigs: ReturnType<typeof toSizeConfigs>) => {
+  const handleSubmit = (values: DevAppFormValues, sizeConfigs: ReturnType<typeof toSizeConfigs>) => {
     const defaultSizeId = sizeConfigs[0]?.id || "2x2";
 
-    if (editingWidget) {
-      updateDevWidget(editingWidget.id, {
+    if (editingApp) {
+      updateDevApp(editingApp.id, {
         name: values.name,
         entry: values.entry,
         sizeConfigs,
@@ -74,7 +74,7 @@ const DevView: React.FC = () => {
       });
       message.success(t("ui.updated"));
     } else {
-      const created = addDevWidget({
+      const created = addDevApp({
         name: values.name,
         entry: values.entry,
         sizeConfigs,
@@ -84,13 +84,13 @@ const DevView: React.FC = () => {
         message.warning(t("ui.dev.duplicateEntry"));
         return;
       }
-      onAddStoreItem?.({ kind: "widget", widgetId: created.id });
+      onAddStoreItem?.({ kind: "app", appId: created.id });
       message.success(t("ui.addedToDesktop"));
     }
   };
 
   const handleRemove = (id: string) => {
-    removeDevWidget(id);
+    removeDevApp(id);
     message.success(t("ui.removed"));
   };
 
@@ -116,19 +116,19 @@ const DevView: React.FC = () => {
 
       <div className="shrink-0">
         <StoreHeroCard
-          title={t("ui.debugCustomWidgets")}
-          description={t("ui.dev.customWidgetsDescription")}
+          title={t("ui.debugCustomApps")}
+          description={t("ui.dev.customAppsDescription")}
           tone="dev"
         />
       </div>
 
-      {devWidgets.length === 0 ? (
+      {devApps.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <Empty description={t("ui.noCustomWidgets")} />
+          <Empty description={t("ui.noCustomApps")} />
         </div>
       ) : (
         <div className="mt-5 grid flex-1 grid-cols-1 gap-3 overflow-y-auto px-1 pr-1">
-          {devWidgets.map((dw) => {
+          {devApps.map((dw) => {
             return (
               <div
                 key={dw.id}
@@ -162,13 +162,13 @@ const DevView: React.FC = () => {
                           shape="round"
                           className="apple-store-action font-bold!"
                           onClick={() =>
-                            onAddStoreItem?.({ kind: "widget", widgetId: dw.id })
+                            onAddStoreItem?.({ kind: "app", appId: dw.id })
                           }
                         >
                           {t("ui.addToDesktop")}
                         </Button>
                         <Popconfirm
-                          title={t("ui.deleteThisWidget")}
+                          title={t("ui.deleteThisApp")}
                           onConfirm={() => handleRemove(dw.id)}
                           okText={t("ui.delete")}
                           cancelText={t("ui.cancel")}
@@ -202,10 +202,10 @@ const DevView: React.FC = () => {
         </div>
       )}
 
-      <DevWidgetModal
+      <DevAppModal
         open={modalOpen}
         onClose={closeModal}
-        editingWidget={editingWidget}
+        editingApp={editingApp}
         onSubmit={handleSubmit}
       />
     </DefaultAppView>

@@ -2,21 +2,21 @@ import { DesktopNextBaseModal } from "zs_library";
 import { App, Button, Popconfirm, Tag } from "antd";
 import { useState, type FC } from "react";
 import { css } from "@emotion/css";
-import type { WidgetConfig } from "@/types";
+import type { AppConfig } from "@/types";
 import { sharedEventBus } from "@/sdk";
 import {
-  clearWidgetStorage,
-  formatWidgetStorageSize,
-  getWidgetStorageStats,
-} from "@/utils/widget-storage";
+  clearAppStorage,
+  formatAppStorageSize,
+  getAppStorageStats,
+} from "@/utils/app-storage";
 import { resolveLocalizedText, useI18n } from "@/i18n";
 
-interface WidgetInfoModalProps {
+interface AppInfoModalProps {
   visible: boolean;
   onClose: () => void;
-  widgetId: string;
-  widgetName?: string;
-  widgetConfig?: WidgetConfig;
+  appId: string;
+  appName?: string;
+  appConfig?: AppConfig;
 }
 
 const InfoRow = ({ label, value }: { label: string; value?: string | number | null }) => (
@@ -28,37 +28,37 @@ const InfoRow = ({ label, value }: { label: string; value?: string | number | nu
   </div>
 );
 
-const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
+const AppInfoModal: FC<AppInfoModalProps> = ({
   visible,
   onClose,
-  widgetId,
-  widgetName,
-  widgetConfig,
+  appId,
+  appName,
+  appConfig,
 }) => {
   const { t, language } = useI18n();
   const { message } = App.useApp();
   const [, setVersion] = useState(0);
-  const stats = getWidgetStorageStats(widgetId);
+  const stats = getAppStorageStats(appId);
   const title =
     resolveLocalizedText(
-      widgetConfig?.displayNameI18n,
+      appConfig?.displayNameI18n,
       language,
-      widgetName || widgetConfig?.name,
+      appName || appConfig?.name,
     ) || t("ui.app");
   const description = resolveLocalizedText(
-    widgetConfig?.descriptionI18n,
+    appConfig?.descriptionI18n,
     language,
-    widgetConfig?.description,
+    appConfig?.description,
   );
   const appIconType =
-    widgetConfig?.appIcon?.type === "custom" ? t("ui.customElement") : t("ui.image");
+    appConfig?.appIcon?.type === "custom" ? t("ui.customElement") : t("ui.image");
 
   const handleClear = () => {
-    const keys = clearWidgetStorage(widgetId);
+    const keys = clearAppStorage(appId);
     keys.forEach((key) => {
-      sharedEventBus.emit("storage:changed", { widgetId, key, value: null });
+      sharedEventBus.emit("storage:changed", { appId, key, value: null });
     });
-    sharedEventBus.emit("storage:changed", { widgetId, key: "*", value: null });
+    sharedEventBus.emit("storage:changed", { appId, key: "*", value: null });
     setVersion((value) => value + 1);
     message.success(t("ui.appDataCleared"));
   };
@@ -70,7 +70,7 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
       width={520}
       destroyOnClose
     >
-      <div className={appleWidgetInfoClassName}>
+      <div className={appleAppInfoClassName}>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="truncate text-[21px] font-semibold tracking-normal text-[#1d1d1f]">
@@ -88,16 +88,16 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
         </div>
 
         <div className="mt-5 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
-          <InfoRow label={t("ui.appID")} value={widgetId} />
-          <InfoRow label={t("ui.version")} value={widgetConfig?.version} />
-          <InfoRow label={t("ui.author")} value={widgetConfig?.author} />
-          <InfoRow label={t("ui.source")} value={widgetConfig?.sourceType || "legacy"} />
+          <InfoRow label={t("ui.appID")} value={appId} />
+          <InfoRow label={t("ui.version")} value={appConfig?.version} />
+          <InfoRow label={t("ui.author")} value={appConfig?.author} />
+          <InfoRow label={t("ui.source")} value={appConfig?.sourceType || "legacy"} />
           <InfoRow label={t("ui.iconMode")} value={appIconType} />
-          <InfoRow label={t("ui.entry")} value={widgetConfig?.entry} />
+          <InfoRow label={t("ui.entry")} value={appConfig?.entry} />
         </div>
 
         <div className="mt-4 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
-          <InfoRow label={t("ui.storageUsed")} value={formatWidgetStorageSize(stats.byteSize)} />
+          <InfoRow label={t("ui.storageUsed")} value={formatAppStorageSize(stats.byteSize)} />
           <InfoRow label={t("ui.dataItems")} value={t("ui.countItems", { count: stats.keyCount })} />
           <InfoRow label={t("ui.namespace")} value={stats.key} />
         </div>
@@ -123,9 +123,9 @@ const WidgetInfoModal: FC<WidgetInfoModalProps> = ({
   );
 };
 
-export default WidgetInfoModal;
+export default AppInfoModal;
 
-const appleWidgetInfoClassName = css`
+const appleAppInfoClassName = css`
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 18px;
   background:

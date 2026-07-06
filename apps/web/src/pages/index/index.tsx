@@ -1,5 +1,6 @@
 import {
   DesktopNext,
+  DesktopNextBaseModal,
   desktopNextThemeDark,
   desktopNextThemeLight,
 } from "zs_library";
@@ -16,6 +17,7 @@ import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import type { ReactNode } from "react";
 import {
+  RiApps2Line,
   RiStore2Line,
   RiSettingsLine,
   RiInformationLine,
@@ -37,15 +39,15 @@ import {
 } from "@/utils/storage";
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
-import { useWidget } from "@/hooks/useWidget";
-import PureWidget from "@/components/micro-frontend/pure-widget";
-import PureWidgetWindow from "@/components/window/pure-widget-window";
+import { useApp } from "@/hooks/useApp";
+import PureApp from "@/components/micro-frontend/pure-app";
+import PureAppWindow from "@/components/window/pure-app-window";
 import { createHostSDK, sharedEventBus } from "@/sdk";
-import type { WidgetMode, WidgetSDK, WidgetThemeInfo } from "@/sdk";
+import type { AppMode, AppSDK, AppThemeInfo } from "@/sdk";
 import { notification } from "@/utils/globalNotification";
 import axiosInstance from "@/utils/axios";
 import LoadingOverlay from "./components/loading-overlay";
-import WidgetInfoModal from "@/components/widget-info-modal";
+import AppInfoModal from "@/components/app-info-modal";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import { Outlet, useNavigate } from "react-router";
@@ -61,8 +63,8 @@ import Notice from "./components/notice";
 import Feedback from "./components/feedback";
 import { accountRoute } from "./components/default-apps/account/route-paths";
 import BoringAccountAvatar from "@/components/auth/BoringAccountAvatar";
-import { getPublicWidgetDetail } from "@/services/widget";
-import type { WidgetApiItem } from "@/types";
+import { getPublicAppDetail } from "@/services/app";
+import type { AppApiItem } from "@/types";
 import {
   DesktopSearchBar,
   matchesUnifiedSearchShortcut,
@@ -70,10 +72,10 @@ import {
   useUnifiedSearchPreferences,
 } from "@/components/unified-search";
 import {
-  getCurrentWidgetLocale,
-  resolveWidgetDescription,
-  resolveWidgetDisplayName,
-  resolveWidgetTags,
+  getCurrentAppLocale,
+  resolveAppDescription,
+  resolveAppDisplayName,
+  resolveAppTags,
   useI18n,
 } from "@/i18n";
 
@@ -100,57 +102,119 @@ type DesktopRootItem = {
 type DesktopStorageItem = Omit<DesktopItem, "children"> & {
   children?: DesktopStorageItem[];
 };
+type DesktopAppAvailability =
+  | { status: "available"; app?: AppApiItem; isDev?: boolean }
+  | { status: "checking" }
+  | {
+      status: "unavailable";
+      reason: "disabledOrDeleted" | "verificationFailed";
+    };
 
-const getWidgetDesktopType = (item: Pick<DesktopItem, "type" | "dataType">) => {
-  if (typeof item.type === "string" && item.type.startsWith("widget:")) {
+const getAppDesktopType = (item: Pick<DesktopItem, "type" | "dataType">) => {
+  if (
+    typeof item.type === "string" &&
+    item.type.startsWith("app:") &&
+    !item.type.startsWith("app-launcher:")
+  ) {
     return item.type;
+  }
+  if (
+    typeof item.dataType === "string" &&
+    item.dataType.startsWith("app:") &&
+    !item.dataType.startsWith("app-launcher:")
+  ) {
+    return item.dataType;
+  }
+  if (typeof item.type === "string" && item.type.startsWith("widget:")) {
+    return `app:${item.type.slice("widget:".length)}`;
   }
   if (
     typeof item.dataType === "string" &&
     item.dataType.startsWith("widget:")
   ) {
-    return item.dataType;
+    return `app:${item.dataType.slice("widget:".length)}`;
   }
   return null;
 };
 
-const getWidgetAppDesktopType = (
+const getAppLauncherDesktopType = (
   item: Pick<DesktopItem, "type" | "dataType" | "data">,
 ) => {
   if (
     item.type === "app" &&
     typeof item.dataType === "string" &&
-    item.dataType.startsWith("widget-app:")
+    item.dataType.startsWith("app-launcher:")
   ) {
     return item.dataType;
   }
-  const widgetId = item.data?.widgetConfig?.id;
-  if (item.type === "app" && typeof widgetId === "string" && widgetId) {
-    return `widget-app:${widgetId}`;
+  if (
+    item.type === "app" &&
+    typeof item.dataType === "string" &&
+    item.dataType.startsWith("widget-app:")
+  ) {
+    return `app-launcher:${item.dataType.slice("widget-app:".length)}`;
+  }
+  const appId = item.data?.appConfig?.id;
+  if (item.type === "app" && typeof appId === "string" && appId) {
+    return `app-launcher:${appId}`;
+  }
+  const legacyAppId = (item.data as any)?.widgetConfig?.id;
+  if (item.type === "app" && typeof legacyAppId === "string" && legacyAppId) {
+    return `app-launcher:${legacyAppId}`;
   }
   return null;
 };
 
-const normalizeWidgetDesktopItem = (
+const getDesktopItemAppId = (
+  item: Pick<DesktopItem, "type" | "dataType" | "data">,
+) => {
+  const appConfigId = item.data?.appConfig?.id;
+  if (typeof appConfigId === "string" && appConfigId) return appConfigId;
+
+  const legacyAppId = (item.data as any)?.widgetConfig?.id;
+  if (typeof legacyAppId === "string" && legacyAppId) return legacyAppId;
+
+  const appLauncherDesktopType = getAppLauncherDesktopType(item);
+  if (appLauncherDesktopType) {
+    return appLauncherDesktopType.replace("app-launcher:", "");
+  }
+
+  const appDesktopType = getAppDesktopType(item);
+  if (appDesktopType) return appDesktopType.replace("app:", "");
+
+  return null;
+};
+
+const normalizeAppDesktopItem = (
   item: DesktopStorageItem,
 ): DesktopStorageItem => {
-  const widgetType = getWidgetDesktopType(item);
+  const legacyConfig = (item.data as any)?.widgetConfig;
+  const data = (legacyConfig && !item.data?.appConfig
+    ? { ...(item.data ?? {}), appConfig: legacyConfig }
+    : item.data) as DesktopStorageItem["data"];
+  const itemWithData = { ...item, data } as DesktopStorageItem;
+  const appLauncherType = getAppLauncherDesktopType(itemWithData);
+  const appType = getAppDesktopType(itemWithData);
   return {
     ...item,
-    type: widgetType ?? item.type,
-    dataType: widgetType ?? item.dataType,
-    children: item.children?.map(normalizeWidgetDesktopItem),
+    ...(appLauncherType
+      ? { type: "app", dataType: appLauncherType }
+      : appType
+        ? { type: appType, dataType: appType }
+        : {}),
+    data,
+    children: item.children?.map(normalizeAppDesktopItem),
   };
 };
 
-const normalizeWidgetDesktopList = (list: DesktopRootItem[]): DesktopPage[] =>
+const normalizeAppDesktopList = (list: DesktopRootItem[]): DesktopPage[] =>
   list
     .filter((root) => root.id !== "dock")
     .map((root, index) => ({
       ...root,
       id: root.id ?? `page-${index + 1}`,
       type: root.type ?? "page",
-      children: root.children?.map(normalizeWidgetDesktopItem) ?? [],
+      children: root.children?.map(normalizeAppDesktopItem) ?? [],
     }));
 
 const hasDesktopChildren = (
@@ -209,6 +273,12 @@ const normalizeHttpUrl = (rawUrl: string | undefined) => {
   }
 };
 
+const isAppUnavailableResponse = (error: unknown) => {
+  const status = (error as { response?: { status?: number } })?.response
+    ?.status;
+  return status === 403 || status === 404 || status === 410;
+};
+
 const readStoredDesktopRoots = (): DesktopRootItem[] => {
   const raw = localStorage.getItem(DESKTOP_LIST_STORAGE_KEY);
   if (!raw) return [];
@@ -224,12 +294,12 @@ const readStoredDesktopRoots = (): DesktopRootItem[] => {
 
 const readStoredDockItems = (): DesktopItem[] => {
   const dockRoot = readStoredDesktopRoots().find((root) => root.id === "dock");
-  return dockRoot?.children?.map(normalizeWidgetDesktopItem) ?? [];
+  return dockRoot?.children?.map(normalizeAppDesktopItem) ?? [];
 };
 
 const extractDockItems = (list: DesktopRootItem[]): DesktopItem[] => {
   const dockRoot = list.find((root) => root.id === "dock");
-  return dockRoot?.children?.map(normalizeWidgetDesktopItem) ?? [];
+  return dockRoot?.children?.map(normalizeAppDesktopItem) ?? [];
 };
 
 const persistDesktopStorage = (
@@ -261,7 +331,7 @@ const persistDesktopStorage = (
 };
 
 const toDesktopNextPages = (list: DesktopRootItem[]): DesktopPage[] => {
-  const pages = normalizeWidgetDesktopList(list);
+  const pages = normalizeAppDesktopList(list);
 
   return pages.length ? pages : createEmptyDesktopPages();
 };
@@ -270,14 +340,14 @@ const readStoredDesktopPages = (): DesktopPage[] => {
   return toDesktopNextPages(readStoredDesktopRoots());
 };
 
-const migrateStoredWidgetDesktopList = () => {
+const migrateStoredAppDesktopList = () => {
   const roots = readStoredDesktopRoots();
   if (!roots.length) return;
   persistDesktopStorage(toDesktopNextPages(roots), readStoredDockItems());
 };
 
 function Index() {
-  useState(migrateStoredWidgetDesktopList);
+  useState(migrateStoredAppDesktopList);
 
   const desktopRef = useRef<DesktopNextHandleRef>(null);
   const initialDesktopPagesRef = useRef<DesktopPage[] | null>(null);
@@ -310,19 +380,158 @@ function Index() {
   } = useDesktopTheme();
   const navigate = useNavigate();
   const {
-    widgets,
-    devWidgets,
+    apps,
+    devApps,
+    loading: appsLoading,
+    loaded: appsLoaded,
     getEntryUrl,
     getAppIconUrl,
     addToDesktop,
     addAppToDesktop,
     registerDesktopRef,
-  } = useWidget();
+  } = useApp();
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
   const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
   const preferDark = resolvedColorScheme === "dark";
   const { preferences: searchPreferences } = useUnifiedSearchPreferences();
+  const appMap = useMemo(
+    () => new Map(apps.map((app) => [app._id, app])),
+    [apps],
+  );
+  const devAppMap = useMemo(
+    () => new Map(devApps.map((app) => [app.id, app])),
+    [devApps],
+  );
+  const resolveDesktopAppAvailability = useCallback(
+    (appId: string): DesktopAppAvailability => {
+      if (devAppMap.has(appId)) return { status: "available", isDev: true };
+      if (!appsLoaded || appsLoading) return { status: "checking" };
+      const app = appMap.get(appId);
+      return app
+        ? { status: "available", app }
+        : { status: "unavailable", reason: "disabledOrDeleted" };
+    },
+    [appMap, appsLoaded, appsLoading, devAppMap],
+  );
+  const [availabilityModal, setAvailabilityModal] = useState<{
+    status: "checking" | "unavailable";
+    name?: string;
+    icon?: string | null;
+  } | null>(null);
+  const openAvailabilityModal = useCallback(
+    (
+      status: "checking" | "unavailable",
+      options?: { name?: string; icon?: string | null },
+    ) => {
+      setAvailabilityModal({
+        status,
+        name: options?.name,
+        icon: options?.icon ?? null,
+      });
+    },
+    [],
+  );
+  const renderAppAvailabilityPlaceholder = useCallback(
+    ({
+      status,
+      name,
+      icon,
+    }: {
+      status: "checking" | "unavailable";
+      name: string;
+      icon?: string | null;
+    }) => {
+      const unavailable = status === "unavailable";
+      const title = t(
+        unavailable ? "ui.appUnavailableMessage" : "ui.appCheckingMessage",
+      );
+
+      return (
+        <button
+          type="button"
+          title={`${name} - ${title}`}
+          aria-label={`${name} - ${title}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            openAvailabilityModal(status, { name, icon });
+          }}
+          className={cx(
+            "relative flex h-full w-full items-center justify-center overflow-visible border-0 bg-transparent p-0 text-center",
+            css`
+              border-radius: inherit;
+              cursor: ${unavailable ? "not-allowed" : "wait"};
+            `,
+          )}
+        >
+          <span
+            className={cx(
+              "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[inherit]",
+              css`
+                background: ${unavailable
+                  ? "rgba(142, 142, 147, 0.16)"
+                  : "rgba(10, 132, 255, 0.12)"};
+                box-shadow:
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+                  0 6px 16px rgba(0, 0, 0, 0.12);
+
+                &::after {
+                  content: "";
+                  position: absolute;
+                  inset: 0;
+                  background: ${unavailable
+                    ? "rgba(242, 242, 247, 0.34)"
+                    : "rgba(10, 132, 255, 0.1)"};
+                  pointer-events: none;
+                }
+
+                .dark & {
+                  background: ${unavailable
+                    ? "rgba(99, 99, 102, 0.22)"
+                    : "rgba(10, 132, 255, 0.18)"};
+                  box-shadow:
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                    0 8px 18px rgba(0, 0, 0, 0.28);
+
+                  &::after {
+                    background: ${unavailable
+                      ? "rgba(0, 0, 0, 0.18)"
+                      : "rgba(10, 132, 255, 0.08)"};
+                  }
+                }
+              `,
+            )}
+          >
+            {icon ? (
+              <img
+                src={icon}
+                alt=""
+                draggable={false}
+                className={cx(
+                  "h-full w-full object-contain",
+                  unavailable
+                    ? "grayscale opacity-60 contrast-[0.9]"
+                    : "opacity-75",
+                )}
+              />
+            ) : (
+              <span
+                className={cx(
+                  "flex h-full w-full items-center justify-center rounded-[inherit]",
+                  unavailable
+                    ? "bg-white/20 text-[#8e8e93] dark:bg-white/10 dark:text-[#aeaeb2]"
+                    : "bg-white/28 text-[#0a84ff] dark:bg-white/10",
+                )}
+              >
+                <RiApps2Line size={22} className="opacity-75" />
+              </span>
+            )}
+          </span>
+        </button>
+      );
+    },
+    [openAvailabilityModal, t],
+  );
 
   useEffect(() => {
     sharedEventBus.emit("locale:change", locale);
@@ -383,22 +592,22 @@ function Index() {
   }, [personalization.wallpaper]);
 
   const [init, { setFalse: finishInit }] = useBoolean(true);
-  const [fullWidget, setFullWidget] = useState<{
+  const [fullApp, setFullApp] = useState<{
     entry: string;
     props?: any;
     title?: string;
-    widgetId?: string;
-    widgetConfig?: DesktopItemData["widgetConfig"];
+    appId?: string;
+    appConfig?: DesktopItemData["appConfig"];
   } | null>(null);
 
   // 应用信息弹窗状态
   const [infoTarget, setInfoTarget] = useState<{
-    widgetId: string;
-    widgetName: string;
-    widgetConfig?: DesktopItemData["widgetConfig"];
+    appId: string;
+    appName: string;
+    appConfig?: DesktopItemData["appConfig"];
   } | null>(null);
 
-  /** 为指定小组件创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
+  /** 为指定应用创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
   const sdkDepsRef = useRef({
     activeThemeId,
     appearanceMode,
@@ -422,13 +631,13 @@ function Index() {
 
   const buildSDK = useCallback(
     (
-      widgetId: string,
+      appId: string,
       sizeId: string,
-      mode: WidgetMode,
-    ): WidgetSDK => {
+      mode: AppMode,
+    ): AppSDK => {
       const deps = sdkDepsRef.current;
       return createHostSDK({
-        widgetId,
+        appId,
         sizeId,
         mode,
         theme: {
@@ -438,7 +647,7 @@ function Index() {
           resolvedColorScheme: deps.resolvedColorScheme,
         },
         locale: deps.locale,
-        getLocale: getCurrentWidgetLocale,
+        getLocale: getCurrentAppLocale,
         user: deps.user
           ? {
               _id: deps.user._id,
@@ -457,21 +666,21 @@ function Index() {
     [],
   );
 
-  const createWidgetConfigFromApi = useCallback(
+  const createAppConfigFromApi = useCallback(
     (
-      widget: WidgetApiItem,
-      fallback?: DesktopItemData["widgetConfig"],
-    ): DesktopItemData["widgetConfig"] | undefined => {
-      const entry = getEntryUrl(widget) || fallback?.entry;
+      app: AppApiItem,
+      fallback?: DesktopItemData["appConfig"],
+    ): DesktopItemData["appConfig"] | undefined => {
+      const entry = getEntryUrl(app) || fallback?.entry;
       if (!entry) return fallback;
-      const snapshot = widget.configSnapshot;
-      const name = resolveWidgetDisplayName(widget, language, fallback);
-      const description = resolveWidgetDescription(widget, language, fallback);
-      const tags = resolveWidgetTags(widget, language, fallback);
+      const snapshot = app.configSnapshot;
+      const name = resolveAppDisplayName(app, language, fallback);
+      const description = resolveAppDescription(app, language, fallback);
+      const tags = resolveAppTags(app, language, fallback);
 
       return {
         ...(fallback ?? {}),
-        id: widget._id,
+        id: app._id,
         name,
         entry,
         props: {
@@ -481,141 +690,165 @@ function Index() {
         ...definedProps({
           displayName: firstDefined(
             snapshot?.displayName,
-            widget.displayName,
+            app.displayName,
             fallback?.displayName,
           ),
           displayNameI18n: firstDefined(
             snapshot?.displayNameI18n,
-            widget.displayNameI18n,
+            app.displayNameI18n,
             fallback?.displayNameI18n,
           ),
           settingsSchema: firstDefined(
             snapshot?.settingsSchema,
-            widget.settingsSchema,
+            app.settingsSchema,
             fallback?.settingsSchema,
           ),
           defaultSizeId: firstDefined(
             snapshot?.defaultSizeId,
-            widget.defaultSizeId,
+            app.defaultSizeId,
             fallback?.defaultSizeId,
           ),
           pagePaths: firstDefined(
             snapshot?.pagePaths,
-            widget.pagePaths,
+            app.pagePaths,
             fallback?.pagePaths,
           ),
           supportAppMode: firstDefined(
             snapshot?.supportAppMode,
-            widget.supportAppMode,
+            app.supportAppMode,
             fallback?.supportAppMode,
           ),
           appIcon: firstDefined(
             snapshot?.appIcon,
-            widget.appIcon,
+            app.appIcon,
             fallback?.appIcon,
           ),
           appIconUrl: firstDefined(
-            getAppIconUrl(widget),
+            getAppIconUrl(app),
             snapshot?.appIconUrl,
-            widget.appIconUrl,
+            app.appIconUrl,
             fallback?.appIconUrl,
           ),
-          sourceType: firstDefined(widget.sourceType, fallback?.sourceType),
+          sourceType: firstDefined(app.sourceType, fallback?.sourceType),
           version: firstDefined(
             snapshot?.version,
-            widget.version,
+            app.version,
             fallback?.version,
           ),
-          author: firstDefined(snapshot?.author, widget.author, fallback?.author),
+          author: firstDefined(snapshot?.author, app.author, fallback?.author),
           description,
           descriptionI18n: firstDefined(
             snapshot?.descriptionI18n,
-            widget.descriptionI18n,
+            app.descriptionI18n,
             fallback?.descriptionI18n,
           ),
           tags,
           tagsI18n: firstDefined(
             snapshot?.tagsI18n,
-            widget.tagsI18n,
+            app.tagsI18n,
             fallback?.tagsI18n,
           ),
         }),
+        availability: "available",
+        unavailableReason: undefined,
       };
     },
     [getAppIconUrl, getEntryUrl, language],
   );
 
-  const resolveWidgetConfig = useCallback(
-    (
-      widgetId: string,
-      fallback?: DesktopItemData["widgetConfig"],
-    ): DesktopItemData["widgetConfig"] | undefined => {
-      const widget = widgets.find((item) => item._id === widgetId);
-      return widget ? createWidgetConfigFromApi(widget, fallback) : fallback;
-    },
-    [createWidgetConfigFromApi, widgets],
-  );
-
-  const resolveWidgetConfigFresh = useCallback(
+  const resolveAppConfigFresh = useCallback(
     async (
-      widgetId: string,
-      fallback?: DesktopItemData["widgetConfig"],
-    ): Promise<DesktopItemData["widgetConfig"] | undefined> => {
+      appId: string,
+      fallback?: DesktopItemData["appConfig"],
+    ): Promise<DesktopItemData["appConfig"] | null | undefined> => {
       try {
-        const detail = await getPublicWidgetDetail(widgetId);
-        const widget = ((detail as any)?.data ?? detail) as WidgetApiItem;
-        if (widget?._id) return createWidgetConfigFromApi(widget, fallback);
+        const detail = await getPublicAppDetail(appId);
+        const app = ((detail as any)?.data ?? detail) as AppApiItem;
+        if (app?._id) return createAppConfigFromApi(app, fallback);
       } catch (error) {
-        console.warn("Failed to refresh widget detail before opening", error);
+        if (isAppUnavailableResponse(error)) {
+          return null;
+        }
+        console.warn("Failed to refresh app detail before opening", error);
       }
-      return resolveWidgetConfig(widgetId, fallback);
+      const knownAvailableApp = appMap.get(appId);
+      return knownAvailableApp
+        ? createAppConfigFromApi(knownAvailableApp, fallback)
+        : undefined;
     },
-    [createWidgetConfigFromApi, resolveWidgetConfig],
+    [appMap, createAppConfigFromApi],
   );
 
-  const refreshStoredWidgetSnapshots = useCallback(() => {
-    if (!widgets.length) return;
-    const widgetMap = new Map(widgets.map((widget) => [widget._id, widget]));
+  const refreshStoredAppSnapshots = useCallback(() => {
+    if (!appsLoaded) return;
     let changed = false;
 
     const refreshItem = (item: DesktopItem): DesktopItem => {
-      const widgetAppDesktopType = getWidgetAppDesktopType(item);
-      const widgetDesktopType = getWidgetDesktopType(item);
-      const widgetId =
-        widgetAppDesktopType?.replace("widget-app:", "") ??
-        widgetDesktopType?.replace("widget:", "");
-      if (!widgetId) return item;
+      const appLauncherDesktopType = getAppLauncherDesktopType(item);
+      const appDesktopType = getAppDesktopType(item);
+      const appId = getDesktopItemAppId(item);
+      if (!appId) return item;
 
-      const widget = widgetMap.get(widgetId);
-      if (!widget) return item;
+      if (devAppMap.has(appId)) return item;
 
-      const currentConfig = item.data?.widgetConfig;
-      const nextConfig = createWidgetConfigFromApi(widget, currentConfig);
+      const currentConfig = item.data?.appConfig;
+      const app = appMap.get(appId);
+      if (!app) {
+        if (!currentConfig) return item;
+        const nextAppConfig: DesktopItemData["appConfig"] = {
+          ...currentConfig,
+          id: appId,
+          entry: "",
+          availability: "unavailable",
+          unavailableReason: "disabledOrDeleted",
+        };
+        const nextItem: DesktopItem = {
+          ...item,
+          ...(appLauncherDesktopType
+            ? { type: "app", dataType: appLauncherDesktopType }
+            : {}),
+          ...(appDesktopType
+            ? { type: appDesktopType, dataType: appDesktopType }
+            : {}),
+          data: {
+            ...(item.data ?? { name: currentConfig.name || t("ui.app") }),
+            name: item.data?.name || currentConfig.name || t("ui.app"),
+            appConfig: nextAppConfig,
+          },
+        };
+
+        if (JSON.stringify(nextItem) !== JSON.stringify(item)) {
+          changed = true;
+        }
+        return nextItem;
+      }
+
+      const nextConfig = createAppConfigFromApi(app, currentConfig);
       if (!nextConfig) return item;
 
       const appIconUrl =
-        nextConfig.appIconUrl ?? getAppIconUrl(widget) ?? undefined;
-      const nextWidgetConfig = {
+        nextConfig.appIconUrl ?? getAppIconUrl(app) ?? undefined;
+      const nextAppConfig = {
         ...nextConfig,
         ...(appIconUrl ? { appIconUrl } : {}),
       };
       const nextData: DesktopItem["data"] = {
-        ...(item.data ?? { name: nextWidgetConfig.name }),
-        name: nextWidgetConfig.name || item.data?.name || t("ui.widget"),
-        widgetConfig: nextWidgetConfig,
+        ...(item.data ?? { name: nextAppConfig.name }),
+        name: nextAppConfig.name || item.data?.name || t("ui.app"),
+        appConfig: nextAppConfig,
       };
 
-      if (widgetAppDesktopType && appIconUrl) {
+      if (appLauncherDesktopType && appIconUrl) {
         nextData.icon = appIconUrl;
       }
 
       const nextItem: DesktopItem = {
         ...item,
-        ...(widgetAppDesktopType
-          ? { type: "app", dataType: widgetAppDesktopType }
+        ...(appLauncherDesktopType
+          ? { type: "app", dataType: appLauncherDesktopType }
           : {}),
-        ...(widgetDesktopType
-          ? { type: widgetDesktopType, dataType: widgetDesktopType }
+        ...(appDesktopType
+          ? { type: appDesktopType, dataType: appDesktopType }
           : {}),
         data: nextData,
       };
@@ -639,38 +872,77 @@ function Index() {
     setDesktopPages(nextPages);
     setDockItems(nextDockItems);
     persistDesktopStorage(nextPages, nextDockItems);
-  }, [createWidgetConfigFromApi, getAppIconUrl, t, widgets]);
+  }, [
+    appMap,
+    appsLoaded,
+    createAppConfigFromApi,
+    devAppMap,
+    getAppIconUrl,
+    t,
+  ]);
 
-  const openWidgetWindow = useCallback(
+  const openAppWindow = useCallback(
     async ({
-      widgetId,
-      widgetConfig,
+      appId,
+      appConfig,
       fallbackTitle,
     }: {
-      widgetId: string;
-      widgetConfig: DesktopItemData["widgetConfig"];
+      appId: string;
+      appConfig: DesktopItemData["appConfig"];
       fallbackTitle: string;
     }) => {
-      const resolvedWidgetConfig = await resolveWidgetConfigFresh(
-        widgetId,
-        widgetConfig,
+      const availability = resolveDesktopAppAvailability(appId);
+      if (availability.status === "checking") {
+        openAvailabilityModal("checking", {
+          name: appConfig?.name || fallbackTitle,
+          icon: appConfig?.appIconUrl,
+        });
+        return;
+      }
+      if (availability.status === "unavailable") {
+        openAvailabilityModal("unavailable", {
+          name: appConfig?.name || fallbackTitle,
+          icon: appConfig?.appIconUrl,
+        });
+        return;
+      }
+      const resolvedAppConfig = await resolveAppConfigFresh(
+        appId,
+        appConfig,
       );
-      const nextConfig = resolvedWidgetConfig || widgetConfig;
-      if (!nextConfig?.entry) return;
-      setFullWidget({
+      if (resolvedAppConfig === null) {
+        openAvailabilityModal("unavailable", {
+          name: appConfig?.name || fallbackTitle,
+          icon: appConfig?.appIconUrl,
+        });
+        return;
+      }
+      const nextConfig = resolvedAppConfig || appConfig;
+      if (!nextConfig?.entry) {
+        openAvailabilityModal("unavailable", {
+          name: appConfig?.name || fallbackTitle,
+          icon: appConfig?.appIconUrl,
+        });
+        return;
+      }
+      setFullApp({
         entry: nextConfig.entry,
         props: nextConfig.props,
         title: nextConfig.name || fallbackTitle,
-        widgetId,
-        widgetConfig: nextConfig,
+        appId,
+        appConfig: nextConfig,
       });
     },
-    [resolveWidgetConfigFresh],
+    [
+      openAvailabilityModal,
+      resolveAppConfigFresh,
+      resolveDesktopAppAvailability,
+    ],
   );
 
   useEffect(() => {
-    refreshStoredWidgetSnapshots();
-  }, [refreshStoredWidgetSnapshots]);
+    refreshStoredAppSnapshots();
+  }, [refreshStoredAppSnapshots]);
 
   useEffect(() => {
     if (!searchPreferences.enableSpotlightShortcut) return undefined;
@@ -694,24 +966,24 @@ function Index() {
     searchPreferences.spotlightShortcut,
   ]);
 
-  /** 当主题变化时通过事件总线广播，让所有小组件收到通知 */
+  /** 当主题变化时通过事件总线广播，让所有应用收到通知 */
   useEffect(() => {
     sharedEventBus.emit("theme:change", {
       activeThemeId: resolvedColorScheme,
       desktopThemeId: activeThemeId,
       appearanceMode,
       resolvedColorScheme,
-    } as WidgetThemeInfo);
+    } as AppThemeInfo);
   }, [activeThemeId, appearanceMode, resolvedColorScheme]);
 
-  /** 根据后端小组件数据动态构建 Desktop 的 typeConfigMap */
+  /** 根据后端应用数据动态构建 Desktop 的 typeConfigMap */
   const typeConfigMap = useMemo((): TypeConfigMap => {
     const map: TypeConfigMap = {};
     const applyConfig = (key: string, config: TypeConfigMap[string]) => {
       map[key] = config;
     };
 
-    for (const w of widgets) {
+    for (const w of apps) {
       const config = {
         sizeConfigs: w.sizeConfigs?.length
           ? w.sizeConfigs
@@ -722,9 +994,9 @@ function Index() {
         allowDelete: true,
         allowResize: (w.sizeConfigs?.length ?? 0) > 1,
       };
-      applyConfig(`widget:${w._id}`, config);
+      applyConfig(`app:${w._id}`, config);
     }
-    for (const dw of devWidgets) {
+    for (const dw of devApps) {
       const config = {
         sizeConfigs: dw.sizeConfigs?.length
           ? dw.sizeConfigs
@@ -735,15 +1007,15 @@ function Index() {
         allowDelete: true,
         allowResize: (dw.sizeConfigs?.length ?? 0) > 1,
       };
-      applyConfig(`widget:${dw.id}`, config);
+      applyConfig(`app:${dw.id}`, config);
     }
     return map;
-  }, [widgets, devWidgets]);
+  }, [apps, devApps]);
 
   const dataTypeMenuConfigMap = useMemo((): DataTypeMenuConfigMap => {
     const map: DataTypeMenuConfigMap = {};
-    const addInfoItem = (widgetType: string) => {
-      map[widgetType] = [
+    const addInfoItem = (appType: string) => {
+      map[appType] = [
         {
           text: t("ui.appInfo"),
           icon: <RiInformationLine size={18} />,
@@ -751,14 +1023,14 @@ function Index() {
       ];
     };
 
-    for (const widget of widgets) {
-      if (widget.configSnapshot?.supportAppMode ?? widget.supportAppMode) {
-        addInfoItem(`widget-app:${widget._id}`);
+    for (const app of apps) {
+      if (app.configSnapshot?.supportAppMode ?? app.supportAppMode) {
+        addInfoItem(`app-launcher:${app._id}`);
       }
     }
 
     return map;
-  }, [t, widgets]);
+  }, [t, apps]);
 
   // userLimit 由 ConfigContext 提供
 
@@ -947,6 +1219,22 @@ function Index() {
   const createDockHistoryItem = useCallback((item: DesktopItem) => {
     const icon = item.data?.icon;
     const name = item.data?.name || t("ui.app");
+    const appId = getDesktopItemAppId(item);
+    const availability = appId
+      ? resolveDesktopAppAvailability(appId)
+      : ({ status: "available" } as DesktopAppAvailability);
+
+    if (availability.status !== "available") {
+      return (
+        <div className="h-14 w-14 overflow-visible rounded-[16px]">
+          {renderAppAvailabilityPlaceholder({
+            status: availability.status,
+            name,
+            icon: typeof icon === "string" ? icon : null,
+          })}
+        </div>
+      );
+    }
 
     return (
       <button
@@ -992,7 +1280,7 @@ function Index() {
         )}
       </button>
     );
-  }, [t]);
+  }, [renderAppAvailabilityPlaceholder, resolveDesktopAppAvailability, t]);
 
   useEffect(() => {
     runDefaultDesktop();
@@ -1108,7 +1396,7 @@ function Index() {
     [persistDesktopPages],
   );
 
-  // 注册 desktopRef 到 WidgetContext，使 addToDesktop 可直接操控桌面
+  // 注册 desktopRef 到 AppContext，使 addToDesktop 可直接操控桌面
   useEffect(() => {
     registerDesktopRef(
       desktopRef,
@@ -1139,14 +1427,13 @@ function Index() {
       }
 
       if (payload.kind === "app") {
-        addAppToDesktop(payload.widgetId);
+        if (payload.sizeId) {
+          addToDesktop(payload.appId, { sizeId: payload.sizeId });
+        } else {
+          addAppToDesktop(payload.appId);
+        }
         return;
       }
-
-      addToDesktop(
-        payload.widgetId,
-        payload.sizeId ? { sizeId: payload.sizeId } : undefined,
-      );
     },
     [addAppToDesktop, addItemToCurrentPage, addToDesktop, message, t],
   );
@@ -1154,60 +1441,60 @@ function Index() {
   const handleContextMenuItemClick = useCallback(
     (item: DesktopItem, payload: ContextMenuActionPayload) => {
       if (payload.actionType !== "custom") return;
-      const widgetAppDesktopType = getWidgetAppDesktopType(item);
-      if (!widgetAppDesktopType) return;
+      const appLauncherDesktopType = getAppLauncherDesktopType(item);
+      if (!appLauncherDesktopType) return;
 
-      const widgetConfig = item.data?.widgetConfig;
-      const widgetId =
-        widgetConfig?.id ??
-        widgetAppDesktopType?.replace("widget-app:", "");
-      if (!widgetId) return;
-      const latestWidget = widgets.find((widget) => widget._id === widgetId);
-      const latestDevWidget = devWidgets.find((widget) => widget.id === widgetId);
-      const latestConfig = latestWidget
-        ? createWidgetConfigFromApi(latestWidget, widgetConfig)
+      const appConfig = item.data?.appConfig;
+      const appId =
+        appConfig?.id ??
+        appLauncherDesktopType?.replace("app-launcher:", "");
+      if (!appId) return;
+      const latestApp = apps.find((app) => app._id === appId);
+      const latestDevApp = devApps.find((app) => app.id === appId);
+      const latestConfig = latestApp
+        ? createAppConfigFromApi(latestApp, appConfig)
         : undefined;
 
       setInfoTarget({
-        widgetId,
-        widgetName: latestWidget
-          ? resolveWidgetDisplayName(latestWidget, language, widgetConfig)
-          : latestDevWidget?.name ??
-            widgetConfig?.name ??
+        appId,
+        appName: latestApp
+          ? resolveAppDisplayName(latestApp, language, appConfig)
+          : latestDevApp?.name ??
+            appConfig?.name ??
             item.data?.name ??
-            t("ui.widget"),
-        widgetConfig: {
-          ...(widgetConfig ?? {}),
+            t("ui.app"),
+        appConfig: {
+          ...(appConfig ?? {}),
           ...(latestConfig ?? {}),
-          id: widgetId,
-          name: latestWidget
-            ? resolveWidgetDisplayName(latestWidget, language, widgetConfig)
-            : latestDevWidget?.name ??
-              widgetConfig?.name ??
+          id: appId,
+          name: latestApp
+            ? resolveAppDisplayName(latestApp, language, appConfig)
+            : latestDevApp?.name ??
+              appConfig?.name ??
               item.data?.name ??
-              t("ui.widget"),
+              t("ui.app"),
           entry:
             latestConfig?.entry ??
-            latestDevWidget?.entry ??
-            widgetConfig?.entry ??
+            latestDevApp?.entry ??
+            appConfig?.entry ??
             "",
         },
       });
     },
-    [createWidgetConfigFromApi, devWidgets, language, t, widgets],
+    [createAppConfigFromApi, devApps, language, t, apps],
   );
 
   const handleOpenSearchApp = useCallback(
-    (widget: WidgetApiItem) => {
-      const widgetConfig = createWidgetConfigFromApi(widget);
-      if (!widgetConfig?.entry) return;
-      void openWidgetWindow({
-        widgetId: widget._id,
-        widgetConfig,
-        fallbackTitle: widgetConfig.name || t("ui.app"),
+    (app: AppApiItem) => {
+      const appConfig = createAppConfigFromApi(app);
+      if (!appConfig?.entry) return;
+      void openAppWindow({
+        appId: app._id,
+        appConfig,
+        fallbackTitle: appConfig.name || t("ui.app"),
       });
     },
-    [createWidgetConfigFromApi, openWidgetWindow, t],
+    [createAppConfigFromApi, openAppWindow, t],
   );
 
   return (
@@ -1246,21 +1533,64 @@ function Index() {
           dataTypeMenuConfigMap={dataTypeMenuConfigMap}
           onContextMenuItemClick={handleContextMenuItemClick}
           itemIconBuilder={(item) => {
-            const widgetAppDesktopType = getWidgetAppDesktopType(item);
-            const appWidgetConfig = item.data?.widgetConfig;
+            const appLauncherDesktopType = getAppLauncherDesktopType(item);
+            const appLauncherConfig = item.data?.appConfig;
+            if (appLauncherDesktopType) {
+              const appId = getDesktopItemAppId(item);
+              const availability = appId
+                ? resolveDesktopAppAvailability(appId)
+                : ({ status: "unavailable", reason: "verificationFailed" } as const);
+              if (availability.status !== "available") {
+                return renderAppAvailabilityPlaceholder({
+                  status: availability.status,
+                  name: item.data?.name || appLauncherConfig?.name || t("ui.app"),
+                  icon:
+                    appLauncherConfig?.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+              }
+            }
             if (
-              widgetAppDesktopType &&
-              appWidgetConfig?.entry &&
-              appWidgetConfig.appIcon?.type === "custom"
+              appLauncherDesktopType &&
+              appLauncherConfig?.appIcon?.type === "custom"
             ) {
-              const widgetId =
-                appWidgetConfig.id || widgetAppDesktopType.replace("widget-app:", "");
-              const sdk = buildSDK(widgetId, "appIcon", "appIcon");
+              const appId =
+                appLauncherConfig.id || appLauncherDesktopType.replace("app-launcher:", "");
+              const availability = resolveDesktopAppAvailability(appId);
+              if (availability.status !== "available") {
+                return renderAppAvailabilityPlaceholder({
+                  status: availability.status,
+                  name: item.data?.name || appLauncherConfig.name || t("ui.app"),
+                  icon:
+                    appLauncherConfig.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+              }
+              const renderConfig = availability.app
+                ? createAppConfigFromApi(availability.app, appLauncherConfig) ??
+                  appLauncherConfig
+                : appLauncherConfig;
+              if (!renderConfig.entry) {
+                return renderAppAvailabilityPlaceholder({
+                  status: "unavailable",
+                  name: item.data?.name || renderConfig.name || t("ui.app"),
+                  icon:
+                    renderConfig.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+              }
+              const sdk = buildSDK(appId, "appIcon", "appIcon");
               return (
-                <PureWidget
+                <PureApp
                   config={{
-                    entry: appWidgetConfig.entry,
-                    props: appWidgetConfig.props,
+                    entry: renderConfig.entry,
+                    props: renderConfig.props,
                     mode: "appIcon",
                     sdk,
                   }}
@@ -1272,22 +1602,49 @@ function Index() {
               );
             }
 
-            const widgetDesktopType = getWidgetDesktopType(item);
-            // 动态匹配所有 widget: 前缀的桌面项，渲染对应小组件（icon 模式）
-            const widgetConfig = item.data?.widgetConfig;
-            if (widgetDesktopType && widgetConfig?.entry) {
-              const widgetId =
-                widgetConfig.id || widgetDesktopType.replace("widget:", "");
+            const appDesktopType = getAppDesktopType(item);
+            // 动态匹配所有 app: 前缀的桌面项，渲染对应应用（icon 模式）
+            const appConfig = item.data?.appConfig;
+            if (appDesktopType) {
+              const appId =
+                appConfig?.id || appDesktopType.replace("app:", "");
+              const availability = resolveDesktopAppAvailability(appId);
+              if (availability.status !== "available") {
+                return renderAppAvailabilityPlaceholder({
+                  status: availability.status,
+                  name: item.data?.name || appConfig?.name || t("ui.app"),
+                  icon:
+                    appConfig?.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+              }
+              const renderConfig = availability.app
+                ? createAppConfigFromApi(availability.app, appConfig) ??
+                  appConfig
+                : appConfig;
+              if (!renderConfig?.entry) {
+                return renderAppAvailabilityPlaceholder({
+                  status: "unavailable",
+                  name: item.data?.name || renderConfig?.name || t("ui.app"),
+                  icon:
+                    renderConfig?.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+              }
               const sizeId =
                 typeof item.config?.sizeId === "string"
                   ? item.config.sizeId
-                  : widgetConfig.defaultSizeId || "2x2";
-              const sdk = buildSDK(widgetId, sizeId, "icon");
+                  : renderConfig.defaultSizeId || "2x2";
+              const sdk = buildSDK(appId, sizeId, "icon");
               return (
-                <PureWidget
+                <PureApp
                   config={{
-                    entry: widgetConfig.entry,
-                    props: widgetConfig.props,
+                    entry: renderConfig.entry,
+                    props: renderConfig.props,
                     mode: "icon",
                     sdk,
                   }}
@@ -1296,10 +1653,10 @@ function Index() {
                     height: 100%;
                   `}
                   onClick={() => {
-                    void openWidgetWindow({
-                      widgetId,
-                      widgetConfig,
-                      fallbackTitle: widgetConfig.name || item.data?.name || t("ui.widget"),
+                    void openAppWindow({
+                      appId,
+                      appConfig: renderConfig,
+                      fallbackTitle: renderConfig.name || item.data?.name || t("ui.app"),
                     });
                   }}
                 />
@@ -1344,19 +1701,50 @@ function Index() {
             fixedItemBuilder: createFixedItemBuilder,
           }}
           onItemClick={(item) => {
+            const appLauncherDesktopType = getAppLauncherDesktopType(item);
+            const appDesktopType = getAppDesktopType(item);
+            const appConfig = item.data?.appConfig;
+            const managedAppId = getDesktopItemAppId(item);
+
+            if (managedAppId) {
+              const availability =
+                resolveDesktopAppAvailability(managedAppId);
+              if (availability.status === "checking") {
+                openAvailabilityModal("checking", {
+                  name: item.data?.name || appConfig?.name,
+                  icon:
+                    appConfig?.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+                return;
+              }
+              if (availability.status === "unavailable") {
+                openAvailabilityModal("unavailable", {
+                  name: item.data?.name || appConfig?.name,
+                  icon:
+                    appConfig?.appIconUrl ??
+                    (typeof item.data?.icon === "string"
+                      ? item.data.icon
+                      : null),
+                });
+                return;
+              }
+            }
+
             syncDockItemFromDesktopClick(item);
-            const widgetAppDesktopType = getWidgetAppDesktopType(item);
-            const widgetConfig = item.data?.widgetConfig;
-            if (widgetAppDesktopType && widgetConfig?.entry) {
-              const widgetId =
-                widgetConfig.id || widgetAppDesktopType.replace("widget-app:", "");
-              void openWidgetWindow({
-                widgetId,
-                widgetConfig,
-                fallbackTitle: item.data?.name || widgetConfig.name || t("ui.app"),
+            if (appLauncherDesktopType && appConfig?.entry) {
+              const appId =
+                appConfig.id || appLauncherDesktopType.replace("app-launcher:", "");
+              void openAppWindow({
+                appId,
+                appConfig,
+                fallbackTitle: item.data?.name || appConfig.name || t("ui.app"),
               });
               return;
             }
+            if (appDesktopType) return;
             if (item.type === "app" && item.data?.url) {
               const url = normalizeHttpUrl(item.data.url);
               if (!url) return;
@@ -1366,29 +1754,99 @@ function Index() {
         />
       </div>
       <Outlet context={{ onAddStoreItem: handleAddStoreItem }} />
-      {fullWidget && (
-        <PureWidgetWindow
+      {availabilityModal && (
+        <DesktopNextBaseModal
+          visible
+          onClose={() => setAvailabilityModal(null)}
+          width={390}
+          destroyOnClose
+          theme={desktopTheme}
+          styles={{
+            panel: {
+              background: preferDark ? "#1c1c1e" : "#ffffff",
+              border: preferDark
+                ? "1px solid rgba(255,255,255,0.10)"
+                : "1px solid rgba(60,60,67,0.10)",
+              boxShadow: preferDark
+                ? "0 24px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 24px 60px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.9)",
+            },
+            body: {
+              padding: "28px 24px 24px",
+            },
+          }}
+        >
+          <div className="flex flex-col items-center text-center text-[#1d1d1f] dark:text-[#f5f5f7]">
+            <div className="relative flex h-[78px] w-[78px] items-center justify-center overflow-visible rounded-[22px] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
+              {availabilityModal.icon ? (
+                <div className="relative h-[62px] w-[62px] overflow-hidden rounded-[18px]">
+                  <img
+                    src={availabilityModal.icon}
+                    alt=""
+                    className={cx(
+                      "h-full w-full object-contain",
+                      availabilityModal.status === "unavailable"
+                        ? "grayscale opacity-[0.65] contrast-[0.9]"
+                        : "opacity-[0.85]",
+                    )}
+                    draggable={false}
+                  />
+                  <span className="absolute inset-0 bg-white/20 dark:bg-black/20" />
+                </div>
+              ) : (
+                <RiApps2Line
+                  size={31}
+                  className={
+                    availabilityModal.status === "unavailable"
+                      ? "text-[#8e8e93] dark:text-[#aeaeb2]"
+                      : "text-[#007aff]"
+                  }
+                />
+              )}
+            </div>
+            <div className="mt-5 max-w-full truncate text-[21px] font-semibold tracking-normal">
+              {availabilityModal.name || t("ui.app")}
+            </div>
+            <div className="mt-2 max-w-[306px] text-sm font-medium leading-6 text-[#6e6e73] dark:text-[#c7c7cc]">
+              {t(
+                availabilityModal.status === "unavailable"
+                  ? "ui.appUnavailableMessage"
+                  : "ui.appCheckingMessage",
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setAvailabilityModal(null)}
+              className="mt-6 rounded-full border border-white/20 bg-[#007aff] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(0,122,255,0.24)] transition hover:bg-[#0a84ff] active:scale-[0.98]"
+            >
+              {t("ui.close")}
+            </button>
+          </div>
+        </DesktopNextBaseModal>
+      )}
+      {fullApp && (
+        <PureAppWindow
           visible={true}
-          onClose={() => setFullWidget(null)}
-          config={{ entry: fullWidget.entry, props: fullWidget.props }}
-          title={fullWidget.title}
-          widgetConfig={fullWidget.widgetConfig}
+          onClose={() => setFullApp(null)}
+          config={{ entry: fullApp.entry, props: fullApp.props }}
+          title={fullApp.title}
+          appConfig={fullApp.appConfig}
           width={600}
           height={400}
           createSdk={(mode, sizeId) =>
-            fullWidget.widgetId
-              ? buildSDK(fullWidget.widgetId, sizeId, mode)
+            fullApp.appId
+              ? buildSDK(fullApp.appId, sizeId, mode)
               : undefined
           }
         />
       )}
       {infoTarget && (
-        <WidgetInfoModal
+        <AppInfoModal
           visible={true}
           onClose={() => setInfoTarget(null)}
-          widgetId={infoTarget.widgetId}
-          widgetName={infoTarget.widgetName}
-          widgetConfig={infoTarget.widgetConfig}
+          appId={infoTarget.appId}
+          appName={infoTarget.appName}
+          appConfig={infoTarget.appConfig}
         />
       )}
       <SearchSpotlight

@@ -13,13 +13,13 @@ import type { StoreOutletContext } from "../../index";
 import { getWebsiteId } from "../../utils";
 import { useRequest } from "ahooks";
 import { getTabsWebsitePublic } from "@/services/website";
-import { useWidget } from "@/hooks/useWidget";
-import type { WidgetApiItem } from "@/types";
+import { useApp } from "@/hooks/useApp";
+import type { AppApiItem } from "@/types";
 import { css } from "@emotion/css";
 import {
-  resolveWidgetDescription,
-  resolveWidgetDisplayName,
-  resolveWidgetTags,
+  resolveAppDescription,
+  resolveAppDisplayName,
+  resolveAppTags,
   useI18n,
 } from "@/i18n";
 
@@ -29,7 +29,7 @@ const SEARCH_KIND_OPTIONS = [
   { label: "ui.all", value: "all" },
   { label: "ui.websites", value: "website" },
   { label: "ui.app", value: "app" },
-  { label: "ui.widget", value: "widget" },
+  { label: "ui.widgets", value: "widget" },
 ];
 
 const SEARCH_PAGE_SIZE = 12;
@@ -56,29 +56,29 @@ const toTagLabel = (tag: unknown) => {
   return "";
 };
 
-const getWidgetTags = (item: WidgetApiItem, language: "zh-CN" | "en-US") => {
-  const tags = resolveWidgetTags(item, language);
+const getAppTags = (item: AppApiItem, language: "zh-CN" | "en-US") => {
+  const tags = resolveAppTags(item, language);
   return tags.map(toTagLabel).filter(Boolean);
 };
 
-const getWidgetDefaultSizeId = (item: WidgetApiItem) =>
+const getAppDefaultSizeId = (item: AppApiItem) =>
   item.configSnapshot?.defaultSizeId ??
   item.defaultSizeId ??
   item.sizeConfigs?.[0]?.id ??
   "2x2";
 
-const supportsAppMode = (item: WidgetApiItem) =>
+const supportsAppMode = (item: AppApiItem) =>
   Boolean(item.configSnapshot?.supportAppMode ?? item.supportAppMode);
 
-const supportsIconMode = (item: WidgetApiItem) =>
+const supportsIconMode = (item: AppApiItem) =>
   Boolean(item.configSnapshot?.supportIconMode ?? item.supportIconMode);
 
 const matchesQuery = (item: any, query: string, language: "zh-CN" | "en-US") => {
   const q = query.trim().toLowerCase();
   if (!q) return false;
-  const displayName = resolveWidgetDisplayName(item, language);
-  const description = resolveWidgetDescription(item, language);
-  const tags = getWidgetTags(item, language);
+  const displayName = resolveAppDisplayName(item, language);
+  const description = resolveAppDescription(item, language);
+  const tags = getAppTags(item, language);
   const haystack = [
     displayName,
     item.name,
@@ -130,19 +130,21 @@ const ResultSection = ({
   );
 };
 
-const WidgetResultCard = ({
+const AppResultCard = ({
   item,
   iconUrl,
   onAdd,
+  showSize = false,
 }: {
-  item: WidgetApiItem;
+  item: AppApiItem;
   iconUrl?: string | null;
-  onAdd?: (widget: WidgetApiItem, sizeId?: string) => void;
+  showSize?: boolean;
+  onAdd?: (app: AppApiItem, sizeId?: string) => void;
 }) => {
   const { t, language } = useI18n();
-  const displayName = resolveWidgetDisplayName(item, language);
-  const description = resolveWidgetDescription(item, language);
-  const tags = getWidgetTags(item, language);
+  const displayName = resolveAppDisplayName(item, language);
+  const description = resolveAppDescription(item, language);
+  const tags = getAppTags(item, language);
   return (
   <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
     <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
@@ -165,9 +167,11 @@ const WidgetResultCard = ({
         {description}
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
-          {getWidgetDefaultSizeId(item)}
-        </Tag>
+        {showSize ? (
+          <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
+            {getAppDefaultSizeId(item)}
+          </Tag>
+        ) : null}
         {tags
           .slice(0, 3)
           .map((tag) => (
@@ -185,70 +189,7 @@ const WidgetResultCard = ({
       size="small"
       shape="round"
       className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
-      onClick={() => onAdd?.(item, getWidgetDefaultSizeId(item))}
-    >
-      {t("ui.get")}
-    </Button>
-  </article>
-  );
-};
-
-const AppResultCard = ({
-  item,
-  iconUrl,
-  onAdd,
-}: {
-  item: WidgetApiItem;
-  iconUrl?: string | null;
-  onAdd?: (widget: WidgetApiItem) => void;
-}) => {
-  const { t, language } = useI18n();
-  const displayName = resolveWidgetDisplayName(item, language);
-  const description = resolveWidgetDescription(item, language);
-  const tags = getWidgetTags(item, language);
-  return (
-  <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
-    <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
-      {iconUrl ? (
-        <img
-          src={iconUrl}
-          alt={displayName}
-          className="h-full w-full object-contain p-2.5"
-          loading="lazy"
-        />
-      ) : (
-        <RiApps2Line size={22} />
-      )}
-    </div>
-    <div className="min-w-0 flex-1">
-      <div className="truncate text-sm font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
-        {displayName}
-      </div>
-      <div className="mt-1 line-clamp-2 text-xs font-medium leading-5 text-gray-500 dark:text-gray-400">
-        {description}
-      </div>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
-          {t("ui.app")}
-        </Tag>
-        {tags
-          .slice(0, 3)
-          .map((tag) => (
-            <Tag
-              key={tag}
-              className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!"
-            >
-              {tag}
-            </Tag>
-          ))}
-      </div>
-    </div>
-    <Button
-      type="primary"
-      size="small"
-      shape="round"
-      className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
-      onClick={() => onAdd?.(item)}
+      onClick={() => onAdd?.(item, showSize ? getAppDefaultSizeId(item) : undefined)}
     >
       {t("ui.get")}
     </Button>
@@ -261,13 +202,12 @@ const StoreSearchView = () => {
   const { query, setQuery, onAddStoreItem } =
     useAppRouteContext<StoreOutletContext>();
   const {
-    widgets,
-    devWidgets,
+    apps,
+    devApps,
     devModeEnabled,
-    loading: widgetLoading,
-    getIconUrl,
+    loading: appLoading,
     getAppIconUrl,
-  } = useWidget();
+  } = useApp();
   const [kind, setKind] = useState<SearchKind>("all");
   const searchKindOptions = useMemo(
     () =>
@@ -311,10 +251,10 @@ const StoreSearchView = () => {
     return data?.total ?? data?.count ?? websiteResults.length;
   }, [websiteData, websiteResults.length]);
 
-  const searchableWidgets = useMemo<WidgetApiItem[]>(() => {
-    const backendWidgets = widgets ?? [];
-    const localDevWidgets = devModeEnabled
-      ? devWidgets.map(
+  const searchableApps = useMemo<AppApiItem[]>(() => {
+    const backendApps = apps ?? [];
+    const localDevApps = devModeEnabled
+      ? devApps.map(
           (item) =>
             ({
               _id: item.id,
@@ -328,27 +268,32 @@ const StoreSearchView = () => {
               supportAppMode: false,
               tags: ["Developer"],
               sortOrder: 0,
-            }) as WidgetApiItem,
+            }) as AppApiItem,
         )
       : [];
-    return [...backendWidgets, ...localDevWidgets];
-  }, [devModeEnabled, devWidgets, widgets]);
-
-  const widgetResults = useMemo(() => {
-    if (!normalizedQuery) return [];
-    return searchableWidgets
-      .filter(supportsIconMode)
-      .filter((item) => matchesQuery(item, normalizedQuery, language))
-      .slice(0, SEARCH_PAGE_SIZE);
-  }, [language, normalizedQuery, searchableWidgets]);
+    return [...backendApps, ...localDevApps];
+  }, [devModeEnabled, devApps, apps]);
 
   const appResults = useMemo(() => {
     if (!normalizedQuery) return [];
-    return (widgets ?? [])
-      .filter(supportsAppMode)
-      .filter((item) => matchesQuery(item, normalizedQuery, language))
+    return searchableApps
+      .filter(
+        (item) =>
+          supportsAppMode(item) && matchesQuery(item, normalizedQuery, language),
+      )
       .slice(0, SEARCH_PAGE_SIZE);
-  }, [language, normalizedQuery, widgets]);
+  }, [language, normalizedQuery, searchableApps]);
+
+  const widgetResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return searchableApps
+      .filter(
+        (item) =>
+          supportsIconMode(item) &&
+          matchesQuery(item, normalizedQuery, language),
+      )
+      .slice(0, SEARCH_PAGE_SIZE);
+  }, [language, normalizedQuery, searchableApps]);
 
   const resultCount =
     (showWebsites ? websiteResults.length : 0) +
@@ -357,7 +302,7 @@ const StoreSearchView = () => {
   const searching =
     Boolean(normalizedQuery) &&
     ((showWebsites && websiteLoading) ||
-      ((showApps || showWidgets) && widgetLoading));
+      ((showApps || showWidgets) && appLoading));
 
   const openWebsiteDetail = (item: any) => {
     setQuery("");
@@ -367,16 +312,11 @@ const StoreSearchView = () => {
   };
 
   const navigateFromSearch = (path: string) => {
-    setQuery("");
     navigate(path);
   };
 
-  const handleAddWidget = (item: WidgetApiItem, sizeId?: string) => {
-    onAddStoreItem?.({ kind: "widget", widgetId: item._id, sizeId });
-  };
-
-  const handleAddApp = (item: WidgetApiItem) => {
-    onAddStoreItem?.({ kind: "app", widgetId: item._id });
+  const handleAddApp = (item: AppApiItem, sizeId?: string) => {
+    onAddStoreItem?.({ kind: "app", appId: item._id, sizeId });
   };
 
   return (
@@ -451,7 +391,7 @@ const StoreSearchView = () => {
             </ResultSection>
           ) : null}
 
-          {(showApps || showWidgets) && widgetLoading ? (
+          {showApps && appLoading ? (
             <div className="flex min-h-32 items-center justify-center">
               <Spin />
             </div>
@@ -488,7 +428,7 @@ const StoreSearchView = () => {
 
           {showWidgets && widgetResults.length > 0 ? (
             <ResultSection
-              title={t("ui.widget")}
+              title={t("ui.widgets")}
               count={widgetResults.length}
               action={
                 <Button
@@ -504,16 +444,18 @@ const StoreSearchView = () => {
             >
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 {widgetResults.map((item) => (
-                  <WidgetResultCard
+                  <AppResultCard
                     key={item._id}
                     item={item}
-                    iconUrl={getIconUrl(item)}
-                    onAdd={handleAddWidget}
+                    iconUrl={getAppIconUrl(item)}
+                    showSize
+                    onAdd={handleAddApp}
                   />
                 ))}
               </div>
             </ResultSection>
           ) : null}
+
         </div>
       </div>
     </DefaultAppView>
