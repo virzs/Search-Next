@@ -389,6 +389,368 @@ importers:
         specifier: ^5.9.2
         version: 5.9.3
 
+  apps/apps/calculator:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/calendar:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/clock:
+    dependencies:
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      react-router:
+        specifier: ^7.9.4
+        version: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/daily-counter:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/memo:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/pipe-link:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      kontra:
+        specifier: 10.0.2
+        version: 10.0.2
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/soldier-rush-3d:
+    dependencies:
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
+      three:
+        specifier: ^0.185.1
+        version: 0.185.1
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@types/three':
+        specifier: ^0.185.0
+        version: 0.185.0
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
+  apps/apps/todo:
+    dependencies:
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.1.4
+        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.8.0
+        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
+      tailwindcss:
+        specifier: ^4.1.17
+        version: 4.1.18
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
+
   apps/docs:
     dependencies:
       rspress:
@@ -531,368 +893,6 @@ importers:
       vite:
         specifier: ^7.1.12
         version: 7.3.0(@types/node@18.19.130)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/calculator:
-    dependencies:
-      '@radix-ui/react-slot':
-        specifier: ^1.2.4
-        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.0
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/calendar:
-    dependencies:
-      '@radix-ui/react-slot':
-        specifier: ^1.2.4
-        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.0
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/clock:
-    dependencies:
-      date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      react-router:
-        specifier: ^7.9.4
-        version: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/daily-counter:
-    dependencies:
-      '@radix-ui/react-slot':
-        specifier: ^1.2.4
-        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.0
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/memo:
-    dependencies:
-      '@radix-ui/react-slot':
-        specifier: ^1.2.4
-        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.0
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/pipe-link:
-    dependencies:
-      '@radix-ui/react-slot':
-        specifier: ^1.2.4
-        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      kontra:
-        specifier: 10.0.2
-        version: 10.0.2
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.0
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/soldier-rush-3d:
-    dependencies:
-      '@radix-ui/react-slot':
-        specifier: ^1.2.4
-        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.0
-      three:
-        specifier: ^0.185.1
-        version: 0.185.1
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@types/three':
-        specifier: ^0.185.0
-        version: 0.185.0
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
-
-  apps/widgets/todo:
-    dependencies:
-      i18next:
-        specifier: ^24.2.3
-        version: 24.2.3(typescript@5.7.3)
-      react:
-        specifier: ^19.2.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^19.2.0
-        version: 19.2.3(react@19.2.3)
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.18(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      '@types/react':
-        specifier: ^19.0.10
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.0.4
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react-swc':
-        specifier: ^3.8.0
-        version: 3.11.0(@swc/helpers@0.5.23)(vite@7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2))
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.1.18
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.1.12
-        version: 7.3.0(@types/node@24.5.2)(jiti@2.6.1)(less@4.6.7)(lightningcss@1.30.2)(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.48.0)(yaml@2.8.2)
 
 packages:
 

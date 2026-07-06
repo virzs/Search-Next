@@ -1,6 +1,6 @@
 # Search Next
 
-Search Next 是一个桌面化的导航与搜索入口，支持网站收藏、应用/小组件、统一搜索、主题壁纸、用户数据同步与后台管理。当前仓库采用 pnpm workspace 组织，前端、后台、后端 API 与内置小组件都在同一个仓库中维护。
+Search Next 是一个桌面化的导航与搜索入口，支持网站收藏、应用/应用、统一搜索、主题壁纸、用户数据同步与后台管理。当前仓库采用 pnpm workspace 组织，前端、后台、后端 API 与内置应用都在同一个仓库中维护。
 
 ## 预览
 
@@ -13,10 +13,10 @@ Search Next 是一个桌面化的导航与搜索入口，支持网站收藏、�
 - `apps/web`：用户侧主站，Vite + React。
 - `apps/admin`：管理后台，Vite + React。
 - `apps/api`：后端 API，NestJS + MongoDB + Redis。
-- `apps/widgets/*`：内置小组件，每个目录是一个独立小组件工程。
+- `apps/apps/*`：内置应用，每个目录是一个独立应用工程。
 - `apps/docs`：文档站点。
 - `packages/*`：共享包。
-- `scripts`：小组件脚手架、打包、截图等脚本。
+- `scripts`：应用脚手架、打包、截图等脚本。
 
 ## 本地运行指南
 
@@ -113,10 +113,10 @@ API 发布包使用 ncc 打成单文件输出：
 pnpm --filter search-next-api ncc:build
 ```
 
-内置小组件构建：
+内置应用构建：
 
 ```bash
-pnpm build:widgets
+pnpm build:apps
 ```
 
 ### 发版命令
@@ -139,7 +139,7 @@ pnpm release
 pnpm release 0.14.0
 ```
 
-完整发版使用 `v<version>` tag。发布后会触发 GitHub Actions 构建 API、主站生产包、管理后台、文档站和所有内置小组件。
+完整发版使用 `v<version>` tag。发布后会触发 GitHub Actions 构建 API、主站生产包、管理后台、文档站和所有内置应用。
 
 也可以单独发布某个项目：
 
@@ -148,15 +148,15 @@ pnpm release api
 pnpm release admin
 pnpm release web
 pnpm release docs
-pnpm release widgets
-pnpm release widget:todo
+pnpm release apps
+pnpm release app:todo
 ```
 
 单项目 tag 会使用 `<project>-v<version>`，例如 `web-v0.14.0`、`api-v0.14.0`、`todo-v0.2.0`。也可以直接指定版本：
 
 ```bash
 pnpm release web 0.14.0
-pnpm release widget:todo 0.2.0
+pnpm release app:todo 0.2.0
 ```
 
 发版前可先查看更改信息或预演流程：
@@ -192,7 +192,7 @@ pnpm install --frozen-lockfile
 pnpm --filter search-next-api ncc:build
 pnpm build
 pnpm build:admin
-pnpm build:widgets
+pnpm build:apps
 ```
 
 启动 API：
@@ -244,30 +244,30 @@ server {
 - 上传目录、MongoDB、Redis 中的重要数据已配置备份。
 - 生产环境不使用仓库中的示例密钥、个人密钥或开发环境配置。
 
-## 小组件开发
+## 应用开发
 
 创建脚手架：
 
 ```bash
-pnpm widget:create react my-widget
-pnpm widget:create vue my-widget
-pnpm widget:create solid my-widget
+pnpm app:create react my-tool
+pnpm app:create vue my-tool
+pnpm app:create solid my-tool
 ```
 
-启动某个小组件：
+启动某个应用：
 
 ```bash
-pnpm --filter my-widget-widget dev
+pnpm --filter my-tool-app dev
 ```
 
 构建并打包：
 
 ```bash
-pnpm --filter my-widget-widget build
-pnpm widget:pack my-widget
+pnpm --filter my-tool-app build
+pnpm app:pack my-tool
 ```
 
-小组件入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的小组件。
+应用入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的应用。
 
 ## 免责声明
 
@@ -275,4 +275,4 @@ pnpm widget:pack my-widget
 
 项目中涉及的第三方图标、网站入口、搜索服务、AI 模型、云存储及其他外部资源，均受对应服务商协议约束。使用者应自行确认授权、额度、数据处理方式和当地法律法规要求。
 
-任何因部署、配置、二次开发、加载不可信小组件或使用第三方服务造成的数据丢失、隐私泄露、账号风险、费用损失或服务不可用，由使用者自行承担。生产环境请勿提交或复用示例密钥、个人密钥和开发环境配置。
+任何因部署、配置、二次开发、加载不可信应用或使用第三方服务造成的数据丢失、隐私泄露、账号风险、费用损失或服务不可用，由使用者自行承担。生产环境请勿提交或复用示例密钥、个人密钥和开发环境配置。
