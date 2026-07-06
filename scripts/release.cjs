@@ -1,6 +1,6 @@
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
-const { listWidgetNames, resolveReleaseProject } = require("./release-projects.cjs");
+const { listAppNames, resolveReleaseProject } = require("./release-projects.cjs");
 
 const root = path.resolve(__dirname, "..");
 const mode = process.argv[2] || "release";
@@ -13,8 +13,8 @@ if (!validModes.has(mode)) {
 }
 
 const printHelp = () => {
-  const widgets = listWidgetNames(root).map((name) => `widget:${name}`);
-  const projects = ["all", "api", "web", "admin", "docs", "widgets", ...widgets];
+  const apps = listAppNames(root).map((name) => `app:${name}`);
+  const projects = ["all", "api", "web", "admin", "docs", "apps", ...apps];
 
   console.log(`Usage:
   pnpm release [project] [version|increment] [release-it options]
@@ -28,7 +28,7 @@ Examples:
   pnpm release
   pnpm release api
   pnpm release web 0.14.0
-  pnpm release widget:todo patch
+  pnpm release app:todo patch
   pnpm release:dry admin 0.14.0
   pnpm release:changes web`);
 };

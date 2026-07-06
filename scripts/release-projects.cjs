@@ -68,53 +68,53 @@ const normalizeProjectName = (value) => {
   const input = String(value || "all").trim() || "all";
   return input
     .replace(/^apps\//, "")
-    .replace(/^widgets\//, "widget:")
+    .replace(/^apps\//, "app:")
     .replace(/^search-next-/, "")
-    .replace(/-widget$/, "");
+    .replace(/-app$/, "");
 };
 
-const listWidgetNames = (root) => {
-  const widgetsRoot = path.join(root, "apps/widgets");
-  if (!fs.existsSync(widgetsRoot)) return [];
+const listAppNames = (root) => {
+  const appsRoot = path.join(root, "apps/apps");
+  if (!fs.existsSync(appsRoot)) return [];
   return fs
-    .readdirSync(widgetsRoot, { withFileTypes: true })
+    .readdirSync(appsRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((name) => fs.existsSync(path.join(widgetsRoot, name, "widget.config.json")))
+    .filter((name) => fs.existsSync(path.join(appsRoot, name, "app.config.json")))
     .sort();
 };
 
-const readWidgetConfig = (root, widgetName) => {
-  const file = path.join(root, "apps/widgets", widgetName, "widget.config.json");
+const readAppConfig = (root, appName) => {
+  const file = path.join(root, "apps/apps", appName, "app.config.json");
   if (!fs.existsSync(file)) return null;
   return JSON.parse(fs.readFileSync(file, "utf8"));
 };
 
-const createWidgetUnit = (root, widgetName) => {
-  const config = readWidgetConfig(root, widgetName);
+const createAppUnit = (root, appName) => {
+  const config = readAppConfig(root, appName);
   if (!config) return null;
   return {
-    type: "widget",
-    id: `widget:${widgetName}`,
-    name: widgetName,
+    type: "app-package",
+    id: `app:${appName}`,
+    name: appName,
     config,
-    build: ["node", ["scripts/pack-widget.mjs", widgetName]],
-    assetName: `${config.name}-${config.version}.snwidget`,
+    build: ["node", ["scripts/pack-app.mjs", appName]],
+    assetName: `${config.name}-${config.version}.snapp`,
   };
 };
 
-const createWidgetsProject = (root) => ({
-  id: "widgets",
-  label: "widgets",
-  title: "Widgets",
+const createAppsProject = (root) => ({
+  id: "apps",
+  label: "apps",
+  title: "Apps",
   units: [
     {
-      type: "widgets",
-      id: "widgets",
-      build: ["node", ["scripts/pack-widget.mjs", "--all"]],
+      type: "app-packages",
+      id: "apps",
+      build: ["node", ["scripts/pack-app.mjs", "--all"]],
     },
   ],
-  pathspecs: ["apps/widgets", "scripts/pack-widget.mjs", "scripts/capture-widget-screenshots.mjs"],
+  pathspecs: ["apps/apps", "scripts/pack-app.mjs", "scripts/capture-app-screenshots.mjs"],
 });
 
 const decorateProject = (project) => {
@@ -137,34 +137,34 @@ const resolveReleaseProject = (root = process.cwd(), value = process.env.RELEASE
       title: "Search Next",
       units: [
         ...Object.values(appProjects).flatMap((project) => project.units),
-        ...createWidgetsProject(root).units,
+        ...createAppsProject(root).units,
       ],
       pathspecs: [],
     });
   }
 
-  if (projectName === "widgets") return decorateProject(createWidgetsProject(root));
+  if (projectName === "apps") return decorateProject(createAppsProject(root));
 
   if (appProjects[projectName]) return decorateProject(appProjects[projectName]);
 
-  const widgetName = projectName.replace(/^widgets?:/, "");
-  const widgetUnit = createWidgetUnit(root, widgetName);
-  if (widgetUnit) {
+  const appName = projectName.replace(/^apps?:/, "");
+  const appUnit = createAppUnit(root, appName);
+  if (appUnit) {
     return decorateProject({
-      id: `widget:${widgetName}`,
-      label: widgetUnit.config.name || widgetName,
-      title: `Widget ${widgetUnit.config.displayName || widgetName}`,
-      units: [widgetUnit],
-      pathspecs: [`apps/widgets/${widgetName}`],
+      id: `app:${appName}`,
+      label: appUnit.config.name || appName,
+      title: `App ${appUnit.config.displayName || appName}`,
+      units: [appUnit],
+      pathspecs: [`apps/apps/${appName}`],
     });
   }
 
-  const available = ["all", ...Object.keys(appProjects), "widgets", ...listWidgetNames(root).map((name) => `widget:${name}`)];
+  const available = ["all", ...Object.keys(appProjects), "apps", ...listAppNames(root).map((name) => `app:${name}`)];
   throw new Error(`Unknown release project "${value}". Available projects: ${available.join(", ")}`);
 };
 
 module.exports = {
   appProjects,
-  listWidgetNames,
+  listAppNames,
   resolveReleaseProject,
 };

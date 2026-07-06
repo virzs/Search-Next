@@ -173,10 +173,10 @@ const prepareAppAsset = async (unit, version, outputDir, assets) => {
   console.log(`[release-assets] Packed ${path.basename(output)} (${count} files, ${formatBytes(size)})`);
 };
 
-const prepareWidgetAsset = async (unit, outputDir, assets) => {
-  const source = path.join(root, "dist/widgets", unit.assetName);
+const prepareAppPackageAsset = async (unit, outputDir, assets) => {
+  const source = path.join(root, "dist/apps", unit.assetName);
   const info = await exists(source);
-  if (!info?.isFile()) throw new Error(`Missing widget package ${unit.assetName}.`);
+  if (!info?.isFile()) throw new Error(`Missing app package ${unit.assetName}.`);
   const output = path.join(outputDir, unit.assetName);
   await copyFile(source, output);
   const size = (await stat(output)).size;
@@ -184,21 +184,21 @@ const prepareWidgetAsset = async (unit, outputDir, assets) => {
   console.log(`[release-assets] Copied ${unit.assetName} (${formatBytes(size)})`);
 };
 
-const prepareWidgetGroupAssets = async (outputDir, assets) => {
-  const widgetDir = path.join(root, "dist/widgets");
-  const info = await exists(widgetDir);
-  if (!info?.isDirectory()) throw new Error("Missing widget package directory dist/widgets.");
+const prepareAppPackageGroupAssets = async (outputDir, assets) => {
+  const appDir = path.join(root, "dist/apps");
+  const info = await exists(appDir);
+  if (!info?.isDirectory()) throw new Error("Missing app package directory dist/apps.");
 
-  const widgetFiles = (await readdir(widgetDir, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".snwidget"))
+  const appFiles = (await readdir(appDir, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".snapp"))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  for (const file of widgetFiles) {
-    const source = path.join(widgetDir, file.name);
+  for (const file of appFiles) {
+    const source = path.join(appDir, file.name);
     const output = path.join(outputDir, file.name);
     await copyFile(source, output);
     const size = (await stat(output)).size;
-    assets.push({ project: "widgets", name: file.name, path: path.relative(root, output), size });
+    assets.push({ project: "apps", name: file.name, path: path.relative(root, output), size });
     console.log(`[release-assets] Copied ${file.name} (${formatBytes(size)})`);
   }
 };
@@ -217,8 +217,8 @@ const prepare = async () => {
   for (const unit of project.units) {
     await run(unit.build[0], unit.build[1]);
     if (unit.type === "app") await prepareAppAsset(unit, version, outputDir, assets);
-    if (unit.type === "widget") await prepareWidgetAsset(unit, outputDir, assets);
-    if (unit.type === "widgets") await prepareWidgetGroupAssets(outputDir, assets);
+    if (unit.type === "app-package") await prepareAppPackageAsset(unit, outputDir, assets);
+    if (unit.type === "app-packages") await prepareAppPackageGroupAssets(outputDir, assets);
   }
 
   const manifest = {
