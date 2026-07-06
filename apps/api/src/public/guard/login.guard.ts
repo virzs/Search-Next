@@ -39,7 +39,7 @@ export class LoginGuard implements CanActivate {
       return requireLogin;
     }
 
-    // 可选登录：有 token 则解析设置 request.user；无 token 也放行
+    // 可选登录：有效 token 设置 request.user；无 token 或无效 token 都放行
     const optionalLogin = this.reflector.getAllAndOverride('optional-login', [
       context.getClass(),
       context.getHandler(),
@@ -55,7 +55,7 @@ export class LoginGuard implements CanActivate {
           });
           request.user = data.user ?? data;
         } catch (e) {
-          throw new UnauthorizedException('token 失效，请重新登录');
+          request.user = undefined;
         }
       }
       return true;
