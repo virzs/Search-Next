@@ -1,7 +1,7 @@
 import { baseDeleteRequest, baseGetRequest } from "@/utils/axios";
 
 export interface AdminUserDataPluginSummary {
-  widgetId: string;
+  appId: string;
   name?: string;
   version?: string;
   count: number;

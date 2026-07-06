@@ -2,23 +2,22 @@ import TablePageContainer from "@/components/containter/table";
 import TablePage from "@/components/TablePage2";
 import Operation from "@/components/TablePage2/Operation";
 import { useTablePage } from "@/hooks/useTablePage2";
-import { delWidgetClassify, getWidgetClassify, updateWidgetClassifyEnable } from "@/services/tabs/widget_classify";
+import { delAppClassify, getAppClassify, updateAppClassifyEnable } from "@/services/tabs/app_classify";
 import { useRequest } from "ahooks";
 import { message, Image, App } from "antd";
 import { useState } from "react";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import ClassifyHandle from "./handle";
 
-const WidgetClassify = () => {
+const AppClassify = () => {
   const { modal } = App.useApp();
-  const table = useTablePage(getWidgetClassify);
+  const table = useTablePage(getAppClassify);
   const { refresh } = table;
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | undefined>(undefined);
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
-  const { runAsync: updateEnableRun } = useRequest(updateWidgetClassifyEnable, {
+  const { runAsync: updateEnableRun } = useRequest(updateAppClassifyEnable, {
     manual: true,
     onSuccess: () => {
       message.success("切换启用状态成功");
@@ -26,7 +25,7 @@ const WidgetClassify = () => {
     },
   });
 
-  const { runAsync: delRun } = useRequest(delWidgetClassify, {
+  const { runAsync: delRun } = useRequest(delAppClassify, {
     manual: true,
     onSuccess: () => {
       message.success("删除成功");
@@ -54,6 +53,11 @@ const WidgetClassify = () => {
     {
       title: "描述",
       dataIndex: "description",
+    },
+    {
+      title: "排序",
+      dataIndex: "sortOrder",
+      width: 80,
     },
     {
       title: "是否启用",
@@ -109,12 +113,6 @@ const WidgetClassify = () => {
         table={table}
         columns={columns}
         pagination={false}
-        expandable={{
-          childrenColumnName: "children",
-          expandedRowKeys: expandedKeys,
-          onExpandedRowsChange: setExpandedKeys,
-          indentSize: 24,
-        }}
         button={
           <ClassifyHandle
             open={open}
@@ -133,4 +131,4 @@ const WidgetClassify = () => {
   );
 };
 
-export default WidgetClassify;
+export default AppClassify;

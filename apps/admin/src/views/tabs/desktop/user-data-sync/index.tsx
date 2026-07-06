@@ -33,8 +33,8 @@ const renderPluginSummary = (summary?: AdminUserDataPluginSummary[]) => {
   return (
     <div className="flex flex-wrap gap-1">
       {summary.map((plugin) => (
-        <Tag key={plugin.widgetId} color="blue">
-          {plugin.name || plugin.widgetId}
+        <Tag key={plugin.appId} color="blue">
+          {plugin.name || plugin.appId}
           {plugin.version ? ` v${plugin.version}` : ""} x{plugin.count}
         </Tag>
       ))}
@@ -114,7 +114,7 @@ const DesktopUserDataSync = () => {
       width: 90,
     },
     {
-      title: "使用的小组件",
+      title: "使用的应用",
       dataIndex: "pluginSummary",
       render: renderPluginSummary,
     },
@@ -184,7 +184,7 @@ const DesktopUserDataSync = () => {
               width: 80,
             },
             {
-              title: "使用的小组件",
+              title: "使用的应用",
               dataIndex: "pluginSummary",
               render: renderPluginSummary,
             },

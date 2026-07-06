@@ -1,21 +1,21 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import { Modal, Spin, Checkbox, Pagination, Image, Empty, Input } from "antd";
 import { useTablePage } from "@/hooks/useTablePage2";
-import { getWidget, WidgetItem } from "@/services/tabs/widget";
+import { getApp, AppItem } from "@/services/tabs/app";
 
-export interface WidgetAppSelectModalProps {
+export interface AppSelectModalProps {
   open: boolean;
-  value?: WidgetItem[];
+  value?: AppItem[];
   title?: string;
   okText?: string;
-  onOk: (widgets: WidgetItem[]) => void | Promise<void>;
+  onOk: (apps: AppItem[]) => void | Promise<void>;
   onCancel: () => void;
 }
 
-const supportsAppMode = (item: WidgetItem) =>
+const supportsAppMode = (item: AppItem) =>
   Boolean((item.configSnapshot?.supportAppMode as boolean | undefined) ?? item.supportAppMode);
 
-const getAppIconUrl = (item: WidgetItem) => {
+const getAppIconUrl = (item: AppItem) => {
   const snapshotIconUrl =
     typeof item.configSnapshot?.appIconUrl === "string"
       ? item.configSnapshot.appIconUrl
@@ -42,15 +42,15 @@ export const toBackendAssetUrl = (entry?: string) => {
   return new URL(normalized, window.location.origin).href;
 };
 
-const WidgetAppSelectModal: FC<WidgetAppSelectModalProps> = (props) => {
+const AppSelectModal: FC<AppSelectModalProps> = (props) => {
   const { open, value, title, okText, onOk, onCancel } = props;
-  const [selectedMap, setSelectedMap] = useState<Map<string, WidgetItem>>(
+  const [selectedMap, setSelectedMap] = useState<Map<string, AppItem>>(
     new Map(),
   );
   const [keyword, setKeyword] = useState("");
 
-  const table = useTablePage<WidgetItem>(getWidget, {
-    pathname: "/desktop/widget-app-select-modal",
+  const table = useTablePage<AppItem>(getApp, {
+    pathname: "/desktop/app-select-modal",
     defaultParams: {
       page: 1,
       pageSize: 1000,
@@ -58,7 +58,7 @@ const WidgetAppSelectModal: FC<WidgetAppSelectModalProps> = (props) => {
   });
 
   const {
-    data: widgetData = [],
+    data: rawAppData = [],
     total = 0,
     current,
     setCurrent,
@@ -68,16 +68,16 @@ const WidgetAppSelectModal: FC<WidgetAppSelectModalProps> = (props) => {
   } = table;
 
   const appData = useMemo(
-    () => widgetData.filter(supportsAppMode),
-    [widgetData],
+    () => rawAppData.filter(supportsAppMode),
+    [rawAppData],
   );
 
   useEffect(() => {
     if (!open) return;
     setSelectedMap(() => {
-      const next = new Map<string, WidgetItem>();
-      for (const widget of value || []) {
-        if (widget?._id) next.set(widget._id, widget);
+      const next = new Map<string, AppItem>();
+      for (const app of value || []) {
+        if (app?._id) next.set(app._id, app);
       }
       return next;
     });
@@ -92,7 +92,7 @@ const WidgetAppSelectModal: FC<WidgetAppSelectModalProps> = (props) => {
     });
   }, [open]);
 
-  const toggleSelect = (record: WidgetItem, checked?: boolean) => {
+  const toggleSelect = (record: AppItem, checked?: boolean) => {
     setSelectedMap((prev) => {
       const next = new Map(prev);
       const key = record._id;
@@ -206,4 +206,4 @@ const WidgetAppSelectModal: FC<WidgetAppSelectModalProps> = (props) => {
   );
 };
 
-export default WidgetAppSelectModal;
+export default AppSelectModal;

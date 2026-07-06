@@ -18,9 +18,11 @@ import DesktopConfigPreview from "./desktop/desktop-config/preview";
 import WallpaperIndex from "./wallpaper";
 import WallpaperCategoryIndex from "./wallpaper/category";
 import WallpaperHandle from "./wallpaper/handle";
-import WidgetIndex from "./widget";
-import WidgetHandle from "./widget/handle";
-import WidgetClassify from "./widget/classify";
+import AppIndex from "./app";
+import AppHandle from "./app/handle";
+import AppClassify from "./app/classify";
+import AppCollection from "./app/collection";
+import AppCollectionHandle from "./app/collection/handle";
 import WebsiteCollection from "./website/collection";
 import WebsiteCollectionHandle from "./website/collection/handle";
 import WebsiteCollectionDetail from "./website/collection/detail";
@@ -51,10 +53,12 @@ export const TabsPaths = {
   wallpaperHandle: "/tabs/wallpaper/handle",
   wallpaperCategory: "/tabs/wallpaper/category",
   wallpaperUpload: "/tabs/wallpaper/upload",
-  // 小组件相关路径
-  widget: "/tabs/widget",
-  widgetHandle: "/tabs/widget/handle",
-  widgetClassify: "/tabs/widget-classify",
+  // 应用相关路径
+  app: "/tabs/app",
+  appHandle: "/tabs/app/handle",
+  appClassify: "/tabs/app-classify",
+  appCollection: "/tabs/app/collection",
+  appCollectionHandle: "/tabs/app/collection/handle",
 };
 
 const TabsRouter: RouteObject = {
@@ -170,22 +174,34 @@ const TabsRouter: RouteObject = {
       path: TabsPaths.wallpaperHandle + "/:id",
       element: <WallpaperHandle />,
     },
-    // 小组件路由
+    // 应用路由
     {
-      path: TabsPaths.widget,
-      element: <WidgetIndex />,
+      path: TabsPaths.app,
+      element: <AppIndex />,
     },
     {
-      path: TabsPaths.widgetHandle,
-      element: <WidgetHandle />,
+      path: TabsPaths.appHandle,
+      element: <AppHandle />,
     },
     {
-      path: TabsPaths.widgetHandle + "/:id",
-      element: <WidgetHandle />,
+      path: TabsPaths.appHandle + "/:id",
+      element: <AppHandle />,
     },
     {
-      path: TabsPaths.widgetClassify,
-      element: <WidgetClassify />,
+      path: TabsPaths.appClassify,
+      element: <AppClassify />,
+    },
+    {
+      path: TabsPaths.appCollection,
+      element: <AppCollection />,
+    },
+    {
+      path: TabsPaths.appCollectionHandle,
+      element: <AppCollectionHandle />,
+    },
+    {
+      path: TabsPaths.appCollectionHandle + "/:id",
+      element: <AppCollectionHandle />,
     },
   ],
 };
@@ -247,24 +263,39 @@ export const TabsMenu: Menu = {
       ],
     },
     {
-      name: "小组件",
+      name: "应用",
       children: [
         {
-          name: "分类",
-          path: TabsPaths.widgetClassify,
+          name: "应用分类",
+          path: TabsPaths.appClassify,
         },
         {
-          name: "小组件",
-          path: TabsPaths.widget,
+          name: "应用合集",
+          path: TabsPaths.appCollection,
           hideChildrenInMenu: true,
           children: [
             {
               name: "新增",
-              path: TabsPaths.widgetHandle,
+              path: TabsPaths.appCollectionHandle,
             },
             {
               name: "编辑",
-              path: TabsPaths.widgetHandle + "/:id",
+              path: TabsPaths.appCollectionHandle + "/:id",
+            },
+          ],
+        },
+        {
+          name: "应用管理",
+          path: TabsPaths.app,
+          hideChildrenInMenu: true,
+          children: [
+            {
+              name: "新增",
+              path: TabsPaths.appHandle,
+            },
+            {
+              name: "编辑",
+              path: TabsPaths.appHandle + "/:id",
             },
           ],
         },

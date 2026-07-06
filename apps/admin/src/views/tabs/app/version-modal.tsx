@@ -1,39 +1,39 @@
 import { App, Button, Modal, Space, Table, Tag, Typography } from "antd";
 import { FC, useEffect, useMemo } from "react";
 import { useRequest } from "ahooks";
-import { getWidgetVersions, publishWidgetVersion, WidgetVersionItem } from "@/services/tabs/widget";
+import { getAppVersions, publishAppVersion, AppVersionItem } from "@/services/tabs/app";
 
 const { Text } = Typography;
 
-interface WidgetVersionModalProps {
+interface AppVersionModalProps {
   open: boolean;
-  widgetId?: string;
-  widgetName?: string;
+  appId?: string;
+  appName?: string;
   onClose: () => void;
   onPublished: () => void;
 }
 
-const WidgetVersionModal: FC<WidgetVersionModalProps> = ({
+const AppVersionModal: FC<AppVersionModalProps> = ({
   open,
-  widgetId,
-  widgetName,
+  appId,
+  appName,
   onClose,
   onPublished,
 }) => {
   const { message } = App.useApp();
-  const { data, loading, run } = useRequest(getWidgetVersions, { manual: true });
-  const { runAsync: publishRun, loading: publishLoading } = useRequest(publishWidgetVersion, {
+  const { data, loading, run } = useRequest(getAppVersions, { manual: true });
+  const { runAsync: publishRun, loading: publishLoading } = useRequest(publishAppVersion, {
     manual: true,
     onSuccess: () => {
       message.success("版本已发布");
-      if (widgetId) run(widgetId);
+      if (appId) run(appId);
       onPublished();
     },
   });
 
   useEffect(() => {
-    if (open && widgetId) run(widgetId);
-  }, [open, widgetId, run]);
+    if (open && appId) run(appId);
+  }, [open, appId, run]);
 
   const versionRows = useMemo(() => {
     const seen = new Set<string>();
@@ -46,8 +46,8 @@ const WidgetVersionModal: FC<WidgetVersionModalProps> = ({
   }, [data]);
 
   return (
-    <Modal open={open} title={`${widgetName || "小组件"} - 版本管理`} onCancel={onClose} footer={null} width={900}>
-      <Table<WidgetVersionItem>
+    <Modal open={open} title={`${appName || "应用"} - 版本管理`} onCancel={onClose} footer={null} width={900}>
+      <Table<AppVersionItem>
         rowKey="_id"
         loading={loading}
         dataSource={versionRows}
@@ -78,7 +78,7 @@ const WidgetVersionModal: FC<WidgetVersionModalProps> = ({
                 type="link"
                 disabled={record.active}
                 loading={publishLoading}
-                onClick={() => widgetId && publishRun(widgetId, record._id)}
+                onClick={() => appId && publishRun(appId, record._id)}
               >
                 发布
               </Button>
@@ -90,4 +90,4 @@ const WidgetVersionModal: FC<WidgetVersionModalProps> = ({
   );
 };
 
-export default WidgetVersionModal;
+export default AppVersionModal;

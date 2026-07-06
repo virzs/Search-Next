@@ -9,6 +9,12 @@ import {
 export interface WebsiteCollection {
   title: string;
   description?: string;
+  kicker?: string;
+  cover?: any;
+  accentColor?: string;
+  layout?: "story" | "compact";
+  featured?: boolean;
+  itemLimit?: number;
   enable?: boolean;
   effectiveStart?: string;
   effectiveEnd?: string;

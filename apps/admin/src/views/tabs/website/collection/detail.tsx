@@ -75,7 +75,11 @@ const WebsiteCollectionDetail = () => {
       <div className="max-w-5xl mx-auto py-2">
         <Descriptions bordered column={1} size="small">
           <Descriptions.Item label="名称">{(data as any)?.title ?? "-"}</Descriptions.Item>
+          <Descriptions.Item label="短标题">{(data as any)?.kicker ?? "-"}</Descriptions.Item>
           <Descriptions.Item label="简介">{(data as any)?.description ?? "-"}</Descriptions.Item>
+          <Descriptions.Item label="推荐大卡">{(data as any)?.featured ? "是" : "否"}</Descriptions.Item>
+          <Descriptions.Item label="展示样式">{(data as any)?.layout ?? "story"}</Descriptions.Item>
+          <Descriptions.Item label="预览数量">{(data as any)?.itemLimit ?? 8}</Descriptions.Item>
           <Descriptions.Item label="是否启用">{(data as any)?.enable ? "是" : "否"}</Descriptions.Item>
           <Descriptions.Item label="排序">{(data as any)?.sort ?? 0}</Descriptions.Item>
           <Descriptions.Item label="生效开始">

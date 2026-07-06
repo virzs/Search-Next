@@ -4,9 +4,9 @@ import { Form, Select, App, Switch, InputNumber, Input, Button, Upload, Alert, C
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router";
-import { addWidget, getWidgetDetail, updateWidget, uploadWidgetPackage, WidgetItem, WidgetScreenshot, WidgetSettingsField } from "@/services/tabs/widget";
+import { addApp, getAppDetail, updateApp, uploadAppPackage, AppItem, AppScreenshot, AppSettingsField } from "@/services/tabs/app";
 import { useRequest } from "ahooks";
-import { getAllWidgetClassify } from "@/services/tabs/widget_classify";
+import { getAllAppClassify } from "@/services/tabs/app_classify";
 import FullPageContainer from "@/components/containter/full";
 import ProFormUpload from "@/components/pro-form/fields/upload";
 import { RiUploadCloud2Line } from "@remixicon/react";
@@ -22,17 +22,17 @@ const PREVIEW_THEME_OPTIONS = [
   { label: "深色", value: "dark" },
 ];
 
-type SettingsSchemaInput = string | WidgetSettingsField[] | undefined;
+type SettingsSchemaInput = string | AppSettingsField[] | undefined;
 type PreviewTheme = "light" | "dark";
 
-const parseSettingsSchema = (value: SettingsSchemaInput): WidgetSettingsField[] | undefined => {
+const parseSettingsSchema = (value: SettingsSchemaInput): AppSettingsField[] | undefined => {
   if (!value || value === "") return undefined;
   if (Array.isArray(value)) return value;
   return JSON.parse(value);
 };
 
 const validateSettingsSchemaValue = (value: SettingsSchemaInput): string | null => {
-  let schema: WidgetSettingsField[] | undefined;
+  let schema: AppSettingsField[] | undefined;
   try {
     schema = parseSettingsSchema(value);
   } catch {
@@ -55,10 +55,10 @@ const validateSettingsSchemaValue = (value: SettingsSchemaInput): string | null 
   return null;
 };
 
-const isAllowedSettingsType = (type: unknown): type is WidgetSettingsField["type"] =>
+const isAllowedSettingsType = (type: unknown): type is AppSettingsField["type"] =>
   typeof type === "string" && ALLOWED_SETTINGS_TYPES.some((allowedType) => allowedType === type);
 
-const normalizeWidgetPayload = (values: WidgetItem): WidgetItem => {
+const normalizeAppPayload = (values: AppItem): AppItem => {
   const sizeConfigs = values.sizeConfigs?.length ? values.sizeConfigs : [{ ...DEFAULT_SIZE_CONFIG }];
   const defaultSizeId = values.defaultSizeId || DEFAULT_SIZE_CONFIG.id;
   const supportAppMode = values.supportAppMode ?? false;
@@ -76,7 +76,7 @@ const normalizeWidgetPayload = (values: WidgetItem): WidgetItem => {
   };
 };
 
-const getConfigValue = (data: WidgetItem | undefined, key: string) => data?.configSnapshot?.[key];
+const getConfigValue = (data: AppItem | undefined, key: string) => data?.configSnapshot?.[key];
 
 const getPreviewTheme = (themeId?: string): PreviewTheme => (themeId === "dark" ? "dark" : "light");
 
@@ -86,15 +86,15 @@ const getPreviewSortIndex = (sizeId: string) => {
   return index >= 0 ? index : order.length;
 };
 
-const getWidgetAssetUrl = (url?: string) => {
+const getAppAssetUrl = (url?: string) => {
   if (!url) return "";
   if (/^(https?:)?\/\//.test(url)) return url;
   const normalized = url.startsWith("/") ? url : `/${url}`;
   return normalized;
 };
 
-const getVisibleScreenshots = (screenshots: WidgetScreenshot[], theme: PreviewTheme) => {
-  const bySize = new Map<string, WidgetScreenshot>();
+const getVisibleScreenshots = (screenshots: AppScreenshot[], theme: PreviewTheme) => {
+  const bySize = new Map<string, AppScreenshot>();
 
   screenshots
     .filter((item) => getPreviewTheme(item.themeId) === theme)
@@ -109,7 +109,7 @@ const getVisibleScreenshots = (screenshots: WidgetScreenshot[], theme: PreviewTh
   });
 };
 
-const WidgetScreenshotPreview: FC<{ screenshots?: WidgetScreenshot[] }> = ({ screenshots = [] }) => {
+const AppScreenshotPreview: FC<{ screenshots?: AppScreenshot[] }> = ({ screenshots = [] }) => {
   const [theme, setTheme] = useState<PreviewTheme>("light");
   const validScreenshots = screenshots.filter((item) => item?.url && item?.sizeId);
   if (!validScreenshots.length) return null;
@@ -136,7 +136,7 @@ const WidgetScreenshotPreview: FC<{ screenshots?: WidgetScreenshot[] }> = ({ scr
               <div key={`${item.themeId}-${item.sizeId}-${item.file}`} className="rounded-lg border border-solid border-gray-200 bg-gray-50 p-3">
                 <div className="flex h-36 items-center justify-center overflow-hidden rounded-md bg-white">
                   <Image
-                    src={getWidgetAssetUrl(item.url)}
+                    src={getAppAssetUrl(item.url)}
                     alt={`${item.sizeId} ${activeTheme}`}
                     className="max-h-32 object-contain"
                   />
@@ -158,39 +158,39 @@ const WidgetScreenshotPreview: FC<{ screenshots?: WidgetScreenshot[] }> = ({ scr
   );
 };
 
-const getConfigStringValue = (data: WidgetItem | undefined, key: string) => {
+const getConfigStringValue = (data: AppItem | undefined, key: string) => {
   const value = getConfigValue(data, key);
   return typeof value === "string" ? value : "";
 };
 
-const getConfigArrayValue = <T,>(data: WidgetItem | undefined, key: string): T[] | undefined => {
+const getConfigArrayValue = <T,>(data: AppItem | undefined, key: string): T[] | undefined => {
   const value = getConfigValue(data, key);
   return Array.isArray(value) ? value as T[] : undefined;
 };
 
-const getConfigBooleanValue = (data: WidgetItem | undefined, key: string) => {
+const getConfigBooleanValue = (data: AppItem | undefined, key: string) => {
   const value = getConfigValue(data, key);
   return typeof value === "boolean" ? value : undefined;
 };
 
-const buildFormValuesFromWidget = (widget: WidgetItem): Partial<WidgetItem> => ({
-  ...widget,
-  name: widget.name || getConfigStringValue(widget, "displayName") || getConfigStringValue(widget, "name"),
-  description: widget.description || getConfigStringValue(widget, "description"),
-  version: widget.version || getConfigStringValue(widget, "version"),
-  author: widget.author || getConfigStringValue(widget, "author"),
-  entryFileName: widget.entryFileName || getConfigStringValue(widget, "entry"),
-  sizeConfigs: widget.sizeConfigs?.length ? widget.sizeConfigs : getConfigArrayValue(widget, "sizeConfigs"),
-  defaultSizeId: widget.defaultSizeId || getConfigStringValue(widget, "defaultSizeId"),
-  supportIconMode: widget.supportIconMode ?? getConfigBooleanValue(widget, "supportIconMode"),
-  supportAppMode: widget.supportAppMode ?? getConfigBooleanValue(widget, "supportAppMode"),
-  appIcon: widget.appIcon || getConfigValue(widget, "appIcon") as WidgetItem["appIcon"],
-  appIconUrl: widget.appIconUrl || getConfigStringValue(widget, "appIconUrl"),
-  tags: widget.tags?.length ? widget.tags : getConfigArrayValue<string>(widget, "tags"),
-  settingsSchema: widget.settingsSchema?.length ? widget.settingsSchema : getConfigArrayValue<WidgetSettingsField>(widget, "settingsSchema"),
+const buildFormValuesFromApp = (app: AppItem): Partial<AppItem> => ({
+  ...app,
+  name: app.name || getConfigStringValue(app, "displayName") || getConfigStringValue(app, "name"),
+  description: app.description || getConfigStringValue(app, "description"),
+  version: app.version || getConfigStringValue(app, "version"),
+  author: app.author || getConfigStringValue(app, "author"),
+  entryFileName: app.entryFileName || getConfigStringValue(app, "entry"),
+  sizeConfigs: app.sizeConfigs?.length ? app.sizeConfigs : getConfigArrayValue(app, "sizeConfigs"),
+  defaultSizeId: app.defaultSizeId || getConfigStringValue(app, "defaultSizeId"),
+  supportIconMode: app.supportIconMode ?? getConfigBooleanValue(app, "supportIconMode"),
+  supportAppMode: app.supportAppMode ?? getConfigBooleanValue(app, "supportAppMode"),
+  appIcon: app.appIcon || getConfigValue(app, "appIcon") as AppItem["appIcon"],
+  appIconUrl: app.appIconUrl || getConfigStringValue(app, "appIconUrl"),
+  tags: app.tags?.length ? app.tags : getConfigArrayValue<string>(app, "tags"),
+  settingsSchema: app.settingsSchema?.length ? app.settingsSchema : getConfigArrayValue<AppSettingsField>(app, "settingsSchema"),
 });
 
-const getClassifyValue = (classify: WidgetItem["classify"] | any) => {
+const getClassifyValue = (classify: AppItem["classify"] | any) => {
   if (!classify) return undefined;
   if (typeof classify === "string") return classify;
   return classify._id ?? classify.id;
@@ -215,7 +215,7 @@ const inferEntry = (names: string[]): string | undefined => {
   return names[0];
 };
 
-const WidgetHandle: FC = () => {
+const AppHandle: FC = () => {
   const ref = useRef<ProFormInstance<any>>(null);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -223,22 +223,22 @@ const WidgetHandle: FC = () => {
   const { message } = App.useApp();
 
   const [fileNames, setFileNames] = useState<string[]>([]);
-  const [packageWidgetId, setPackageWidgetId] = useState<string | undefined>();
-  const [packageMeta, setPackageMeta] = useState<WidgetItem | undefined>();
-  const uploadDir = useMemo(() => `widget_${uuidv4()}`, []);
+  const [packageAppId, setPackageAppId] = useState<string | undefined>();
+  const [packageMeta, setPackageMeta] = useState<AppItem | undefined>();
+  const uploadDir = useMemo(() => `app_${uuidv4()}`, []);
 
   const {
     data: detailData,
     run: detailRun,
     loading: detailLoading,
-  } = useRequest(getWidgetDetail, {
+  } = useRequest(getAppDetail, {
     manual: true,
     onSuccess: (data: any) => {
       const names = (data?.files || []).map((f: any) => f?.name).filter(Boolean);
       setFileNames(names);
       setPackageMeta(data);
       ref.current?.setFieldsValue({
-        ...buildFormValuesFromWidget(data),
+        ...buildFormValuesFromApp(data),
         enable: data.enable ?? true,
         sortOrder: data.sortOrder ?? 0,
         classify: getClassifyValue(data.classify),
@@ -253,7 +253,7 @@ const WidgetHandle: FC = () => {
   }, [id]);
 
   // 分类数据
-  const { data: classifyOptions } = useRequest(getAllWidgetClassify);
+  const { data: classifyOptions } = useRequest(getAllAppClassify);
 
   const entryDetected = useMemo(() => inferEntry(fileNames), [fileNames]);
 
@@ -266,7 +266,7 @@ const WidgetHandle: FC = () => {
     }
   }, [entryDetected]);
 
-  const { runAsync: addRun } = useRequest(addWidget, {
+  const { runAsync: addRun } = useRequest(addApp, {
     manual: true,
     onSuccess: () => {
       message.success("新增成功");
@@ -274,7 +274,7 @@ const WidgetHandle: FC = () => {
     },
   });
 
-  const { runAsync: editRun } = useRequest(updateWidget, {
+  const { runAsync: editRun } = useRequest(updateApp, {
     manual: true,
     onSuccess: () => {
       message.success("修改成功");
@@ -282,32 +282,32 @@ const WidgetHandle: FC = () => {
     },
   });
 
-  const { runAsync: uploadPackageRun, loading: uploadPackageLoading } = useRequest(uploadWidgetPackage, {
+  const { runAsync: uploadPackageRun, loading: uploadPackageLoading } = useRequest(uploadAppPackage, {
     manual: true,
     onSuccess: (result) => {
-      const widget = result?.widget;
-      if (!widget) {
-        message.error("小组件包上传成功，但响应中缺少组件数据");
+      const app = result?.app;
+      if (!app) {
+        message.error("应用包上传成功，但响应中缺少应用数据");
         return;
       }
       const nextValues = {
-        ...buildFormValuesFromWidget(widget),
-        enable: widget.enable ?? true,
-        sortOrder: widget.sortOrder ?? 0,
-        classify: getClassifyValue(widget.classify),
+        ...buildFormValuesFromApp(app),
+        enable: app.enable ?? true,
+        sortOrder: app.sortOrder ?? 0,
+        classify: getClassifyValue(app.classify),
       };
-      setPackageWidgetId(widget._id);
-      setPackageMeta(widget);
+      setPackageAppId(app._id);
+      setPackageMeta(app);
       setFileNames([]);
       ref.current?.resetFields();
       window.setTimeout(() => {
         ref.current?.setFieldsValue(nextValues);
       }, 0);
-      message.success("已读取 .snwidget 配置并回填表单");
+      message.success("已读取 .snapp 配置并回填表单");
     },
   });
 
-  const packageMode = packageMeta?.sourceType === "snwidget" || !!packageWidgetId;
+  const packageMode = packageMeta?.sourceType === "snapp" || !!packageAppId;
 
   return (
     <FullPageContainer loading={detailLoading}>
@@ -330,9 +330,9 @@ const WidgetHandle: FC = () => {
             searchConfig: { submitText: "保存" },
             render: (_, dom) => <div className="flex items-center justify-center gap-2">{...dom}</div>,
           }}
-          onFinish={async (values: WidgetItem) => {
-            const payload = normalizeWidgetPayload(values);
-            const targetId = id || packageWidgetId;
+          onFinish={async (values: AppItem) => {
+            const payload = normalizeAppPayload(values);
+            const targetId = id || packageAppId;
             if (targetId) {
               await editRun(targetId, payload);
             } else {
@@ -342,36 +342,36 @@ const WidgetHandle: FC = () => {
             return true;
           }}
         >
-          <Card className="mb-5" title="组件包" size="small">
+          <Card className="mb-5" title="应用包" size="small">
             <Space direction="vertical" className="w-full" size={12}>
               <Upload
-                accept=".snwidget"
+                accept=".snapp"
                 showUploadList={false}
                 beforeUpload={(file) => {
-                  uploadPackageRun(file, id || packageWidgetId);
+                  uploadPackageRun(file, id || packageAppId);
                   return false;
                 }}
               >
                 <Button icon={<RiUploadCloud2Line size={16} />} loading={uploadPackageLoading}>
-                  上传并读取 .snwidget
+                  上传并读取 .snapp
                 </Button>
               </Upload>
               <Alert
                 type="info"
                 showIcon
-                message="推荐使用组件包配置"
-                description="上传 .snwidget 后，名称、简介、入口、版本、作者、尺寸、图标模式、应用模式、标签和设置 Schema 会从包内 widget.config.json 自动读取。表单中仅建议维护分类、启用状态、排序等运营字段。"
+                message="推荐使用应用包配置"
+                description="上传 .snapp 后，名称、简介、入口、版本、作者、尺寸、图标模式、应用模式、标签和设置 Schema 会从包内 app.config.json 自动读取。表单中仅建议维护分类、启用状态、排序等运营字段。"
               />
               {packageMode ? (
                 <div className="flex flex-wrap gap-2 text-sm">
-                  <Tag color="blue">snwidget</Tag>
+                  <Tag color="blue">snapp</Tag>
                   {packageMeta?.packageName ? <Text type="secondary">包名：{packageMeta.packageName}</Text> : null}
                   {packageMeta?.entryUrl ? <Text copyable type="secondary">入口：{packageMeta.entryUrl}</Text> : null}
                 </div>
               ) : null}
             </Space>
           </Card>
-          {packageMode ? <WidgetScreenshotPreview screenshots={packageMeta?.screenshots} /> : null}
+          {packageMode ? <AppScreenshotPreview screenshots={packageMeta?.screenshots} /> : null}
           <ProFormText
             name="name"
             label="名称"
@@ -398,13 +398,13 @@ const WidgetHandle: FC = () => {
           </Form.Item>
           {!packageMode ? (
             <>
-              <ProFormText name="dir" label="上传目录" placeholder="例如 widget_xxx" />
+              <ProFormText name="dir" label="上传目录" placeholder="例如 app_xxx" />
               <ProFormDependency name={["dir"]}>
                 {({ dir }) => (
                   <ProFormUpload
                     name="icon"
                     label="图标"
-                    tooltip="上传小组件图标"
+                    tooltip="上传应用图标"
                     fieldProps={{
                       dragger: true,
                       multiple: false,
@@ -421,7 +421,7 @@ const WidgetHandle: FC = () => {
                   <ProFormUpload
                     name="previewImages"
                     label="预览图"
-                    tooltip="上传小组件的预览图片"
+                    tooltip="上传应用的预览图片"
                     fieldProps={{
                       dragger: true,
                       multiple: true,
@@ -474,7 +474,7 @@ const WidgetHandle: FC = () => {
             name="version"
             label="版本号"
             placeholder="例如 1.0.0"
-            tooltip="小组件版本号，建议使用语义化版本"
+            tooltip="应用版本号，建议使用语义化版本"
             disabled={packageMode}
           />
 
@@ -512,9 +512,9 @@ const WidgetHandle: FC = () => {
                     <ProFormText
                       name="appIconUrl"
                       label="应用图标URL"
-                      placeholder="留空则回退小组件图标"
+                      placeholder="留空则回退应用图标"
                       disabled={packageMode}
-                      tooltip="手动配置时可填完整URL；组件包会自动回填包内静态资源URL"
+                      tooltip="手动配置时可填完整URL；应用包会自动回填包内静态资源URL"
                     />
                   ) : null}
                 </>
@@ -542,7 +542,7 @@ const WidgetHandle: FC = () => {
           </Form.Item>
 
           {/* 尺寸配置 */}
-          <Form.Item label="尺寸配置" tooltip="定义该小组件支持的桌面尺寸">
+          <Form.Item label="尺寸配置" tooltip="定义该应用支持的桌面尺寸">
             <Form.List name="sizeConfigs">
               {(fields, { add, remove }) => (
                 <>
@@ -580,7 +580,7 @@ const WidgetHandle: FC = () => {
               <Form.Item
                 label="默认尺寸"
                 name="defaultSizeId"
-                tooltip="选择小组件的默认桌面尺寸"
+                tooltip="选择应用的默认桌面尺寸"
                 rules={[
                   { required: true, message: "请选择默认尺寸" },
                   {
@@ -603,11 +603,11 @@ const WidgetHandle: FC = () => {
             )}
           </ProFormDependency>
 
-          {/* 设置表单 Schema（JSON 格式，定义小组件可配置项） */}
+          {/* 设置表单 Schema（JSON 格式，定义应用可配置项） */}
           <Form.Item
             label="设置Schema"
             name="settingsSchema"
-            tooltip="JSON 数组格式，定义小组件的用户可配置项（如时区、标题等），以 antd 表单组件为基准"
+            tooltip="JSON 数组格式，定义应用的用户可配置项（如时区、标题等），以 antd 表单组件为基准"
             normalize={(value) => {
               if (!value || typeof value !== "string") return value;
               try {
@@ -640,4 +640,4 @@ const WidgetHandle: FC = () => {
   );
 };
 
-export default WidgetHandle;
+export default AppHandle;

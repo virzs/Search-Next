@@ -1,16 +1,31 @@
 import FullPageContainer from "@/components/containter/full";
-import { baseFormItemLayout } from "@/utils/utils";
-import { ProForm, ProFormColorPicker, ProFormDateRangePicker, ProFormDigit, ProFormInstance, ProFormSelect, ProFormSwitch, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
 import ProFormUpload from "@/components/pro-form/fields/upload";
-import { App, Button, InputNumber, Select, Tag, Tree } from "antd";
+import { baseFormItemLayout } from "@/utils/utils";
+import {
+  ProForm,
+  ProFormColorPicker,
+  ProFormDateRangePicker,
+  ProFormDigit,
+  ProFormInstance,
+  ProFormSelect,
+  ProFormSwitch,
+  ProFormText,
+  ProFormTextArea,
+} from "@ant-design/pro-components";
+import { App, Button, InputNumber, Select, Tag } from "antd";
 import dayjs from "dayjs";
 import { useRequest } from "ahooks";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { addWebsiteCollection, getWebsiteCollectionDetail, previewWebsiteCollectionDynamic, updateWebsiteCollection } from "@/services/tabs/website_collection";
-import WebsiteSelectModal from "@/views/tabs/desktop/desktop-config/components/website-select-modal";
-import type { Website } from "@/services/tabs/website_classifty";
-import { getWebsiteClassifyTree } from "@/services/tabs/website_classifty";
+import {
+  addAppCollection,
+  getAppCollectionDetail,
+  previewAppCollectionDynamic,
+  updateAppCollection,
+} from "@/services/tabs/app_collection";
+import type { AppItem } from "@/services/tabs/app";
+import { getAllAppClassify } from "@/services/tabs/app_classify";
+import AppSelectModal from "./app-select-modal";
 
 type CollectionFormValues = {
   title: string;
@@ -23,19 +38,19 @@ type CollectionFormValues = {
   itemLimit?: number;
   enable?: boolean;
   sort?: number;
-  websites?: string[];
+  apps?: string[];
   effectiveRange?: [any, any];
   type?: "static" | "dynamic";
   dynamic?: {
     classifyIds?: string[];
-    sortBy?: "createdAt" | "updatedAt" | "click";
+    sortBy?: "createdAt" | "updatedAt";
     sortOrder?: "asc" | "desc";
     limit?: number;
   };
   updateIntervalSec?: number;
 };
 
-const normalizeWebsiteIds = (input: unknown): string[] => {
+const normalizeAppIds = (input: unknown): string[] => {
   const arr = Array.isArray(input) ? input : [];
   return arr
     .map((item: any) => {
@@ -46,10 +61,16 @@ const normalizeWebsiteIds = (input: unknown): string[] => {
     .filter(Boolean);
 };
 
-const normalizeWebsiteRecords = (input: unknown): Website[] => {
+const normalizeAppRecords = (input: unknown): AppItem[] => {
   const arr = Array.isArray(input) ? input : [];
   return arr.filter((item: any) => item && typeof item === "object" && typeof item._id === "string");
 };
+
+const supportsAppMode = (item: AppItem) =>
+  Boolean(
+    (item.configSnapshot?.supportAppMode as boolean | undefined) ??
+      item.supportAppMode,
+  );
 
 const pickIntervalUnitFromSec = (sec?: number) => {
   const v = Number(sec ?? 0) || 0;
@@ -59,57 +80,56 @@ const pickIntervalUnitFromSec = (sec?: number) => {
   return { unit: "second" as const, value: v || 300 };
 };
 
-const DynamicWebsitePreview: FC<{ dynamic?: CollectionFormValues["dynamic"] }> = (props) => {
-  const { dynamic } = props;
+const DynamicAppPreview: FC<{ dynamic?: CollectionFormValues["dynamic"] }> = ({ dynamic }) => {
   const payload = useMemo(() => ({ dynamic }), [dynamic]);
   const { data, loading } = useRequest(
     async () => {
       if (!payload.dynamic) return [];
-      return (await previewWebsiteCollectionDynamic(payload as any)) as any[];
+      return (await previewAppCollectionDynamic(payload as any)) as any[];
     },
     {
       refreshDeps: [JSON.stringify(payload)],
       debounceWait: 300,
       ready: !!payload.dynamic,
-    }
+    },
   );
 
-  const list = (data as any[]) || [];
-
+  const list = ((data as AppItem[]) || []).filter(supportsAppMode);
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-xs text-gray-500">预览（最多 {dynamic?.limit ?? 200} 条）</div>
+      <div className="text-xs text-gray-500">
+        应用预览（前台仅展示支持应用模式的项目）
+      </div>
       {loading ? (
         <div className="text-sm text-gray-500">加载中...</div>
       ) : list.length ? (
         <div className="flex flex-wrap gap-2">
           {list.slice(0, 30).map((w: any) => (
-            <Tag key={w?._id ?? w?.url}>{w?.name ?? w?._id ?? w?.url}</Tag>
+            <Tag key={w?._id}>{w?.name ?? w?._id}</Tag>
           ))}
           {list.length > 30 ? <div className="text-xs text-gray-500 self-center">等 {list.length} 个</div> : null}
         </div>
       ) : (
-        <div className="text-sm text-gray-500">暂无符合规则的网站</div>
+        <div className="text-sm text-gray-500">暂无符合规则的应用</div>
       )}
     </div>
   );
 };
 
-const WebsiteCollectionHandle: FC = () => {
+const AppCollectionHandle: FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { message } = App.useApp();
   const ref = useRef<ProFormInstance<CollectionFormValues>>(null);
-  const [websiteSelectOpen, setWebsiteSelectOpen] = useState(false);
-  const [selectedWebsites, setSelectedWebsites] = useState<Website[]>([]);
+  const [appSelectOpen, setAppSelectOpen] = useState(false);
+  const [selectedApps, setSelectedApps] = useState<AppItem[]>([]);
   const [intervalUnit, setIntervalUnit] = useState<"second" | "minute" | "hour" | "day">("second");
   const [intervalValue, setIntervalValue] = useState<number>(300);
 
-  const { data: detailData, run: detailRun, loading: detailLoading } = useRequest(getWebsiteCollectionDetail, {
+  const { data: detailData, run: detailRun, loading: detailLoading } = useRequest(getAppCollectionDetail, {
     manual: true,
   });
-
-  const { data: classifyTree = [] } = useRequest(getWebsiteClassifyTree);
+  const { data: classifyOptionsData } = useRequest(getAllAppClassify);
 
   useEffect(() => {
     if (id) detailRun(id);
@@ -122,13 +142,12 @@ const WebsiteCollectionHandle: FC = () => {
     const { unit, value } = pickIntervalUnitFromSec((detailData as any)?.updateIntervalSec);
     setIntervalUnit(unit);
     setIntervalValue(value);
-    setSelectedWebsites(normalizeWebsiteRecords((detailData as any)?.websites));
+    setSelectedApps(normalizeAppRecords((detailData as any)?.apps));
     ref.current?.setFieldsValue({
       ...(detailData as any),
-      websites: normalizeWebsiteIds((detailData as any)?.websites),
+      apps: normalizeAppIds((detailData as any)?.apps),
       effectiveRange: start || end ? [start ? dayjs(start) : null, end ? dayjs(end) : null] : undefined,
     });
-
   }, [detailData]);
 
   const initialValues = useMemo(
@@ -146,7 +165,7 @@ const WebsiteCollectionHandle: FC = () => {
         limit: 200,
       },
     }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -160,6 +179,14 @@ const WebsiteCollectionHandle: FC = () => {
     ref.current?.setFieldValue("updateIntervalSec", sec);
   }, [intervalUnit, intervalValue]);
 
+  const classifyOptions = useMemo(() => {
+    const raw = (classifyOptionsData as any)?.data ?? classifyOptionsData ?? [];
+    return (Array.isArray(raw) ? raw : []).map((item: any) => ({
+      label: item?.name,
+      value: item?._id,
+    })).filter((item: any) => item.value);
+  }, [classifyOptionsData]);
+
   return (
     <FullPageContainer loading={detailLoading}>
       <div className="max-w-5xl mx-auto py-6">
@@ -171,7 +198,7 @@ const WebsiteCollectionHandle: FC = () => {
             searchConfig: { submitText: "保存" },
             render: (_: any, dom: any) => <div className="flex items-center justify-center gap-2">{dom}</div>,
           }}
-          onFinish={async (values: CollectionFormValues) => {
+          onFinish={async (values) => {
             const range = values.effectiveRange;
             const type = values.type ?? "static";
             const payload: any = {
@@ -188,16 +215,16 @@ const WebsiteCollectionHandle: FC = () => {
               type,
               updateIntervalSec: values.updateIntervalSec,
               dynamic: values.dynamic,
-              websites: type === "dynamic" ? [] : normalizeWebsiteIds(values.websites),
+              apps: type === "dynamic" ? [] : normalizeAppIds(values.apps),
               effectiveStart: range?.[0] ? dayjs(range[0]).toISOString() : undefined,
               effectiveEnd: range?.[1] ? dayjs(range[1]).toISOString() : undefined,
             };
 
             if (id) {
-              await updateWebsiteCollection(id, payload);
+              await updateAppCollection(id, payload);
               message.success("修改成功");
             } else {
-              await addWebsiteCollection(payload);
+              await addAppCollection(payload);
               message.success("新增成功");
             }
 
@@ -211,14 +238,12 @@ const WebsiteCollectionHandle: FC = () => {
           <ProFormUpload
             name="cover"
             label="封面图"
-            fieldProps={{ dir: "website_collection_cover", accept: "image/*", maxCount: 1 }}
+            fieldProps={{ dir: "app_collection_cover", accept: "image/*", maxCount: 1 }}
           />
           <ProFormColorPicker
             name="accentColor"
             label="强调色"
-            formItemProps={{
-              getValueFromEvent: (e: any) => e.toRgbString(),
-            }}
+            formItemProps={{ getValueFromEvent: (e: any) => e.toRgbString() }}
             // @ts-ignore 类型中缺少 format 属性,但实际运行时存在
             fieldProps={{ format: "rgb" }}
           />
@@ -228,8 +253,8 @@ const WebsiteCollectionHandle: FC = () => {
             valueEnum={{ story: "大卡故事", compact: "紧凑列表" }}
             fieldProps={{ allowClear: false }}
           />
-          <ProFormSwitch name="featured" label="推荐为大卡" />
-          <ProFormDigit name="itemLimit" label="前台预览数量" fieldProps={{ precision: 0, min: 1, max: 20 }} />
+          <ProFormSwitch name="featured" label="推荐为应用大卡" />
+          <ProFormDigit name="itemLimit" label="前台合集预览数量" fieldProps={{ precision: 0, min: 1, max: 20 }} />
           <ProFormDigit name="sort" label="排序" fieldProps={{ precision: 0, min: 0 }} />
           <ProFormSwitch name="enable" label="是否启用" />
           <ProFormDateRangePicker name="effectiveRange" label="生效时间范围" />
@@ -237,8 +262,8 @@ const WebsiteCollectionHandle: FC = () => {
             name="type"
             label="合集类型"
             valueEnum={{
-              static: "静态（手动绑定网站）",
-              dynamic: "动态（按规则自动生成）",
+              static: "静态（手动绑定应用）",
+              dynamic: "动态（按分类自动生成应用）",
             }}
             fieldProps={{ allowClear: false }}
           />
@@ -272,19 +297,20 @@ const WebsiteCollectionHandle: FC = () => {
                           { label: "天", value: "day" },
                         ]}
                       />
-                      <div className="text-xs text-gray-500">
-                        {Math.max(1, Math.floor((Number(intervalValue) || 0) * (intervalUnit === "second" ? 1 : intervalUnit === "minute" ? 60 : intervalUnit === "hour" ? 3600 : 86400)))} 秒
-                      </div>
                     </div>
                   </ProForm.Item>
                   <ProFormSelect
+                    name={["dynamic", "classifyIds"]}
+                    label="应用分类筛选"
+                    fieldProps={{
+                      mode: "multiple",
+                      options: classifyOptions,
+                    }}
+                  />
+                  <ProFormSelect
                     name={["dynamic", "sortBy"]}
                     label="排序字段"
-                    valueEnum={{
-                      createdAt: "最近新增",
-                      updatedAt: "最近更新",
-                      click: "点击排行",
-                    }}
+                    valueEnum={{ createdAt: "最近新增", updatedAt: "最近更新" }}
                     fieldProps={{ allowClear: false }}
                   />
                   <ProFormSelect
@@ -298,48 +324,22 @@ const WebsiteCollectionHandle: FC = () => {
                     label="最大数量"
                     fieldProps={{ precision: 0, min: 1, max: 5000 }}
                   />
-                  <ProForm.Item label="分类筛选" name={["dynamic", "classifyIds"]}>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="small"
-                          disabled={!((form.getFieldValue(["dynamic", "classifyIds"]) as string[] | undefined) || []).length}
-                          onClick={() => form.setFieldValue(["dynamic", "classifyIds"], [])}
-                        >
-                          清空
-                        </Button>
-                      </div>
-                      <div className="border rounded p-2 max-h-80 overflow-auto">
-                        <Tree
-                          checkable
-                          selectable={false}
-                          fieldNames={{ title: "name", key: "_id", children: "children" }}
-                          treeData={classifyTree as any}
-                          checkedKeys={(form.getFieldValue(["dynamic", "classifyIds"]) as string[] | undefined) || []}
-                          onCheck={(checkedKeys: any) => {
-                            const keys = Array.isArray(checkedKeys) ? checkedKeys : checkedKeys?.checked || [];
-                            form.setFieldValue(["dynamic", "classifyIds"], keys);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </ProForm.Item>
                   <ProForm.Item label="规则预览">
-                    <DynamicWebsitePreview dynamic={dynamic} />
+                    <DynamicAppPreview dynamic={dynamic} />
                   </ProForm.Item>
                 </>
               );
             }}
           </ProForm.Item>
-          <ProForm.Item name="websites" hidden>
+          <ProForm.Item name="apps" hidden>
             <div />
           </ProForm.Item>
-          <ProForm.Item label="绑定网站" shouldUpdate>
+          <ProForm.Item label="绑定应用" shouldUpdate>
             {(form: any) => {
               const type = form.getFieldValue("type") as CollectionFormValues["type"];
-              const ids = (form.getFieldValue("websites") as string[] | undefined) || [];
-              const tags = selectedWebsites
-                .filter((w) => ids.includes(w._id))
+              const ids = (form.getFieldValue("apps") as string[] | undefined) || [];
+              const tags = selectedApps
+                .filter((w) => w._id && ids.includes(w._id))
                 .map((w, index) => (
                   <Tag key={w._id} className="py-1">
                     {w?.name ?? w?._id}
@@ -349,11 +349,11 @@ const WebsiteCollectionHandle: FC = () => {
                       className="px-1!"
                       disabled={index === 0}
                       onClick={() => {
-                        const next = [...selectedWebsites];
+                        const next = [...selectedApps];
                         const [item] = next.splice(index, 1);
                         next.splice(index - 1, 0, item);
-                        setSelectedWebsites(next);
-                        ref.current?.setFieldValue("websites", next.map((w) => w._id));
+                        setSelectedApps(next);
+                        ref.current?.setFieldValue("apps", next.map((w) => w._id));
                       }}
                     >
                       ↑
@@ -362,13 +362,13 @@ const WebsiteCollectionHandle: FC = () => {
                       type="link"
                       size="small"
                       className="px-1!"
-                      disabled={index === selectedWebsites.length - 1}
+                      disabled={index === selectedApps.length - 1}
                       onClick={() => {
-                        const next = [...selectedWebsites];
+                        const next = [...selectedApps];
                         const [item] = next.splice(index, 1);
                         next.splice(index + 1, 0, item);
-                        setSelectedWebsites(next);
-                        ref.current?.setFieldValue("websites", next.map((w) => w._id));
+                        setSelectedApps(next);
+                        ref.current?.setFieldValue("apps", next.map((w) => w._id));
                       }}
                     >
                       ↓
@@ -379,20 +379,20 @@ const WebsiteCollectionHandle: FC = () => {
               return (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <Button onClick={() => setWebsiteSelectOpen(true)} disabled={type === "dynamic"}>
-                      选择网站
+                    <Button onClick={() => setAppSelectOpen(true)} disabled={type === "dynamic"}>
+                      选择应用
                     </Button>
                     <Button
                       onClick={() => {
-                        setSelectedWebsites([]);
-                        ref.current?.setFieldValue("websites", []);
+                        setSelectedApps([]);
+                        ref.current?.setFieldValue("apps", []);
                       }}
                       disabled={!ids.length}
                     >
                       清空
                     </Button>
                     <div className="text-xs text-gray-500">
-                      {type === "dynamic" ? "动态规则自动生成" : `已选择：${ids.length} 项`}
+                      {type === "dynamic" ? "按规则自动生成应用" : `已选择：${ids.length} 项`}
                     </div>
                   </div>
                   {tags.length ? <div className="flex flex-wrap gap-2">{tags}</div> : null}
@@ -402,16 +402,16 @@ const WebsiteCollectionHandle: FC = () => {
           </ProForm.Item>
         </ProForm>
 
-        <WebsiteSelectModal
-          open={websiteSelectOpen}
-          value={selectedWebsites}
-          title="绑定网站"
+        <AppSelectModal
+          open={appSelectOpen}
+          value={selectedApps}
+          title="绑定应用"
           okText="确定"
-          onCancel={() => setWebsiteSelectOpen(false)}
-          onOk={async (websites) => {
-            setSelectedWebsites(websites);
-            ref.current?.setFieldValue("websites", websites.map((w) => w._id));
-            setWebsiteSelectOpen(false);
+          onCancel={() => setAppSelectOpen(false)}
+          onOk={async (apps) => {
+            setSelectedApps(apps);
+            ref.current?.setFieldValue("apps", apps.map((w) => w._id));
+            setAppSelectOpen(false);
           }}
         />
       </div>
@@ -419,4 +419,4 @@ const WebsiteCollectionHandle: FC = () => {
   );
 };
 
-export default WebsiteCollectionHandle;
+export default AppCollectionHandle;

@@ -4,12 +4,12 @@ import Operation from "@/components/TablePage2/Operation";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import { useTablePage } from "@/hooks/useTablePage2";
 import {
-  delWidget,
-  getWidget,
-  updateWidgetEnable,
-  uploadWidgetPackage,
-  type WidgetPackageImportResult,
-} from "@/services/tabs/widget";
+  delApp,
+  getApp,
+  updateAppEnable,
+  uploadAppPackage,
+  type AppPackageImportResult,
+} from "@/services/tabs/app";
 import {
   Alert,
   Button,
@@ -28,7 +28,7 @@ import { useNavigate } from "react-router";
 import { RiAddLine, RiUploadCloud2Line } from "@remixicon/react";
 import { TabsPaths } from "../router";
 import { type ReactNode, useMemo, useState } from "react";
-import WidgetVersionModal from "./version-modal";
+import AppVersionModal from "./version-modal";
 
 const { Dragger } = Upload;
 
@@ -49,10 +49,10 @@ const getFileKey = (file: File) =>
 const getUploadErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error || "上传失败");
 
-const getImportResultText = (result: WidgetPackageImportResult) => {
-  const widgetName = result.widget?.name || "小组件";
-  const version = result.widget?.version || result.version?.version;
-  return version ? `${widgetName} v${version}` : widgetName;
+const getImportResultText = (result: AppPackageImportResult) => {
+  const appName = result.app?.name || "应用";
+  const version = result.app?.version || result.version?.version;
+  return version ? `${appName} v${version}` : appName;
 };
 
 const statusTagMap: Record<BatchUploadStatus, ReactNode> = {
@@ -62,7 +62,7 @@ const statusTagMap: Record<BatchUploadStatus, ReactNode> = {
   error: <Tag color="error">失败</Tag>,
 };
 
-const BatchWidgetUploadModal = ({
+const BatchAppUploadModal = ({
   open,
   onClose,
   onUploaded,
@@ -98,8 +98,8 @@ const BatchWidgetUploadModal = ({
 
   const handleBeforeUpload: UploadProps["beforeUpload"] = (rawFile) => {
     const file = rawFile as File & { uid: string };
-    if (!file.name.toLowerCase().endsWith(".snwidget")) {
-      message.warning(`${file.name} 不是 .snwidget 文件`);
+    if (!file.name.toLowerCase().endsWith(".snapp")) {
+      message.warning(`${file.name} 不是 .snapp 文件`);
       return false;
     }
 
@@ -135,7 +135,7 @@ const BatchWidgetUploadModal = ({
     for (const item of targets) {
       updateItem(item.uid, { status: "uploading", message: undefined });
       try {
-        const result = await uploadWidgetPackage(item.file);
+        const result = await uploadAppPackage(item.file);
         success += 1;
         updateItem(item.uid, {
           status: "success",
@@ -152,11 +152,11 @@ const BatchWidgetUploadModal = ({
 
     setUploading(false);
     if (success) {
-      message.success(`成功导入/更新 ${success} 个小组件`);
+      message.success(`成功导入/更新 ${success} 个应用`);
       onUploaded();
     }
     if (failed) {
-      message.error(`${failed} 个小组件上传失败，可修正后重试`);
+      message.error(`${failed} 个应用上传失败，可修正后重试`);
     }
   };
 
@@ -169,7 +169,7 @@ const BatchWidgetUploadModal = ({
   return (
     <Modal
       open={open}
-      title="批量上传小组件"
+      title="批量上传应用"
       width={760}
       onCancel={handleClose}
       footer={[
@@ -194,12 +194,12 @@ const BatchWidgetUploadModal = ({
         <Alert
           showIcon
           type="info"
-          message="支持一次选择多个 .snwidget 包"
-          description="系统会按包内 widget.config.json 的 name 自动新增或更新同名小组件，并发布当前包版本。分类、启用状态和排序等运营字段会保留原值。"
+          message="支持一次选择多个 .snapp 包"
+          description="系统会按包内 app.config.json 的 name 自动新增或更新同名应用，并发布当前包版本。分类、启用状态和排序等运营字段会保留原值。"
         />
         <Dragger
           multiple
-          accept=".snwidget"
+          accept=".snapp"
           beforeUpload={handleBeforeUpload}
           showUploadList={false}
           disabled={uploading}
@@ -207,8 +207,8 @@ const BatchWidgetUploadModal = ({
           <p className="ant-upload-drag-icon">
             <RiUploadCloud2Line size={34} />
           </p>
-          <p className="ant-upload-text">点击或拖拽多个 .snwidget 文件到这里</p>
-          <p className="ant-upload-hint">已存在的小组件会按包名自动更新，无需逐个进入表单。</p>
+          <p className="ant-upload-text">点击或拖拽多个 .snapp 文件到这里</p>
+          <p className="ant-upload-hint">已存在的应用会按包名自动更新，无需逐个进入表单。</p>
         </Dragger>
 
         {items.length ? (
@@ -268,14 +268,14 @@ const BatchWidgetUploadModal = ({
   );
 };
 
-const WidgetIndex = () => {
+const AppIndex = () => {
   const navigate = useNavigate();
-  const table = useTablePage(getWidget);
+  const table = useTablePage(getApp);
   const { refresh } = table;
   const [versionTarget, setVersionTarget] = useState<any>(null);
   const [batchUploadOpen, setBatchUploadOpen] = useState(false);
 
-  const { runAsync: delRun } = useRequest(delWidget, {
+  const { runAsync: delRun } = useRequest(delApp, {
     manual: true,
     onSuccess: () => {
       message.success("删除成功");
@@ -283,7 +283,7 @@ const WidgetIndex = () => {
     },
   });
 
-  const { runAsync: updateEnableRun } = useRequest(updateWidgetEnable, {
+  const { runAsync: updateEnableRun } = useRequest(updateAppEnable, {
     manual: true,
     onSuccess: () => {
       message.success("操作成功");
@@ -349,7 +349,7 @@ const WidgetIndex = () => {
       title: "来源",
       dataIndex: "sourceType",
       width: 110,
-      render: (value: string) => value === "snwidget" ? <Tag color="blue">snwidget</Tag> : <Tag>legacy</Tag>,
+      render: (value: string) => value === "snapp" ? <Tag color="blue">snapp</Tag> : <Tag>legacy</Tag>,
     },
     {
       title: "操作",
@@ -361,7 +361,7 @@ const WidgetIndex = () => {
           columns={[
             {
               title: "修改",
-              onClick: () => navigate(TabsPaths.widgetHandle + "/" + record._id),
+              onClick: () => navigate(TabsPaths.appHandle + "/" + record._id),
             },
             {
               title: "版本",
@@ -369,7 +369,7 @@ const WidgetIndex = () => {
             },
             {
               title: record.enable ? "禁用" : "启用",
-              confirm: record.enable ? { title: "确认禁用?", content: "禁用后前台将不再展示该小组件" } : undefined,
+              confirm: record.enable ? { title: "确认禁用?", content: "禁用后前台将不再展示该应用" } : undefined,
               onClick: async () => {
                 await updateEnableRun(record._id);
               },
@@ -397,21 +397,21 @@ const WidgetIndex = () => {
             <Button icon={<RiUploadCloud2Line size={16} />} onClick={() => setBatchUploadOpen(true)}>
               批量上传
             </Button>
-            <Button type="primary" icon={<RiAddLine size={16} />} onClick={() => navigate(TabsPaths.widgetHandle)}>
+            <Button type="primary" icon={<RiAddLine size={16} />} onClick={() => navigate(TabsPaths.appHandle)}>
               新增
             </Button>
           </Space>
         }
       />
-      <BatchWidgetUploadModal
+      <BatchAppUploadModal
         open={batchUploadOpen}
         onClose={() => setBatchUploadOpen(false)}
         onUploaded={refresh}
       />
-      <WidgetVersionModal
+      <AppVersionModal
         open={!!versionTarget}
-        widgetId={versionTarget?._id}
-        widgetName={versionTarget?.name}
+        appId={versionTarget?._id}
+        appName={versionTarget?.name}
         onClose={() => setVersionTarget(null)}
         onPublished={refresh}
       />
@@ -419,4 +419,4 @@ const WidgetIndex = () => {
   );
 };
 
-export default WidgetIndex;
+export default AppIndex;

@@ -1,11 +1,11 @@
 import {
-  addWidgetClassify,
-  getWidgetClassifyDetail,
-  updateWidgetClassify,
-  WidgetClassify,
-} from "@/services/tabs/widget_classify";
+  addAppClassify,
+  getAppClassifyDetail,
+  updateAppClassify,
+  AppClassify,
+} from "@/services/tabs/app_classify";
 import { baseFormItemLayout } from "@/utils/utils";
-import { ModalForm, ProFormInstance, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
+import { ModalForm, ProFormDigit, ProFormInstance, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
 import { RiAddLine } from "@remixicon/react";
 import { useRequest } from "ahooks";
 import { Button, message } from "antd";
@@ -22,9 +22,9 @@ export interface HandleModalProps {
 const ClassifyHandle: FC<HandleModalProps> = (props) => {
   const { onFinished, open, editId, onClose, onDetailLoading } = props;
 
-  const ref = useRef<ProFormInstance<WidgetClassify>>(null);
+  const ref = useRef<ProFormInstance<AppClassify>>(null);
 
-  const { data, loading, run } = useRequest(getWidgetClassifyDetail, {
+  const { data, loading, run } = useRequest(getAppClassifyDetail, {
     manual: true,
   });
 
@@ -47,7 +47,7 @@ const ClassifyHandle: FC<HandleModalProps> = (props) => {
   }, [loading]);
 
   return (
-    <ModalForm<WidgetClassify>
+    <ModalForm<AppClassify>
       {...baseFormItemLayout}
       open={open}
       formRef={ref}
@@ -57,16 +57,16 @@ const ClassifyHandle: FC<HandleModalProps> = (props) => {
         </Button>
       }
       title={editId ? "编辑分类" : "新增分类"}
-      initialValues={{ enable: true }}
+      initialValues={{ enable: true, sortOrder: 0 }}
       onOpenChange={(open) => {
         if (!open) {
           onClose?.();
         }
         ref.current?.resetFields();
       }}
-      onFinish={(values: WidgetClassify) => {
+      onFinish={(values: AppClassify) => {
         return new Promise((resolve) => {
-          (editId ? updateWidgetClassify(editId, values) : addWidgetClassify(values))
+          (editId ? updateAppClassify(editId, values) : addAppClassify(values))
             .then(() => {
               message.success(editId ? "修改成功" : "新增成功");
               onFinished?.(values);
@@ -84,6 +84,7 @@ const ClassifyHandle: FC<HandleModalProps> = (props) => {
     >
       <ProFormText name="name" label="名称" rules={[{ required: true, message: "请输入名称" }]} />
       <ProFormTextArea name="description" label="描述" />
+      <ProFormDigit name="sortOrder" label="排序" fieldProps={{ precision: 0, min: 0 }} />
     </ModalForm>
   );
 };

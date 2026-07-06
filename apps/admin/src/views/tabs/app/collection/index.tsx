@@ -3,7 +3,7 @@ import TablePage from "@/components/TablePage2";
 import Operation from "@/components/TablePage2/Operation";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import { useTablePage } from "@/hooks/useTablePage2";
-import { delWebsiteCollection, getWebsiteCollection } from "@/services/tabs/website_collection";
+import { delAppCollection, getAppCollection } from "@/services/tabs/app_collection";
 import { App, Button, Modal, Switch } from "antd";
 import { useMemo, useState } from "react";
 import { RiAddLine } from "@remixicon/react";
@@ -13,18 +13,18 @@ import { useRequest } from "ahooks";
 
 const { useModal } = Modal;
 
-const WebsiteCollection = () => {
+const AppCollection = () => {
   const navigate = useNavigate();
   const { message } = App.useApp();
   const [modal, contextHolder] = useModal();
   const [onlyActive, setOnlyActive] = useState(true);
 
-  const table = useTablePage(getWebsiteCollection, {
+  const table = useTablePage(getAppCollection, {
     defaultParams: useMemo(() => ({ active: "true" }), []),
   });
   const { refresh, params } = table;
 
-  const { runAsync: delRun } = useRequest(delWebsiteCollection, {
+  const { runAsync: delRun } = useRequest(delAppCollection, {
     manual: true,
     onSuccess: () => {
       message.success("删除成功");
@@ -33,44 +33,13 @@ const WebsiteCollection = () => {
   });
 
   const columns: WindowTableColumnType<any>[] = [
-    {
-      title: "名称",
-      dataIndex: "title",
-      render: (text) => text ?? "-",
-    },
-    {
-      title: "简介",
-      dataIndex: "description",
-      render: (text) => text ?? "-",
-    },
-    {
-      title: "短标题",
-      dataIndex: "kicker",
-      render: (text) => text ?? "-",
-    },
-    {
-      title: "推荐",
-      dataIndex: "featured",
-      width: 80,
-      render: (v) => (v ? "是" : "否"),
-    },
-    {
-      title: "预览数",
-      dataIndex: "itemLimit",
-      width: 90,
-      render: (v) => v ?? 8,
-    },
-    {
-      title: "排序",
-      dataIndex: "sort",
-      width: 80,
-    },
-    {
-      title: "是否启用",
-      dataIndex: "enable",
-      width: 100,
-      render: (v) => (v ? "是" : "否"),
-    },
+    { title: "名称", dataIndex: "title", render: (text) => text ?? "-" },
+    { title: "短标题", dataIndex: "kicker", render: (text) => text ?? "-" },
+    { title: "简介", dataIndex: "description", render: (text) => text ?? "-" },
+    { title: "推荐", dataIndex: "featured", width: 80, render: (v) => (v ? "是" : "否") },
+    { title: "排序", dataIndex: "sort", width: 80 },
+    { title: "预览数", dataIndex: "itemLimit", width: 90, render: (v) => v ?? 8 },
+    { title: "是否启用", dataIndex: "enable", width: 100, render: (v) => (v ? "是" : "否") },
     {
       title: "生效开始",
       dataIndex: "effectiveStart",
@@ -82,11 +51,11 @@ const WebsiteCollection = () => {
       render: (v) => (v ? String(v).slice(0, 19).replace("T", " ") : "-"),
     },
     {
-      title: "网站数",
-      dataIndex: "websites",
-      width: 100,
+      title: "应用数",
+      dataIndex: "apps",
+      width: 110,
       render: (v, record: any) => {
-        if (record?.type === "dynamic") return "动态规则自动生成";
+        if (record?.type === "dynamic") return "按规则自动生成";
         return Array.isArray(v) ? v.length : 0;
       },
     },
@@ -94,17 +63,13 @@ const WebsiteCollection = () => {
       title: "操作",
       dataIndex: "action",
       fixed: "right",
-      width: 180,
+      width: 160,
       render: (_: any, record: any) => (
         <Operation
           columns={[
             {
-              title: "详情",
-              onClick: () => navigate(`${TabsPaths.websiteCollectionDetail}/${record._id}`),
-            },
-            {
-              title: "修改",
-              onClick: () => navigate(`${TabsPaths.websiteCollectionHandle}/${record._id}`),
+              title: "编辑",
+              onClick: () => navigate(`${TabsPaths.appCollectionHandle}/${record._id}`),
             },
             {
               title: "删除",
@@ -133,8 +98,8 @@ const WebsiteCollection = () => {
         showSearch
         columns={columns}
         button={
-          <Button type="primary" icon={<RiAddLine size={16} />} onClick={() => navigate(TabsPaths.websiteCollectionHandle)}>
-            新增
+          <Button type="primary" icon={<RiAddLine size={16} />} onClick={() => navigate(TabsPaths.appCollectionHandle)}>
+            新增应用合集
           </Button>
         }
       >
@@ -158,4 +123,4 @@ const WebsiteCollection = () => {
   );
 };
 
-export default WebsiteCollection;
+export default AppCollection;
