@@ -1,0 +1,117 @@
+name: Build release assets
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+env:
+  RELEASE_BRANCH: release
+
+jobs:
+  build-assets:
+    name: Build and upload release assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve release project
+        id: release
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          tag="${RELEASE_TAG}"
+          project="all"
+          version=""
+
+          if [[ "$tag" =~ ^v(.+)$ ]]; then
+            project="all"
+            version="${BASH_REMATCH[1]}"
+          elif [[ "$tag" =~ ^(.+)-v(.+)$ ]]; then
+            prefix="${BASH_REMATCH[1]}"
+            version="${BASH_REMATCH[2]}"
+            case "$prefix" in
+              api|web|admin|docs|widgets)
+                project="$prefix"
+                ;;
+              *)
+                project="widget:$prefix"
+                ;;
+            esac
+          else
+            echo "Unsupported release tag: $tag" >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "project=$project" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Validate release branch
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          git fetch origin "${RELEASE_BRANCH}:refs/remotes/origin/${RELEASE_BRANCH}"
+          tag_sha="$(git rev-list -n 1 "${RELEASE_TAG}")"
+
+          if ! git merge-base --is-ancestor "${tag_sha}" "origin/${RELEASE_BRANCH}"; then
+            echo "Release tag ${RELEASE_TAG} is not contained in origin/${RELEASE_BRANCH}." >&2
+            echo "Merge the source branch into ${RELEASE_BRANCH}, then create the release from ${RELEASE_BRANCH}." >&2
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Chrome for widget screenshots
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Write optional frontend env files
+        shell: bash
+        env:
+          WEB_PROD_ENV: ${{ secrets.WEB_PROD_ENV }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${WEB_PROD_ENV}" ]]; then
+            printf '%s\n' "${WEB_PROD_ENV}" > apps/web/prod.env
+          else
+            touch apps/web/prod.env
+          fi
+
+      - name: Build release assets
+        env:
+          RELEASE_PROJECT: ${{ steps.release.outputs.project }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          WIDGET_SCREENSHOT_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: pnpm release:prepare
+
+      - name: Upload assets to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: gh release upload "$RELEASE_TAG" dist/releases/* --clobber

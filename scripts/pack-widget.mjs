@@ -6,27 +6,26 @@ import { spawn } from "node:child_process";
 import zlib from "node:zlib";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const name = process.argv.slice(2).find((arg) => arg !== "--");
+const args = process.argv.slice(2).filter((arg) => arg !== "--");
+const all = args.includes("--all");
+const name = args.find((arg) => arg !== "--all");
 const widgetNamePattern = /^[a-z][a-z0-9-]*$/;
 const widgetVersionPattern = /^[0-9A-Za-z][0-9A-Za-z._-]*$/;
 
-if (!name) {
+if ((!all && !name) || (all && name)) {
   console.error("Usage: node scripts/pack-widget.mjs <widget-name>");
+  console.error("   or: node scripts/pack-widget.mjs --all");
   process.exit(1);
 }
 
-if (!widgetNamePattern.test(name)) {
+if (name && !widgetNamePattern.test(name)) {
   console.error("Widget name must use kebab-case: letters, numbers, and dashes only.");
   process.exit(1);
 }
 
 const widgetsRoot = path.resolve(root, "apps", "widgets");
 const buildRoot = path.resolve(root, "dist", "widget-build");
-const widgetDir = path.resolve(widgetsRoot, name);
-const buildDir = path.resolve(buildRoot, name);
 const distDir = path.resolve(root, "dist", "widgets");
-const configFile = path.join(widgetDir, "widget.config.json");
-const screenshotManifestFile = path.join(buildDir, "screenshots", "manifest.json");
 const screenshotScript = path.join(root, "scripts", "capture-widget-screenshots.mjs");
 
 const assertInside = (parent, child, label) => {
@@ -79,7 +78,7 @@ const collect = async (dir, prefix = "") => {
   return files;
 };
 
-const countScreenshotFiles = async () => {
+const countScreenshotFiles = async (buildDir) => {
   const screenshotsDir = path.join(buildDir, "screenshots");
   if (!(await exists(screenshotsDir))) return 0;
   const files = await collect(screenshotsDir, "screenshots");
@@ -153,7 +152,23 @@ const writeZip = async (sourceDir, output) => {
   return files.length;
 };
 
-const main = async () => {
+const listWidgetNames = async () => {
+  const entries = await readdir(widgetsRoot, { withFileTypes: true });
+  const names = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const configFile = path.join(widgetsRoot, entry.name, "widget.config.json");
+    if (await exists(configFile)) names.push(entry.name);
+  }
+  return names.sort();
+};
+
+const packWidget = async (widgetName) => {
+  const widgetDir = path.resolve(widgetsRoot, widgetName);
+  const buildDir = path.resolve(buildRoot, widgetName);
+  const configFile = path.join(widgetDir, "widget.config.json");
+  const screenshotManifestFile = path.join(buildDir, "screenshots", "manifest.json");
+
   assertInside(widgetsRoot, widgetDir, "Widget directory");
   assertInside(buildRoot, buildDir, "Build directory");
   const config = JSON.parse(await readFile(configFile, "utf8"));
@@ -164,16 +179,31 @@ const main = async () => {
     throw new Error("widget.config.json version contains unsupported characters.");
   }
   await rm(buildDir, { recursive: true, force: true });
-  await run("pnpm", ["--filter", `${name}-widget`, "build"], { cwd: root });
+  await run("pnpm", ["--filter", `${widgetName}-widget`, "build"], { cwd: root });
   await cp(configFile, path.join(buildDir, "widget.config.json"));
   if (config.supportIconMode !== false && !(await exists(screenshotManifestFile))) {
     console.log("[pack-widget] Missing screenshots manifest; generating icon screenshots before packing.");
-    await run(process.execPath, [screenshotScript, name], { cwd: root });
+    await run(process.execPath, [screenshotScript, widgetName], { cwd: root });
   }
   const output = path.join(distDir, `${config.name}-${config.version}.snwidget`);
-  const screenshotCount = await countScreenshotFiles();
+  const screenshotCount = await countScreenshotFiles(buildDir);
   const count = await writeZip(buildDir, output);
   console.log(`Packed ${count} files (${screenshotCount} screenshot files) -> ${output}`);
+};
+
+const main = async () => {
+  if (!all) {
+    await packWidget(name);
+    return;
+  }
+
+  const names = await listWidgetNames();
+  if (names.length === 0) throw new Error("No widgets found to pack.");
+  for (const widgetName of names) {
+    console.log(`\n[pack-widget] Packing ${widgetName}`);
+    await packWidget(widgetName);
+  }
+  console.log(`\n[pack-widget] Packed ${names.length} widgets.`);
 };
 
 main().catch((error) => {

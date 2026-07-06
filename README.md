@@ -113,6 +113,56 @@ pnpm build:api
 pnpm build:widgets
 ```
 
+### 发版命令
+
+发版使用通用工具 `release-it` 负责版本选择、tag 和 GitHub Release。发版必须在 `release` 分支执行；Release 发布后，GitHub Actions 会自动校验 tag 属于 `release` 分支，再构建对应项目、打包 `dist/releases` 资产，并上传回这个 Release。发版前可先查看本次更改信息：
+
+```bash
+pnpm release:changes
+```
+
+推荐流程是先把待发布代码合并到 `release` 分支，再做版本发布：
+
+```bash
+git switch release
+git pull --ff-only origin release
+git merge --no-ff <source-branch>
+git push origin release
+```
+
+完整发版使用 `v<version>` tag。发布后会触发 GitHub Actions 构建 API、主站生产包、管理后台、文档站和所有内置小组件：
+
+```bash
+GITHUB_TOKEN=ghp_xxx pnpm release -- 0.14.0
+```
+
+也可以单独发布某个项目。`RELEASE_PROJECT` 支持 `api`、`web`、`admin`、`docs`、`widgets`，以及单个小组件 `widget:<name>`。单项目 tag 会使用 `<project>-v<version>`，例如 `web-v0.14.0`、`todo-v0.2.0`：
+
+```bash
+RELEASE_PROJECT=web GITHUB_TOKEN=ghp_xxx pnpm release -- 0.14.0
+RELEASE_PROJECT=widget:todo GITHUB_TOKEN=ghp_xxx pnpm release -- 0.2.0
+```
+
+如果想先预演流程：
+
+```bash
+RELEASE_PROJECT=web pnpm release:dry -- 0.14.0
+```
+
+如果想先保持草稿状态，使用下面的命令。草稿 Release 不会触发资产构建；在 GitHub 上发布草稿后，`Build release assets` workflow 才会开始构建和上传：
+
+```bash
+RELEASE_DRAFT=true RELEASE_PROJECT=widget:todo GITHUB_TOKEN=ghp_xxx pnpm release -- 0.2.0
+```
+
+也可以只准备本地发布资产，不创建 GitHub Release：
+
+```bash
+RELEASE_PROJECT=web RELEASE_VERSION=0.14.0 pnpm release:prepare
+```
+
+如果主站生产构建需要环境变量，可在仓库 Secrets 中配置 `WEB_PROD_ENV`，内容格式与 `apps/web/prod.env` 一致。GitHub Actions 会在构建前写入该文件；未配置时会创建空的 `prod.env`。
+
 ## 部署指南
 
 推荐部署形态：
