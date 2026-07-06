@@ -5,6 +5,7 @@ import {
   isOperationColumn,
   WINDOW_TABLE_INDEX_COLUMN_DATA_INDEX,
   WINDOW_TABLE_ROW_HEIGHT,
+  WINDOW_TABLE_SELECTION_COLUMN_WIDTH,
   flattenTreeData,
   getAllExpandableKeys,
   FlattenedTreeNode,
@@ -284,7 +285,14 @@ function InternalTable<RecordType extends object = any>(
 
             // 然后将处理后的内容包装在树形结构中
             const cellContent = (
-              <div className="window-table-cell-tree-expand" style={{ paddingLeft: indent }}>
+              <div
+                className="window-table-cell-tree-expand"
+                data-layout="tree-flex-v5"
+                style={{
+                  "--window-table-tree-indent": `${indent}px`,
+                } as React.CSSProperties}
+              >
+                <span className="window-table-cell-tree-expand-indent" />
                 {expandIcon}
                 <div className="window-table-cell-tree-expand-content">{renderedContent}</div>
               </div>
@@ -330,6 +338,22 @@ function InternalTable<RecordType extends object = any>(
   });
 
   const { rows } = table.getRowModel();
+  const visibleLeafColumns = table.getVisibleLeafColumns();
+  const columnSizeSignature = visibleLeafColumns.map((column) => `${column.id}:${column.getSize()}`).join("|");
+  const tableContentWidth =
+    WINDOW_TABLE_SELECTION_COLUMN_WIDTH + visibleLeafColumns.reduce((total, column) => total + column.getSize(), 0);
+  const renderedTableWidth = tableWidth ? Math.max(tableWidth, tableContentWidth) : tableContentWidth;
+  const tableColGroup = useMemo(
+    () => (
+      <colgroup>
+        <col style={{ width: WINDOW_TABLE_SELECTION_COLUMN_WIDTH }} />
+        {visibleLeafColumns.map((column) => (
+          <col key={column.id} style={{ width: column.getSize() }} />
+        ))}
+      </colgroup>
+    ),
+    [columnSizeSignature]
+  );
 
   const disabledRowKeys = useMemo(() => {
     const keys: any[] = [];
@@ -374,7 +398,23 @@ function InternalTable<RecordType extends object = any>(
     return allKeys;
   }, [disabledRowKeys, selectionDisabledRowKeys]);
 
-  const Table = useCallback((props: any) => <table {...props} className={cx("window-table", className)} />, []);
+  const Table = useCallback(
+    ({ children, style, ...tableProps }: any) => (
+      <table
+        {...tableProps}
+        className={cx("window-table", className)}
+        style={{
+          ...style,
+          width: renderedTableWidth,
+          minWidth: tableContentWidth,
+        }}
+      >
+        {tableColGroup}
+        {children}
+      </table>
+    ),
+    [className, renderedTableWidth, tableContentWidth, tableColGroup]
+  );
 
   const TableHead = useCallback((props: any) => {
     return <thead {...props} className="window-table-header" />;

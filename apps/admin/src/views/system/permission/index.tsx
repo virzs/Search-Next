@@ -1,20 +1,19 @@
 import TablePageContainer from "@/components/containter/table";
 import { deletePermission, getPermissionTree } from "@/services/system/permission";
-import { ActionType } from "@ant-design/pro-components";
 import PermissionHandle from "./handle";
-import { useRef, useState } from "react";
-import { App, message } from "antd";
+import { useState } from "react";
+import { App, message, Space, Tag } from "antd";
 import Operation from "@/components/TablePage2/Operation";
 import { useRequest } from "ahooks";
 import TablePage from "@/components/TablePage2";
 import { useTablePage } from "@/hooks/useTablePage2";
 import { WindowTableColumnType } from "@/components/WindowTable";
+import { PermissionMethodTag } from "./method";
 
 const Permission = () => {
   const table = useTablePage(getPermissionTree);
 
   const { modal } = App.useApp();
-  const actionRef = useRef<ActionType>(null);
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | undefined>(undefined);
@@ -24,7 +23,7 @@ const Permission = () => {
     manual: true,
     onSuccess: () => {
       message.success("删除成功");
-      actionRef.current?.reload();
+      table.refresh();
     },
   });
 
@@ -32,28 +31,48 @@ const Permission = () => {
     {
       title: "名称",
       dataIndex: "name",
+      width: 180,
+      minWidth: 150,
     },
     {
       title: "描述",
       dataIndex: "description",
+      width: 100,
+      render: (description, record, _rowIndex, children) => {
+        if (!description || description === record.url) {
+          return "-";
+        }
+        return children;
+      },
     },
     {
       title: "请求方式",
       dataIndex: "method",
+      width: 110,
+      render: (method) => <PermissionMethodTag method={method} />,
     },
     {
       title: "URL",
       dataIndex: "url",
+      width: 220,
+      minWidth: 160,
     },
     {
-      title: "类型",
-      dataIndex: "type",
+      title: "状态",
+      dataIndex: "source",
+      width: 100,
+      render: (_, record) => (
+        <Space size={4}>
+          <Tag color={record.source === "auto" ? "blue" : "default"}>{record.source === "auto" ? "自动" : "手动"}</Tag>
+          {record.isStale ? <Tag color="orange">已失效</Tag> : null}
+        </Space>
+      ),
     },
     {
       title: "操作",
       dataIndex: "action",
       fixed: "right",
-      width: 200,
+      width: 180,
       render: (_, record) => {
         return (
           <Operation
@@ -104,7 +123,7 @@ const Permission = () => {
             open={open}
             editId={editId}
             onFinished={() => {
-              actionRef.current?.reload();
+              table.refresh();
             }}
             onClose={() => {
               setOpen(false);

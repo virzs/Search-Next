@@ -15,7 +15,7 @@ const Text: React.FC<TextProps> = (props) => {
   const { tooltip = true, className, style, content, ...rest } = props;
 
   const textClassName = cx(
-    "inline-block max-w-full overflow-hidden text-ellipsis whitespace-nowrap break-all",
+    "block w-full max-w-full overflow-hidden text-ellipsis whitespace-nowrap break-all",
     className
   );
 

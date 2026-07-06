@@ -9,9 +9,11 @@
     background: var(--ant-table-header-bg);
 
     &-cell {
+      box-sizing: border-box;
       padding: 0 8px;
       text-align: left;
       font-weight: normal;
+      overflow: hidden;
 
       &-title {
         flex: 1;
@@ -87,27 +89,52 @@
   }
 
   &-cell {
+    box-sizing: border-box;
     padding: 0 8px;
     height: 100%;
+    overflow: hidden;
 
     &-content {
       height: 100%;
       display: flex;
       align-items: center;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+
+      >* {
+        flex: 1 1 0;
+        width: 0;
+        min-width: 0;
+        max-width: 100%;
+      }
     }
 
     // 树状数据展开/折叠控件样式
-    &-tree-expand {
-      display: inline-flex;
+      &-tree-expand {
+      // Keep the tree row box constrained by the table cell; indentation must
+      // participate in flex sizing instead of being outer padding.
+      display: flex;
       align-items: center;
+      gap: 4px;
+      box-sizing: border-box;
+      inline-size: 100%;
+      width: 100%;
+      max-inline-size: 100%;
+      max-width: 100%;
+      min-inline-size: 0;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
 
       &-icon {
         display: inline-flex;
+        flex: 0 0 16px;
         align-items: center;
         justify-content: center;
         width: 16px;
         height: 16px;
-        margin-right: 4px;
         cursor: pointer;
         border-radius: 2px;
         transition: all 0.2s;
@@ -131,9 +158,31 @@
         }
       }
 
+      &-indent {
+        display: block;
+        flex: 0 1 var(--window-table-tree-indent, 0px);
+        width: var(--window-table-tree-indent, 0px);
+        min-width: 0;
+        max-width: var(--window-table-tree-indent, 0px);
+        height: 1px;
+      }
+
       &-content {
-        flex: 1;
+        flex: 1 1 0;
+        width: 0;
+        min-width: 0;
+        max-width: 100%;
         overflow: hidden;
+
+        >* {
+          display: block;
+          width: 100%;
+          min-width: 0;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
     }
   }

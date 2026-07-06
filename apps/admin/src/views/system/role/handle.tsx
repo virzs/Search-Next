@@ -1,11 +1,12 @@
 import FullPageContainer from "@/components/containter/full";
-import { getPermissionTree } from "@/services/system/permission";
+import { PermissionListData, getPermissionTree } from "@/services/system/permission";
 import { RoleRequest, detailRolePermissions, postRole, putRole } from "@/services/system/role";
 import { baseFormItemLayout } from "@/utils/utils";
-import { BetaSchemaForm, ProCard, ProFormInstance, ProFormColumnsType } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
-import { Alert, message } from "antd";
-import { useEffect, useRef } from "react";
+import { Alert, Button, Form, Input, message, Space, Tree } from "antd";
+import type { DataNode } from "antd/es/tree";
+import type { Key } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 
 const getRoleFormValues = (role: RoleRequest): RoleRequest => ({
@@ -13,14 +14,47 @@ const getRoleFormValues = (role: RoleRequest): RoleRequest => ({
   permissions: role.permissions ?? [],
 });
 
+const getPermissionTreeData = (permissions: PermissionListData[] = []): DataNode[] => {
+  return permissions.map((item) => ({
+    title: item.name,
+    key: item._id!,
+    children: item.children?.length ? getPermissionTreeData(item.children) : undefined,
+  }));
+};
+
+interface PermissionTreeFieldProps {
+  value?: string[];
+  onChange?: (value: string[]) => void;
+  treeData: DataNode[];
+  disabled?: boolean;
+}
+
+const PermissionTreeField: FC<PermissionTreeFieldProps> = (props) => {
+  const { value = [], onChange, treeData, disabled } = props;
+
+  return (
+    <Tree
+      blockNode
+      checkable
+      disabled={disabled}
+      treeData={treeData}
+      checkedKeys={value}
+      height={420}
+      onCheck={(checked) => {
+        const keys = Array.isArray(checked) ? checked : checked.checked;
+        onChange?.(keys.map((key: Key) => `${key}`));
+      }}
+    />
+  );
+};
+
 const RoleHandle = () => {
   const navigate = useNavigate();
-
-  const { data: pData = [], loading: pLoading } = useRequest(getPermissionTree);
-
   const { id } = useParams();
+  const [form] = Form.useForm<RoleRequest>();
 
-  const ref = useRef<ProFormInstance<RoleRequest> | undefined>(undefined);
+  const { data: pData = [], loading: pLoading } = useRequest(() => getPermissionTree({ simple: true }));
+  const permissionTreeData = useMemo(() => getPermissionTreeData(pData as PermissionListData[]), [pData]);
 
   const { data, loading, run } = useRequest(detailRolePermissions, {
     manual: true,
@@ -31,84 +65,74 @@ const RoleHandle = () => {
   useEffect(() => {
     if (id) {
       run(id);
+    } else {
+      form.resetFields();
     }
   }, [id]);
 
   useEffect(() => {
     if (data) {
-      ref.current?.setFieldsValue(getRoleFormValues(data));
+      form.setFieldsValue(getRoleFormValues(data));
     }
   }, [data]);
 
+  const handleFinish = async (values: RoleRequest) => {
+    if (isSystemRole) {
+      return;
+    }
+
+    const payload = {
+      ...values,
+      permissions: values.permissions ?? [],
+    };
+
+    try {
+      if (id) {
+        await putRole(id, payload);
+      } else {
+        await postRole(payload);
+      }
+      message.success(id ? "修改成功" : "新增成功");
+      form.resetFields();
+      navigate(-1);
+    } catch {
+      return;
+    }
+  };
+
   return (
-    <FullPageContainer>
+    <FullPageContainer loading={pLoading || loading}>
       <div className="max-w-5xl mx-auto">
-        <ProCard>
-          {isSystemRole ? (
-            <Alert className="mb-4" message="系统内置角色不可修改，也不需要配置具体权限。" type="info" showIcon />
+        {isSystemRole ? (
+          <Alert className="mb-4" message="系统内置角色不可修改，也不需要配置具体权限。" type="info" showIcon />
+        ) : null}
+        <Form<RoleRequest>
+          {...baseFormItemLayout}
+          form={form}
+          disabled={isSystemRole}
+          initialValues={{ permissions: [] }}
+          onFinish={handleFinish}
+        >
+          <Form.Item name="name" label="名称" rules={[{ required: true, message: "名称不能为空" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="description" label="描述">
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item name="permissions" label="权限">
+            <PermissionTreeField treeData={permissionTreeData} />
+          </Form.Item>
+          {!isSystemRole ? (
+            <Form.Item wrapperCol={{ offset: 6, span: 14 }}>
+              <Space>
+                <Button type="primary" htmlType="submit">
+                  保存
+                </Button>
+                <Button onClick={() => navigate(-1)}>取消</Button>
+              </Space>
+            </Form.Item>
           ) : null}
-          <BetaSchemaForm<RoleRequest>
-            loading={pLoading || loading}
-            {...baseFormItemLayout}
-            readonly={isSystemRole}
-            submitter={
-              isSystemRole
-                ? false
-                : {
-                    searchConfig: {
-                      submitText: "保存",
-                    },
-                    render(_, dom) {
-                      return <div className="flex items-center justify-center gap-2">{...dom}</div>;
-                    },
-                  }
-            }
-            formRef={ref}
-            onFinish={(values) => {
-              if (isSystemRole) {
-                return Promise.resolve(true);
-              }
-              return new Promise((resolve) => {
-                (id ? putRole(id, values) : postRole(values))
-                  .then(() => {
-                    message.success(id ? "修改成功" : "新增成功");
-                    resolve(true);
-                    ref.current?.resetFields();
-                    navigate(-1);
-                  })
-                  .catch(() => {
-                    resolve(false);
-                  });
-              });
-            }}
-            columns={[
-              {
-                title: "名称",
-                dataIndex: "name",
-                valueType: "text",
-                formItemProps: {
-                  rules: [
-                    {
-                      required: true,
-                      message: "名称不能为空",
-                    },
-                  ],
-                },
-              },
-              {
-                title: "描述",
-                dataIndex: "description",
-                valueType: "textarea",
-              },
-              {
-                title: "权限",
-                dataIndex: "permissions",
-                valueType: "tree" as ProFormColumnsType<RoleRequest>["valueType"],
-                valueEnum: pData,
-              },
-            ]}
-          />
-        </ProCard>
+        </Form>
       </div>
     </FullPageContainer>
   );

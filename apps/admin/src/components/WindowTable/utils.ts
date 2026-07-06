@@ -3,6 +3,7 @@ import { CSSProperties } from "react";
 import { FixedColumn } from "./hooks/useColumnFixed";
 
 export const WINDOW_TABLE_ROW_HEIGHT = 42;
+export const WINDOW_TABLE_SELECTION_COLUMN_WIDTH = 35;
 export const WINDOW_TABLE_INDEX_COLUMN_DATA_INDEX = "table-index";
 export const TABLE_OPERATION_COLUMN_DATA_INDEX = ["operation", "operate"];
 

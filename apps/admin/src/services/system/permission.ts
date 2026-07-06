@@ -12,6 +12,7 @@ export async function getPermissionTree(params: any) {
 }
 
 export interface PermissionListData {
+  _id?: string;
   name: string;
   description: string;
   url: string;
@@ -19,6 +20,12 @@ export interface PermissionListData {
   type: number;
   parent: string;
   level: number;
+  source?: "manual" | "auto";
+  syncKey?: string;
+  isStale?: boolean;
+  lastSyncedAt?: string;
+  staleSince?: string;
+  children?: PermissionListData[] | null;
 }
 
 // /system/permission post
