@@ -10,7 +10,7 @@ const appProjects = {
       {
         type: "app",
         id: "api",
-        build: ["pnpm", ["build:api"]],
+        build: ["pnpm", ["--filter", "search-next-api", "ncc:build"]],
         dist: ["apps/api/dist"],
         assetPrefix: "search-next-api",
       },

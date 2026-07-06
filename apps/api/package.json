@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
+    "ncc:build": "node scripts/clean-dist.js --reset && ncc build src/main.ts -o dist --minify --no-source-map-register && node scripts/clean-dist.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -76,6 +77,7 @@
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
+    "@vercel/ncc": "^0.44.1",
     "cross-env": "^10.0.0",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",

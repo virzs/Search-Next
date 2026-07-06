@@ -107,6 +107,12 @@ pnpm build:admin
 pnpm build:api
 ```
 
+API 发布包使用 ncc 打成单文件输出：
+
+```bash
+pnpm --filter search-next-api ncc:build
+```
+
 内置小组件构建：
 
 ```bash
@@ -183,7 +189,7 @@ pnpm release:prepare -- --project web --version 0.14.0
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm build:api
+pnpm --filter search-next-api ncc:build
 pnpm build
 pnpm build:admin
 pnpm build:widgets

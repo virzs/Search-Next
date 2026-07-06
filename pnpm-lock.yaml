@@ -346,6 +346,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.44.1
         version: 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      '@vercel/ncc':
+        specifier: ^0.44.1
+        version: 0.44.1
       cross-env:
         specifier: ^10.0.0
         version: 10.1.0
@@ -5598,6 +5601,10 @@ packages:
     resolution: {integrity: sha512-nAB74NfSNKknqQ1RrYj6uz8FcXEomu/MATJZxh/x+BArzN2U3JbOYC0APYzUIGhVY3m5hRxA8VPNdPBoG8txlA==}
     cpu: [x64]
     os: [win32]
+
+  '@vercel/ncc@0.44.1':
+    resolution: {integrity: sha512-cUjIE5P2YY1n+Kt9rFIazMMpGoPn1Fic04rOmTkElMkiDP5oszGfERMpo2shVkFKDL7rVppdM2pqJKC59shQWQ==}
+    hasBin: true
 
   '@vis.gl/react-mapbox@8.1.0':
     resolution: {integrity: sha512-FwvH822oxEjWYOr+pP2L8hpv+7cZB2UsQbHHHT0ryrkvvqzmTgt7qHDhamv0EobKw86e1I+B4ojENdJ5G5BkyQ==}
@@ -17265,6 +17272,8 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
+
+  '@vercel/ncc@0.44.1': {}
 
   '@vis.gl/react-mapbox@8.1.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
