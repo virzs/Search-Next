@@ -24,6 +24,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
+      "@search-next/desktop": ["../../packages/desktop/src/index.ts"],
       "@/*": ["./src/*"]
     }
   },

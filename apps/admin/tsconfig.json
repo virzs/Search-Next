@@ -20,6 +20,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
+      "@search-next/desktop": ["../../packages/desktop/src/index.ts"],
       "@/*": ["./src/*"]
     }
   },

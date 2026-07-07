@@ -1,178 +1,117 @@
 import { Button, Tooltip } from "antd";
-import { useEffect, useRef, useState } from "react";
-import { Desktop, DesktopAppItem, DesktopHandle, DesktopListItem, DesktopSortItem } from "zs_library";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { DesktopNext } from "zs_library";
+import type { DesktopNextHandle, TypeConfigMap } from "zs_library";
 import { v4 as uuidv4 } from "uuid";
 import { ProFormRadio, ProFormSelect } from "@ant-design/pro-components";
-import { DesktopThemeConfig, getActiveDesktopThemeConfig } from "@/services/tabs/desktop/theme-config";
-import { RemixiconComponentType, RiBrush2Fill, RiSettingsFill, RiStore2Fill, RiUserFill } from "@remixicon/react";
-import { css, cx } from "@emotion/css";
+import {
+  buildAppLauncherDesktopItem,
+  buildSizedAppDesktopItem,
+  buildDesktopTypeConfigMap,
+  buildWebsiteDesktopItem,
+  createEmptyDesktopPages,
+  DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
+  extractDockItems,
+  toDesktopPages,
+  toDesktopRoots,
+  type DesktopItemData,
+  type DesktopPage,
+  type DesktopRootItem,
+  type DesktopSortItem,
+} from "@search-next/desktop";
+import {
+  DesktopThemeConfig,
+  getActiveDesktopThemeConfig,
+} from "@/services/tabs/desktop/theme-config";
 import WebsiteSelectModal from "./website-select-modal";
 import type { Website } from "@/services/tabs/website_classifty";
-import AppSelectModal, { toBackendAssetUrl } from "./app-select-modal";
+import AppSelectModal, {
+  toBackendAssetUrl,
+  type AppItemWithDesktopSize,
+} from "./app-select-modal";
 import type { AppItem } from "@/services/tabs/app";
+import {
+  adminDesktopItemIconBuilder,
+  createAdminFixedItemBuilder,
+} from "./desktop-rendering";
 
 export interface DesktopEditorProps {
-  value?: any;
-  onChange?: (value: any) => void;
+  value?: {
+    list?: DesktopRootItem[];
+    [key: string]: unknown;
+  };
+  onChange?: (value: {
+    list: DesktopRootItem[];
+    [key: string]: unknown;
+  }) => void;
 }
 
 const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
-  const desktopRef = useRef<DesktopHandle>(null);
-  const initializedRef = useRef<boolean>(false);
-  const [websiteModalOpen, setWebsiteModalOpen] = useState<boolean>(false);
-  const [appModalOpen, setAppModalOpen] = useState<boolean>(false);
+  const desktopRef = useRef<DesktopNextHandle>(null);
+  const initializedRef = useRef(false);
+  const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
+  const [websiteModalOpen, setWebsiteModalOpen] = useState(false);
+  const [appModalOpen, setAppModalOpen] = useState(false);
+  const [componentModalOpen, setComponentModalOpen] = useState(false);
+  const [pages, setPages] = useState<DesktopPage[]>(createEmptyDesktopPages);
+  const [dockItems, setDockItems] = useState<
+    DesktopSortItem<DesktopItemData>[]
+  >([]);
 
-  const [list, setlist] = useState<DesktopListItem[]>([
-    {
-      id: "dock",
-      type: "dock",
-      children: [],
-    },
-  ]);
-
-  const [selectedDesktopTheme, setSelectedDesktopTheme] = useState<DesktopThemeConfig | null>(null);
-  const [selectedDesktopThemeType, setSelectedDesktopThemeType] = useState<"lightConfig" | "darkConfig" | null>(
-    "lightConfig"
-  );
+  const [selectedDesktopTheme, setSelectedDesktopTheme] =
+    useState<DesktopThemeConfig | null>(null);
+  const [selectedDesktopThemeType, setSelectedDesktopThemeType] = useState<
+    "lightConfig" | "darkConfig"
+  >("lightConfig");
 
   useEffect(() => {
-    if (onChange) {
-      onChange({
-        list,
-      });
-    }
-  }, [list]);
+    valueRef.current = value;
+  }, [value]);
 
-  // 仅第一次通过 value 进行回显初始化
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   useEffect(() => {
     if (initializedRef.current) return;
     if (!value) return;
 
-    try {
-      // 回显列表
-      if (Array.isArray((value as any)?.list)) {
-        setlist((value as any).list as DesktopListItem[]);
-        desktopRef.current?.state.setList((value as any).list as DesktopListItem[]);
-      }
-    } finally {
-      initializedRef.current = true;
-    }
+    const list = Array.isArray(value.list) ? value.list : [];
+    setPages(toDesktopPages(list) as DesktopPage[]);
+    setDockItems(extractDockItems(list) as DesktopSortItem<DesktopItemData>[]);
+    initializedRef.current = true;
   }, [value]);
 
-  const createFixedItemBuilder = (i: DesktopSortItem) => {
-    // 封装通用的固定项组件
-    const createFixedItem = ({
-      key,
-      name,
-      IconComponent,
-      backgroundStyle,
-      iconSize,
-      onClick,
-    }: {
-      key: string;
-      name: string;
-      IconComponent: RemixiconComponentType;
-      backgroundStyle: string;
-      iconSize?: number;
-      onClick?: () => void;
-    }) => (
-      <DesktopAppItem
-        key={key}
-        disabledDrag
-        iconSize={56}
-        data={{
-          id: i.id,
-          type: "app",
-          data: { name },
-        }}
-        onClick={onClick}
-        itemIndex={-1}
-        noLetters
-        contextMenuProps={false}
-        icon={
-          <div
-            className={cx(
-              "flex items-center justify-center w-full h-full rounded-lg",
-              css`
-                ${backgroundStyle}
-                color: #fff;
-              `
-            )}
-          >
-            <IconComponent size={iconSize} />
-          </div>
-        }
-      />
-    );
+  useEffect(() => {
+    onChangeRef.current?.({
+      ...(valueRef.current ?? {}),
+      list: toDesktopRoots(pages, dockItems),
+    });
+  }, [dockItems, pages]);
 
-    switch (i.id) {
-      case "*:my":
-        return createFixedItem({
-          key: "my",
-          name: "账号",
-          IconComponent: RiUserFill,
-          backgroundStyle: "background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);",
-        });
-      case "*:theme":
-        return createFixedItem({
-          key: "theme",
-          name: "主题",
-          IconComponent: RiBrush2Fill,
-          backgroundStyle: `background: conic-gradient(from 0deg at center,
-            #ff0000 0deg, #ff8000 60deg, #ffff00 120deg,
-            #80ff00 180deg, #00ff80 240deg, #0080ff 300deg, #ff0000 360deg);`,
-          iconSize: 28,
-        });
-      case "*:store":
-        return createFixedItem({
-          key: "store",
-          name: "应用商店",
-          IconComponent: RiStore2Fill,
-          backgroundStyle: "background: linear-gradient(135deg, #0066ff 0%, #3399ff 50%, #66b3ff 100%);",
-        });
-      case "*:settings":
-        return createFixedItem({
-          key: "settings",
-          name: "设置",
-          IconComponent: RiSettingsFill,
-          backgroundStyle: "background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);",
-        });
-      default:
-        return null;
-    }
-  };
+  const typeConfigMap = useMemo(
+    () => buildDesktopTypeConfigMap([], pages) as TypeConfigMap,
+    [pages],
+  );
 
-  const getAppEntryUrl = (app: AppItem) => {
-    const snapshotEntry =
-      typeof app.configSnapshot?.entryUrl === "string"
-        ? app.configSnapshot.entryUrl
-        : undefined;
-    const entry =
-      app.entryUrl ||
-      snapshotEntry ||
-      (app.dir && app.entryFileName
-        ? `/uploads/${app.dir}/${app.entryFileName}`
-        : "");
-    return toBackendAssetUrl(entry);
-  };
-
-  const getAppIconUrl = (app: AppItem) => {
-    const snapshotIconUrl =
-      typeof app.configSnapshot?.appIconUrl === "string"
-        ? app.configSnapshot.appIconUrl
-        : undefined;
-    const appIcon =
-      (app.appIcon || app.configSnapshot?.appIcon) as
-        | AppItem["appIcon"]
-        | undefined;
-    if (appIcon?.type === "custom") return "";
-    return toBackendAssetUrl(
-      app.appIconUrl ||
-        snapshotIconUrl ||
-        app.iconUrl ||
-        app.icon?.url ||
-        "",
-    );
+  const addItemsToCurrentPage = (items: DesktopSortItem<DesktopItemData>[]) => {
+    if (!items.length) return;
+    setPages((currentPages) => {
+      const sourcePages = currentPages.length
+        ? currentPages
+        : createEmptyDesktopPages();
+      const currentPageIndex = desktopRef.current?.currentPage ?? 0;
+      const targetPageIndex = Math.min(
+        Math.max(currentPageIndex, 0),
+        sourcePages.length - 1,
+      );
+      return sourcePages.map((page, index) =>
+        index === targetPageIndex
+          ? { ...page, children: [...page.children, ...items] }
+          : page,
+      );
+    });
   };
 
   return (
@@ -196,10 +135,15 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
                 return (
                   <div className="flex flex-wrap items-center gap-2">
                     {entries.map(([prop, color]) => (
-                      <Tooltip key={prop} title={`${(color as string) || "未设置"}`}>
+                      <Tooltip
+                        key={prop}
+                        title={`${(color as string) || "未设置"}`}
+                      >
                         <div
                           className="w-4 h-4 rounded border"
-                          style={{ backgroundColor: (color as string) || "transparent" }}
+                          style={{
+                            backgroundColor: (color as string) || "transparent",
+                          }}
                         />
                       </Tooltip>
                     ))}
@@ -214,7 +158,9 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
                   {renderBaseSwatches(lightConfig)}
                   {darkConfig ? (
                     <>
-                      <div className="text-xs text-gray-400 mt-1 mb-1">深色基础色</div>
+                      <div className="text-xs text-gray-400 mt-1 mb-1">
+                        深色基础色
+                      </div>
                       {renderBaseSwatches(darkConfig)}
                     </>
                   ) : null}
@@ -230,7 +176,7 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
           request={getActiveDesktopThemeConfig}
         />
         <ProFormRadio.Group
-          name="radio-group"
+          name="desktop-theme-type"
           radioType="button"
           options={[
             {
@@ -244,13 +190,19 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
           ]}
           fieldProps={{
             value: selectedDesktopThemeType,
-            onChange: (value) => {
-              setSelectedDesktopThemeType(value.target.value as "lightConfig" | "darkConfig");
+            onChange: (event) => {
+              setSelectedDesktopThemeType(
+                event.target.value as "lightConfig" | "darkConfig",
+              );
             },
           }}
         />
         <div className="flex mb-2">
-          <Button type="primary" className="w-full" onClick={() => setWebsiteModalOpen(true)}>
+          <Button
+            type="primary"
+            className="w-full"
+            onClick={() => setWebsiteModalOpen(true)}
+          >
             选择网站并添加
           </Button>
         </div>
@@ -259,79 +211,44 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
             选择应用并添加
           </Button>
         </div>
+        <div className="flex mb-2">
+          <Button className="w-full" onClick={() => setComponentModalOpen(true)}>
+            选择组件并添加
+          </Button>
+        </div>
       </div>
-      <Desktop
+      <DesktopNext<DesktopItemData>
         ref={desktopRef}
         className="h-full flex-grow"
-        enableCaching={false}
-        theme={selectedDesktopTheme?.[selectedDesktopThemeType || "lightConfig"]}
-        list={list}
-        onChange={(d) => {
-          setlist(d);
-        }}
-        dock={{
-          enabled: true,
-          fixedItems: [
-            {
-              id: "*:my",
-              type: "app",
-              data: {
-                name: "账号",
-              },
-            },
-            {
-              id: "*:theme",
-              type: "app",
-              data: {
-                name: "主题",
-              },
-            },
-            {
-              id: "*:store",
-              type: "app",
-              data: {
-                name: "应用商店",
-              },
-            },
-            {
-              id: "*:settings",
-              type: "app",
-              data: {
-                name: "设置",
-              },
-            },
-          ],
-          fixedItemBuilder: createFixedItemBuilder,
+        pages={pages}
+        onChange={(nextPages) => setPages(nextPages as DesktopPage[])}
+        maxPages={5}
+        theme={selectedDesktopTheme?.[selectedDesktopThemeType]}
+        typeConfigMap={typeConfigMap}
+        contextMenuProps={{ showRemoveButton: true }}
+        itemIconBuilder={adminDesktopItemIconBuilder}
+        dockProps={{
+          items: dockItems,
+          fixedItems: DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
+          fixedItemBuilder: createAdminFixedItemBuilder,
         }}
       />
       <WebsiteSelectModal
         open={websiteModalOpen}
         onCancel={() => setWebsiteModalOpen(false)}
         onOk={(websites: Website[]) => {
-          if (!websites || !websites.length) {
-            setWebsiteModalOpen(false);
-            return;
-          }
-          const firstGroup = list.filter((item) => item.type === "page")[0];
-          const items = websites.map((w) => ({
-            id: uuidv4(),
-            type: "app" as const,
-            data: {
-              name: w.name,
-              icon: w.iconEdited?.url || w.icon?.url,
-              iconColor: (w as any)?.themeColor,
-              url: w.url,
-            },
-          }));
-          if (firstGroup) {
-            items.forEach((item) => desktopRef.current?.state.addItem(item, [firstGroup.id]));
-          } else {
-            desktopRef.current?.state?.addRootItem({
-              id: uuidv4(),
-              type: "page",
-              children: items,
-            });
-          }
+          const items = (websites ?? [])
+            .filter((website) => Boolean(website?.url))
+            .map((website) =>
+              buildWebsiteDesktopItem({
+                id: uuidv4(),
+                name: website.name,
+                icon: website.iconEdited?.url || website.icon?.url,
+                iconColor: (website as any)?.themeColor,
+                url: website.url,
+              }),
+            );
+          addItemsToCurrentPage(items);
           setWebsiteModalOpen(false);
         }}
       />
@@ -339,58 +256,46 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
         open={appModalOpen}
         onCancel={() => setAppModalOpen(false)}
         onOk={(apps: AppItem[]) => {
-          if (!apps || !apps.length) {
-            setAppModalOpen(false);
-            return;
-          }
-          const firstGroup = list.filter((item) => item.type === "page")[0];
-          const items = apps.map((app) => {
-            const appIcon =
-              (app.appIcon || app.configSnapshot?.appIcon) as
-                | AppItem["appIcon"]
-                | undefined;
-            const appIconUrl = getAppIconUrl(app);
-            return {
-              id: uuidv4(),
-              type: "app" as const,
-              dataType: `app-launcher:${app._id}`,
-              data: {
+          const items = (apps ?? [])
+            .map((app) =>
+              buildAppLauncherDesktopItem(app, {
+                instanceId: uuidv4(),
+                appId: app._id,
                 name: app.name,
-                ...(appIconUrl ? { icon: appIconUrl } : {}),
-                appConfig: {
-                  id: app._id || "",
-                  name: app.name,
-                  entry: getAppEntryUrl(app),
-                  props: { title: app.name },
-                  defaultSizeId: app.defaultSizeId,
-                  supportAppMode: Boolean(
-                    (app.configSnapshot?.supportAppMode as boolean | undefined) ??
-                      app.supportAppMode,
-                  ),
-                  appIcon,
-                  appIconUrl,
-                  sourceType: app.sourceType,
-                  version:
-                    (app.configSnapshot?.version as string | undefined) ??
-                    app.version,
-                  author:
-                    (app.configSnapshot?.author as string | undefined) ??
-                    app.author,
-                  description: app.description,
-                },
-              },
-            };
-          });
-          if (firstGroup) {
-            items.forEach((item) => desktopRef.current?.state.addItem(item, [firstGroup.id]));
-          } else {
-            desktopRef.current?.state?.addRootItem({
-              id: uuidv4(),
-              type: "page",
-              children: items,
-            });
-          }
+                description: app.description,
+                resolveAssetUrl: toBackendAssetUrl,
+              }),
+            )
+            .filter(
+              (item): item is DesktopSortItem<DesktopItemData> => item !== null,
+            );
+          addItemsToCurrentPage(items);
           setAppModalOpen(false);
+        }}
+      />
+      <AppSelectModal
+        open={componentModalOpen}
+        mode="component"
+        title="选择组件"
+        okText="添加组件"
+        onCancel={() => setComponentModalOpen(false)}
+        onOk={(apps: AppItemWithDesktopSize[]) => {
+          const items = (apps ?? [])
+            .map((app) =>
+              buildSizedAppDesktopItem(app, {
+                instanceId: uuidv4(),
+                appId: app._id,
+                name: app.name,
+                description: app.description,
+                sizeId: app.desktopSizeId,
+                resolveAssetUrl: toBackendAssetUrl,
+              }),
+            )
+            .filter(
+              (item): item is DesktopSortItem<DesktopItemData> => item !== null,
+            );
+          addItemsToCurrentPage(items);
+          setComponentModalOpen(false);
         }}
       />
     </div>

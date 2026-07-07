@@ -8,8 +8,6 @@ import "zs_library/style.css";
 import type {
   ContextMenuActionPayload,
   DataTypeMenuConfigMap,
-  DndPageItem,
-  DndSortItem,
   TypeConfigMap,
 } from "zs_library";
 import { css, cx } from "@emotion/css";
@@ -26,7 +24,23 @@ import {
   RemixiconComponentType,
   RiUserLine,
 } from "@remixicon/react";
-import type { DesktopItemData } from "../../types";
+import {
+  createEmptyDesktopPages,
+  buildDesktopTypeConfigMap,
+  extractDockItems,
+  getAppDesktopType,
+  getAppLauncherDesktopType,
+  getDesktopItemAppId,
+  hasDesktopPagesContent,
+  hasDesktopRootsContent,
+  preserveDesktopPageMetadata,
+  toDesktopPages,
+  toDesktopRoots,
+  type DesktopItemData,
+  type DesktopPage,
+  type DesktopRootItem,
+  type DesktopSortItem,
+} from "@search-next/desktop";
 // import SearchWithAI from "../../components/ai-search";
 import { App } from "antd";
 import {
@@ -83,29 +97,13 @@ import {
   useI18n,
 } from "@/i18n";
 
-type DesktopItem = DndSortItem<DesktopItemData>;
-type DesktopPage = DndPageItem<DesktopItemData> & {
-  type?: string;
-  config?: Record<string, unknown>;
-  data?: Record<string, unknown>;
-};
+type DesktopItem = DesktopSortItem<DesktopItemData>;
 type DesktopNextHandleRef = {
   pages: DesktopPage[];
   currentPage: number;
   setCurrentPage: (page: number) => void;
 };
 
-type DesktopRootItem = {
-  id: string | number;
-  type?: string;
-  config?: Record<string, unknown>;
-  data?: Record<string, unknown>;
-  children?: DesktopStorageItem[];
-};
-
-type DesktopStorageItem = Omit<DesktopItem, "children"> & {
-  children?: DesktopStorageItem[];
-};
 type DesktopAppAvailability =
   | { status: "available"; app?: AppApiItem; isDev?: boolean }
   | { status: "checking" }
@@ -113,146 +111,6 @@ type DesktopAppAvailability =
       status: "unavailable";
       reason: "disabledOrDeleted" | "verificationFailed";
     };
-
-const getAppDesktopType = (item: Pick<DesktopItem, "type" | "dataType">) => {
-  if (
-    typeof item.type === "string" &&
-    item.type.startsWith("app:") &&
-    !item.type.startsWith("app-launcher:")
-  ) {
-    return item.type;
-  }
-  if (
-    typeof item.dataType === "string" &&
-    item.dataType.startsWith("app:") &&
-    !item.dataType.startsWith("app-launcher:")
-  ) {
-    return item.dataType;
-  }
-  if (typeof item.type === "string" && item.type.startsWith("widget:")) {
-    return `app:${item.type.slice("widget:".length)}`;
-  }
-  if (
-    typeof item.dataType === "string" &&
-    item.dataType.startsWith("widget:")
-  ) {
-    return `app:${item.dataType.slice("widget:".length)}`;
-  }
-  return null;
-};
-
-const getAppLauncherDesktopType = (
-  item: Pick<DesktopItem, "type" | "dataType" | "data">,
-) => {
-  if (
-    item.type === "app" &&
-    typeof item.dataType === "string" &&
-    item.dataType.startsWith("app-launcher:")
-  ) {
-    return item.dataType;
-  }
-  if (
-    item.type === "app" &&
-    typeof item.dataType === "string" &&
-    item.dataType.startsWith("widget-app:")
-  ) {
-    return `app-launcher:${item.dataType.slice("widget-app:".length)}`;
-  }
-  const appId = item.data?.appConfig?.id;
-  if (item.type === "app" && typeof appId === "string" && appId) {
-    return `app-launcher:${appId}`;
-  }
-  const legacyAppId = (item.data as any)?.widgetConfig?.id;
-  if (item.type === "app" && typeof legacyAppId === "string" && legacyAppId) {
-    return `app-launcher:${legacyAppId}`;
-  }
-  return null;
-};
-
-const getDesktopItemAppId = (
-  item: Pick<DesktopItem, "type" | "dataType" | "data">,
-) => {
-  const appConfigId = item.data?.appConfig?.id;
-  if (typeof appConfigId === "string" && appConfigId) return appConfigId;
-
-  const legacyAppId = (item.data as any)?.widgetConfig?.id;
-  if (typeof legacyAppId === "string" && legacyAppId) return legacyAppId;
-
-  const appLauncherDesktopType = getAppLauncherDesktopType(item);
-  if (appLauncherDesktopType) {
-    return appLauncherDesktopType.replace("app-launcher:", "");
-  }
-
-  const appDesktopType = getAppDesktopType(item);
-  if (appDesktopType) return appDesktopType.replace("app:", "");
-
-  return null;
-};
-
-const normalizeAppDesktopItem = (
-  item: DesktopStorageItem,
-): DesktopStorageItem => {
-  const legacyConfig = (item.data as any)?.widgetConfig;
-  const data = (legacyConfig && !item.data?.appConfig
-    ? { ...(item.data ?? {}), appConfig: legacyConfig }
-    : item.data) as DesktopStorageItem["data"];
-  const itemWithData = { ...item, data } as DesktopStorageItem;
-  const appLauncherType = getAppLauncherDesktopType(itemWithData);
-  const appType = getAppDesktopType(itemWithData);
-  return {
-    ...item,
-    ...(appLauncherType
-      ? { type: "app", dataType: appLauncherType }
-      : appType
-        ? { type: appType, dataType: appType }
-        : {}),
-    data,
-    children: item.children?.map(normalizeAppDesktopItem),
-  };
-};
-
-const normalizeAppDesktopList = (list: DesktopRootItem[]): DesktopPage[] =>
-  list
-    .filter((root) => root.id !== "dock")
-    .map((root, index) => ({
-      ...root,
-      id: root.id ?? `page-${index + 1}`,
-      type: root.type ?? "page",
-      children: root.children?.map(normalizeAppDesktopItem) ?? [],
-    }));
-
-const hasDesktopChildren = (
-  items: Array<{ children?: DesktopStorageItem[] }> | undefined,
-): boolean => {
-  return Boolean(items?.length);
-};
-
-const hasDesktopPagesContent = (pages: DesktopPage[]): boolean =>
-  pages.some((page) => hasDesktopChildren(page.children));
-
-const hasDesktopRootsContent = (roots: DesktopRootItem[]): boolean =>
-  roots.some((root) => hasDesktopChildren(root.children));
-
-const createEmptyDesktopPages = (): DesktopPage[] => [
-  { id: "page-1", type: "page", children: [] },
-];
-
-const preserveDesktopPageMetadata = (
-  pages: DesktopPage[],
-  previousPages: DesktopPage[],
-): DesktopPage[] =>
-  pages.map((page, index) => {
-    const previous = previousPages[index];
-    return {
-      ...previous,
-      ...page,
-      id: previous?.id ?? page.id ?? `page-${index + 1}`,
-      type: page.type ?? previous?.type ?? "page",
-      config: page.config ?? previous?.config,
-      data: page.data ?? previous?.data,
-      children: page.children ?? [],
-    };
-  });
 
 const firstDefined = <T,>(...values: Array<T | null | undefined>) =>
   values.find((value): value is T => value !== undefined && value !== null);
@@ -297,13 +155,7 @@ const readStoredDesktopRoots = (): DesktopRootItem[] => {
 };
 
 const readStoredDockItems = (): DesktopItem[] => {
-  const dockRoot = readStoredDesktopRoots().find((root) => root.id === "dock");
-  return dockRoot?.children?.map(normalizeAppDesktopItem) ?? [];
-};
-
-const extractDockItems = (list: DesktopRootItem[]): DesktopItem[] => {
-  const dockRoot = list.find((root) => root.id === "dock");
-  return dockRoot?.children?.map(normalizeAppDesktopItem) ?? [];
+  return extractDockItems(readStoredDesktopRoots()) as DesktopItem[];
 };
 
 const persistDesktopStorage = (
@@ -323,44 +175,21 @@ const persistDesktopStorage = (
     return;
   }
 
-  const roots: DesktopRootItem[] = [
-    { id: "dock", type: "dock", children: dockItems },
-    ...nextPages.map((page, index) => ({
-      ...page,
-      id: page.id ?? `page-${index + 1}`,
-      type: page.type ?? "page",
-    })),
-  ];
+  const roots = toDesktopRoots(nextPages, dockItems);
   localStorage.setItem(DESKTOP_LIST_STORAGE_KEY, JSON.stringify(roots));
 };
 
-const toDesktopNextPages = (list: DesktopRootItem[]): DesktopPage[] => {
-  const pages = normalizeAppDesktopList(list);
-
-  return pages.length ? pages : createEmptyDesktopPages();
-};
-
 const readStoredDesktopPages = (): DesktopPage[] => {
-  return toDesktopNextPages(readStoredDesktopRoots());
-};
-
-const migrateStoredAppDesktopList = () => {
-  const roots = readStoredDesktopRoots();
-  if (!roots.length) return;
-  persistDesktopStorage(toDesktopNextPages(roots), readStoredDockItems());
+  return toDesktopPages(readStoredDesktopRoots()) as DesktopPage[];
 };
 
 function Index() {
-  useState(migrateStoredAppDesktopList);
-
   const desktopRef = useRef<DesktopNextHandleRef>(null);
   const initialDesktopPagesRef = useRef<DesktopPage[] | null>(null);
   if (!initialDesktopPagesRef.current) {
     initialDesktopPagesRef.current = readStoredDesktopPages();
   }
-  const desktopPagesRef = useRef<DesktopPage[]>(
-    initialDesktopPagesRef.current,
-  );
+  const desktopPagesRef = useRef<DesktopPage[]>(initialDesktopPagesRef.current);
   const dockItemsRef = useRef<DesktopItem[]>(readStoredDockItems());
   const [desktopPages, setDesktopPages] = useState<DesktopPage[]>(
     () => initialDesktopPagesRef.current ?? createEmptyDesktopPages(),
@@ -560,8 +389,7 @@ function Index() {
         mergedThemeConfigs,
         activeThemeId,
         preferDark,
-      ) ??
-      (preferDark ? desktopNextThemeDark : desktopNextThemeLight)
+      ) ?? (preferDark ? desktopNextThemeDark : desktopNextThemeLight)
     );
   }, [activeThemeId, myThemeConfigs, preferDark, themeConfigs]);
 
@@ -642,11 +470,7 @@ function Index() {
   };
 
   const buildSDK = useCallback(
-    (
-      appId: string,
-      sizeId: string,
-      mode: AppMode,
-    ): AppSDK => {
+    (appId: string, sizeId: string, mode: AppMode): AppSDK => {
       const deps = sdkDepsRef.current;
       return createHostSDK({
         appId,
@@ -884,14 +708,7 @@ function Index() {
     setDesktopPages(nextPages);
     setDockItems(nextDockItems);
     persistDesktopStorage(nextPages, nextDockItems);
-  }, [
-    appMap,
-    appsLoaded,
-    createAppConfigFromApi,
-    devAppMap,
-    getAppIconUrl,
-    t,
-  ]);
+  }, [appMap, appsLoaded, createAppConfigFromApi, devAppMap, getAppIconUrl, t]);
 
   const openAppWindow = useCallback(
     async ({
@@ -918,10 +735,7 @@ function Index() {
         });
         return;
       }
-      const resolvedAppConfig = await resolveAppConfigFresh(
-        appId,
-        appConfig,
-      );
+      const resolvedAppConfig = await resolveAppConfigFresh(appId, appConfig);
       if (resolvedAppConfig === null) {
         openAvailabilityModal("unavailable", {
           name: appConfig?.name || fallbackTitle,
@@ -990,38 +804,7 @@ function Index() {
 
   /** 根据后端应用数据动态构建 Desktop 的 typeConfigMap */
   const typeConfigMap = useMemo((): TypeConfigMap => {
-    const map: TypeConfigMap = {};
-    const applyConfig = (key: string, config: TypeConfigMap[string]) => {
-      map[key] = config;
-    };
-
-    for (const w of apps) {
-      const config = {
-        sizeConfigs: w.sizeConfigs?.length
-          ? w.sizeConfigs
-          : [{ row: 2, col: 2, name: "2x2", id: "2x2" }],
-        defaultSizeId: w.defaultSizeId || w.sizeConfigs?.[0]?.id || "2x2",
-        allowShare: false,
-        allowInfo: false,
-        allowDelete: true,
-        allowResize: (w.sizeConfigs?.length ?? 0) > 1,
-      };
-      applyConfig(`app:${w._id}`, config);
-    }
-    for (const dw of devApps) {
-      const config = {
-        sizeConfigs: dw.sizeConfigs?.length
-          ? dw.sizeConfigs
-          : [{ row: 2, col: 2, name: "2x2", id: "2x2" }],
-        defaultSizeId: dw.defaultSizeId || dw.sizeConfigs?.[0]?.id || "2x2",
-        allowShare: false,
-        allowInfo: false,
-        allowDelete: true,
-        allowResize: (dw.sizeConfigs?.length ?? 0) > 1,
-      };
-      applyConfig(`app:${dw.id}`, config);
-    }
-    return map;
+    return buildDesktopTypeConfigMap([...apps, ...devApps]) as TypeConfigMap;
   }, [apps, devApps]);
 
   const dataTypeMenuConfigMap = useMemo((): DataTypeMenuConfigMap => {
@@ -1071,11 +854,11 @@ function Index() {
           ignoreDesktopChangeUntilRef.current,
           Date.now() + 2000,
         );
-        const nextPages = toDesktopNextPages(roots);
+        const nextPages = toDesktopPages(roots) as DesktopPage[];
         const storedDockItems = dockItemsRef.current;
         const nextDockItems = storedDockItems.length
           ? storedDockItems
-          : extractDockItems(roots);
+          : (extractDockItems(roots) as DesktopItem[]);
         dockItemsRef.current = nextDockItems;
         setDockItems(nextDockItems);
         persistDesktopPages(nextPages, true);
@@ -1192,7 +975,6 @@ function Index() {
             ),
         });
       case "*:personalization":
-      case "*:theme":
         return createFixedItem({
           key: "personalization",
           name: t("ui.personalization"),
@@ -1228,66 +1010,69 @@ function Index() {
     }
   };
 
-  const createDockHistoryItem = useCallback((item: DesktopItem) => {
-    const icon = getStringIcon(item.data?.icon);
-    const name = item.data?.name || t("ui.app");
-    const appId = getDesktopItemAppId(item);
-    const availability = appId
-      ? resolveDesktopAppAvailability(appId)
-      : ({ status: "available" } as DesktopAppAvailability);
+  const createDockHistoryItem = useCallback(
+    (item: DesktopItem) => {
+      const icon = getStringIcon(item.data?.icon);
+      const name = item.data?.name || t("ui.app");
+      const appId = getDesktopItemAppId(item);
+      const availability = appId
+        ? resolveDesktopAppAvailability(appId)
+        : ({ status: "available" } as DesktopAppAvailability);
 
-    if (availability.status !== "available") {
+      if (availability.status !== "available") {
+        return (
+          <div className="h-14 w-14 overflow-visible rounded-[16px]">
+            {renderAppAvailabilityPlaceholder({
+              status: availability.status,
+              name,
+              icon,
+            })}
+          </div>
+        );
+      }
+
       return (
-        <div className="h-14 w-14 overflow-visible rounded-[16px]">
-          {renderAppAvailabilityPlaceholder({
-            status: availability.status,
-            name,
-            icon,
-          })}
-        </div>
+        <button
+          type="button"
+          title={name}
+          className={cx(
+            "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[16px] border-0 p-0",
+            css`
+              position: relative;
+              background: rgba(255, 255, 255, 0.16);
+              border: 1px solid rgba(255, 255, 255, 0.28);
+              box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+              -webkit-backdrop-filter: blur(22px) saturate(1.25);
+              backdrop-filter: blur(22px) saturate(1.25);
+
+              &::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(
+                  120% 90% at 30% 18%,
+                  rgba(255, 255, 255, 0.38) 0%,
+                  rgba(255, 255, 255, 0) 62%
+                );
+                pointer-events: none;
+              }
+            `,
+          )}
+        >
+          {icon ? (
+            <DesktopImageIcon src={icon} name={name} />
+          ) : (
+            <span className="relative z-1 text-lg font-semibold text-white">
+              {name.charAt(0)}
+            </span>
+          )}
+        </button>
       );
-    }
-
-    return (
-      <button
-        type="button"
-        title={name}
-        className={cx(
-          "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[16px] border-0 p-0",
-          css`
-            position: relative;
-            background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            box-shadow:
-              0 8px 18px rgba(0, 0, 0, 0.18),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            -webkit-backdrop-filter: blur(22px) saturate(1.25);
-            backdrop-filter: blur(22px) saturate(1.25);
-
-            &::before {
-              content: "";
-              position: absolute;
-              inset: 0;
-              background: radial-gradient(
-                120% 90% at 30% 18%,
-                rgba(255, 255, 255, 0.38) 0%,
-                rgba(255, 255, 255, 0) 62%
-              );
-              pointer-events: none;
-            }
-          `,
-        )}
-      >
-        {icon ? (
-          <DesktopImageIcon src={icon} name={name} />
-        ) : (
-          <span className="relative z-1 text-lg font-semibold text-white">
-            {name.charAt(0)}
-          </span>
-        )}
-      </button>
-    );
-  }, [renderAppAvailabilityPlaceholder, resolveDesktopAppAvailability, t]);
+    },
+    [renderAppAvailabilityPlaceholder, resolveDesktopAppAvailability, t],
+  );
 
   useEffect(() => {
     runDefaultDesktop();
@@ -1453,8 +1238,7 @@ function Index() {
 
       const appConfig = item.data?.appConfig;
       const appId =
-        appConfig?.id ??
-        appLauncherDesktopType?.replace("app-launcher:", "");
+        appConfig?.id ?? appLauncherDesktopType?.replace("app-launcher:", "");
       if (!appId) return;
       const latestApp = apps.find((app) => app._id === appId);
       const latestDevApp = devApps.find((app) => app.id === appId);
@@ -1466,20 +1250,20 @@ function Index() {
         appId,
         appName: latestApp
           ? resolveAppDisplayName(latestApp, language, appConfig)
-          : latestDevApp?.name ??
+          : (latestDevApp?.name ??
             appConfig?.name ??
             item.data?.name ??
-            t("ui.app"),
+            t("ui.app")),
         appConfig: {
           ...(appConfig ?? {}),
           ...(latestConfig ?? {}),
           id: appId,
           name: latestApp
             ? resolveAppDisplayName(latestApp, language, appConfig)
-            : latestDevApp?.name ??
+            : (latestDevApp?.name ??
               appConfig?.name ??
               item.data?.name ??
-              t("ui.app"),
+              t("ui.app")),
           entry:
             latestConfig?.entry ??
             latestDevApp?.entry ??
@@ -1547,11 +1331,15 @@ function Index() {
               const appId = getDesktopItemAppId(item);
               const availability = appId
                 ? resolveDesktopAppAvailability(appId)
-                : ({ status: "unavailable", reason: "verificationFailed" } as const);
+                : ({
+                    status: "unavailable",
+                    reason: "verificationFailed",
+                  } as const);
               if (availability.status !== "available") {
                 return renderAppAvailabilityPlaceholder({
                   status: availability.status,
-                  name: item.data?.name || appLauncherConfig?.name || t("ui.app"),
+                  name:
+                    item.data?.name || appLauncherConfig?.name || t("ui.app"),
                   icon: appLauncherConfig?.appIconUrl ?? itemIcon,
                 });
               }
@@ -1561,18 +1349,22 @@ function Index() {
               appLauncherConfig?.appIcon?.type === "custom"
             ) {
               const appId =
-                appLauncherConfig.id || appLauncherDesktopType.replace("app-launcher:", "");
+                appLauncherConfig.id ||
+                appLauncherDesktopType.replace("app-launcher:", "");
               const availability = resolveDesktopAppAvailability(appId);
               if (availability.status !== "available") {
                 return renderAppAvailabilityPlaceholder({
                   status: availability.status,
-                  name: item.data?.name || appLauncherConfig.name || t("ui.app"),
+                  name:
+                    item.data?.name || appLauncherConfig.name || t("ui.app"),
                   icon: appLauncherConfig.appIconUrl ?? itemIcon,
                 });
               }
               const renderConfig = availability.app
-                ? createAppConfigFromApi(availability.app, appLauncherConfig) ??
-                  appLauncherConfig
+                ? (createAppConfigFromApi(
+                    availability.app,
+                    appLauncherConfig,
+                  ) ?? appLauncherConfig)
                 : appLauncherConfig;
               if (!renderConfig.entry) {
                 return renderAppAvailabilityPlaceholder({
@@ -1605,8 +1397,10 @@ function Index() {
               const availability = resolveDesktopAppAvailability(appId);
               const renderConfig =
                 availability.status === "available" && availability.app
-                  ? createAppConfigFromApi(availability.app, appLauncherConfig) ??
-                    appLauncherConfig
+                  ? (createAppConfigFromApi(
+                      availability.app,
+                      appLauncherConfig,
+                    ) ?? appLauncherConfig)
                   : appLauncherConfig;
               const icon = renderConfig?.appIconUrl ?? itemIcon;
               if (icon) {
@@ -1624,8 +1418,7 @@ function Index() {
             // 动态匹配所有 app: 前缀的桌面项，渲染对应应用（icon 模式）
             const appConfig = item.data?.appConfig;
             if (appDesktopType) {
-              const appId =
-                appConfig?.id || appDesktopType.replace("app:", "");
+              const appId = appConfig?.id || appDesktopType.replace("app:", "");
               const availability = resolveDesktopAppAvailability(appId);
               if (availability.status !== "available") {
                 return renderAppAvailabilityPlaceholder({
@@ -1635,8 +1428,8 @@ function Index() {
                 });
               }
               const renderConfig = availability.app
-                ? createAppConfigFromApi(availability.app, appConfig) ??
-                  appConfig
+                ? (createAppConfigFromApi(availability.app, appConfig) ??
+                  appConfig)
                 : appConfig;
               if (!renderConfig?.entry) {
                 return renderAppAvailabilityPlaceholder({
@@ -1666,7 +1459,8 @@ function Index() {
                     void openAppWindow({
                       appId,
                       appConfig: renderConfig,
-                      fallbackTitle: renderConfig.name || item.data?.name || t("ui.app"),
+                      fallbackTitle:
+                        renderConfig.name || item.data?.name || t("ui.app"),
                     });
                   }}
                 />
@@ -1727,8 +1521,7 @@ function Index() {
             const managedAppId = getDesktopItemAppId(item);
 
             if (managedAppId) {
-              const availability =
-                resolveDesktopAppAvailability(managedAppId);
+              const availability = resolveDesktopAppAvailability(managedAppId);
               if (availability.status === "checking") {
                 openAvailabilityModal("checking", {
                   name: item.data?.name || appConfig?.name,
@@ -1756,7 +1549,8 @@ function Index() {
             syncDockItemFromDesktopClick(item);
             if (appLauncherDesktopType && appConfig?.entry) {
               const appId =
-                appConfig.id || appLauncherDesktopType.replace("app-launcher:", "");
+                appConfig.id ||
+                appLauncherDesktopType.replace("app-launcher:", "");
               void openAppWindow({
                 appId,
                 appConfig,
@@ -1853,9 +1647,7 @@ function Index() {
           width={600}
           height={400}
           createSdk={(mode, sizeId) =>
-            fullApp.appId
-              ? buildSDK(fullApp.appId, sizeId, mode)
-              : undefined
+            fullApp.appId ? buildSDK(fullApp.appId, sizeId, mode) : undefined
           }
         />
       )}

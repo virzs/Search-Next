@@ -6,7 +6,13 @@ import {
   getAppIconUrl,
   getAppLauncherIconUrl,
 } from "@/services/app";
-import type { AppApiItem, AppIcon, AppConfig, AppPagePaths, AppSettingsField, AppSizeConfig } from "@/types";
+import {
+  buildAppLauncherDesktopItem,
+  buildSizedAppDesktopItem,
+  type DesktopItemData,
+  type DesktopSortItem,
+} from "@search-next/desktop";
+import type { AppApiItem, AppSizeConfig } from "@/types";
 import {
   getCurrentAppLanguage,
   resolveAppDescription,
@@ -18,6 +24,7 @@ import {
   DEV_APPS_STORAGE_KEY,
   migrateLegacyAppKeys,
 } from "@/utils/storage";
+import { toBackendAssetUrl } from "@/utils/utils";
 
 /** 开发者自定义应用（不经过后端，直接提供 ESM 入口地址） */
 export interface DevApp {
@@ -29,19 +36,7 @@ export interface DevApp {
   createdAt: string;
 }
 
-type DesktopItemForApp = {
-  id: string | number;
-  type: string;
-  dataType?: string;
-  config?: {
-    sizeId?: string;
-  };
-  data: {
-    name: string;
-    icon?: string;
-    appConfig?: AppConfig & { props: { title: string } };
-  };
-};
+type DesktopItemForApp = DesktopSortItem<DesktopItemData>;
 
 interface LegacyDesktopRefLike {
   state: {
@@ -64,15 +59,6 @@ type RemoveDesktopItemsByType = (dataType: string) => void;
 type AddAppToDesktopOptions = {
   sizeId?: string;
 };
-type AppConfigMetadata = Pick<
-  AppConfig,
-  | "displayName"
-  | "displayNameI18n"
-  | "descriptionI18n"
-  | "tags"
-  | "tagsI18n"
->;
-
 interface AppContextValue {
   apps: AppApiItem[];
   loading: boolean;
@@ -195,79 +181,44 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   /** 根据 appId 构建桌面项数据 */
   const buildDesktopItem = useCallback((appId: string, options?: AddAppToDesktopOptions) => {
     const devMatch = devAppsRef.current.find((d) => d.id === appId);
-    let entryUrl: string | null = null;
-    let appName: string;
-    let description: string | undefined;
-    let version: string | undefined;
-    let author: string | undefined;
-    let sourceType: "legacy" | "snapp" | undefined;
-    let settingsSchema: AppSettingsField[] | undefined;
-    let defaultSizeId = "2x2";
-    let pagePaths: AppPagePaths | undefined;
-    let supportAppMode = false;
-    let appIcon: AppIcon | undefined;
-    let appIconUrl: string | null = null;
-    let metadata: Partial<AppConfigMetadata> = {};
-
     if (devMatch) {
-      entryUrl = devMatch.entry;
-      appName = devMatch.name;
-      defaultSizeId = options?.sizeId || devMatch.defaultSizeId;
-    } else {
-      const app = (appsRef.current ?? []).find((w) => w._id === appId);
-      if (!app) return null;
-      const language = getCurrentAppLanguage();
-      const snapshot = app.configSnapshot;
-      entryUrl = buildAppEntryUrl(app);
-      appName = resolveAppDisplayName(app, language);
-      description = resolveAppDescription(app, language);
-      version = (snapshot?.version as string | undefined) ?? app.version;
-      author = (snapshot?.author as string | undefined) ?? app.author;
-      sourceType = app.sourceType;
-      settingsSchema = snapshot?.settingsSchema || app.settingsSchema;
-      defaultSizeId = options?.sizeId || snapshot?.defaultSizeId || app.defaultSizeId || "2x2";
-      pagePaths = snapshot?.pagePaths ?? app.pagePaths;
-      supportAppMode = Boolean(snapshot?.supportAppMode ?? app.supportAppMode);
-      appIcon = snapshot?.appIcon ?? app.appIcon;
-      appIconUrl = getAppLauncherIconUrl(app);
-      metadata = {
-        displayName: snapshot?.displayName ?? app.displayName,
-        displayNameI18n: snapshot?.displayNameI18n ?? app.displayNameI18n,
-        descriptionI18n: snapshot?.descriptionI18n ?? app.descriptionI18n,
-        tags: resolveAppTags(app, language),
-        tagsI18n: snapshot?.tagsI18n ?? app.tagsI18n,
-      };
+      return buildSizedAppDesktopItem(
+        {
+          id: devMatch.id,
+          name: devMatch.name,
+          entryUrl: devMatch.entry,
+          sizeConfigs: devMatch.sizeConfigs,
+          defaultSizeId: devMatch.defaultSizeId,
+        },
+        {
+          instanceId: generateDesktopAppInstanceId(appId),
+          appId,
+          name: devMatch.name,
+          sizeId: options?.sizeId,
+          resolveAssetUrl: toBackendAssetUrl,
+        },
+      );
     }
 
-    if (!entryUrl) return null;
+    const app = (appsRef.current ?? []).find((w) => w._id === appId);
+    if (!app) return null;
+    const language = getCurrentAppLanguage();
+    const snapshot = app.configSnapshot;
+    const appName = resolveAppDisplayName(app, language);
 
-    const appType = `app:${appId}`;
-    return {
-      id: generateDesktopAppInstanceId(appId),
-      type: appType,
-      dataType: appType,
-      config: options?.sizeId ? { sizeId: options.sizeId } : undefined,
-      data: {
-        name: appName,
-        appConfig: {
-          id: appId,
-          name: appName,
-          entry: entryUrl,
-          props: { title: appName },
-          settingsSchema,
-          defaultSizeId,
-          pagePaths,
-          supportAppMode,
-          appIcon,
-          appIconUrl,
-          sourceType,
-          version,
-          author,
-          description,
-          ...metadata,
-        },
-      },
-    };
+    return buildSizedAppDesktopItem(app, {
+      instanceId: generateDesktopAppInstanceId(appId),
+      appId,
+      name: appName,
+      description: resolveAppDescription(app, language),
+      displayName: snapshot?.displayName ?? app.displayName,
+      displayNameI18n: snapshot?.displayNameI18n ?? app.displayNameI18n,
+      descriptionI18n: snapshot?.descriptionI18n ?? app.descriptionI18n,
+      tags: resolveAppTags(app, language),
+      tagsI18n: snapshot?.tagsI18n ?? app.tagsI18n,
+      sizeId: options?.sizeId,
+      resolveAssetUrl: toBackendAssetUrl,
+    });
   }, []);
 
   const buildDesktopAppItem = useCallback((appId: string) => {
@@ -275,43 +226,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (!app) return null;
     const language = getCurrentAppLanguage();
     const snapshot = app.configSnapshot;
-    const entryUrl = buildAppEntryUrl(app);
-    if (!entryUrl) return null;
-
     const appName = resolveAppDisplayName(app, language);
-    const appIcon = snapshot?.appIcon ?? app.appIcon;
-    const appIconUrl = getAppLauncherIconUrl(app);
-    const appType = `app-launcher:${appId}`;
-    return {
-      id: generateDesktopAppInstanceId(`app:${appId}`),
-      type: "app",
-      dataType: appType,
-      data: {
-        name: appName,
-        ...(appIconUrl ? { icon: appIconUrl } : {}),
-        appConfig: {
-          id: appId,
-          name: appName,
-          entry: entryUrl,
-          props: { title: appName },
-          displayName: snapshot?.displayName ?? app.displayName,
-          displayNameI18n: snapshot?.displayNameI18n ?? app.displayNameI18n,
-          settingsSchema: snapshot?.settingsSchema || app.settingsSchema,
-          defaultSizeId: snapshot?.defaultSizeId || app.defaultSizeId || "2x2",
-          pagePaths: snapshot?.pagePaths ?? app.pagePaths,
-          supportAppMode: Boolean(snapshot?.supportAppMode ?? app.supportAppMode),
-          appIcon,
-          appIconUrl,
-          sourceType: app.sourceType,
-          version: (snapshot?.version as string | undefined) ?? app.version,
-          author: (snapshot?.author as string | undefined) ?? app.author,
-          description: resolveAppDescription(app, language),
-          descriptionI18n: snapshot?.descriptionI18n ?? app.descriptionI18n,
-          tags: resolveAppTags(app, language),
-          tagsI18n: snapshot?.tagsI18n ?? app.tagsI18n,
-        },
-      },
-    };
+
+    return buildAppLauncherDesktopItem(app, {
+      instanceId: generateDesktopAppInstanceId(`app:${appId}`),
+      appId,
+      name: appName,
+      description: resolveAppDescription(app, language),
+      displayName: snapshot?.displayName ?? app.displayName,
+      displayNameI18n: snapshot?.displayNameI18n ?? app.displayNameI18n,
+      descriptionI18n: snapshot?.descriptionI18n ?? app.descriptionI18n,
+      tags: resolveAppTags(app, language),
+      tagsI18n: snapshot?.tagsI18n ?? app.tagsI18n,
+      resolveAssetUrl: toBackendAssetUrl,
+    });
   }, []);
 
   /** 直接添加应用到桌面，允许重复添加 */
