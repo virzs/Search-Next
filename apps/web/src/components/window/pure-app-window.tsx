@@ -125,6 +125,7 @@ const PureAppWindow: React.FC<PureAppWindowProps> = ({
       onClose={onClose}
       width={typeof width === "number" ? width : undefined}
       destroyOnClose
+      floatingControls
       styles={{
         body: { padding: 0 },
       }}
@@ -133,8 +134,8 @@ const PureAppWindow: React.FC<PureAppWindowProps> = ({
         className="flex w-full flex-col overflow-hidden bg-white/95 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.72)] backdrop-blur-xl dark:bg-[#1c1c1e]/95 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
         style={{ height: windowHeight }}
       >
-        <div className="grid h-[42px] flex-none grid-cols-[92px_1fr_92px] items-center border-b border-black/5 bg-white/90 px-2 dark:border-white/10 dark:bg-[#1c1c1e]/90">
-          <div className="flex items-center justify-start">
+        <div className="grid h-[42px] flex-none grid-cols-[156px_minmax(0,1fr)_156px] items-center border-b border-black/5 bg-white/90 px-2 dark:border-white/10 dark:bg-[#1c1c1e]/90">
+          <div className="flex items-center justify-start pl-[76px]">
             {showBackButton && (
               <button
                 type="button"

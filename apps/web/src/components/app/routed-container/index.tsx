@@ -282,8 +282,14 @@ const routedHeaderClassName = css`
   height: 48px;
   min-height: 48px;
   max-height: 48px;
+  padding-left: 84px;
   overflow: hidden;
   background: transparent;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
 
   .app-route-title {
     padding: 0 16px 0 4px;

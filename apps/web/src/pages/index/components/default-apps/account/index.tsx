@@ -15,6 +15,9 @@ const AccountModalRoute = () => {
       visible
       onClose={() => navigate("/")}
       width={600}
+      floatingControls={{
+        fullscreen: false,
+      }}
       styles={{
         panel: {
           overflow: "hidden",
@@ -141,7 +144,11 @@ const accountAuthPageClassName = css`
   width: 100%;
   padding: 34px 40px 42px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(246, 246, 248, 0.9)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(246, 246, 248, 0.9)
+    ),
     rgba(246, 246, 248, 0.92);
 
   .unlogged-view-content {
@@ -184,7 +191,11 @@ const accountProfilePageClassName = css`
     border: 0;
     border-radius: 0;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(246, 246, 248, 0.9)),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.9),
+        rgba(246, 246, 248, 0.9)
+      ),
       rgba(246, 246, 248, 0.94);
     box-shadow: none;
   }

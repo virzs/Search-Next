@@ -92,6 +92,7 @@ const AppResponsiveOverlay: FC<AppResponsiveOverlayProps> = ({
         visible={modalProps?.visible ?? open}
         onClose={modalProps?.onClose ?? onClose}
         width={modalProps?.width ?? 1180}
+        floatingControls={modalProps?.floatingControls ?? true}
       >
         {contentNode}
       </DesktopNextBaseModal>
