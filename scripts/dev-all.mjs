@@ -9,15 +9,15 @@ const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 const services = [
   {
     name: "api",
-    args: ["--filter", "search-next-api", "dev"],
+    cwd: path.join(root, "apps", "api"),
   },
   {
     name: "web",
-    args: ["--filter", "search-next-web", "dev"],
+    cwd: path.join(root, "apps", "web"),
   },
   {
     name: "admin",
-    args: ["--filter", "search-next-admin", "dev"],
+    cwd: path.join(root, "apps", "admin"),
   },
 ];
 
@@ -38,10 +38,10 @@ const exitWhenDone = () => {
 };
 
 for (const service of services) {
-  console.log(`[dev:all] starting ${service.name}: ${pnpm} ${service.args.join(" ")}`);
+  console.log(`[dev:all] starting ${service.name}: pnpm dev`);
 
-  const child = spawn(pnpm, service.args, {
-    cwd: root,
+  const child = spawn(pnpm, ["dev"], {
+    cwd: service.cwd,
     env: process.env,
     shell: false,
     stdio: "inherit",
