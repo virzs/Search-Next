@@ -20,6 +20,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 8133,
       strictPort: true,
+      watch: {
+        usePolling: true,
+        interval: 100,
+      },
       proxy: {
         "/api": {
           target: proxyTarget,
