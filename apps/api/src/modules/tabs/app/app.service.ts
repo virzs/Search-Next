@@ -99,6 +99,9 @@ type AppListQuery = (AppQueryDto | AppPublicQueryDto) & {
   classify?: string;
   search?: string;
   tag?: string;
+  enable?: boolean | string;
+  supportIconMode?: boolean | string;
+  supportAppMode?: boolean | string;
   publicPage?: boolean;
 };
 type AppPublicResponse = Record<string, unknown> & {
@@ -136,6 +139,13 @@ const SCREENSHOT_IMAGE_EXTENSIONS = new Set([
   '.gif',
 ]);
 
+const toBooleanFilter = (value: unknown) => {
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return undefined;
+};
+
 @Injectable()
 export class AppService {
   constructor(
@@ -146,15 +156,33 @@ export class AppService {
   ) {}
 
   async list(query: AppQueryDto) {
-    const { page = 1, pageSize = 10, classify, search, tag } =
-      query as AppListQuery;
+    const {
+      page = 1,
+      pageSize = 10,
+      classify,
+      search,
+      tag,
+      enable,
+      supportIconMode,
+      supportAppMode,
+    } = query as AppListQuery;
 
     // 构建分页查询条件
     const conditions: any = {};
+    const enableFilter = toBooleanFilter(enable);
+    const supportIconModeFilter = toBooleanFilter(supportIconMode);
+    const supportAppModeFilter = toBooleanFilter(supportAppMode);
     if (classify) conditions.classify = classify;
     if (search) conditions.name = { $regex: search, $options: 'i' };
     // 支持按标签精确筛选
     if (tag) conditions.tags = tag;
+    if (typeof enableFilter === 'boolean') conditions.enable = enableFilter;
+    if (typeof supportIconModeFilter === 'boolean') {
+      conditions.supportIconMode = supportIconModeFilter;
+    }
+    if (typeof supportAppModeFilter === 'boolean') {
+      conditions.supportAppMode = supportAppModeFilter;
+    }
 
     const list = await this.appModel
       .find(conditions)

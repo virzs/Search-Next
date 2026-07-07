@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -12,12 +12,33 @@ import {
 } from 'class-validator';
 import { PageDto } from 'src/public/dto/page';
 
+const toOptionalBoolean = ({ value }: { value: unknown }) => {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+};
+
 export class WebsiteForAdminDto extends PageDto {
   @ApiProperty({ description: '所属分类' })
   @IsString()
   @IsOptional()
   @Expose()
   classifyIds: string;
+
+  @ApiProperty({ description: '搜索', required: false })
+  @IsString()
+  @IsOptional()
+  @Expose()
+  search?: string;
+
+  @ApiProperty({ description: '是否启用', required: false })
+  @IsBoolean()
+  @IsOptional()
+  @Transform(toOptionalBoolean)
+  @Expose()
+  enable?: boolean;
 }
 
 export class WebsitesForUserDto extends PageDto {

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose, Type, Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import {
   IsMongoId,
   IsOptional,
@@ -13,6 +13,14 @@ import {
   IsNumberString,
 } from 'class-validator';
 import { PageDto } from 'src/public/dto/page';
+
+const toOptionalBoolean = ({ value }: { value: unknown }) => {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+};
 
 export class AppDto {
   @ApiProperty({ description: '应用名称' })
@@ -196,6 +204,27 @@ export class AppQueryDto extends PageDto {
   @IsString()
   @Expose()
   tag?: string;
+
+  @ApiPropertyOptional({ description: '是否启用' })
+  @IsOptional()
+  @Transform(toOptionalBoolean)
+  @IsBoolean()
+  @Expose()
+  enable?: boolean;
+
+  @ApiPropertyOptional({ description: '是否支持图标模式' })
+  @IsOptional()
+  @Transform(toOptionalBoolean)
+  @IsBoolean()
+  @Expose()
+  supportIconMode?: boolean;
+
+  @ApiPropertyOptional({ description: '是否支持应用模式' })
+  @IsOptional()
+  @Transform(toOptionalBoolean)
+  @IsBoolean()
+  @Expose()
+  supportAppMode?: boolean;
 
   @ApiPropertyOptional({ description: '排序（默认为创建时间倒序）' })
   @IsOptional()

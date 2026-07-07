@@ -15,6 +15,7 @@ export type DesktopConfigPersonalization = {
 export type DesktopConfigListItem = {
   id: string;
   type: string;
+  dataType?: string;
   config?: Record<string, any>;
   data?: Record<string, any>;
   children?: DesktopConfigListItem[];

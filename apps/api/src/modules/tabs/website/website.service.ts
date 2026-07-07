@@ -34,17 +34,26 @@ export class WebsiteService {
    * 获取网站分页 后台
    */
   async getWebsites(query: WebsiteForAdminDto) {
-    const { page = 1, pageSize = 10, classifyIds } = query;
+    const { page = 1, pageSize = 10, classifyIds, search, enable } = query;
     const classifyIdsArr = ![null, undefined, ''].includes(classifyIds)
       ? classifyIds.split(',')
       : [];
 
     // 构建查询条件
-    const finder = {};
+    const finder: any = {};
 
     // 处理分类筛选
     if (classifyIdsArr.length > 0) {
       finder['classify'] = { $in: classifyIdsArr };
+    }
+    if (search) {
+      finder.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { url: { $regex: search, $options: 'i' } },
+      ];
+    }
+    if (typeof enable === 'boolean') {
+      finder.enable = enable;
     }
 
     const websites = await this.websiteModel

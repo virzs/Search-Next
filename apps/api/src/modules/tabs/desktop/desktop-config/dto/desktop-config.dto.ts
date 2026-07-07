@@ -90,6 +90,15 @@ export class DesktopConfigListItemDto {
   type: string;
 
   @ApiPropertyOptional({
+    description: '桌面项数据类型',
+    example: 'app:todo',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  dataType?: string;
+
+  @ApiPropertyOptional({
     description: '列表项配置',
     example: { sizeId: '2x2' },
   })
