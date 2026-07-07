@@ -40,7 +40,7 @@
     "react-virtuoso": "^4.14.1",
     "react-window": "^2.2.1",
     "uuid": "^11.0.3",
-    "zs_library": "^0.8.2"
+    "zs_library": "^0.9.7"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.15",
