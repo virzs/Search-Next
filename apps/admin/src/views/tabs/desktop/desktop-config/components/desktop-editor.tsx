@@ -1,14 +1,14 @@
-import { Button, Tooltip } from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { DesktopNext } from "zs_library";
-import type { DesktopNextHandle, TypeConfigMap } from "zs_library";
-import { v4 as uuidv4 } from "uuid";
-import { ProFormRadio, ProFormSelect } from "@ant-design/pro-components";
+import { Segmented, Select } from "antd";
+import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import {
-  buildAppLauncherDesktopItem,
-  buildSizedAppDesktopItem,
+  DesktopNext,
+  desktopNextThemeDark,
+  desktopNextThemeLight,
+} from "zs_library";
+import type { DesktopNextHandle, TypeConfigMap } from "zs_library";
+import { useRequest } from "ahooks";
+import {
   buildDesktopTypeConfigMap,
-  buildWebsiteDesktopItem,
   createEmptyDesktopPages,
   DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
   extractDockItems,
@@ -23,17 +23,17 @@ import {
   DesktopThemeConfig,
   getActiveDesktopThemeConfig,
 } from "@/services/tabs/desktop/theme-config";
-import WebsiteSelectModal from "./website-select-modal";
-import type { Website } from "@/services/tabs/website_classifty";
-import AppSelectModal, {
-  toBackendAssetUrl,
-  type AppItemWithDesktopSize,
-} from "./app-select-modal";
-import type { AppItem } from "@/services/tabs/app";
 import {
-  adminDesktopItemIconBuilder,
+  createAdminDesktopItemIconBuilder,
   createAdminFixedItemBuilder,
+  emitAdminDesktopPreviewThemeChange,
+  type AdminDesktopPreviewThemeMode,
 } from "./desktop-rendering";
+import DesktopResourceTabs from "./desktop-resource-tabs";
+
+const RESOURCE_DRAG_TYPE = "application/x-search-next-desktop-item";
+
+export type DesktopThemeType = "lightConfig" | "darkConfig";
 
 export interface DesktopEditorProps {
   value?: {
@@ -44,26 +44,103 @@ export interface DesktopEditorProps {
     list: DesktopRootItem[];
     [key: string]: unknown;
   }) => void;
+  theme?: DesktopThemeConfig | null;
+  themeType?: DesktopThemeType;
 }
 
-const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
+export interface DesktopEditorToolbarProps {
+  theme?: DesktopThemeConfig | null;
+  themeType: DesktopThemeType;
+  onThemeChange: (theme: DesktopThemeConfig | null) => void;
+  onThemeTypeChange: (themeType: DesktopThemeType) => void;
+}
+
+export const DesktopEditorToolbar = ({
+  theme,
+  themeType,
+  onThemeChange,
+  onThemeTypeChange,
+}: DesktopEditorToolbarProps) => {
+  const { data: themes = [], loading } = useRequest(
+    getActiveDesktopThemeConfig,
+  );
+
+  const options = useMemo(
+    () =>
+      themes.map((item) => ({
+        label: item.name,
+        value: item._id || item.name,
+        theme: item,
+      })),
+    [themes],
+  );
+
+  return (
+    <div className={desktopHeaderToolbarClassName}>
+      <Select
+        allowClear
+        className={themeSelectClassName}
+        loading={loading}
+        options={options}
+        placeholder="默认主题"
+        value={theme?._id || theme?.name}
+        onClear={() => onThemeChange(null)}
+        onChange={(_, option) => {
+          const selectedOption = Array.isArray(option) ? option[0] : option;
+          onThemeChange(
+            (selectedOption as { theme?: DesktopThemeConfig } | undefined)
+              ?.theme ?? null,
+          );
+        }}
+      />
+      <Segmented
+        className={themeModeSegmentClassName}
+        value={themeType}
+        options={[
+          { label: "浅色", value: "lightConfig" },
+          { label: "深色", value: "darkConfig" },
+        ]}
+        onChange={(nextValue) =>
+          onThemeTypeChange(nextValue as DesktopThemeType)
+        }
+      />
+    </div>
+  );
+};
+
+const DesktopEditor = ({
+  value,
+  onChange,
+  theme,
+  themeType = "lightConfig",
+}: DesktopEditorProps) => {
   const desktopRef = useRef<DesktopNextHandle>(null);
   const initializedRef = useRef(false);
   const valueRef = useRef(value);
   const onChangeRef = useRef(onChange);
-  const [websiteModalOpen, setWebsiteModalOpen] = useState(false);
-  const [appModalOpen, setAppModalOpen] = useState(false);
-  const [componentModalOpen, setComponentModalOpen] = useState(false);
+  const draggingResourceRef = useRef<DesktopSortItem<DesktopItemData> | null>(
+    null,
+  );
   const [pages, setPages] = useState<DesktopPage[]>(createEmptyDesktopPages);
   const [dockItems, setDockItems] = useState<
     DesktopSortItem<DesktopItemData>[]
   >([]);
-
-  const [selectedDesktopTheme, setSelectedDesktopTheme] =
-    useState<DesktopThemeConfig | null>(null);
-  const [selectedDesktopThemeType, setSelectedDesktopThemeType] = useState<
-    "lightConfig" | "darkConfig"
-  >("lightConfig");
+  const themeMode: AdminDesktopPreviewThemeMode =
+    themeType === "darkConfig" ? "dark" : "light";
+  const resolvedTheme = useMemo(() => {
+    if (theme) {
+      return themeType === "darkConfig"
+        ? theme.darkConfig || theme.lightConfig || desktopNextThemeDark
+        : theme.lightConfig || desktopNextThemeLight;
+    }
+    return themeType === "darkConfig"
+      ? desktopNextThemeDark
+      : desktopNextThemeLight;
+  }, [theme, themeType]);
+  const itemIconBuilder = useMemo(
+    () => createAdminDesktopItemIconBuilder(themeMode),
+    [themeMode],
+  );
 
   useEffect(() => {
     valueRef.current = value;
@@ -72,6 +149,10 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
+
+  useEffect(() => {
+    emitAdminDesktopPreviewThemeChange(themeMode);
+  }, [themeMode]);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -114,192 +195,118 @@ const DesktopEditor = ({ value, onChange }: DesktopEditorProps) => {
     });
   };
 
+  const handleResourceDragStart = (
+    event: DragEvent<HTMLElement>,
+    item: DesktopSortItem<DesktopItemData>,
+  ) => {
+    draggingResourceRef.current = item;
+    event.dataTransfer.effectAllowed = "copy";
+    event.dataTransfer.setData(RESOURCE_DRAG_TYPE, JSON.stringify(item));
+    event.dataTransfer.setData("text/plain", item.data?.name || "");
+  };
+
+  const handleResourceDrop = (event: DragEvent<HTMLElement>) => {
+    const isResourceDrag = Array.from(event.dataTransfer.types).includes(
+      RESOURCE_DRAG_TYPE,
+    );
+    if (!isResourceDrag && !draggingResourceRef.current) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const rawItem = event.dataTransfer.getData(RESOURCE_DRAG_TYPE);
+    const item =
+      draggingResourceRef.current ||
+      (rawItem
+        ? (JSON.parse(rawItem) as DesktopSortItem<DesktopItemData>)
+        : null);
+    if (item) addItemsToCurrentPage([item]);
+    draggingResourceRef.current = null;
+  };
+
+  const handleResourceDragOver = (event: DragEvent<HTMLElement>) => {
+    if (
+      draggingResourceRef.current ||
+      Array.from(event.dataTransfer.types).includes(RESOURCE_DRAG_TYPE)
+    ) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+    }
+  };
+
   return (
-    <div className="flex w-full h-full">
-      <div className="w-64 border-r pr-4">
-        <ProFormSelect
-          wrapperCol={{ span: 24 }}
-          fieldProps={{
-            className: "w-full",
-            fieldNames: {
-              label: "name",
-              value: "_id",
-            },
-            optionRender: (item) => {
-              const data = item.data as DesktopThemeConfig;
-              const { name, lightConfig, darkConfig } = data;
-
-              const renderBaseSwatches = (cfg: any) => {
-                const base = cfg?.token?.base || {};
-                const entries = Object.entries(base || {});
-                return (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {entries.map(([prop, color]) => (
-                      <Tooltip
-                        key={prop}
-                        title={`${(color as string) || "未设置"}`}
-                      >
-                        <div
-                          className="w-4 h-4 rounded border"
-                          style={{
-                            backgroundColor: (color as string) || "transparent",
-                          }}
-                        />
-                      </Tooltip>
-                    ))}
-                  </div>
-                );
-              };
-
-              return (
-                <div className="flex flex-col gap-1 py-1">
-                  <div className="font-medium">{name}</div>
-                  <div className="text-xs text-gray-400 mb-1">亮色基础色</div>
-                  {renderBaseSwatches(lightConfig)}
-                  {darkConfig ? (
-                    <>
-                      <div className="text-xs text-gray-400 mt-1 mb-1">
-                        深色基础色
-                      </div>
-                      {renderBaseSwatches(darkConfig)}
-                    </>
-                  ) : null}
-                </div>
-              );
-            },
-            value: selectedDesktopTheme?._id,
-            onChange: (_, option) => {
-              setSelectedDesktopTheme(option as DesktopThemeConfig);
-            },
+    <div className={desktopEditorShellClassName}>
+      <DesktopResourceTabs
+        onResourceDragStart={handleResourceDragStart}
+        onResourceDragEnd={() => {
+          draggingResourceRef.current = null;
+        }}
+        onAddItem={(item) => addItemsToCurrentPage([item])}
+      />
+      <main
+        className={getDesktopCanvasStageClassName(themeMode)}
+        onDragOverCapture={handleResourceDragOver}
+        onDropCapture={handleResourceDrop}
+      >
+        <div
+          className={getDesktopCanvasFrameClassName(themeMode)}
+          style={{
+            backgroundColor:
+              resolvedTheme.token.base?.backgroundColor ??
+              (themeMode === "dark" ? "#111827" : "#ffffff"),
           }}
-          placeholder="默认主题"
-          request={getActiveDesktopThemeConfig}
-        />
-        <ProFormRadio.Group
-          name="desktop-theme-type"
-          radioType="button"
-          options={[
-            {
-              label: "浅色",
-              value: "lightConfig",
-            },
-            {
-              label: "深色",
-              value: "darkConfig",
-            },
-          ]}
-          fieldProps={{
-            value: selectedDesktopThemeType,
-            onChange: (event) => {
-              setSelectedDesktopThemeType(
-                event.target.value as "lightConfig" | "darkConfig",
-              );
-            },
-          }}
-        />
-        <div className="flex mb-2">
-          <Button
-            type="primary"
-            className="w-full"
-            onClick={() => setWebsiteModalOpen(true)}
-          >
-            选择网站并添加
-          </Button>
+        >
+          <DesktopNext<DesktopItemData>
+            ref={desktopRef}
+            className={desktopCanvasClassName}
+            pages={pages}
+            onChange={(nextPages) => setPages(nextPages as DesktopPage[])}
+            maxPages={5}
+            theme={resolvedTheme}
+            typeConfigMap={typeConfigMap}
+            contextMenuProps={{ showRemoveButton: true, showSizeButton: true }}
+            itemIconBuilder={itemIconBuilder}
+            dockProps={{
+              items: dockItems,
+              fixedItems: DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
+              fixedItemBuilder: createAdminFixedItemBuilder,
+            }}
+          />
         </div>
-        <div className="flex mb-2">
-          <Button className="w-full" onClick={() => setAppModalOpen(true)}>
-            选择应用并添加
-          </Button>
-        </div>
-        <div className="flex mb-2">
-          <Button className="w-full" onClick={() => setComponentModalOpen(true)}>
-            选择组件并添加
-          </Button>
-        </div>
-      </div>
-      <DesktopNext<DesktopItemData>
-        ref={desktopRef}
-        className="h-full flex-grow"
-        pages={pages}
-        onChange={(nextPages) => setPages(nextPages as DesktopPage[])}
-        maxPages={5}
-        theme={selectedDesktopTheme?.[selectedDesktopThemeType]}
-        typeConfigMap={typeConfigMap}
-        contextMenuProps={{ showRemoveButton: true }}
-        itemIconBuilder={adminDesktopItemIconBuilder}
-        dockProps={{
-          items: dockItems,
-          fixedItems: DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
-          fixedItemBuilder: createAdminFixedItemBuilder,
-        }}
-      />
-      <WebsiteSelectModal
-        open={websiteModalOpen}
-        onCancel={() => setWebsiteModalOpen(false)}
-        onOk={(websites: Website[]) => {
-          const items = (websites ?? [])
-            .filter((website) => Boolean(website?.url))
-            .map((website) =>
-              buildWebsiteDesktopItem({
-                id: uuidv4(),
-                name: website.name,
-                icon: website.iconEdited?.url || website.icon?.url,
-                iconColor: (website as any)?.themeColor,
-                url: website.url,
-              }),
-            );
-          addItemsToCurrentPage(items);
-          setWebsiteModalOpen(false);
-        }}
-      />
-      <AppSelectModal
-        open={appModalOpen}
-        onCancel={() => setAppModalOpen(false)}
-        onOk={(apps: AppItem[]) => {
-          const items = (apps ?? [])
-            .map((app) =>
-              buildAppLauncherDesktopItem(app, {
-                instanceId: uuidv4(),
-                appId: app._id,
-                name: app.name,
-                description: app.description,
-                resolveAssetUrl: toBackendAssetUrl,
-              }),
-            )
-            .filter(
-              (item): item is DesktopSortItem<DesktopItemData> => item !== null,
-            );
-          addItemsToCurrentPage(items);
-          setAppModalOpen(false);
-        }}
-      />
-      <AppSelectModal
-        open={componentModalOpen}
-        mode="component"
-        title="选择组件"
-        okText="添加组件"
-        onCancel={() => setComponentModalOpen(false)}
-        onOk={(apps: AppItemWithDesktopSize[]) => {
-          const items = (apps ?? [])
-            .map((app) =>
-              buildSizedAppDesktopItem(app, {
-                instanceId: uuidv4(),
-                appId: app._id,
-                name: app.name,
-                description: app.description,
-                sizeId: app.desktopSizeId,
-                resolveAssetUrl: toBackendAssetUrl,
-              }),
-            )
-            .filter(
-              (item): item is DesktopSortItem<DesktopItemData> => item !== null,
-            );
-          addItemsToCurrentPage(items);
-          setComponentModalOpen(false);
-        }}
-      />
+      </main>
     </div>
   );
 };
+
+const desktopEditorShellClassName =
+  "flex h-full max-h-full min-h-0 flex-row overflow-hidden bg-slate-200";
+
+const desktopHeaderToolbarClassName =
+  "flex min-w-[380px] flex-nowrap items-center gap-2.5";
+
+const themeSelectClassName = "w-[220px]";
+
+const themeModeSegmentClassName = "w-[136px]";
+
+const getDesktopCanvasStageClassName = (
+  themeMode: AdminDesktopPreviewThemeMode,
+) =>
+  [
+    "min-h-0 w-0 flex-1 p-2.5",
+    "[background-size:24px_24px]",
+    themeMode === "dark"
+      ? "bg-slate-950 [background-image:linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"
+      : "bg-slate-50 [background-image:linear-gradient(90deg,rgba(15,23,42,0.035)_1px,transparent_1px),linear-gradient(180deg,rgba(15,23,42,0.035)_1px,transparent_1px)]",
+  ].join(" ");
+
+const getDesktopCanvasFrameClassName = (
+  themeMode: AdminDesktopPreviewThemeMode,
+) =>
+  [
+    "h-full w-full overflow-hidden rounded-lg border",
+    themeMode === "dark" ? "border-white/10" : "border-slate-300/60",
+  ].join(" ");
+
+const desktopCanvasClassName = "h-full w-full overflow-hidden";
 
 export default DesktopEditor;

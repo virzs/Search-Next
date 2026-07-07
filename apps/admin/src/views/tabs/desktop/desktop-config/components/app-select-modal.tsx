@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import {
-  Modal,
+  Drawer,
   Spin,
   Checkbox,
   Pagination,
@@ -8,10 +8,13 @@ import {
   Empty,
   Input,
   Select,
-  Tag,
+  Button,
 } from "antd";
 import { useTablePage } from "@/hooks/useTablePage2";
 import { getApp, AppItem } from "@/services/tabs/app";
+import { getBackendOrigin, toBackendAssetUrl } from "./desktop-assets";
+
+export { getBackendOrigin, toBackendAssetUrl };
 
 export type AppSelectMode = "app" | "component";
 export type AppItemWithDesktopSize = AppItem & { desktopSizeId?: string };
@@ -74,39 +77,35 @@ const getAppIconUrl = (item: AppItem) => {
   );
 };
 
-export const getBackendOrigin = () => {
-  const env = import.meta.env as Record<string, string | undefined>;
-  const configuredOrigin = env.VITE_API_ORIGIN || env.VITE_API_PROXY_TARGET;
-  if (configuredOrigin) return configuredOrigin.replace(/\/+$/, "");
-  if (import.meta.env.DEV) return "http://localhost:5151";
-  return window.location.origin;
-};
-
-export const toBackendAssetUrl = (entry?: string) => {
-  if (!entry) return "";
-  if (entry.startsWith("http://") || entry.startsWith("https://")) return entry;
-  if (entry.startsWith("//")) return `${window.location.protocol}${entry}`;
-  const normalized = entry.startsWith("/") ? entry : `/${entry}`;
-  if (normalized.startsWith("/static/") || normalized.startsWith("/uploads/")) {
-    return new URL(normalized, getBackendOrigin()).href;
-  }
-  return new URL(normalized, window.location.origin).href;
-};
-
 const AppSelectModal: FC<AppSelectModalProps> = (props) => {
   const { open, mode = "app", value, title, okText, onOk, onCancel } = props;
-  const [selectedMap, setSelectedMap] = useState<Map<string, AppItemWithDesktopSize>>(
-    new Map(),
-  );
+  const [selectedMap, setSelectedMap] = useState<
+    Map<string, AppItemWithDesktopSize>
+  >(new Map());
   const [keyword, setKeyword] = useState("");
+  const resourceParams = useMemo(
+    () =>
+      mode === "component"
+        ? { enable: true, supportIconMode: true }
+        : { enable: true, supportAppMode: true },
+    [mode],
+  );
 
-  const table = useTablePage<AppItem>(getApp, {
-    pathname: "/desktop/app-select-modal",
-    defaultParams: {
-      page: 1,
-      pageSize: 1000,
+  const table = useTablePage<AppItem>(
+    (params) =>
+      getApp({
+        ...params,
+        ...resourceParams,
+      }),
+    {
+      pathname: `/desktop/app-select-modal/${mode}`,
+      defaultParams: {
+        page: 1,
+        pageSize: 1000,
+        ...resourceParams,
+      },
     },
-  });
+  );
 
   const {
     data: rawAppData = [],
@@ -120,7 +119,9 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
 
   const appData = useMemo(() => {
     const predicate = mode === "component" ? supportsIconMode : supportsAppMode;
-    return rawAppData.filter(predicate);
+    return rawAppData.filter(
+      (item) => item.enable !== false && predicate(item),
+    );
   }, [mode, rawAppData]);
 
   useEffect(() => {
@@ -145,6 +146,7 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
     if (!open) return;
     table.run({
       ...table.params,
+      ...resourceParams,
       page: 1,
       search: keyword || undefined,
     });
@@ -190,21 +192,33 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
     setKeyword(nextKeyword);
     table.run({
       ...table.params,
+      ...resourceParams,
       page: 1,
       search: nextKeyword || undefined,
     });
   };
 
   return (
-    <Modal
+    <Drawer
       open={open}
-      onOk={handleOk}
-      onCancel={onCancel}
-      width={820}
-      okText={okText ?? "确定"}
+      onClose={onCancel}
+      width={560}
       title={title ?? (mode === "component" ? "选择组件" : "选择应用")}
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-gray-500">
+            已选择：{selectedMap.size} 项
+          </span>
+          <div className="flex items-center gap-2">
+            <Button onClick={onCancel}>取消</Button>
+            <Button type="primary" onClick={handleOk}>
+              {okText ?? "确定"}
+            </Button>
+          </div>
+        </div>
+      }
     >
-      <div style={{ minHeight: 520 }}>
+      <div className="flex h-full flex-col">
         <div className="mb-3">
           <Input.Search
             allowClear
@@ -217,7 +231,7 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
         </div>
         <Spin className="w-full" spinning={loading}>
           {appData.length ? (
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-1 gap-2">
               {appData.map((item) => {
                 const selected = item._id ? selectedMap.has(item._id) : false;
                 const selectedItem = item._id ? selectedMap.get(item._id) : undefined;
@@ -226,7 +240,7 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
                 const activeSizeId =
                   selectedItem?.desktopSizeId || getDefaultSizeId(item);
                 return (
-                  <div key={item._id} className="max-w-60 w-full">
+                  <div key={item._id}>
                     <div
                       className={`flex items-center gap-2 p-2 rounded border cursor-pointer ${
                         selected ? "border-blue-500" : "border-gray-200"
@@ -285,13 +299,7 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
           )}
         </Spin>
 
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span>已选择：{selectedMap.size} 项</span>
-            {mode === "component" ? (
-              <Tag className="m-0">将作为桌面组件添加</Tag>
-            ) : null}
-          </div>
+        <div className="mt-3 flex items-center justify-end">
           <Pagination
             pageSize={pageSize}
             total={total}
@@ -309,7 +317,7 @@ const AppSelectModal: FC<AppSelectModalProps> = (props) => {
           />
         </div>
       </div>
-    </Modal>
+    </Drawer>
   );
 };
 

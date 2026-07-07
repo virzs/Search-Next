@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import {
-  Modal,
+  Drawer,
   Tree,
   Spin,
   Checkbox,
@@ -42,17 +42,26 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
     new Map(),
   );
   const [keyword, setKeyword] = useState("");
+  const websiteResourceParams = useMemo(() => ({ enable: true }), []);
 
-  const table = useTablePage<Website>(getWebsiteList, {
-    pathname: "/desktop/website-select-modal",
-    defaultParams: {
-      page: 1,
-      pageSize: 24,
+  const table = useTablePage<Website>(
+    (params) =>
+      getWebsiteList({
+        ...params,
+        ...websiteResourceParams,
+      }),
+    {
+      pathname: "/desktop/website-select-modal",
+      defaultParams: {
+        page: 1,
+        pageSize: 24,
+        ...websiteResourceParams,
+      },
     },
-  });
+  );
 
   const {
-    data: websiteData = [],
+    data: rawWebsiteData = [],
     total = 0,
     current,
     setCurrent,
@@ -60,6 +69,11 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
     setPageSize,
     loading,
   } = table;
+
+  const websiteData = useMemo(
+    () => rawWebsiteData.filter((item) => item.enable !== false),
+    [rawWebsiteData],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -76,6 +90,7 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
     if (!open) return;
     table.run({
       ...table.params,
+      ...websiteResourceParams,
       page: 1,
       search: keyword || undefined,
       classifyIds: selectedClassifyId,
@@ -86,6 +101,7 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
     setSelectedClassifyId(undefined);
     table.run({
       ...table.params,
+      ...websiteResourceParams,
       page: 1,
       search: keyword || undefined,
       classifyIds: undefined,
@@ -118,6 +134,7 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
     setSelectedClassifyId(id);
     table.run({
       ...table.params,
+      ...websiteResourceParams,
       classifyIds: id,
       search: keyword || undefined,
       page: 1,
@@ -149,6 +166,7 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
     setKeyword(nextKeyword);
     table.run({
       ...table.params,
+      ...websiteResourceParams,
       page: 1,
       search: nextKeyword || undefined,
       classifyIds: selectedClassifyId,
@@ -156,15 +174,26 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
   };
 
   return (
-    <Modal
+    <Drawer
       open={open}
-      onOk={handleOk}
-      onCancel={onCancel}
-      width={960}
-      okText={okText ?? "确定"}
+      onClose={onCancel}
+      width={680}
       title={title ?? "选择网站"}
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-gray-500">
+            已选择：{selectedMap.size} 项
+          </span>
+          <div className="flex items-center gap-2">
+            <Button onClick={onCancel}>取消</Button>
+            <Button type="primary" onClick={handleOk}>
+              {okText ?? "确定"}
+            </Button>
+          </div>
+        </div>
+      }
     >
-      <div className="flex" style={{ minHeight: 520 }}>
+      <div className="flex h-full" style={{ minHeight: 520 }}>
         <div className="w-48 shrink-0 pr-3 border-r">
           <Spin spinning={classifyLoading}>
             {treeData.length ? (
@@ -207,11 +236,11 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
           </div>
           <Spin className="w-full" spinning={loading}>
             {websiteData.length ? (
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-1 gap-2">
                 {websiteData.map((item) => {
                   const selected = isSelected(item._id);
                   return (
-                    <div key={item._id} className="max-w-56 w-full">
+                    <div key={item._id}>
                       <div
                         className={`flex items-center gap-2 p-2 rounded border cursor-pointer ${
                           selected ? "border-blue-500" : "border-gray-200"
@@ -249,8 +278,7 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
             )}
           </Spin>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="text-sm">已选择：{selectedMap.size} 项</div>
+          <div className="mt-3 flex items-center justify-end">
             <Pagination
               pageSize={pageSize}
               total={total}
@@ -269,7 +297,7 @@ const WebsiteSelectModal: FC<WebsiteSelectModalProps> = (props) => {
           </div>
         </div>
       </div>
-    </Modal>
+    </Drawer>
   );
 };
 

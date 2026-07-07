@@ -12,6 +12,13 @@ export type SupportedLocale = "zh-CN" | "en-US";
 export type LocalizedText = Partial<Record<SupportedLocale, string>>;
 export type LocalizedStringList = Partial<Record<SupportedLocale, string[]>>;
 
+export interface AppConfigSizeConfig {
+  row: number;
+  col: number;
+  name: string;
+  id?: string;
+}
+
 export interface AppConfig {
   id: string;
   name: string;
@@ -23,6 +30,7 @@ export interface AppConfig {
   size?: "small" | "medium" | "large";
   category?: string;
   settingsSchema?: AppSettingsField[];
+  sizeConfigs?: AppConfigSizeConfig[];
   defaultSizeId?: string;
   pagePaths?: AppPagePaths;
   supportAppMode?: boolean;

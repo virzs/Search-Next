@@ -1,4 +1,9 @@
-import type { DesktopPage, DesktopRootItem, DesktopSortItem } from "./types";
+import type {
+  DesktopItemData,
+  DesktopPage,
+  DesktopRootItem,
+  DesktopSortItem,
+} from "./types";
 
 export const createEmptyDesktopPages = (): DesktopPage[] => [
   { id: "page-1", type: "page", children: [] },
@@ -19,6 +24,43 @@ export const hasDesktopRootsContent = (roots: DesktopRootItem[]) =>
     (root) => Array.isArray(root.children) && root.children.length > 0,
   );
 
+const completeDesktopItemDataType = (
+  item: DesktopSortItem<DesktopItemData>,
+): DesktopSortItem<DesktopItemData> => {
+  const appId = item.data?.appConfig?.id;
+  const itemType = typeof item.type === "string" ? item.type : "";
+  let dataType = item.dataType;
+
+  if (!dataType && appId) {
+    if (itemType === "app") {
+      dataType = `app-launcher:${appId}`;
+    } else if (itemType.startsWith("app:")) {
+      dataType = itemType;
+    }
+  }
+
+  const children = Array.isArray(item.children)
+    ? item.children.map((child) =>
+        completeDesktopItemDataType(child as DesktopSortItem<DesktopItemData>),
+      )
+    : item.children;
+
+  return {
+    ...item,
+    ...(dataType ? { dataType } : {}),
+    ...(children ? { children } : {}),
+  };
+};
+
+const completeDesktopItemsDataType = (
+  items: DesktopSortItem[] | undefined,
+): DesktopSortItem[] =>
+  Array.isArray(items)
+    ? items.map((item) =>
+        completeDesktopItemDataType(item as DesktopSortItem<DesktopItemData>),
+      )
+    : [];
+
 export const toDesktopPages = (
   list: DesktopRootItem[] | null | undefined,
 ): DesktopPage[] => {
@@ -28,7 +70,7 @@ export const toDesktopPages = (
       ...root,
       id: root.id ?? `page-${index + 1}`,
       type: "page",
-      children: Array.isArray(root.children) ? root.children : [],
+      children: completeDesktopItemsDataType(root.children),
     }));
 
   return pages.length ? pages : createEmptyDesktopPages();
@@ -40,7 +82,7 @@ export const extractDockItems = (
   const dockRoot = (Array.isArray(list) ? list : []).find(
     (root) => root.type === "dock" && root.id === "dock",
   );
-  return Array.isArray(dockRoot?.children) ? dockRoot.children : [];
+  return completeDesktopItemsDataType(dockRoot?.children);
 };
 
 export const toDesktopRoots = (
@@ -52,13 +94,13 @@ export const toDesktopRoots = (
     {
       id: "dock",
       type: "dock",
-      children: dockItems,
+      children: completeDesktopItemsDataType(dockItems),
     },
     ...normalizedPages.map((page, index) => ({
       ...page,
       id: page.id ?? `page-${index + 1}`,
       type: "page",
-      children: Array.isArray(page.children) ? page.children : [],
+      children: completeDesktopItemsDataType(page.children),
     })),
   ];
 };

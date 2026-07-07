@@ -1,5 +1,4 @@
 import { Outlet } from "react-router";
-import { cx, css } from "@emotion/css";
 import BasePageContainer, { BasePageContainerProps } from "./base";
 import { FC, ReactNode } from "react";
 import { ProCard, ProCardProps } from "@ant-design/pro-components";
@@ -21,42 +20,7 @@ const FullPageContainer: FC<FullPageContainerProps> = (props) => {
   const { extra, title: cardTitle, ...cardRest } = cardProps ?? {};
 
   return (
-    <div
-      className={cx(
-        "h-full",
-        css`
-          .ant-pro-page-container {
-            height: 100%;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 100vh;
-            .ant-pro-page-container-children-container {
-              overflow-y: auto;
-              > .ant-pro-card {
-                height: 100%;
-                > .ant-pro-card-body {
-                  overflow-y: auto;
-                  scrollbar-width: thin;
-                  scrollbar-color: #eaeaea transparent;
-                  scrollbar-gutter: stable;
-                }
-              }
-            }
-          }
-          .ant-pro-grid-content {
-            flex: 1;
-            height: 0;
-            .ant-pro-grid-content-children {
-              height: 100%;
-              .ant-pro-page-container-children-content {
-                height: 100%;
-              }
-            }
-          }
-        `
-      )}
-    >
+    <div className={fullPageContainerClassName}>
       <BasePageContainer
         childrenContentStyle={{
           height: "100%",
@@ -80,7 +44,7 @@ const FullPageContainer: FC<FullPageContainerProps> = (props) => {
             </Space>
           }
           loading={loading}
-          title={title}
+          title={title ?? cardTitle}
           {...cardRest}
         >
           {children ?? <Outlet />}
@@ -89,5 +53,19 @@ const FullPageContainer: FC<FullPageContainerProps> = (props) => {
     </div>
   );
 };
+
+const fullPageContainerClassName = [
+  "h-full",
+  "[&_.ant-pro-page-container]:flex [&_.ant-pro-page-container]:h-full [&_.ant-pro-page-container]:max-h-screen [&_.ant-pro-page-container]:flex-col [&_.ant-pro-page-container]:overflow-hidden",
+  "[&_.ant-pro-page-container-children-container]:overflow-y-auto",
+  "[&_.ant-pro-page-container-children-container>.ant-pro-card]:h-full",
+  "[&_.ant-pro-page-container-children-container>.ant-pro-card>.ant-pro-card-body]:overflow-y-auto",
+  "[&_.ant-pro-page-container-children-container>.ant-pro-card>.ant-pro-card-body]:[scrollbar-color:#eaeaea_transparent]",
+  "[&_.ant-pro-page-container-children-container>.ant-pro-card>.ant-pro-card-body]:[scrollbar-gutter:stable]",
+  "[&_.ant-pro-page-container-children-container>.ant-pro-card>.ant-pro-card-body]:[scrollbar-width:thin]",
+  "[&_.ant-pro-grid-content]:h-0 [&_.ant-pro-grid-content]:flex-1",
+  "[&_.ant-pro-grid-content-children]:h-full",
+  "[&_.ant-pro-page-container-children-content]:h-full",
+].join(" ");
 
 export default FullPageContainer;

@@ -1,167 +1,41 @@
-import React, { useEffect, useRef, useState } from "react";
-import type { AppMode, AppSDK } from "@/sdk";
+import {
+  DesktopRemoteApp,
+  type DesktopRemoteAppConfig,
+} from "@search-next/desktop";
+import type { CSSProperties, FC } from "react";
+import type { AppSDK } from "@/sdk";
 import { useI18n } from "@/i18n";
 
-export interface PureAppConfig {
-  entry: string;
-  props?: Record<string, unknown>;
-  mode?: AppMode;
-  /** 应用 SDK 实例（由宿主创建并注入） */
-  sdk?: AppSDK;
-}
+export type PureAppConfig = DesktopRemoteAppConfig<AppSDK>;
 
 interface PureAppProps {
   config: PureAppConfig;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   onClick?: () => void;
 }
 
-const createShadowMount = (container: HTMLElement) => {
-  const shadowRoot = container.shadowRoot || container.attachShadow({ mode: "open" });
-  shadowRoot.querySelectorAll('[data-pure-app-mount="true"]').forEach((node) => node.remove());
-  const mountHost = document.createElement("div");
-  const mountPoint = document.createElement("div");
-
-  mountHost.className = "w-full h-full";
-  mountHost.dataset.pureAppMount = "true";
-  mountHost.style.width = "100%";
-  mountHost.style.height = "100%";
-  mountPoint.className = "w-full h-full";
-  mountPoint.style.width = "100%";
-  mountPoint.style.height = "100%";
-  mountHost.append(mountPoint);
-  shadowRoot.append(mountHost);
-
-  return {
-    mountPoint,
-    cleanup: () => mountHost.remove(),
-  };
-};
-
-const PureApp: React.FC<PureAppProps> = ({ config, className, style, onClick }) => {
+const PureApp: FC<PureAppProps> = ({
+  config,
+  className,
+  style,
+  onClick,
+}) => {
   const { t } = useI18n();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const propsRef = useRef(config.props);
-  propsRef.current = config.props;
-  const sdkRef = useRef(config.sdk);
-  sdkRef.current = config.sdk;
-  const propsKey = JSON.stringify(config.props ?? {});
-  const sdkSizeId = config.sdk?.sizeId;
-
-  useEffect(() => {
-    let cleanup: (() => void) | undefined;
-    let shadowMount: ReturnType<typeof createShadowMount> | undefined;
-    let cancelled = false;
-
-    const load = async () => {
-      try {
-        setError(null);
-        try {
-          (globalThis as any).process = (globalThis as any).process || { env: {} };
-        } catch {
-          /* empty */
-        }
-        const toAbsUrl = (entry: string) => {
-          if (!entry) return entry;
-          if (entry.startsWith("http://") || entry.startsWith("https://")) return entry;
-          if (entry.startsWith("//")) return `${window.location.protocol}${entry}`;
-          return new URL(entry, window.location.origin).href;
-        };
-
-        const abs = toAbsUrl(String(config.entry));
-
-        try {
-          const u = new URL(abs);
-          const clientUrl = `${u.protocol}//${u.host}/@vite/client`;
-          try {
-            await import(/* @vite-ignore */ clientUrl);
-          } catch {
-            /* empty */
-          }
-          try {
-            await new Function("u", "return import(u)")(clientUrl);
-          } catch {
-            /* empty */
-          }
-        } catch {
-          /* empty */
-        }
-
-        let mod: any;
-        try {
-          mod = await import(/* @vite-ignore */ abs);
-        } catch {
-          /* empty */
-        }
-        try {
-          mod = await new Function("u", "return import(u)")(abs);
-        } catch {
-          /* empty */
-        }
-
-        const mount = (mod?.mount || mod?.default) as (
-          el: HTMLElement,
-          props?: Record<string, unknown>
-        ) => (() => void) | void;
-
-        if (!mount || typeof mount !== "function") {
-          throw new Error("App module does not export mount/default function");
-        }
-
-        if (containerRef.current) {
-          if (cancelled) return;
-          shadowMount = createShadowMount(containerRef.current);
-
-          const ret = mount(shadowMount.mountPoint, {
-            ...(propsRef.current || {}),
-            mode: config.mode || "icon",
-            ...(sdkRef.current ? { sdk: sdkRef.current } : {}),
-          });
-          if (cancelled) {
-            if (typeof ret === "function") ret();
-            shadowMount.cleanup();
-            return;
-          }
-          if (typeof ret === "function") cleanup = ret;
-        }
-      } catch (e) {
-        if (cancelled) return;
-        if (shadowMount) {
-          shadowMount.cleanup();
-          shadowMount = undefined;
-        }
-        const msg = e instanceof Error ? e.message : String(e);
-        setError(msg);
-        console.error("Failed to load app:", msg);
-      }
-    };
-
-    load();
-    return () => {
-      cancelled = true;
-      try {
-        cleanup?.();
-      } catch {
-        /* empty */
-      }
-      shadowMount?.cleanup();
-    };
-  }, [config.entry, config.mode, propsKey, sdkSizeId]);
-
-  if (error) {
-    return (
-      <div className={className} style={style}>
-        <div className="flex items-center justify-center w-full h-full text-red-500 text-xs">
+  return (
+    <DesktopRemoteApp
+      config={config}
+      className={className}
+      style={style}
+      onClick={onClick}
+      loadFailedFallback={
+        <div className="flex h-full w-full items-center justify-center text-xs text-red-500">
           {t("app.loadFailed")}
         </div>
-      </div>
-    );
-  }
-
-  return <div ref={containerRef} className={className} style={style} onClick={onClick} />;
+      }
+    />
+  );
 };
 
 export default PureApp;

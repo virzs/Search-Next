@@ -1,6 +1,5 @@
 import { PageContainer, PageContainerProps } from "@ant-design/pro-components";
 import { FC, ReactNode } from "react";
-import { cx, css } from "@emotion/css";
 
 export interface BasePageContainerProps extends PageContainerProps {
   children?: ReactNode;
@@ -11,39 +10,9 @@ const BasePageContainer: FC<BasePageContainerProps> = (props) => {
 
   return (
     <PageContainer
-      className={cx(
-        className,
-        css`
-          .ant-page-header {
-            padding-bottom: 8px;
-            padding-left: 24px;
-            .ant-breadcrumb {
-              height: 2.5rem;
-              padding: 0;
-              display: flex;
-              align-items: center;
-            }
-          }
-          .ant-pro-grid-content{
-            .ant-pro-page-container-children-container {
-              padding-left: 8px;
-            }
-          }
-          /* 手机端padding调小 ant-page-header ant-pro-page-container-children-container */
-          @media (max-width: 500px) {
-            .ant-page-header {
-              padding-left: 24px;
-              padding-right: 24px;
-              .ant-page-header-breadcrumb {
-                padding-top: 12px;
-              }
-            }
-            .ant-pro-page-container-children-container {
-              padding: 0 24px 24px;
-            }
-          }
-        `
-      )}
+      className={[basePageContainerClassName, className]
+        .filter(Boolean)
+        .join(" ")}
       title={false}
       fixedHeader={false}
       ghost
@@ -51,5 +20,16 @@ const BasePageContainer: FC<BasePageContainerProps> = (props) => {
     />
   );
 };
+
+const basePageContainerClassName = [
+  "[&_.ant-page-header]:pb-2 [&_.ant-page-header]:pl-6",
+  "[&_.ant-page-header_.ant-breadcrumb]:flex [&_.ant-page-header_.ant-breadcrumb]:h-10 [&_.ant-page-header_.ant-breadcrumb]:items-center [&_.ant-page-header_.ant-breadcrumb]:p-0",
+  "[&_.ant-pro-grid-content_.ant-pro-page-container-children-container]:pl-2",
+  "max-[500px]:[&_.ant-page-header]:px-6",
+  "max-[500px]:[&_.ant-page-header_.ant-page-header-breadcrumb]:pt-3",
+  "max-[500px]:[&_.ant-pro-page-container-children-container]:px-6",
+  "max-[500px]:[&_.ant-pro-page-container-children-container]:pb-6",
+  "max-[500px]:[&_.ant-pro-page-container-children-container]:pt-0",
+].join(" ");
 
 export default BasePageContainer;

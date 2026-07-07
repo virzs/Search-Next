@@ -25,6 +25,7 @@ import {
   RiUserLine,
 } from "@remixicon/react";
 import {
+  createDesktopItemIconBuilder,
   createEmptyDesktopPages,
   buildDesktopTypeConfigMap,
   extractDockItems,
@@ -55,7 +56,6 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
 import { useApp } from "@/hooks/useApp";
-import PureApp from "@/components/micro-frontend/pure-app";
 import PureAppWindow from "@/components/window/pure-app-window";
 import { createHostSDK, sharedEventBus } from "@/sdk";
 import type { AppMode, AppSDK, AppThemeInfo } from "@/sdk";
@@ -538,6 +538,11 @@ function Index() {
             snapshot?.settingsSchema,
             app.settingsSchema,
             fallback?.settingsSchema,
+          ),
+          sizeConfigs: firstDefined(
+            snapshot?.sizeConfigs,
+            app.sizeConfigs,
+            fallback?.sizeConfigs,
           ),
           defaultSizeId: firstDefined(
             snapshot?.defaultSizeId,
@@ -1288,6 +1293,57 @@ function Index() {
     [createAppConfigFromApi, openAppWindow, t],
   );
 
+  const desktopItemIconBuilder = useMemo(
+    () =>
+      createDesktopItemIconBuilder<AppSDK, AppApiItem>({
+        appNameFallback: t("ui.app"),
+        remoteAppClassName: css`
+          width: 100%;
+          height: 100%;
+        `,
+        createSdk: ({ appId, sizeId, mode }) =>
+          buildSDK(appId, sizeId, mode),
+        resolveAppAvailability: (appId) =>
+          resolveDesktopAppAvailability(appId),
+        resolveAppConfig: ({ app, appConfig }) =>
+          app ? (createAppConfigFromApi(app, appConfig) ?? appConfig) : appConfig,
+        renderAvailabilityPlaceholder: ({ status, name, src }) =>
+          renderAppAvailabilityPlaceholder({
+            status,
+            name: name || t("ui.app"),
+            icon: src,
+          }),
+        renderImageIcon: ({ src, name, objectFit }) =>
+          src ? (
+            <DesktopImageIcon
+              src={src}
+              name={name || t("ui.app")}
+              objectFit={objectFit}
+            />
+          ) : null,
+        remoteLoadFailedFallback: () => (
+          <div className="flex h-full w-full items-center justify-center text-xs text-red-500">
+            {t("app.loadFailed")}
+          </div>
+        ),
+        onAppComponentClick: ({ appId, appConfig, item }) => {
+          void openAppWindow({
+            appId,
+            appConfig,
+            fallbackTitle: appConfig.name || item.data?.name || t("ui.app"),
+          });
+        },
+      }),
+    [
+      buildSDK,
+      createAppConfigFromApi,
+      openAppWindow,
+      renderAppAvailabilityPlaceholder,
+      resolveDesktopAppAvailability,
+      t,
+    ],
+  );
+
   return (
     <div
       className={cx(
@@ -1323,162 +1379,7 @@ function Index() {
           contextMenuProps={{ showRemoveButton: true }}
           dataTypeMenuConfigMap={dataTypeMenuConfigMap}
           onContextMenuItemClick={handleContextMenuItemClick}
-          itemIconBuilder={(item) => {
-            const appLauncherDesktopType = getAppLauncherDesktopType(item);
-            const appLauncherConfig = item.data?.appConfig;
-            const itemIcon = getStringIcon(item.data?.icon);
-            if (appLauncherDesktopType) {
-              const appId = getDesktopItemAppId(item);
-              const availability = appId
-                ? resolveDesktopAppAvailability(appId)
-                : ({
-                    status: "unavailable",
-                    reason: "verificationFailed",
-                  } as const);
-              if (availability.status !== "available") {
-                return renderAppAvailabilityPlaceholder({
-                  status: availability.status,
-                  name:
-                    item.data?.name || appLauncherConfig?.name || t("ui.app"),
-                  icon: appLauncherConfig?.appIconUrl ?? itemIcon,
-                });
-              }
-            }
-            if (
-              appLauncherDesktopType &&
-              appLauncherConfig?.appIcon?.type === "custom"
-            ) {
-              const appId =
-                appLauncherConfig.id ||
-                appLauncherDesktopType.replace("app-launcher:", "");
-              const availability = resolveDesktopAppAvailability(appId);
-              if (availability.status !== "available") {
-                return renderAppAvailabilityPlaceholder({
-                  status: availability.status,
-                  name:
-                    item.data?.name || appLauncherConfig.name || t("ui.app"),
-                  icon: appLauncherConfig.appIconUrl ?? itemIcon,
-                });
-              }
-              const renderConfig = availability.app
-                ? (createAppConfigFromApi(
-                    availability.app,
-                    appLauncherConfig,
-                  ) ?? appLauncherConfig)
-                : appLauncherConfig;
-              if (!renderConfig.entry) {
-                return renderAppAvailabilityPlaceholder({
-                  status: "unavailable",
-                  name: item.data?.name || renderConfig.name || t("ui.app"),
-                  icon: renderConfig.appIconUrl ?? itemIcon,
-                });
-              }
-              const sdk = buildSDK(appId, "appIcon", "appIcon");
-              return (
-                <PureApp
-                  config={{
-                    entry: renderConfig.entry,
-                    props: renderConfig.props,
-                    mode: "appIcon",
-                    sdk,
-                  }}
-                  className={css`
-                    width: 100%;
-                    height: 100%;
-                  `}
-                />
-              );
-            }
-
-            if (appLauncherDesktopType) {
-              const appId =
-                appLauncherConfig?.id ||
-                appLauncherDesktopType.replace("app-launcher:", "");
-              const availability = resolveDesktopAppAvailability(appId);
-              const renderConfig =
-                availability.status === "available" && availability.app
-                  ? (createAppConfigFromApi(
-                      availability.app,
-                      appLauncherConfig,
-                    ) ?? appLauncherConfig)
-                  : appLauncherConfig;
-              const icon = renderConfig?.appIconUrl ?? itemIcon;
-              if (icon) {
-                return (
-                  <DesktopImageIcon
-                    src={icon}
-                    name={item.data?.name || renderConfig?.name || t("ui.app")}
-                    objectFit="contain"
-                  />
-                );
-              }
-            }
-
-            const appDesktopType = getAppDesktopType(item);
-            // 动态匹配所有 app: 前缀的桌面项，渲染对应应用（icon 模式）
-            const appConfig = item.data?.appConfig;
-            if (appDesktopType) {
-              const appId = appConfig?.id || appDesktopType.replace("app:", "");
-              const availability = resolveDesktopAppAvailability(appId);
-              if (availability.status !== "available") {
-                return renderAppAvailabilityPlaceholder({
-                  status: availability.status,
-                  name: item.data?.name || appConfig?.name || t("ui.app"),
-                  icon: appConfig?.appIconUrl ?? itemIcon,
-                });
-              }
-              const renderConfig = availability.app
-                ? (createAppConfigFromApi(availability.app, appConfig) ??
-                  appConfig)
-                : appConfig;
-              if (!renderConfig?.entry) {
-                return renderAppAvailabilityPlaceholder({
-                  status: "unavailable",
-                  name: item.data?.name || renderConfig?.name || t("ui.app"),
-                  icon: renderConfig?.appIconUrl ?? itemIcon,
-                });
-              }
-              const sizeId =
-                typeof item.config?.sizeId === "string"
-                  ? item.config.sizeId
-                  : renderConfig.defaultSizeId || "2x2";
-              const sdk = buildSDK(appId, sizeId, "icon");
-              return (
-                <PureApp
-                  config={{
-                    entry: renderConfig.entry,
-                    props: renderConfig.props,
-                    mode: "icon",
-                    sdk,
-                  }}
-                  className={css`
-                    width: 100%;
-                    height: 100%;
-                  `}
-                  onClick={() => {
-                    void openAppWindow({
-                      appId,
-                      appConfig: renderConfig,
-                      fallbackTitle:
-                        renderConfig.name || item.data?.name || t("ui.app"),
-                    });
-                  }}
-                />
-              );
-            }
-
-            if (item.type === "app" && itemIcon) {
-              return (
-                <DesktopImageIcon
-                  src={itemIcon}
-                  name={item.data?.name || t("ui.app")}
-                  objectFit={item.data?.url ? "cover" : "contain"}
-                />
-              );
-            }
-
-            return null;
-          }}
+          itemIconBuilder={desktopItemIconBuilder}
           dockProps={{
             items: dockItems,
             itemBuilder: createDockHistoryItem,
