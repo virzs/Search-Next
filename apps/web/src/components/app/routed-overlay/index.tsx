@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import {
   useLocation,
   useNavigate,
@@ -231,6 +232,7 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
   const location = useLocation();
   const outlet = useOutlet();
   const parentContext = useOutletContext<ParentContext>();
+  const [routeClosing, setRouteClosing] = useState(false);
   const [searchValue, setSearchValue] = useState(
     sidebarProps?.search?.initialValue ?? "",
   );
@@ -254,6 +256,10 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
     : effectiveSearchValue;
   const latestLocationRef = useRef(location);
   const latestNavigateRef = useRef(navigate);
+  const handleClose = useCallback(() => {
+    flushSync(() => setRouteClosing(true));
+    navigate(closeTo);
+  }, [closeTo, navigate]);
 
   useEffect(() => {
     latestLocationRef.current = location;
@@ -402,10 +408,12 @@ const AppRoutedOverlay = <ParentContext, RouteContext>({
     <div className={outletWrapperClassName}>{outlet}</div>
   );
 
+  if (routeClosing) return null;
+
   return (
     <AppRoutedContainer
       open
-      onClose={() => navigate(closeTo)}
+      onClose={handleClose}
       title={title}
       navigationTitle={activeMenuItem?.label}
       wrapContent={wrapContent}

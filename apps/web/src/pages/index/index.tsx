@@ -15,6 +15,7 @@ import type {
 import { css, cx } from "@emotion/css";
 import { useBoolean, useRequest } from "ahooks";
 import { useRef, useEffect, useMemo, useState, useCallback } from "react";
+import { flushSync } from "react-dom";
 import type { ReactNode } from "react";
 import {
   RiApps2Line,
@@ -435,6 +436,9 @@ function Index() {
     },
     [],
   );
+  const closeAvailabilityModal = useCallback(() => {
+    flushSync(() => setAvailabilityModal(null));
+  }, []);
   const renderAppAvailabilityPlaceholder = useCallback(
     ({
       status,
@@ -608,6 +612,12 @@ function Index() {
     appName: string;
     appConfig?: DesktopItemData["appConfig"];
   } | null>(null);
+  const closeFullApp = useCallback(() => {
+    flushSync(() => setFullApp(null));
+  }, []);
+  const closeInfoModal = useCallback(() => {
+    flushSync(() => setInfoTarget(null));
+  }, []);
 
   /** 为指定应用创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
   const sdkDepsRef = useRef({
@@ -1767,7 +1777,7 @@ function Index() {
       {availabilityModal && (
         <DesktopNextBaseModal
           visible
-          onClose={() => setAvailabilityModal(null)}
+          onClose={closeAvailabilityModal}
           width={390}
           destroyOnClose
           theme={desktopTheme}
@@ -1825,7 +1835,7 @@ function Index() {
             </div>
             <button
               type="button"
-              onClick={() => setAvailabilityModal(null)}
+              onClick={closeAvailabilityModal}
               className="mt-6 rounded-full border border-white/20 bg-[#007aff] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(0,122,255,0.24)] transition hover:bg-[#0a84ff] active:scale-[0.98]"
             >
               {t("ui.close")}
@@ -1836,7 +1846,7 @@ function Index() {
       {fullApp && (
         <PureAppWindow
           visible={true}
-          onClose={() => setFullApp(null)}
+          onClose={closeFullApp}
           config={{ entry: fullApp.entry, props: fullApp.props }}
           title={fullApp.title}
           appConfig={fullApp.appConfig}
@@ -1852,7 +1862,7 @@ function Index() {
       {infoTarget && (
         <AppInfoModal
           visible={true}
-          onClose={() => setInfoTarget(null)}
+          onClose={closeInfoModal}
           appId={infoTarget.appId}
           appName={infoTarget.appName}
           appConfig={infoTarget.appConfig}

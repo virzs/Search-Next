@@ -1,5 +1,7 @@
 import { css, cx } from "@emotion/css";
 import { Navigate, Outlet, useNavigate } from "react-router";
+import { useState } from "react";
+import { flushSync } from "react-dom";
 import { DesktopNextBaseModal } from "zs_library";
 import { AccountInfo, UnloggedView } from "@/components/auth";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,11 +11,18 @@ import { useI18n } from "@/i18n";
 
 const AccountModalRoute = () => {
   const navigate = useNavigate();
+  const [routeClosing, setRouteClosing] = useState(false);
+  const handleClose = () => {
+    flushSync(() => setRouteClosing(true));
+    navigate("/");
+  };
+
+  if (routeClosing) return null;
 
   return (
     <DesktopNextBaseModal
       visible
-      onClose={() => navigate("/")}
+      onClose={handleClose}
       width={600}
       floatingControls={{
         fullscreen: false,
