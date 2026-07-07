@@ -61,6 +61,9 @@ import {
 import { settingsRoute } from "./components/default-apps/settings/route-paths";
 import Notice from "./components/notice";
 import Feedback from "./components/feedback";
+import DesktopImageIcon, {
+  getStringIcon,
+} from "./components/desktop-image-icon";
 import { accountRoute } from "./components/default-apps/account/route-paths";
 import BoringAccountAvatar from "@/components/auth/BoringAccountAvatar";
 import { getPublicAppDetail } from "@/services/app";
@@ -503,12 +506,11 @@ function Index() {
             )}
           >
             {icon ? (
-              <img
+              <DesktopImageIcon
                 src={icon}
-                alt=""
-                draggable={false}
+                name={name}
+                objectFit="contain"
                 className={cx(
-                  "h-full w-full object-contain",
                   unavailable
                     ? "grayscale opacity-60 contrast-[0.9]"
                     : "opacity-75",
@@ -1217,7 +1219,7 @@ function Index() {
   };
 
   const createDockHistoryItem = useCallback((item: DesktopItem) => {
-    const icon = item.data?.icon;
+    const icon = getStringIcon(item.data?.icon);
     const name = item.data?.name || t("ui.app");
     const appId = getDesktopItemAppId(item);
     const availability = appId
@@ -1230,7 +1232,7 @@ function Index() {
           {renderAppAvailabilityPlaceholder({
             status: availability.status,
             name,
-            icon: typeof icon === "string" ? icon : null,
+            icon,
           })}
         </div>
       );
@@ -1266,13 +1268,8 @@ function Index() {
           `,
         )}
       >
-        {typeof icon === "string" && icon ? (
-          <img
-            src={icon}
-            alt={name}
-            className="h-full w-full object-cover"
-            draggable={false}
-          />
+        {icon ? (
+          <DesktopImageIcon src={icon} name={name} />
         ) : (
           <span className="relative z-1 text-lg font-semibold text-white">
             {name.charAt(0)}
@@ -1535,6 +1532,7 @@ function Index() {
           itemIconBuilder={(item) => {
             const appLauncherDesktopType = getAppLauncherDesktopType(item);
             const appLauncherConfig = item.data?.appConfig;
+            const itemIcon = getStringIcon(item.data?.icon);
             if (appLauncherDesktopType) {
               const appId = getDesktopItemAppId(item);
               const availability = appId
@@ -1544,11 +1542,7 @@ function Index() {
                 return renderAppAvailabilityPlaceholder({
                   status: availability.status,
                   name: item.data?.name || appLauncherConfig?.name || t("ui.app"),
-                  icon:
-                    appLauncherConfig?.appIconUrl ??
-                    (typeof item.data?.icon === "string"
-                      ? item.data.icon
-                      : null),
+                  icon: appLauncherConfig?.appIconUrl ?? itemIcon,
                 });
               }
             }
@@ -1563,11 +1557,7 @@ function Index() {
                 return renderAppAvailabilityPlaceholder({
                   status: availability.status,
                   name: item.data?.name || appLauncherConfig.name || t("ui.app"),
-                  icon:
-                    appLauncherConfig.appIconUrl ??
-                    (typeof item.data?.icon === "string"
-                      ? item.data.icon
-                      : null),
+                  icon: appLauncherConfig.appIconUrl ?? itemIcon,
                 });
               }
               const renderConfig = availability.app
@@ -1578,11 +1568,7 @@ function Index() {
                 return renderAppAvailabilityPlaceholder({
                   status: "unavailable",
                   name: item.data?.name || renderConfig.name || t("ui.app"),
-                  icon:
-                    renderConfig.appIconUrl ??
-                    (typeof item.data?.icon === "string"
-                      ? item.data.icon
-                      : null),
+                  icon: renderConfig.appIconUrl ?? itemIcon,
                 });
               }
               const sdk = buildSDK(appId, "appIcon", "appIcon");
@@ -1602,6 +1588,28 @@ function Index() {
               );
             }
 
+            if (appLauncherDesktopType) {
+              const appId =
+                appLauncherConfig?.id ||
+                appLauncherDesktopType.replace("app-launcher:", "");
+              const availability = resolveDesktopAppAvailability(appId);
+              const renderConfig =
+                availability.status === "available" && availability.app
+                  ? createAppConfigFromApi(availability.app, appLauncherConfig) ??
+                    appLauncherConfig
+                  : appLauncherConfig;
+              const icon = renderConfig?.appIconUrl ?? itemIcon;
+              if (icon) {
+                return (
+                  <DesktopImageIcon
+                    src={icon}
+                    name={item.data?.name || renderConfig?.name || t("ui.app")}
+                    objectFit="contain"
+                  />
+                );
+              }
+            }
+
             const appDesktopType = getAppDesktopType(item);
             // 动态匹配所有 app: 前缀的桌面项，渲染对应应用（icon 模式）
             const appConfig = item.data?.appConfig;
@@ -1613,11 +1621,7 @@ function Index() {
                 return renderAppAvailabilityPlaceholder({
                   status: availability.status,
                   name: item.data?.name || appConfig?.name || t("ui.app"),
-                  icon:
-                    appConfig?.appIconUrl ??
-                    (typeof item.data?.icon === "string"
-                      ? item.data.icon
-                      : null),
+                  icon: appConfig?.appIconUrl ?? itemIcon,
                 });
               }
               const renderConfig = availability.app
@@ -1628,11 +1632,7 @@ function Index() {
                 return renderAppAvailabilityPlaceholder({
                   status: "unavailable",
                   name: item.data?.name || renderConfig?.name || t("ui.app"),
-                  icon:
-                    renderConfig?.appIconUrl ??
-                    (typeof item.data?.icon === "string"
-                      ? item.data.icon
-                      : null),
+                  icon: renderConfig?.appIconUrl ?? itemIcon,
                 });
               }
               const sizeId =
@@ -1659,6 +1659,16 @@ function Index() {
                       fallbackTitle: renderConfig.name || item.data?.name || t("ui.app"),
                     });
                   }}
+                />
+              );
+            }
+
+            if (item.type === "app" && itemIcon) {
+              return (
+                <DesktopImageIcon
+                  src={itemIcon}
+                  name={item.data?.name || t("ui.app")}
+                  objectFit={item.data?.url ? "cover" : "contain"}
                 />
               );
             }
@@ -1780,16 +1790,15 @@ function Index() {
             <div className="relative flex h-[78px] w-[78px] items-center justify-center overflow-visible rounded-[22px] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
               {availabilityModal.icon ? (
                 <div className="relative h-[62px] w-[62px] overflow-hidden rounded-[18px]">
-                  <img
+                  <DesktopImageIcon
                     src={availabilityModal.icon}
-                    alt=""
+                    name={availabilityModal.name || t("ui.app")}
+                    objectFit="contain"
                     className={cx(
-                      "h-full w-full object-contain",
                       availabilityModal.status === "unavailable"
                         ? "grayscale opacity-[0.65] contrast-[0.9]"
                         : "opacity-[0.85]",
                     )}
-                    draggable={false}
                   />
                   <span className="absolute inset-0 bg-white/20 dark:bg-black/20" />
                 </div>
