@@ -6,6 +6,7 @@ import { Theme } from "@radix-ui/themes";
 import { I18nextProvider } from "react-i18next";
 import zhCN from "antd/locale/zh_CN";
 import enUS from "antd/locale/en_US";
+import { ZsI18nProvider } from "zs_library";
 
 import "./index.css";
 import DesktopNextIndex from "./pages/index";
@@ -40,9 +41,14 @@ const ThemedConfigProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <Theme appearance={resolvedColorScheme}>
-      <ConfigProvider locale={antdLocales[language]} theme={themeConfig}>
-        <App>{children}</App>
-      </ConfigProvider>
+      <ZsI18nProvider language={language}>
+        {/* Keep Search Next translations bound to the app i18n under zs_library's provider. */}
+        <I18nextProvider i18n={i18n}>
+          <ConfigProvider locale={antdLocales[language]} theme={themeConfig}>
+            <App>{children}</App>
+          </ConfigProvider>
+        </I18nextProvider>
+      </ZsI18nProvider>
     </Theme>
   );
 };

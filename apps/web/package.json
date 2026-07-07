@@ -31,14 +31,14 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-draggable": "^4.4.6",
-    "react-infinite-scroll-component": "^6.1.0",
     "react-i18next": "^15.7.4",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-router": "^7.9.4",
     "react-sticky-box": "^2.0.5",
     "remixicon": "^4.7.0",
     "tailwindcss": "^4.1.17",
     "uuid": "^13.0.0",
-    "zs_library": "^0.9.6"
+    "zs_library": "^0.9.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
