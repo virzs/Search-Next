@@ -5,6 +5,8 @@ import * as express from 'express';
 import * as os from 'os';
 import * as path from 'path';
 import { AppModule } from './app.module';
+import { shouldUseSetupOnlyMode } from './config/env';
+import { SetupOnlyModule } from './setup-only.module';
 import { AllExceptionsFilter } from './public/filter/all';
 import { HttpExceptionFilter } from './public/filter/http';
 import { TransformInterceptor } from './public/interceptor/transform';
@@ -14,8 +16,9 @@ import { Logger } from './utils/log4';
 import { ConsoleLogger } from '@nestjs/common';
 
 async function bootstrap() {
+  const setupOnlyMode = shouldUseSetupOnlyMode();
   const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
+    setupOnlyMode ? SetupOnlyModule : AppModule,
     new ExpressAdapter(),
     {
       logger: new ConsoleLogger({
@@ -93,7 +96,7 @@ async function bootstrap() {
   await app.listen(port);
 
   Logger.info(`
-  服务启动成功
+  服务启动成功${setupOnlyMode ? '（首次部署引导模式）' : ''}
 
   Local:   http://localhost:${port}
   Network: http://${ip}:${port}

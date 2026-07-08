@@ -22,6 +22,9 @@ import storageService from './config/storage-service';
 import { CleanupService } from './public/service/cleanup.service';
 import { SystemModule } from './modules/system/system.module';
 import { TabsModule } from './modules/tabs/tabs.module';
+import { getRuntimeEnvFilePath } from './config/env';
+import { buildRedisUrl } from './config/redis-uri';
+import { SetupModule } from './modules/setup/setup.module';
 
 @Module({
   imports: [
@@ -29,7 +32,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
      * 加载配置文件 参考 .env.example
      */
     ConfigModule.forRoot({
-      envFilePath: ['.env', 'local.env', 'dev.env', 'prod.env'],
+      envFilePath: getRuntimeEnvFilePath(),
       ignoreEnvFile: false,
       ignoreEnvVars: false,
       isGlobal: true,
@@ -81,9 +84,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
         const password = config.get('redis.password');
         const db = config.get('redis.db');
         const ttl = config.get('redis.ttl');
-        const auth = password ? `:${password}@` : '';
-        const dbSuffix = Number.isFinite(db) ? `/${db}` : '';
-        const redisUrl = `redis://${auth}${host}:${port}${dbSuffix}`;
+        const redisUrl = buildRedisUrl({ host, port, password, db });
 
         return {
           ttl,
@@ -99,6 +100,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
     SystemModule,
     AiModule,
     TabsModule,
+    SetupModule,
   ],
   providers: [
     JwtService,

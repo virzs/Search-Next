@@ -6,17 +6,40 @@ interface FilterLogTemplateData {
   response?: any;
 }
 
-interface TransformLogTemplateData
-  extends Omit<FilterLogTemplateData, 'statusCode'> {
+interface TransformLogTemplateData extends Omit<
+  FilterLogTemplateData,
+  "statusCode"
+> {
   user?: any;
 }
 
-interface LogTemplateData extends Omit<FilterLogTemplateData, 'response'> {
+interface LogTemplateData extends Omit<FilterLogTemplateData, "response"> {
   cookies?: any;
   params?: any;
   query?: any;
   body?: any;
 }
+
+const SENSITIVE_KEY_PATTERN = /password|token|secret|captcha|authorization/i;
+
+export const redactSensitiveValues = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map((item) => redactSensitiveValues(item));
+  }
+
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      SENSITIVE_KEY_PATTERN.test(key)
+        ? "[REDACTED]"
+        : redactSensitiveValues(item),
+    ]),
+  );
+};
 
 export const filterLogTemplate = (dataSource: FilterLogTemplateData) =>
   `<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -42,8 +65,8 @@ export const logTemplate = (dataSource: LogTemplateData) =>
   Method              : ${dataSource.method}
   IP                  : ${dataSource.ip}
   Status code         : ${dataSource.statusCode}
-  Cookies             : ${JSON.stringify(dataSource.cookies)}
-  Params              : ${JSON.stringify(dataSource.params)}
-  Query               : ${JSON.stringify(dataSource.query)}
-  Body                : ${JSON.stringify(dataSource.body)}
+  Cookies             : ${JSON.stringify(redactSensitiveValues(dataSource.cookies))}
+  Params              : ${JSON.stringify(redactSensitiveValues(dataSource.params))}
+  Query               : ${JSON.stringify(redactSensitiveValues(dataSource.query))}
+  Body                : ${JSON.stringify(redactSensitiveValues(dataSource.body))}
  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`;
