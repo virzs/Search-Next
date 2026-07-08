@@ -23,6 +23,8 @@ import {
   DesktopThemeConfig,
   getActiveDesktopThemeConfig,
 } from "@/services/tabs/desktop/theme-config";
+import { useLayout } from "@/context";
+import { Theme } from "@/hooks/useTheme";
 import {
   createAdminDesktopItemIconBuilder,
   createAdminFixedItemBuilder,
@@ -125,7 +127,10 @@ const DesktopEditor = ({
   const [dockItems, setDockItems] = useState<
     DesktopSortItem<DesktopItemData>[]
   >([]);
-  const themeMode: AdminDesktopPreviewThemeMode =
+  const { theme: adminTheme } = useLayout();
+  const chromeThemeMode: AdminDesktopPreviewThemeMode =
+    adminTheme === Theme.Dark ? "dark" : "light";
+  const previewThemeMode: AdminDesktopPreviewThemeMode =
     themeType === "darkConfig" ? "dark" : "light";
   const resolvedTheme = useMemo(() => {
     if (theme) {
@@ -138,9 +143,10 @@ const DesktopEditor = ({
       : desktopNextThemeLight;
   }, [theme, themeType]);
   const itemIconBuilder = useMemo(
-    () => createAdminDesktopItemIconBuilder(themeMode),
-    [themeMode],
+    () => createAdminDesktopItemIconBuilder(previewThemeMode),
+    [previewThemeMode],
   );
+  const desktopThemeKey = `${theme?._id || theme?.name || "default"}:${themeType}`;
 
   useEffect(() => {
     valueRef.current = value;
@@ -151,8 +157,8 @@ const DesktopEditor = ({
   }, [onChange]);
 
   useEffect(() => {
-    emitAdminDesktopPreviewThemeChange(themeMode);
-  }, [themeMode]);
+    emitAdminDesktopPreviewThemeChange(previewThemeMode);
+  }, [previewThemeMode]);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -235,8 +241,12 @@ const DesktopEditor = ({
   };
 
   return (
-    <div className={desktopEditorShellClassName}>
+    <div
+      className={getDesktopEditorShellClassName(chromeThemeMode)}
+      data-theme={chromeThemeMode}
+    >
       <DesktopResourceTabs
+        themeMode={chromeThemeMode}
         onResourceDragStart={handleResourceDragStart}
         onResourceDragEnd={() => {
           draggingResourceRef.current = null;
@@ -244,19 +254,19 @@ const DesktopEditor = ({
         onAddItem={(item) => addItemsToCurrentPage([item])}
       />
       <main
-        className={getDesktopCanvasStageClassName(themeMode)}
+        className={desktopCanvasStageClassName}
         onDragOverCapture={handleResourceDragOver}
         onDropCapture={handleResourceDrop}
       >
         <div
-          className={getDesktopCanvasFrameClassName(themeMode)}
+          className={desktopCanvasFrameClassName}
+          data-theme={previewThemeMode}
           style={{
-            backgroundColor:
-              resolvedTheme.token.base?.backgroundColor ??
-              (themeMode === "dark" ? "#111827" : "#ffffff"),
+            colorScheme: previewThemeMode,
           }}
         >
           <DesktopNext<DesktopItemData>
+            key={desktopThemeKey}
             ref={desktopRef}
             className={desktopCanvasClassName}
             pages={pages}
@@ -278,8 +288,13 @@ const DesktopEditor = ({
   );
 };
 
-const desktopEditorShellClassName =
-  "flex h-full max-h-full min-h-0 flex-row overflow-hidden bg-slate-200";
+const getDesktopEditorShellClassName = (
+  themeMode: AdminDesktopPreviewThemeMode,
+) =>
+  [
+    "flex h-full max-h-full min-h-0 flex-row overflow-hidden",
+    themeMode === "dark" ? "dark bg-[#141414]" : "bg-white",
+  ].join(" ");
 
 const desktopHeaderToolbarClassName =
   "flex min-w-[380px] flex-nowrap items-center gap-2.5";
@@ -288,25 +303,10 @@ const themeSelectClassName = "w-[220px]";
 
 const themeModeSegmentClassName = "w-[136px]";
 
-const getDesktopCanvasStageClassName = (
-  themeMode: AdminDesktopPreviewThemeMode,
-) =>
-  [
-    "min-h-0 w-0 flex-1 p-2.5",
-    "[background-size:24px_24px]",
-    themeMode === "dark"
-      ? "bg-slate-950 [background-image:linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"
-      : "bg-slate-50 [background-image:linear-gradient(90deg,rgba(15,23,42,0.035)_1px,transparent_1px),linear-gradient(180deg,rgba(15,23,42,0.035)_1px,transparent_1px)]",
-  ].join(" ");
+const desktopCanvasStageClassName = "min-h-0 w-0 flex-1 bg-inherit p-2.5";
 
-const getDesktopCanvasFrameClassName = (
-  themeMode: AdminDesktopPreviewThemeMode,
-) =>
-  [
-    "h-full w-full overflow-hidden rounded-lg border",
-    themeMode === "dark" ? "border-white/10" : "border-slate-300/60",
-  ].join(" ");
+const desktopCanvasFrameClassName = "h-full w-full overflow-hidden bg-inherit";
 
-const desktopCanvasClassName = "h-full w-full overflow-hidden";
+const desktopCanvasClassName = "h-full w-full overflow-hidden bg-inherit";
 
 export default DesktopEditor;

@@ -21,6 +21,8 @@ import {
   putDesktopAdminConfig,
 } from "@/services/tabs/desktop/desktop-config";
 import type { DesktopThemeConfig } from "@/services/tabs/desktop/theme-config";
+import { useLayout } from "@/context";
+import { Theme } from "@/hooks/useTheme";
 
 const { useForm } = ProForm;
 
@@ -32,12 +34,17 @@ const DesktopHandle = () => {
 
   const { id } = useParams();
   const { message } = App.useApp();
+  const { theme: adminTheme } = useLayout();
+  const globalDesktopThemeType: DesktopThemeType =
+    adminTheme === Theme.Dark ? "darkConfig" : "lightConfig";
 
   const [activeStep, setActiveStep] = useState<number>(0);
   const [selectedDesktopTheme, setSelectedDesktopTheme] =
     useState<DesktopThemeConfig | null>(null);
+  const [hasCustomDesktopThemeType, setHasCustomDesktopThemeType] =
+    useState(false);
   const [selectedDesktopThemeType, setSelectedDesktopThemeType] =
-    useState<DesktopThemeType>("lightConfig");
+    useState<DesktopThemeType>(() => globalDesktopThemeType);
 
   const { loading: getLoading, run: getRun } = useRequest(
     detailDesktopAdminConfig,
@@ -87,6 +94,12 @@ const DesktopHandle = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    if (!hasCustomDesktopThemeType) {
+      setSelectedDesktopThemeType(globalDesktopThemeType);
+    }
+  }, [globalDesktopThemeType, hasCustomDesktopThemeType]);
+
   return (
     <FullPageContainer
       backButtonProps={{ confirm: true }}
@@ -102,7 +115,13 @@ const DesktopHandle = () => {
       cardProps={{
         className:
           activeStep === 1
-            ? "[&>.ant-pro-card-body]:!overflow-hidden [&>.ant-pro-card-body]:!p-0"
+            ? [
+                "[&>.ant-pro-card-body]:!overflow-hidden [&>.ant-pro-card-body]:!p-0",
+                "dark:!bg-[#141414]",
+                "dark:[&>.ant-pro-card-head]:!border-[#303030]",
+                "dark:[&>.ant-pro-card-head]:!bg-[#141414]",
+                "dark:[&>.ant-pro-card-body]:!bg-[#141414]",
+              ].join(" ")
             : undefined,
         extra: (
           <div className="flex flex-nowrap items-center gap-2">
@@ -111,7 +130,10 @@ const DesktopHandle = () => {
                 theme={selectedDesktopTheme}
                 themeType={selectedDesktopThemeType}
                 onThemeChange={setSelectedDesktopTheme}
-                onThemeTypeChange={setSelectedDesktopThemeType}
+                onThemeTypeChange={(themeType) => {
+                  setHasCustomDesktopThemeType(true);
+                  setSelectedDesktopThemeType(themeType);
+                }}
               />
             ) : null}
             <Button.Group>

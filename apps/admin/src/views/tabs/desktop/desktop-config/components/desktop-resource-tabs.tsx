@@ -29,7 +29,10 @@ import { getWebsiteList } from "@/services/tabs/website";
 import type { Website } from "@/services/tabs/website_classifty";
 import { toBackendAssetUrl } from "./desktop-assets";
 
+export type DesktopResourceThemeMode = "light" | "dark";
+
 export interface DesktopResourceTabsProps {
+  themeMode?: DesktopResourceThemeMode;
   onResourceDragStart: (
     event: DragEvent<HTMLElement>,
     item: DesktopSortItem<DesktopItemData>,
@@ -200,14 +203,17 @@ interface ResourceDetail {
 
 const ResourceDetailModal = ({
   detail,
+  themeMode = "light",
   onClose,
 }: {
   detail: ResourceDetail | null;
+  themeMode?: DesktopResourceThemeMode;
   onClose: () => void;
 }) => (
   <Modal
     open={Boolean(detail)}
     title={detail?.title}
+    rootClassName={getDetailModalRootClassName(themeMode)}
     width={420}
     footer={null}
     onCancel={onClose}
@@ -299,6 +305,7 @@ const ResourceTabFrame = ({
 };
 
 const WebsiteResourceTab = ({
+  themeMode,
   onResourceDragStart,
   onResourceDragEnd,
 }: DesktopResourceTabsProps) => {
@@ -388,12 +395,17 @@ const WebsiteResourceTab = ({
           />
         );
       })}
-      <ResourceDetailModal detail={detail} onClose={() => setDetail(null)} />
+      <ResourceDetailModal
+        detail={detail}
+        themeMode={themeMode}
+        onClose={() => setDetail(null)}
+      />
     </ResourceTabFrame>
   );
 };
 
 const AppResourceTab = ({
+  themeMode,
   onResourceDragStart,
   onResourceDragEnd,
 }: DesktopResourceTabsProps) => {
@@ -476,12 +488,17 @@ const AppResourceTab = ({
           />
         );
       })}
-      <ResourceDetailModal detail={detail} onClose={() => setDetail(null)} />
+      <ResourceDetailModal
+        detail={detail}
+        themeMode={themeMode}
+        onClose={() => setDetail(null)}
+      />
     </ResourceTabFrame>
   );
 };
 
 const ComponentResourceTab = ({
+  themeMode,
   onResourceDragStart,
   onResourceDragEnd,
 }: DesktopResourceTabsProps) => {
@@ -576,7 +593,11 @@ const ComponentResourceTab = ({
           />
         );
       })}
-      <ResourceDetailModal detail={detail} onClose={() => setDetail(null)} />
+      <ResourceDetailModal
+        detail={detail}
+        themeMode={themeMode}
+        onClose={() => setDetail(null)}
+      />
     </ResourceTabFrame>
   );
 };
@@ -587,43 +608,80 @@ const createTabLabel = (title: string, icon: ReactNode) => (
   </Tooltip>
 );
 
-const DesktopResourceTabs = (props: DesktopResourceTabsProps) => (
-  <div className={resourceTabsClassName}>
-    <Tabs
-      size="small"
-      items={[
-        {
-          key: "website",
-          label: createTabLabel("网站", <RiGlobalLine size={16} />),
-          children: <WebsiteResourceTab {...props} />,
-        },
-        {
-          key: "app",
-          label: createTabLabel("应用", <RiApps2Line size={16} />),
-          children: <AppResourceTab {...props} />,
-        },
-        {
-          key: "component",
-          label: createTabLabel("组件", <RiLayoutGridLine size={16} />),
-          children: <ComponentResourceTab {...props} />,
-        },
-      ]}
-    />
-  </div>
-);
+const DesktopResourceTabs = (props: DesktopResourceTabsProps) => {
+  const themeMode = props.themeMode ?? "light";
 
-const resourceTabsClassName = [
-  "box-border flex h-full max-h-full min-h-0 w-[268px] min-w-[252px] max-w-[280px] flex-none basis-[268px] flex-col overflow-hidden border-r border-slate-200 bg-white",
-  "[&_.ant-tabs]:flex [&_.ant-tabs]:h-full [&_.ant-tabs]:max-h-full [&_.ant-tabs]:min-h-0 [&_.ant-tabs]:min-w-0 [&_.ant-tabs]:flex-1 [&_.ant-tabs]:flex-col [&_.ant-tabs]:overflow-hidden",
-  "[&_.ant-tabs-nav]:!m-0 [&_.ant-tabs-nav]:border-b [&_.ant-tabs-nav]:border-slate-200 [&_.ant-tabs-nav]:px-3",
-  "[&_.ant-tabs-tab]:!m-0 [&_.ant-tabs-tab]:pb-2",
-  "[&_.ant-tabs-tab-btn]:flex [&_.ant-tabs-tab-btn]:items-center",
-  "[&_.ant-tabs-content-holder]:h-0 [&_.ant-tabs-content-holder]:min-h-0 [&_.ant-tabs-content-holder]:flex-1 [&_.ant-tabs-content-holder]:overflow-hidden",
-  "[&_.ant-tabs-content]:h-full [&_.ant-tabs-content]:max-h-full [&_.ant-tabs-content]:min-h-0 [&_.ant-tabs-content]:overflow-hidden",
-  "[&_.ant-tabs-tabpane]:h-full [&_.ant-tabs-tabpane]:max-h-full [&_.ant-tabs-tabpane]:min-h-0 [&_.ant-tabs-tabpane]:overflow-hidden",
-  "[&_.ant-tabs-tabpane-active]:flex [&_.ant-tabs-tabpane-active]:flex-col",
-  "[&_.ant-tabs-tab-active_.resource-tab-label]:text-[#ff4d1f]",
-].join(" ");
+  return (
+    <div className={getResourceTabsClassName(themeMode)}>
+      <Tabs
+        size="small"
+        items={[
+          {
+            key: "website",
+            label: createTabLabel("网站", <RiGlobalLine size={16} />),
+            children: <WebsiteResourceTab {...props} />,
+          },
+          {
+            key: "app",
+            label: createTabLabel("应用", <RiApps2Line size={16} />),
+            children: <AppResourceTab {...props} />,
+          },
+          {
+            key: "component",
+            label: createTabLabel("组件", <RiLayoutGridLine size={16} />),
+            children: <ComponentResourceTab {...props} />,
+          },
+        ]}
+      />
+    </div>
+  );
+};
+
+const getResourceTabsClassName = (themeMode: DesktopResourceThemeMode) =>
+  [
+    "box-border flex h-full max-h-full min-h-0 w-[268px] min-w-[252px] max-w-[280px] flex-none basis-[268px] flex-col overflow-hidden border-r",
+    themeMode === "dark"
+      ? "border-[#303030] bg-[#141414] text-neutral-100"
+      : "border-slate-200 bg-white",
+    "[&_.ant-tabs]:flex [&_.ant-tabs]:h-full [&_.ant-tabs]:max-h-full [&_.ant-tabs]:min-h-0 [&_.ant-tabs]:min-w-0 [&_.ant-tabs]:flex-1 [&_.ant-tabs]:flex-col [&_.ant-tabs]:overflow-hidden",
+    "[&_.ant-tabs-nav]:!m-0 [&_.ant-tabs-nav]:border-b [&_.ant-tabs-nav]:px-3",
+    themeMode === "dark"
+      ? "[&_.ant-tabs-nav]:border-[#303030]"
+      : "[&_.ant-tabs-nav]:border-slate-200",
+    "[&_.ant-tabs-tab]:!m-0 [&_.ant-tabs-tab]:pb-2",
+    "[&_.ant-tabs-tab-btn]:flex [&_.ant-tabs-tab-btn]:items-center",
+    "[&_.ant-tabs-content-holder]:h-0 [&_.ant-tabs-content-holder]:min-h-0 [&_.ant-tabs-content-holder]:flex-1 [&_.ant-tabs-content-holder]:overflow-hidden",
+    "[&_.ant-tabs-content]:h-full [&_.ant-tabs-content]:max-h-full [&_.ant-tabs-content]:min-h-0 [&_.ant-tabs-content]:overflow-hidden",
+    "[&_.ant-tabs-tabpane]:h-full [&_.ant-tabs-tabpane]:max-h-full [&_.ant-tabs-tabpane]:min-h-0 [&_.ant-tabs-tabpane]:overflow-hidden",
+    "[&_.ant-tabs-tabpane-active]:flex [&_.ant-tabs-tabpane-active]:flex-col",
+    "[&_.ant-tabs-tab-active_.resource-tab-label]:text-[#ff4d1f]",
+    themeMode === "dark"
+      ? [
+          "[&_.resource-tab-label]:text-neutral-400",
+          "[&_.ant-tabs-tab-active_.resource-tab-label]:text-[#ff7a45]",
+          "[&_.resource-card:hover]:bg-[#1f1f1f]",
+          "[&_.resource-card:hover_.resource-icon]:bg-[#262626]",
+          "[&_.resource-icon-fallback]:bg-[#1f1f1f]",
+          "[&_.resource-icon-fallback]:text-neutral-300",
+          "[&_.resource-title]:text-neutral-100",
+          "[&_.ant-input-search_.ant-input-affix-wrapper]:!border-[#303030]",
+          "[&_.ant-input-search_.ant-input-affix-wrapper]:!bg-[#1f1f1f]",
+          "[&_.ant-input-search_.ant-input]:!bg-transparent",
+          "[&_.ant-input-search_.ant-input]:!text-neutral-100",
+          "[&_.ant-input::placeholder]:!text-neutral-500",
+          "[&_.ant-input-search-button]:!border-[#303030]",
+          "[&_.ant-input-search-button]:!bg-[#1f1f1f]",
+          "[&_.ant-input-search-button]:!text-neutral-300",
+          "[&_.ant-pagination]:!text-neutral-300",
+          "[&_.ant-pagination-simple-pager]:!text-neutral-300",
+          "[&_.ant-pagination-simple-pager_input]:!border-[#303030]",
+          "[&_.ant-pagination-simple-pager_input]:!bg-[#1f1f1f]",
+          "[&_.ant-pagination-simple-pager_input]:!text-neutral-100",
+          "[&_.ant-pagination-item-link]:!text-neutral-300",
+          "[&_.ant-empty-description]:!text-neutral-500",
+        ].join(" ")
+      : "",
+  ].join(" ");
 
 const resourceTabLabelClassName =
   "resource-tab-label inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500";
@@ -646,20 +704,20 @@ const resourceGridClassName =
   "grid h-full max-h-full min-h-0 flex-1 content-start grid-cols-3 gap-x-2 gap-y-1.5 overflow-y-auto overflow-x-hidden overscroll-contain px-1.5 py-2 [scrollbar-width:thin]";
 
 const resourceCardClassName =
-  "group flex h-[66px] min-w-0 cursor-grab flex-col items-center justify-start gap-1 rounded-md px-1 py-1 active:scale-[0.98] active:cursor-grabbing";
+  "resource-card group flex h-[66px] min-w-0 cursor-grab flex-col items-center justify-start gap-1 rounded-md px-1 py-1 active:scale-[0.98] active:cursor-grabbing";
 
 const resourceCardDisabledClassName = "!cursor-not-allowed opacity-50";
 
 const resourceIconClassName =
-  "grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-lg bg-transparent transition-[background-color,box-shadow,transform] group-hover:bg-slate-100 group-hover:shadow-sm";
+  "resource-icon grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-lg bg-transparent transition-[background-color,box-shadow,transform] group-hover:bg-slate-100 group-hover:shadow-sm";
 
 const resourceIconFallbackClassName =
-  "grid h-9 w-9 place-items-center rounded-lg bg-slate-100 text-sm font-semibold text-slate-500";
+  "resource-icon-fallback grid h-9 w-9 place-items-center rounded-lg bg-slate-100 text-sm font-semibold text-slate-500";
 
 const resourceInfoClassName = "w-full min-w-0";
 
 const resourceTitleClassName =
-  "w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-[11px] font-medium leading-[14px] text-gray-900";
+  "resource-title w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-[11px] font-medium leading-[14px] text-gray-900";
 
 const resourceExtraClassName = "mt-1 flex justify-center";
 
@@ -673,5 +731,18 @@ const detailModalBodyClassName =
   "flex flex-col items-center gap-3";
 
 const detailIconClassName = "h-14 w-14 object-contain";
+
+const getDetailModalRootClassName = (themeMode: DesktopResourceThemeMode) =>
+  themeMode === "dark"
+    ? [
+        "[&_.ant-modal-content]:!bg-[#141414]",
+        "[&_.ant-modal-header]:!bg-[#141414]",
+        "[&_.ant-modal-title]:!text-neutral-100",
+        "[&_.ant-modal-close]:!text-neutral-400",
+        "[&_.ant-modal-close:hover]:!text-neutral-100",
+        "[&_.ant-descriptions-item-label]:!text-neutral-400",
+        "[&_.ant-descriptions-item-content]:!text-neutral-100",
+      ].join(" ")
+    : "";
 
 export default DesktopResourceTabs;

@@ -12,15 +12,24 @@ import {
 import { useRequest } from "ahooks";
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router";
-import { DesktopNext } from "zs_library";
+import {
+  DesktopNext,
+  desktopNextThemeDark,
+  desktopNextThemeLight,
+} from "zs_library";
 import type { TypeConfigMap } from "zs_library";
 import {
-  adminDesktopItemIconBuilder,
+  createAdminDesktopItemIconBuilder,
   createAdminFixedItemBuilder,
+  emitAdminDesktopPreviewThemeChange,
 } from "./components/desktop-rendering";
+import { useLayout } from "@/context";
+import { Theme } from "@/hooks/useTheme";
 
 const DesktopConfigPreview = () => {
   const { id } = useParams();
+  const { theme: adminTheme } = useLayout();
+  const themeMode = adminTheme === Theme.Dark ? "dark" : "light";
 
   const { data, loading, run } = useRequest(detailDesktopAdminConfig, {
     manual: true,
@@ -36,6 +45,13 @@ const DesktopConfigPreview = () => {
     () => buildDesktopTypeConfigMap([], pages) as TypeConfigMap,
     [pages],
   );
+  const desktopTheme =
+    (config?.theme && (config?.theme?.value ?? config?.theme)) ||
+    (themeMode === "dark" ? desktopNextThemeDark : desktopNextThemeLight);
+  const itemIconBuilder = useMemo(
+    () => createAdminDesktopItemIconBuilder(themeMode),
+    [themeMode],
+  );
 
   useEffect(() => {
     if (id) {
@@ -43,22 +59,41 @@ const DesktopConfigPreview = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    emitAdminDesktopPreviewThemeChange(themeMode);
+  }, [themeMode]);
+
   return (
     <FullPageContainer loading={loading}>
-      <DesktopNext<DesktopItemData>
-        pages={pages}
-        onChange={() => undefined}
-        theme={config?.theme && (config?.theme?.value ?? config?.theme)}
-        typeConfigMap={typeConfigMap}
-        itemIconBuilder={adminDesktopItemIconBuilder}
-        dockProps={{
-          items: dockItems,
-          fixedItems: DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
-          fixedItemBuilder: createAdminFixedItemBuilder,
+      <div
+        className={getPreviewShellClassName(themeMode)}
+        data-theme={themeMode}
+        style={{
+          colorScheme: themeMode,
         }}
-      />
+      >
+        <DesktopNext<DesktopItemData>
+          key={themeMode}
+          pages={pages}
+          onChange={() => undefined}
+          theme={desktopTheme}
+          typeConfigMap={typeConfigMap}
+          itemIconBuilder={itemIconBuilder}
+          dockProps={{
+            items: dockItems,
+            fixedItems: DEFAULT_DESKTOP_FIXED_DOCK_ITEMS,
+            fixedItemBuilder: createAdminFixedItemBuilder,
+          }}
+        />
+      </div>
     </FullPageContainer>
   );
 };
+
+const getPreviewShellClassName = (themeMode: "light" | "dark") =>
+  [
+    "h-full w-full overflow-hidden",
+    themeMode === "dark" ? "dark bg-[#141414]" : "bg-white",
+  ].join(" ");
 
 export default DesktopConfigPreview;
