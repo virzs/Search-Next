@@ -49,15 +49,19 @@ pnpm install
 cp apps/api/.env.example apps/api/.env
 ```
 
+后端运行时会读取当前启动目录下的 `.env`。开发模式下通常是 `apps/api/.env`；构建后如果把 API 产物复制到独立目录运行，`.env` 应放在启动命令所在目录。
+
 最小本地配置通常只需要先确认这些值：
 
 ```dotenv
 PORT=5151
+setup_initialized=false
 mongo_host=127.0.0.1
 mongo_port=27017
 mongo_username=
 mongo_password=
 mongo_database=search_next
+mongo_auth_source=
 redis_host=127.0.0.1
 redis_port=6379
 redis_password=
@@ -201,7 +205,7 @@ pnpm build:apps
 pnpm --filter search-next-api start:prod
 ```
 
-生产环境请在 `apps/api/.env` 中配置真实的 MongoDB、Redis、邮箱、存储服务和 `PORT`。如果使用本地存储，`local_storage_path` 应放在持久化目录中，并纳入备份。
+生产环境请在 API 启动目录的 `.env` 中配置真实的 MongoDB、Redis、邮箱、存储服务和 `PORT`。如果使用本地存储，`local_storage_path` 应放在持久化目录中，并纳入备份。
 
 ### 反向代理示例
 
