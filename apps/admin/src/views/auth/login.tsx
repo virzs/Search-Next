@@ -7,6 +7,7 @@ import { LoginForm, ProFormText } from "@ant-design/pro-components";
 import { LoginRequest } from "@/services/auth/interface";
 import { useRequest } from "ahooks";
 import { getPublicProject } from "@/services/system/project";
+import { getSetupStatus } from "@/services/setup";
 import { Alert, Image, Space, Spin, message } from "antd";
 import { AuthPaths } from "./router";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
@@ -16,6 +17,13 @@ const LoginView = () => {
   const navigate = useNavigate();
 
   const { data, loading } = useRequest(getPublicProject);
+  useRequest(getSetupStatus, {
+    onSuccess: (setupStatus) => {
+      if (setupStatus.canSetup) {
+        navigate(AuthPaths.setup, { replace: true });
+      }
+    },
+  });
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 

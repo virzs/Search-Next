@@ -45,6 +45,14 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     const originalRequest = error.config;
+    if (!error.response) {
+      notification.error({
+        message: "网络错误",
+        description: "无法访问服务器，请稍后再试",
+      });
+      return Promise.reject(error);
+    }
+
     if (error.response.status === 400) {
       const errMsg = error.response.data.message;
       notification.error({
