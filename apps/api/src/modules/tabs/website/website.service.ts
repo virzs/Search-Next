@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { WebsiteName, WebsiteTagName } from './schemas/ref-names';
 import { Model } from 'mongoose';
@@ -7,6 +7,8 @@ import { WebsiteTag } from './schemas/tag';
 import { Cron } from '@nestjs/schedule';
 import { Cache } from 'cache-manager';
 import { PageDto } from 'src/public/dto/page';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { validate, ValidationError } from 'class-validator';
 import {
   ParseWebsiteDto,
   UpdateWebsitePublicDto,
@@ -20,6 +22,30 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Response } from 'src/utils/response';
+
+type WebsiteExportItem = {
+  name: string;
+  url: string;
+  description?: string;
+  enable?: boolean;
+  public?: boolean;
+  themeColor?: string;
+};
+
+type ImportErrorItem = {
+  index: number;
+  key?: string;
+  message: string;
+};
+
+type ImportResult = {
+  total: number;
+  created: number;
+  updated: number;
+  restored: number;
+  failed: number;
+  errors: ImportErrorItem[];
+};
 
 @Injectable()
 export class WebsiteService {
@@ -155,6 +181,78 @@ export class WebsiteService {
     const total = await this.websiteModel.countDocuments(finder);
 
     return { data: users, page, pageSize, total };
+  }
+
+  async exportAll() {
+    const rows = await this.websiteModel
+      .find({})
+      .select('-_id name url description enable public themeColor')
+      .lean()
+      .exec();
+
+    return {
+      schemaVersion: 1,
+      type: 'website',
+      exportedAt: new Date().toISOString(),
+      items: rows.map((row) => this.toExportItem(row)),
+    };
+  }
+
+  async importAll(payload: unknown, user?: string): Promise<ImportResult> {
+    const items = this.getImportItems(payload, 'website');
+    const result: ImportResult = {
+      total: items.length,
+      created: 0,
+      updated: 0,
+      restored: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const [index, raw] of items.entries()) {
+      const rowNumber = index + 1;
+      const key = this.getImportKey(raw, 'url');
+
+      try {
+        const normalizedRaw = this.normalizeWebsiteImportItem(raw);
+        const validation = await this.validateDto(WebsiteDto, normalizedRaw);
+        if (!validation.data) {
+          this.pushImportError(result, rowNumber, key, validation.message);
+          continue;
+        }
+
+        const data = this.toWebsiteImportData(validation.data);
+        const existing = await this.websiteModel
+          .findOne({ url: data.url })
+          .exec();
+
+        if (existing) {
+          await this.websiteModel
+            .findByIdAndUpdate(
+              existing._id,
+              {
+                ...data,
+                updater: user,
+              },
+              { new: true },
+            )
+            .exec();
+          result.updated += 1;
+          continue;
+        }
+
+        await this.websiteModel.create({
+          ...data,
+          creator: user,
+        });
+        result.created += 1;
+      } catch (error) {
+        this.pushImportError(result, rowNumber, key, this.errorMessage(error));
+      }
+    }
+
+    result.failed = result.errors.length;
+    return result;
   }
 
   /**
@@ -456,5 +554,129 @@ export class WebsiteService {
       { _id: { $in: tagIds } },
       tagUpdateOperation,
     );
+  }
+
+  private getImportItems(payload: unknown, expectedType: string) {
+    if (Array.isArray(payload)) return payload;
+    if (!payload || typeof payload !== 'object') {
+      throw new BadRequestException('导入文件格式不正确');
+    }
+
+    const body = payload as { type?: unknown; items?: unknown };
+    if (body.type !== undefined && body.type !== expectedType) {
+      throw new BadRequestException('导入文件类型不匹配');
+    }
+    if (!Array.isArray(body.items)) {
+      throw new BadRequestException('导入文件缺少 items 数组');
+    }
+    return body.items;
+  }
+
+  private normalizeWebsiteImportItem(raw: unknown) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+    const item = raw as Record<string, unknown>;
+    return {
+      name: this.trimString(item.name),
+      url: this.trimString(item.url),
+      description: this.trimString(item.description),
+      enable: item.enable,
+      public: item.public,
+      themeColor: this.normalizeRgbColor(item.themeColor),
+    };
+  }
+
+  private toWebsiteImportData(data: WebsiteDto): WebsiteExportItem {
+    const item: WebsiteExportItem = {
+      name: data.name,
+      url: data.url,
+    };
+    if (data.description !== undefined) item.description = data.description;
+    if (data.enable !== undefined) item.enable = data.enable;
+    if (data.public !== undefined) item.public = data.public;
+    if (data.themeColor !== undefined) item.themeColor = data.themeColor;
+    return item;
+  }
+
+  private async validateDto<T extends object>(
+    dtoClass: new () => T,
+    raw: unknown,
+  ): Promise<{ data?: T; message?: string }> {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      return { message: '导入项必须是对象' };
+    }
+
+    const object = plainToInstance(dtoClass, raw, {
+      excludeExtraneousValues: true,
+    });
+    const plain = instanceToPlain(object) as Record<string, unknown>;
+    for (const key of Object.keys(plain)) {
+      if (plain[key] === undefined) {
+        delete plain[key];
+      }
+    }
+
+    const errors = await validate(plainToInstance(dtoClass, plain));
+    if (errors.length > 0) {
+      return { message: this.getFirstValidationMessage(errors) };
+    }
+
+    return { data: plain as T };
+  }
+
+  private toExportItem(row: any): WebsiteExportItem {
+    return {
+      name: row.name,
+      url: row.url,
+      description: row.description,
+      enable: row.enable,
+      public: row.public,
+      themeColor: row.themeColor,
+    };
+  }
+
+  private pushImportError(
+    result: ImportResult,
+    index: number,
+    key: string | undefined,
+    message = '导入失败',
+  ) {
+    result.errors.push({ index, key, message });
+  }
+
+  private getImportKey(raw: unknown, key: string) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+    const value = (raw as Record<string, unknown>)[key];
+    return typeof value === 'string' ? value.trim() : undefined;
+  }
+
+  private trimString(value: unknown) {
+    return typeof value === 'string' ? value.trim() : value;
+  }
+
+  private optionalString(value: unknown) {
+    const trimmed = this.trimString(value);
+    return trimmed === '' ? undefined : trimmed;
+  }
+
+  private normalizeRgbColor(value: unknown) {
+    const trimmed = this.optionalString(value);
+    if (typeof trimmed !== 'string') return trimmed;
+    return /^rgba?\(/i.test(trimmed) ? trimmed.replace(/\s+/g, '') : trimmed;
+  }
+
+  private errorMessage(error: unknown) {
+    return error instanceof Error ? error.message : String(error || '导入失败');
+  }
+
+  private getFirstValidationMessage(errors: ValidationError[]): string {
+    for (const error of errors) {
+      if (error.constraints) {
+        return Object.values(error.constraints)[0];
+      }
+      if (error.children?.length) {
+        return this.getFirstValidationMessage(error.children);
+      }
+    }
+    return '参数校验失败';
   }
 }

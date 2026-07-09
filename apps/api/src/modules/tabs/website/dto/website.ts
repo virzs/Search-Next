@@ -106,6 +106,18 @@ export class WebsiteDto {
   @IsOptional()
   @Expose()
   themeColor: string;
+
+  @ApiProperty({ description: '是否启用', required: false, default: true })
+  @IsBoolean()
+  @IsOptional()
+  @Expose()
+  enable?: boolean;
+
+  @ApiProperty({ description: '是否公开', required: false, default: false })
+  @IsBoolean()
+  @IsOptional()
+  @Expose()
+  public?: boolean;
 }
 
 export class ParseWebsiteDto {

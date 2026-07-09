@@ -38,6 +38,18 @@ export class SearchEngineController {
     return this.searchEngineService.listEnabled();
   }
 
+  @Get('/export')
+  @ApiOperation({ summary: '导出搜索引擎' })
+  exportAll() {
+    return this.searchEngineService.exportAll();
+  }
+
+  @Post('/import')
+  @ApiOperation({ summary: '导入搜索引擎' })
+  importAll(@Body() body: unknown, @User('_id') user: string) {
+    return this.searchEngineService.importAll(body, user);
+  }
+
   @Post('/')
   @ApiOperation({ summary: '创建搜索引擎' })
   create(@Body() body: CreateSearchEngineDto, @User('_id') user: string) {

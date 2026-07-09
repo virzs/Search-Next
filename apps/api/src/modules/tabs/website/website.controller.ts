@@ -85,6 +85,18 @@ export class WebsiteController {
     return this.websiteService.getTop50ClicksFromCache();
   }
 
+  @Get('/export')
+  @ApiOperation({ summary: '导出网站' })
+  exportAll() {
+    return this.websiteService.exportAll();
+  }
+
+  @Post('/import')
+  @ApiOperation({ summary: '导入网站' })
+  importAll(@Body() body: unknown, @User('_id') user: string) {
+    return this.websiteService.importAll(body, user);
+  }
+
   @Put('/:id')
   @ApiOperation({ summary: '更新网站' })
   updateWebsite(
