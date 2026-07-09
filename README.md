@@ -185,7 +185,7 @@ pnpm release:prepare -- --project web --version 0.14.0
 - `apps/api` 作为常驻 Node.js 服务运行，连接生产 MongoDB 与 Redis。
 - `apps/web/dist` 作为主站静态资源部署。
 - `apps/admin/dist` 作为后台静态资源部署，建议使用独立域名或子域名。
-- 使用 Nginx、Caddy 或平台网关把 `/api` 反向代理到 API 服务，并把 `/static` 转发到 API 的静态文件服务。
+- 使用 Nginx、Caddy 或平台网关把 `/api` 反向代理到 API 服务，并让主站和后台都能访问同一个 `/static/` 上传目录。
 
 ### 生产构建
 
@@ -227,9 +227,12 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
   }
 
-  location /static/ {
-    proxy_pass http://127.0.0.1:5151/static/;
-    proxy_set_header Host $host;
+  location ^~ /static/ {
+    alias /var/www/search-next/api/assets/uploads/;
+    try_files $uri =404;
+
+    add_header Access-Control-Allow-Origin * always;
+    add_header Cross-Origin-Resource-Policy cross-origin always;
   }
 
   location / {
@@ -238,13 +241,41 @@ server {
 }
 ```
 
-后台可用另一份静态站点配置，把 `root` 指向 `apps/admin/dist` 的部署目录。若前端和 API 不同域，需要同时处理 CORS、Cookie/鉴权策略与 `/api` 请求转发策略。
+后台可用另一份静态站点配置，把 `root` 指向 `apps/admin/dist` 的部署目录。若主站域名和后台域名不同，两边都要配置同样的 `/static/` 规则。默认情况下，`web`、`admin`、`api` 在同一个部署目录内，API 从 `/var/www/search-next/api` 启动，上传文件实际位于 `/var/www/search-next/api/assets/uploads/apps/...`，接口返回的资源路径是 `/static/apps/...`。因此 `alias` 必须指向 API 启动目录下的 `assets/uploads/`，不要指向 `assets/uploads/apps/`，否则会拼出 `assets/uploads/apps/apps/...` 并导致 404。
+
+如果你把 `local_storage_path` 改成了绝对路径或共享持久化目录，Nginx 的 `alias` 也必须改成同一个目录。
+
+如果 Nginx 不能直接访问上传目录，也可以把 `/static/` 反向代理到 API 服务。这样浏览器仍然访问当前前端域名，不会暴露 API 服务域名：
+
+```nginx
+location ^~ /static/ {
+  proxy_pass http://127.0.0.1:5151;
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+多域名部署时，建议让所有浏览器可见域名都提供：
+
+- `/api/`：转发到 API 服务，并去掉 `/api` 前缀。
+- `/static/`：直接 `alias` 到 API 使用的同一个 `assets/uploads/`，或转发到 API 的 `/static/` 静态服务。
+- `/`：回退到对应前端项目的 `index.html`。
+
+主站和后台都是前端 SPA，`/login`、`/dashboard`、`/store/widget` 等路由不是服务器上的真实文件。Nginx 必须在主站和后台两个站点都配置路由回退，否则刷新这些页面会 404：
+
+```nginx
+location / {
+  try_files $uri $uri/ /index.html;
+}
+```
 
 ### 上线检查
 
 - API 进程已连接生产 MongoDB 与 Redis。
-- `/api` 能正确转发到后端，`/static` 能访问上传资源。
-- 主站和后台刷新任意路由都能回退到 `index.html`。
+- `/api` 能正确转发到后端，`/static/apps/<name>/<version>/icon.svg` 能在主站域名和后台域名下同时访问。
+- 主站和后台刷新 `/login`、`/dashboard` 等前端路由都能回退到 `index.html`。
 - 上传目录、MongoDB、Redis 中的重要数据已配置备份。
 - 生产环境不使用仓库中的示例密钥、个人密钥或开发环境配置。
 
