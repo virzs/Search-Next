@@ -318,7 +318,6 @@ export class SetupService {
     return {
       [SETUP_INITIALIZED_KEY]: "false",
       [SETUP_ENVIRONMENT_CONFIGURED_KEY]: "true",
-      PORT: body.api.port,
       mongo_host: body.mongo.host,
       mongo_port: body.mongo.port,
       mongo_username: body.mongo.username ?? "",

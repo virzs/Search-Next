@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
-    "ncc:build": "node scripts/clean-dist.js --reset && ncc build src/main.ts -o dist --minify --no-source-map-register && node scripts/clean-dist.js",
+    "ncc:build": "node scripts/clean-dist.js --reset && ncc build src/main.ts -o dist --minify --no-source-map-register --external sharp && node scripts/clean-dist.js && node scripts/copy-runtime-assets.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

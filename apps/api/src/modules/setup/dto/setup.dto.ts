@@ -92,16 +92,6 @@ export class SetupRedisDto {
   ttl?: number;
 }
 
-export class SetupApiDto {
-  @ApiProperty({ example: 5151 })
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(65535)
-  @Expose()
-  port: number;
-}
-
 export class SetupR2Dto {
   @ApiProperty({ required: false })
   @IsString()
@@ -195,11 +185,6 @@ export class SetupCheckDto {
 }
 
 export class SetupEnvironmentCompleteDto extends SetupCheckDto {
-  @ValidateNested()
-  @Type(() => SetupApiDto)
-  @Expose()
-  api: SetupApiDto;
-
   @ValidateNested()
   @Type(() => SetupStorageDto)
   @Expose()

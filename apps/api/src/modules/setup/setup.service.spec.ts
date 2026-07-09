@@ -18,7 +18,6 @@ const managedEnvKeys = [
   "SEARCH_NEXT_ENV_FILE",
   SETUP_INITIALIZED_KEY,
   SETUP_ENVIRONMENT_CONFIGURED_KEY,
-  "PORT",
   "mongo_host",
   "mongo_port",
   "mongo_username",
@@ -33,9 +32,6 @@ const managedEnvKeys = [
 ];
 
 const environmentBody: SetupEnvironmentCompleteDto = {
-  api: {
-    port: 5151,
-  },
   mongo: {
     host: "127.0.0.1",
     port: 27017,
@@ -111,6 +107,15 @@ describe("SetupService", () => {
   });
 
   it("writes environment config and moves setup into admin stage", async () => {
+    fs.writeFileSync(
+      envPath,
+      [
+        "setup_initialized=false",
+        "setup_environment_configured=false",
+        "PORT=9999",
+      ].join("\n"),
+      "utf8",
+    );
     jest
       .spyOn(service as any, "runConnectionChecks")
       .mockResolvedValue({ mongo: { ok: true }, redis: { ok: true } });
@@ -129,6 +134,7 @@ describe("SetupService", () => {
       redis_db: "0",
       storage_service: "local",
       local_storage_path: "./assets/uploads",
+      PORT: "9999",
     });
     expect(getSetupState(envPath)).toMatchObject({
       initialized: false,
