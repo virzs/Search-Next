@@ -80,6 +80,28 @@ const defaultAdminValues: AdminFormValues = {
   },
 };
 
+const mergeEnvironmentValues = (
+  current: EnvironmentFormValues,
+  next?: Partial<EnvironmentFormValues>,
+): EnvironmentFormValues => ({
+  mongo: {
+    ...current.mongo,
+    ...(next?.mongo ?? {}),
+  },
+  redis: {
+    ...current.redis,
+    ...(next?.redis ?? {}),
+  },
+  storage: {
+    ...current.storage,
+    ...(next?.storage ?? {}),
+    r2: {
+      ...current.storage.r2,
+      ...(next?.storage?.r2 ?? {}),
+    },
+  },
+});
+
 const mongoFieldNames = [
   ["mongo", "host"],
   ["mongo", "port"],
@@ -142,6 +164,9 @@ const SetupView = () => {
     Form.useWatch(["storage", "service"], environmentForm) ?? "local";
   const navigate = useNavigate();
   const localDirectoryInputRef = useRef<HTMLInputElement>(null);
+  const environmentValuesRef = useRef<EnvironmentFormValues>(
+    defaultEnvironmentValues,
+  );
   const [stage, setStage] = useState<SetupStage>("environment");
   const [runtimeStep, setRuntimeStep] = useState(0);
   const [mongoCheckResult, setMongoCheckResult] =
@@ -199,6 +224,17 @@ const SetupView = () => {
   const redisCheckPassed = useMemo(() => {
     return redisCheckResult?.ok;
   }, [redisCheckResult]);
+
+  const cacheEnvironmentValues = useCallback(
+    (values?: Partial<EnvironmentFormValues>) => {
+      environmentValuesRef.current = mergeEnvironmentValues(
+        environmentValuesRef.current,
+        values,
+      );
+      return environmentValuesRef.current;
+    },
+    [],
+  );
 
   const pollRestartStatus = useCallback(async () => {
     try {
@@ -282,6 +318,8 @@ const SetupView = () => {
   const handleEnvironmentValuesChange = (
     changedValues: Partial<EnvironmentFormValues>,
   ) => {
+    cacheEnvironmentValues(changedValues);
+
     if (changedValues.mongo) {
       setMongoCheckResult(undefined);
     }
@@ -292,6 +330,7 @@ const SetupView = () => {
 
   const testMongoConnection = async () => {
     const values = await environmentForm.validateFields(mongoFieldNames as any);
+    cacheEnvironmentValues({ mongo: values.mongo });
     const result = await runCheckMongo(values.mongo);
     setMongoCheckResult(result);
     if (result.ok) {
@@ -302,6 +341,7 @@ const SetupView = () => {
 
   const testRedisConnection = async () => {
     const values = await environmentForm.validateFields(redisFieldNames as any);
+    cacheEnvironmentValues({ redis: values.redis });
     const result = await runCheckRedis(values.redis);
     setRedisCheckResult(result);
     if (result.ok) {
@@ -322,7 +362,10 @@ const SetupView = () => {
       return;
     }
 
-    const values = await environmentForm.validateFields();
+    await environmentForm.validateFields();
+    const values = cacheEnvironmentValues(
+      environmentForm.getFieldsValue(true) as Partial<EnvironmentFormValues>,
+    );
     await runEnvironmentComplete(values);
     setMongoCheckResult(undefined);
     setRedisCheckResult(undefined);
@@ -675,6 +718,7 @@ const SetupView = () => {
       form={environmentForm}
       layout="vertical"
       initialValues={defaultEnvironmentValues}
+      preserve
       requiredMark={false}
       onValuesChange={handleEnvironmentValuesChange}
     >
