@@ -25,6 +25,28 @@ export interface SearchEngine {
   icon?: string;
 }
 
+export interface ImportErrorItem {
+  index: number;
+  key?: string;
+  message: string;
+}
+
+export interface ImportResult {
+  total: number;
+  created: number;
+  updated: number;
+  restored: number;
+  failed: number;
+  errors: ImportErrorItem[];
+}
+
+export interface SearchEngineExportPackage {
+  schemaVersion: 1;
+  type: "search-engine";
+  exportedAt: string;
+  items: SearchEngine[];
+}
+
 /**
  * 新增
  * /tabs/search-engine
@@ -71,4 +93,24 @@ export async function getSearchEngineDetail(id: string) {
  */
 export async function getSearchEngineEnabled() {
   return baseGetRequest("/tabs/search-engine/enabled")();
+}
+
+/**
+ * 导出
+ * /tabs/search-engine/export
+ */
+export async function exportSearchEngine() {
+  return baseGetRequest<SearchEngineExportPackage>(
+    "/tabs/search-engine/export",
+  )();
+}
+
+/**
+ * 导入
+ * /tabs/search-engine/import
+ */
+export async function importSearchEngine(data: unknown) {
+  return basePostRequest<ImportResult>("/tabs/search-engine/import")(
+    data as object,
+  );
 }

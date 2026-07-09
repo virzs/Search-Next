@@ -7,6 +7,37 @@ import {
   baseDetailRequest,
 } from "@/utils/axios";
 
+export interface WebsiteImportErrorItem {
+  index: number;
+  key?: string;
+  message: string;
+}
+
+export interface WebsiteImportResult {
+  total: number;
+  created: number;
+  updated: number;
+  restored: number;
+  failed: number;
+  errors: WebsiteImportErrorItem[];
+}
+
+export interface WebsiteExportItem {
+  name: string;
+  url: string;
+  description?: string;
+  enable?: boolean;
+  public?: boolean;
+  themeColor?: string;
+}
+
+export interface WebsiteExportPackage {
+  schemaVersion: 1;
+  type: "website";
+  exportedAt: string;
+  items: WebsiteExportItem[];
+}
+
 // /tabs/website
 export async function getWebsiteList(params: any) {
   return baseGetRequest("/tabs/website")(params);
@@ -58,4 +89,16 @@ interface UpdateWebsitePublicData {
 // /tabs/website/public put
 export async function updateWebsitePublic(data: UpdateWebsitePublicData) {
   return basePutRequestNoId("/tabs/website/public")(data);
+}
+
+// /tabs/website/export get
+export async function exportWebsite() {
+  return baseGetRequest<WebsiteExportPackage>("/tabs/website/export")();
+}
+
+// /tabs/website/import post
+export async function importWebsite(data: unknown) {
+  return basePostRequest<WebsiteImportResult>("/tabs/website/import")(
+    data as object,
+  );
 }

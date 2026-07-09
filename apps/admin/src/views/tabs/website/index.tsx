@@ -2,13 +2,29 @@ import TablePageContainer from "@/components/containter/table";
 import TablePage from "@/components/TablePage2";
 import Operation from "@/components/TablePage2/Operation";
 import { App, Button, Image, Space, Tooltip } from "antd";
-import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+import {
+  RiDownloadLine,
+  RiEyeLine,
+  RiEyeOffLine,
+  RiUploadLine,
+} from "@remixicon/react";
 import WebsiteHandle from "./handle";
 import { useTablePage } from "@/hooks/useTablePage2";
-import { useState } from "react";
-import { deleteWebsite, getWebsiteList, updateWebsitePublic } from "@/services/tabs/website";
+import { useRef, useState } from "react";
+import {
+  deleteWebsite,
+  exportWebsite,
+  getWebsiteList,
+  importWebsite,
+  updateWebsitePublic,
+} from "@/services/tabs/website";
 import { useRequest } from "ahooks";
 import { WindowTableColumnType } from "@/components/WindowTable";
+import {
+  downloadJsonFile,
+  readJsonFile,
+  showImportResult,
+} from "@/utils/json-transfer";
 
 const Website = () => {
   const { message } = App.useApp();
@@ -19,6 +35,7 @@ const Website = () => {
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | undefined>(undefined);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const { runAsync: publicRun } = useRequest(updateWebsitePublic, {
     manual: true,
@@ -35,6 +52,40 @@ const Website = () => {
       refresh();
     },
   });
+
+  const { runAsync: exportRun, loading: exportLoading } = useRequest(
+    async () => {
+      const data = await exportWebsite();
+      downloadJsonFile(
+        `website-${new Date().toISOString().slice(0, 10)}.json`,
+        data,
+      );
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success("导出成功");
+      },
+    },
+  );
+
+  const { runAsync: importRun, loading: importLoading } = useRequest(
+    async (file: File) => {
+      const data = await readJsonFile(file);
+      return importWebsite(data);
+    },
+    {
+      manual: true,
+      onSuccess: (result) => {
+        message.success("导入完成");
+        showImportResult("网站导入结果", result);
+        refresh();
+      },
+      onError: (error) => {
+        message.error(error.message || "导入失败");
+      },
+    },
+  );
 
   const columns: WindowTableColumnType<any>[] = [
     {
@@ -147,6 +198,36 @@ const Website = () => {
                 setEditId(undefined);
               }}
             />
+            <input
+              ref={importInputRef}
+              className="hidden"
+              type="file"
+              accept=".json,application/json"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (!file) return;
+                try {
+                  await importRun(file);
+                } catch {
+                  // useRequest already shows the import error message.
+                }
+              }}
+            />
+            <Button
+              icon={<RiUploadLine size={16} />}
+              loading={importLoading}
+              onClick={() => importInputRef.current?.click()}
+            >
+              导入
+            </Button>
+            <Button
+              icon={<RiDownloadLine size={16} />}
+              loading={exportLoading}
+              onClick={() => exportRun()}
+            >
+              导出
+            </Button>
             {selectedRowKeys.length > 0 && (
               <>
                 <Button
