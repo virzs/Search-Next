@@ -44,9 +44,6 @@ export interface SetupCheckRequest {
 }
 
 export interface SetupCompleteRequest extends SetupCheckRequest {
-  api: {
-    port: number;
-  };
   storage: SetupStorageConfig;
   admin: {
     username: string;

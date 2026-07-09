@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Alert,
@@ -21,7 +14,7 @@ import {
   Typography,
   message,
 } from "antd";
-import { useRequest } from "ahooks";
+import { useInterval, useRequest, useTimeout } from "ahooks";
 import {
   RiCheckboxCircleLine,
   RiArrowLeftLine,
@@ -50,9 +43,6 @@ type EnvironmentFormValues = SetupEnvironmentCompleteRequest;
 type AdminFormValues = SetupAdminCompleteRequest;
 
 const defaultEnvironmentValues: EnvironmentFormValues = {
-  api: {
-    port: 5151,
-  },
   mongo: {
     host: "127.0.0.1",
     port: 27017,
@@ -151,7 +141,6 @@ const SetupView = () => {
   const storageService =
     Form.useWatch(["storage", "service"], environmentForm) ?? "local";
   const navigate = useNavigate();
-  const pollTimerRef = useRef<number>();
   const localDirectoryInputRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<SetupStage>("environment");
   const [runtimeStep, setRuntimeStep] = useState(0);
@@ -211,47 +200,40 @@ const SetupView = () => {
     return redisCheckResult?.ok;
   }, [redisCheckResult]);
 
-  const clearPollTimer = useCallback(() => {
-    if (pollTimerRef.current) {
-      window.clearInterval(pollTimerRef.current);
-      pollTimerRef.current = undefined;
+  const pollRestartStatus = useCallback(async () => {
+    try {
+      const nextStatus = await getSetupStatusSilently();
+      if (nextStatus.stage === "admin") {
+        setRestarting(false);
+        setStage("admin");
+        message.success("服务已重启");
+      }
+      if (nextStatus.stage === "done") {
+        setRestarting(false);
+        navigate(AuthPaths.login, { replace: true });
+      }
+    } catch {
+      // The API is expected to be briefly unavailable while the process restarts.
     }
-  }, []);
+  }, [navigate]);
+
+  useInterval(
+    () => {
+      void pollRestartStatus();
+    },
+    restarting ? 2000 : undefined,
+  );
+
+  useTimeout(
+    () => {
+      navigate(AuthPaths.login, { replace: true });
+    },
+    finished ? 1200 : undefined,
+  );
 
   const startRestartPolling = useCallback(() => {
-    clearPollTimer();
     setRestarting(true);
-
-    pollTimerRef.current = window.setInterval(async () => {
-      try {
-        const nextStatus = await getSetupStatusSilently();
-        if (nextStatus.stage === "admin") {
-          clearPollTimer();
-          setRestarting(false);
-          setStage("admin");
-          message.success("服务已重启");
-        }
-        if (nextStatus.stage === "done") {
-          clearPollTimer();
-          navigate(AuthPaths.login, { replace: true });
-        }
-      } catch {
-        // The API is expected to be briefly unavailable while the process restarts.
-      }
-    }, 2000);
-  }, [clearPollTimer, navigate]);
-
-  useEffect(() => {
-    return clearPollTimer;
-  }, [clearPollTimer]);
-
-  useEffect(() => {
-    if (!finished) return;
-    const timer = window.setTimeout(() => {
-      navigate(AuthPaths.login, { replace: true });
-    }, 1200);
-    return () => window.clearTimeout(timer);
-  }, [finished, navigate]);
+  }, []);
 
   const setLocalPath = useCallback(
     (localPath: string) => {
@@ -574,23 +556,6 @@ const SetupView = () => {
 
     return (
       <>
-        <SectionTitle title="服务" />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Form.Item
-            name={["api", "port"]}
-            label="API 端口"
-            rules={[{ required: true, message: "请输入 API 端口" }]}
-          >
-            <InputNumber
-              className="w-full"
-              min={1}
-              max={65535}
-              precision={0}
-              style={inputStyle}
-            />
-          </Form.Item>
-        </div>
-
         <SectionTitle
           title="存储方式"
           description="当前支持本地存储和 Cloudflare R2。"
