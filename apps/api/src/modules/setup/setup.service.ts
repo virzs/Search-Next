@@ -58,16 +58,19 @@ export class SetupService {
 
   async check(body: SetupCheckDto) {
     this.assertCanConfigureEnvironment();
+    this.assertConnectionConfig(body);
     return await this.runConnectionChecks(body);
   }
 
   async checkMongoConnection(body: SetupMongoDto) {
     this.assertCanConfigureEnvironment();
+    this.assertMongoConfig(body);
     return await this.checkMongo(body);
   }
 
   async checkRedisConnection(body: SetupRedisDto) {
     this.assertCanConfigureEnvironment();
+    this.assertRedisConfig(body);
     return await this.checkRedis(body);
   }
 
@@ -77,6 +80,7 @@ export class SetupService {
 
   async completeEnvironment(body: SetupEnvironmentCompleteDto) {
     this.assertCanConfigureEnvironment();
+    this.assertConnectionConfig(body);
     this.validateStorageConfig(body.storage);
 
     const checks = await this.runConnectionChecks(body);
@@ -165,6 +169,33 @@ export class SetupService {
       throw new BadRequestException(
         `请填写 ${missing.map((item) => item[1]).join("、")}`,
       );
+    }
+  }
+
+  private assertConnectionConfig(
+    body: SetupCheckDto | undefined,
+  ): asserts body is SetupCheckDto {
+    if (!body) {
+      throw new BadRequestException("请填写运行环境配置");
+    }
+
+    this.assertMongoConfig(body.mongo);
+    this.assertRedisConfig(body.redis);
+  }
+
+  private assertMongoConfig(
+    mongo: SetupMongoDto | undefined,
+  ): asserts mongo is SetupMongoDto {
+    if (!mongo) {
+      throw new BadRequestException("请填写 MongoDB 配置");
+    }
+  }
+
+  private assertRedisConfig(
+    redis: SetupRedisDto | undefined,
+  ): asserts redis is SetupRedisDto {
+    if (!redis) {
+      throw new BadRequestException("请填写 Redis 配置");
     }
   }
 

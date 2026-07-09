@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Expose, Type } from "class-transformer";
 import {
   IsEmail,
+  IsDefined,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -173,11 +174,13 @@ export class SetupAdminDto {
 }
 
 export class SetupCheckDto {
+  @IsDefined({ message: "请填写 MongoDB 配置" })
   @ValidateNested()
   @Type(() => SetupMongoDto)
   @Expose()
   mongo: SetupMongoDto;
 
+  @IsDefined({ message: "请填写 Redis 配置" })
   @ValidateNested()
   @Type(() => SetupRedisDto)
   @Expose()
@@ -185,6 +188,7 @@ export class SetupCheckDto {
 }
 
 export class SetupEnvironmentCompleteDto extends SetupCheckDto {
+  @IsDefined({ message: "请选择存储方式" })
   @ValidateNested()
   @Type(() => SetupStorageDto)
   @Expose()
@@ -192,6 +196,7 @@ export class SetupEnvironmentCompleteDto extends SetupCheckDto {
 }
 
 export class SetupAdminCompleteDto {
+  @IsDefined({ message: "请填写管理员信息" })
   @ValidateNested()
   @Type(() => SetupAdminDto)
   @Expose()
@@ -199,6 +204,7 @@ export class SetupAdminCompleteDto {
 }
 
 export class SetupCompleteDto extends SetupEnvironmentCompleteDto {
+  @IsDefined({ message: "请填写管理员信息" })
   @ValidateNested()
   @Type(() => SetupAdminDto)
   @Expose()

@@ -155,6 +155,23 @@ describe("SetupService", () => {
     expect(fs.existsSync(envPath)).toBe(false);
   });
 
+  it("rejects incomplete environment payloads before connection checks", async () => {
+    const runConnectionChecks = jest.spyOn(
+      service as any,
+      "runConnectionChecks",
+    );
+
+    await expect(
+      service.completeEnvironment({
+        ...environmentBody,
+        redis: undefined as any,
+      }),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(runConnectionChecks).not.toHaveBeenCalled();
+    expect(fs.existsSync(envPath)).toBe(false);
+  });
+
   it("requires Cloudflare R2 config when R2 storage is selected", async () => {
     await expect(
       service.completeEnvironment({
