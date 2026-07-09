@@ -241,7 +241,6 @@ const notes = () => {
     ? ["log", "--date=short", "--pretty=format:- %s (%h, %ad)", range]
     : ["log", "-n", "40", "--date=short", "--pretty=format:- %s (%h, %ad)", to];
   const commits = git(pathspecs.length ? [...baseArgs, "--", ...pathspecs] : baseArgs);
-  const stat = from ? git(pathspecs.length ? ["diff", "--stat", range, "--", ...pathspecs] : ["diff", "--stat", range]) : "";
 
   console.log(`# ${project.title}`);
   console.log();
@@ -251,11 +250,6 @@ const notes = () => {
   console.log();
   console.log("## Changes");
   console.log(commits || "No changes.");
-  if (stat) {
-    console.log();
-    console.log("## Diff Stat");
-    console.log(stat);
-  }
 };
 
 if (command === "prepare") {
