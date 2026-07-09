@@ -24,6 +24,7 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
   captcha?: string;
+  invitationCode?: string;
   turnstileToken?: string;
 }
 

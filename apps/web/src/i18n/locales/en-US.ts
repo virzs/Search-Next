@@ -155,6 +155,8 @@ const enUS = {
   "ui.enterAUsername": "Enter a username",
   "ui.usernameMustBe220Characters": "Username must be 2-20 characters",
   "ui.auth.usernamePattern": "Username can only contain letters, numbers, underscores, and Chinese characters",
+  "ui.invitationCode": "Invitation Code",
+  "ui.enterInvitationCode": "Enter invitation code",
   "ui.emailVerificationCode": "Email Verification Code",
   "ui.enterTheVerificationCode": "Enter the verification code",
   "ui.theVerificationCodeMustBe6Digits": "The verification code must be 6 digits",

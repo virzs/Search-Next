@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: data.email,
         password: data.password,
         captcha: Number(data.captcha) || undefined,
-        invitationCode: "",
+        invitationCode: data.invitationCode ?? "",
         turnstileToken: data.turnstileToken,
       });
     },

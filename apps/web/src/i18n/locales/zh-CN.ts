@@ -155,6 +155,8 @@ const zhCN = {
   "ui.enterAUsername": "请输入用户名",
   "ui.usernameMustBe220Characters": "用户名长度为2-20个字符",
   "ui.auth.usernamePattern": "用户名只能包含字母、数字、下划线和中文",
+  "ui.invitationCode": "邀请码",
+  "ui.enterInvitationCode": "请输入邀请码",
   "ui.emailVerificationCode": "邮箱验证码",
   "ui.enterTheVerificationCode": "请输入验证码",
   "ui.theVerificationCodeMustBe6Digits": "验证码为6位数字",

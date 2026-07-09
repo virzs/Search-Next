@@ -4,6 +4,7 @@ export interface ProjectPublicInfo {
   name: string;
   description?: string;
   register?: {
+    forceEmailCaptcha?: boolean;
     forceInvitationCode: boolean;
     allowRegister: boolean;
     registerDisabledTip?: string;

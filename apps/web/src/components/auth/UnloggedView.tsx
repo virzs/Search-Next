@@ -153,6 +153,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         password: data.password,
         confirmPassword: data.confirmPassword,
         captcha: data.captcha,
+        invitationCode: data.invitationCode,
         turnstileToken: data.turnstileToken,
       });
 

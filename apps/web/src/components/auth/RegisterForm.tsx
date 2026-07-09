@@ -27,7 +27,7 @@ const { Item } = Form;
 const RegisterForm: React.FC<RegisterFormProps> = ({
   onSubmit,
   loading: externalLoading = false,
-  requireCaptcha = true,
+  requireCaptcha,
   onGetCaptcha,
   className = "",
   initialValues = {},
@@ -46,6 +46,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   const turnstileEnabled = projectInfo?.turnstile?.enabled ?? false;
   const turnstileSiteKey = projectInfo?.turnstile?.siteKey ?? "";
+  const forceEmailCaptcha = projectInfo?.register?.forceEmailCaptcha ?? false;
+  const forceInvitationCode = projectInfo?.register?.forceInvitationCode ?? false;
+  const shouldRequireCaptcha = requireCaptcha ?? forceEmailCaptcha;
+  const invitationCodeFromUrl =
+    typeof window === "undefined"
+      ? undefined
+      : new URLSearchParams(window.location.search).get("code") || undefined;
+  const shouldShowInvitationCode =
+    forceInvitationCode ||
+    Boolean(initialValues.invitationCode || invitationCodeFromUrl);
+  const resolvedInitialValues = {
+    ...(invitationCodeFromUrl ? { invitationCode: invitationCodeFromUrl } : {}),
+    ...initialValues,
+  };
 
   const isLoading = externalLoading || contextRegisterLoading;
 
@@ -156,7 +170,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={initialValues}
+        initialValues={resolvedInitialValues}
         size="large"
       >
         {/* 用户名输入 */}
@@ -195,8 +209,32 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           />
         </Item>
 
+        {shouldShowInvitationCode && (
+          <Item
+            label={t("ui.invitationCode")}
+            name="invitationCode"
+            rules={[
+              {
+                required: forceInvitationCode,
+                message: t("ui.enterInvitationCode"),
+              },
+            ]}
+          >
+            <Input
+              prefix={
+                <RiShieldCheckFill
+                  size={16}
+                  className="apple-auth-field-icon"
+                />
+              }
+              placeholder={t("ui.enterInvitationCode")}
+              autoComplete="off"
+            />
+          </Item>
+        )}
+
         {/* 验证码输入（如果需要） */}
-        {requireCaptcha && (
+        {shouldRequireCaptcha && (
           <Item
             label={t("ui.emailVerificationCode")}
             name="captcha"
