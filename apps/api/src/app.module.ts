@@ -22,7 +22,7 @@ import storageService from './config/storage-service';
 import { CleanupService } from './public/service/cleanup.service';
 import { SystemModule } from './modules/system/system.module';
 import { TabsModule } from './modules/tabs/tabs.module';
-import { getRuntimeEnvFilePath } from './config/env';
+import { getRuntimeEnvFilePaths } from './config/env';
 import { buildRedisUrl } from './config/redis-uri';
 import { SetupModule } from './modules/setup/setup.module';
 
@@ -32,7 +32,7 @@ import { SetupModule } from './modules/setup/setup.module';
      * 加载配置文件 参考 .env.example
      */
     ConfigModule.forRoot({
-      envFilePath: getRuntimeEnvFilePath(),
+      envFilePath: getRuntimeEnvFilePaths(),
       ignoreEnvFile: false,
       ignoreEnvVars: false,
       isGlobal: true,

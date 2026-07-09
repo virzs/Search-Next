@@ -18,10 +18,13 @@ export interface SetupState {
 const ENV_LINE_PATTERN = /^(\s*)([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$/;
 
 export const getRuntimeEnvFilePath = () => {
-  const configuredPath = process.env.SEARCH_NEXT_ENV_FILE;
-  return configuredPath
-    ? path.resolve(configuredPath)
-    : path.resolve(process.cwd(), ".env");
+  return path.resolve(process.cwd(), ".env");
+};
+
+export const getRuntimeEnvFilePaths = () => {
+  return ["dev.env", "prod.env", ".env"].map((name) =>
+    path.resolve(process.cwd(), name),
+  );
 };
 
 export const parseBooleanEnv = (value?: string): boolean | undefined => {
@@ -64,17 +67,30 @@ export const parseEnvContent = (content: string): Record<string, string> => {
 };
 
 export const readRuntimeEnv = (
-  envFilePath = getRuntimeEnvFilePath(),
+  envFilePath: string | string[] = getRuntimeEnvFilePaths(),
 ): Record<string, string> => {
-  if (!fs.existsSync(envFilePath)) return {};
-  return parseEnvContent(fs.readFileSync(envFilePath, "utf8"));
+  const envFilePaths = Array.isArray(envFilePath) ? envFilePath : [envFilePath];
+
+  return envFilePaths.reduce<Record<string, string>>((env, filePath) => {
+    if (!fs.existsSync(filePath)) return env;
+    return {
+      ...parseEnvContent(fs.readFileSync(filePath, "utf8")),
+      ...env,
+    };
+  }, {});
 };
 
 export const getSetupState = (
-  envFilePath = getRuntimeEnvFilePath(),
+  envFilePath: string | string[] = getRuntimeEnvFilePaths(),
 ): SetupState => {
-  const envFileExists = fs.existsSync(envFilePath);
-  const env = envFileExists ? readRuntimeEnv(envFilePath) : {};
+  const envFilePaths = Array.isArray(envFilePath) ? envFilePath : [envFilePath];
+  const existingEnvFilePath = envFilePaths.find((filePath) =>
+    fs.existsSync(filePath),
+  );
+  const envFileExists = Boolean(existingEnvFilePath);
+  const env = existingEnvFilePath
+    ? parseEnvContent(fs.readFileSync(existingEnvFilePath, "utf8"))
+    : {};
   const setupValue =
     process.env[SETUP_INITIALIZED_KEY] ?? env[SETUP_INITIALIZED_KEY];
   const environmentValue =
@@ -98,7 +114,7 @@ export const getSetupState = (
     initialized,
     environmentConfigured,
     canSetup: !initialized,
-    envFilePath,
+    envFilePath: existingEnvFilePath ?? getRuntimeEnvFilePath(),
     mode: environmentConfigured ? "app" : "setup",
     stage,
   };
