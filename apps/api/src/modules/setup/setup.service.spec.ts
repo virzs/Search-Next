@@ -15,7 +15,6 @@ import {
 } from "./dto/setup.dto";
 
 const managedEnvKeys = [
-  "SEARCH_NEXT_ENV_FILE",
   SETUP_INITIALIZED_KEY,
   SETUP_ENVIRONMENT_CONFIGURED_KEY,
   "mongo_host",
@@ -71,11 +70,13 @@ const adminBody: SetupAdminCompleteDto = {
 
 describe("SetupService", () => {
   const originalEnv = new Map<string, string | undefined>();
+  let originalCwd: string;
   let tmpDir: string;
   let envPath: string;
   let service: SetupService;
 
   beforeAll(() => {
+    originalCwd = process.cwd();
     for (const key of managedEnvKeys) {
       originalEnv.set(key, process.env[key]);
     }
@@ -89,11 +90,12 @@ describe("SetupService", () => {
     for (const key of managedEnvKeys) {
       delete process.env[key];
     }
-    process.env.SEARCH_NEXT_ENV_FILE = envPath;
+    process.chdir(tmpDir);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    process.chdir(originalCwd);
     fs.rmSync(tmpDir, { recursive: true, force: true });
 
     for (const key of managedEnvKeys) {
