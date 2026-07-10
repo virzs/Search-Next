@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { Alert, message } from "antd";
+import { Alert, message, theme as antdTheme } from "antd";
+import type { CSSProperties } from "react";
 import { cx } from "@emotion/css";
 import {
   UnloggedViewProps,
@@ -37,6 +38,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
   modalProps = {},
 }) => {
   const { t } = useI18n();
+  const { token } = antdTheme.useToken();
   const [internalAction, setInternalAction] =
     useState<AuthAction>(defaultAction);
   const currentAction = activeAction ?? internalAction;
@@ -208,6 +210,7 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         appleAuthPanelClassName,
         className,
       )}
+      style={{ "--auth-accent": token.colorPrimary } as CSSProperties}
     >
       {/* 头部信息 */}
       <div className="apple-auth-copy">

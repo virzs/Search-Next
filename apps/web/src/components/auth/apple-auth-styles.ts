@@ -46,14 +46,27 @@ export const appleAuthPanelClassName = css`
     margin-left: 6px;
     border: 0;
     background: transparent;
-    color: #007aff;
+    color: var(--auth-accent, #0a84ff);
     font-weight: 700;
   }
 
   .apple-auth-switch-row button:focus-visible {
     border-radius: 8px;
-    outline: 3px solid rgba(0, 122, 255, 0.16);
+    outline: 3px solid color-mix(in srgb, var(--auth-accent, #0a84ff) 16%, transparent);
     outline-offset: 2px;
+  }
+
+  [data-theme="dark"] & {
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] & .apple-auth-title {
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] & .apple-auth-description,
+  [data-theme="dark"] & .apple-auth-switch-row {
+    color: #aeaeb2;
   }
 `;
 
@@ -117,16 +130,16 @@ export const appleAuthFormClassName = css`
 
   .ant-input:hover,
   .ant-input-affix-wrapper:hover {
-    border-color: rgba(0, 122, 255, 0.42) !important;
+    border-color: color-mix(in srgb, var(--auth-accent, #0a84ff) 42%, transparent) !important;
     background: rgba(255, 255, 255, 0.96) !important;
   }
 
   .ant-input:focus,
   .ant-input-focused,
   .ant-input-affix-wrapper-focused {
-    border-color: #007aff !important;
+    border-color: var(--auth-accent, #0a84ff) !important;
     background: #ffffff !important;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.13) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--auth-accent, #0a84ff) 13%, transparent) !important;
   }
 
   .ant-form-item-has-error .ant-input,
@@ -172,23 +185,23 @@ export const appleAuthFormClassName = css`
 
   .ant-checkbox-wrapper:hover .ant-checkbox-inner,
   .ant-checkbox:hover .ant-checkbox-inner {
-    border-color: #007aff !important;
+    border-color: var(--auth-accent, #0a84ff) !important;
   }
 
   .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: #007aff !important;
-    background: #007aff !important;
+    border-color: var(--auth-accent, #0a84ff) !important;
+    background: var(--auth-accent, #0a84ff) !important;
   }
 
   .apple-auth-link {
-    color: #007aff !important;
+    color: var(--auth-accent, #0a84ff) !important;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
   }
 
   .apple-auth-link:hover {
-    color: #0a84ff !important;
+    color: color-mix(in srgb, var(--auth-accent, #0a84ff) 84%, white) !important;
   }
 
   .apple-auth-icon-button.ant-btn {
@@ -203,32 +216,32 @@ export const appleAuthFormClassName = css`
   }
 
   .apple-auth-icon-button.ant-btn:hover {
-    background: rgba(0, 122, 255, 0.08) !important;
-    color: #007aff !important;
+    background: color-mix(in srgb, var(--auth-accent, #0a84ff) 8%, transparent) !important;
+    color: var(--auth-accent, #0a84ff) !important;
   }
 
   .apple-auth-primary-button.ant-btn {
     height: 44px !important;
     border: 0 !important;
     border-radius: 999px !important;
-    background: #007aff !important;
-    box-shadow: 0 10px 24px rgba(0, 122, 255, 0.22) !important;
+    background: var(--auth-accent, #0a84ff) !important;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--auth-accent, #0a84ff) 22%, transparent) !important;
     color: #ffffff !important;
     font-weight: 750;
   }
 
   .apple-auth-primary-button.ant-btn:hover,
   .apple-auth-primary-button.ant-btn:focus {
-    background: #0a84ff !important;
+    background: color-mix(in srgb, var(--auth-accent, #0a84ff) 88%, white) !important;
     color: #ffffff !important;
   }
 
   .apple-auth-primary-button.ant-btn:active {
-    background: #006edb !important;
+    background: color-mix(in srgb, var(--auth-accent, #0a84ff) 88%, black) !important;
   }
 
   .apple-auth-primary-button.ant-btn:disabled {
-    background: rgba(0, 122, 255, 0.42) !important;
+    background: color-mix(in srgb, var(--auth-accent, #0a84ff) 42%, transparent) !important;
     color: rgba(255, 255, 255, 0.78) !important;
   }
 
@@ -243,7 +256,7 @@ export const appleAuthFormClassName = css`
     border-color: rgba(60, 60, 67, 0.16) !important;
     border-radius: 12px !important;
     background: rgba(255, 255, 255, 0.78) !important;
-    color: #007aff !important;
+    color: var(--auth-accent, #0a84ff) !important;
     font-size: 13px;
     font-weight: 750;
     box-shadow: none !important;
@@ -251,9 +264,9 @@ export const appleAuthFormClassName = css`
 
   .apple-auth-code-button.ant-btn:hover,
   .apple-auth-code-button.ant-btn:focus {
-    border-color: rgba(0, 122, 255, 0.35) !important;
+    border-color: color-mix(in srgb, var(--auth-accent, #0a84ff) 35%, transparent) !important;
     background: #ffffff !important;
-    color: #007aff !important;
+    color: var(--auth-accent, #0a84ff) !important;
   }
 
   .apple-auth-code-button.ant-btn:disabled {
@@ -271,6 +284,72 @@ export const appleAuthFormClassName = css`
     color: #6e6e73;
     font-size: 12px;
     line-height: 18px;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #1d1d1f !important;
+    box-shadow: 0 0 0 1000px #f2f2f7 inset !important;
+    caret-color: #1d1d1f;
+  }
+
+  [data-theme="dark"] & .ant-form-item-label > label {
+    color: #d1d1d6;
+  }
+
+  [data-theme="dark"] & .ant-input,
+  [data-theme="dark"] & .ant-input-affix-wrapper {
+    border-color: rgba(235, 235, 245, 0.14) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    color: #f5f5f7;
+  }
+
+  [data-theme="dark"] & .ant-input::placeholder,
+  [data-theme="dark"] & .ant-input-affix-wrapper .ant-input::placeholder {
+    color: rgba(235, 235, 245, 0.38);
+  }
+
+  [data-theme="dark"] & .ant-input:hover,
+  [data-theme="dark"] & .ant-input-affix-wrapper:hover {
+    border-color: color-mix(in srgb, var(--auth-accent, #0a84ff) 52%, transparent) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  [data-theme="dark"] & .ant-input:focus,
+  [data-theme="dark"] & .ant-input-focused,
+  [data-theme="dark"] & .ant-input-affix-wrapper-focused {
+    border-color: var(--auth-accent, #0a84ff) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--auth-accent, #0a84ff) 18%, transparent) !important;
+  }
+
+  [data-theme="dark"] & .ant-form-item-has-error .ant-input,
+  [data-theme="dark"] & .ant-form-item-has-error .ant-input-affix-wrapper {
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  [data-theme="dark"] & .apple-auth-field-icon,
+  [data-theme="dark"] & .apple-auth-icon-button.ant-btn {
+    color: #8e8e93 !important;
+  }
+
+  [data-theme="dark"] & .ant-checkbox-wrapper,
+  [data-theme="dark"] & .apple-auth-terms .ant-typography {
+    color: #aeaeb2;
+  }
+
+  [data-theme="dark"] & .ant-checkbox .ant-checkbox-inner {
+    border-color: rgba(235, 235, 245, 0.22);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  [data-theme="dark"] & input:-webkit-autofill,
+  [data-theme="dark"] & input:-webkit-autofill:hover,
+  [data-theme="dark"] & input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f5f5f7 !important;
+    box-shadow: 0 0 0 1000px #2c2c2e inset !important;
+    caret-color: #f5f5f7;
   }
 
   @media (max-width: 520px) {

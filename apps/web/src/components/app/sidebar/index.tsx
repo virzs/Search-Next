@@ -54,7 +54,7 @@ const AppSidebar: FC<AppSidebarProps> = ({
   return (
     <aside
       className={cx(
-        "w-56 shrink-0 flex flex-col h-full",
+        "w-56 shrink-0 flex flex-col h-full max-[640px]:w-36",
         appSidebarClassName,
         className,
       )}
@@ -108,7 +108,7 @@ const AppSidebar: FC<AppSidebarProps> = ({
 export default AppSidebar;
 
 const appSidebarClassName = css`
-  padding: 14px 10px 16px;
+  padding: 58px 10px 16px;
   background:
     linear-gradient(
       180deg,
@@ -120,6 +120,10 @@ const appSidebarClassName = css`
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.54);
   color: #1d1d1f;
   backdrop-filter: blur(30px) saturate(1.18);
+
+  @media (max-width: 640px) {
+    padding: 54px 6px 14px;
+  }
 
   .app-sidebar-header,
   .app-sidebar-header [class*="text-gray-950"],
@@ -144,10 +148,10 @@ const appSidebarClassName = css`
 
   .ant-input-affix-wrapper:hover,
   .ant-input-affix-wrapper-focused {
-    border-color: rgba(0, 122, 255, 0.35);
+    border-color: color-mix(in srgb, var(--sn-accent) 35%, transparent);
     background: rgba(255, 255, 255, 0.82);
     box-shadow:
-      0 0 0 3px rgba(0, 122, 255, 0.12),
+      0 0 0 3px color-mix(in srgb, var(--sn-accent) 12%, transparent),
       inset 0 1px 1px rgba(0, 0, 0, 0.04);
   }
 
@@ -166,6 +170,10 @@ const appSidebarClassName = css`
     background: transparent;
   }
 
+  .ant-menu:focus-visible {
+    outline: none;
+  }
+
   .ant-menu-item {
     height: 38px;
     line-height: 38px;
@@ -178,7 +186,7 @@ const appSidebarClassName = css`
 
   .ant-menu-item .ant-menu-item-icon,
   .ant-menu-item svg {
-    color: #007aff;
+    color: var(--sn-accent);
   }
 
   .ant-menu-item:hover {
@@ -233,10 +241,10 @@ const appSidebarClassName = css`
 
   [data-theme="dark"] & .ant-input-affix-wrapper:hover,
   [data-theme="dark"] & .ant-input-affix-wrapper-focused {
-    border-color: rgba(10, 132, 255, 0.5);
+    border-color: color-mix(in srgb, var(--sn-accent) 50%, transparent);
     background: rgba(255, 255, 255, 0.12);
     box-shadow:
-      0 0 0 3px rgba(10, 132, 255, 0.18),
+      0 0 0 3px color-mix(in srgb, var(--sn-accent) 18%, transparent),
       inset 0 1px 1px rgba(0, 0, 0, 0.22);
   }
 

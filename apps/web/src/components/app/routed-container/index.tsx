@@ -12,8 +12,9 @@ import AppResponsiveOverlay, {
   AppResponsiveOverlayProps,
 } from "../responsive-overlay";
 import AppSidebar, { AppSidebarProps } from "../sidebar";
-import { Button, ConfigProvider } from "antd";
+import { Button, ConfigProvider, theme as antdTheme } from "antd";
 import type { ConfigProviderProps } from "antd";
+import type { CSSProperties } from "react";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { css, cx } from "@emotion/css";
 import { AppRoutedHeaderContext } from "./header-context";
@@ -41,6 +42,7 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
   sidebarProps,
   children,
 }) => {
+  const { token } = antdTheme.useToken();
   const location = useLocation();
   const navigate = useNavigate();
   const navigationType = useNavigationType();
@@ -220,7 +222,10 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
       }}
     >
       <ConfigProvider componentSize={componentSize}>
-        <div className="flex h-full w-full overflow-hidden">
+        <div
+          className={cx("flex h-full w-full overflow-hidden", appContentThemeClassName)}
+          style={{ "--sn-accent": token.colorPrimary } as CSSProperties}
+        >
           {sidebarProps ? <AppSidebar {...sidebarProps} /> : null}
           <div className="flex h-full w-0 grow flex-col overflow-hidden">
             <AppRoutedHeaderContext.Provider value={headerContextValue}>
@@ -282,7 +287,7 @@ const routedHeaderClassName = css`
   height: 48px;
   min-height: 48px;
   max-height: 48px;
-  padding-left: 84px;
+  padding-left: 8px;
   overflow: hidden;
   background: transparent;
   pointer-events: none;
@@ -304,12 +309,50 @@ const routedHeaderClassName = css`
   }
 `;
 
+const appContentThemeClassName = css`
+  --sn-page: #f5f5f7;
+  --sn-surface: rgba(255, 255, 255, 0.84);
+  --sn-surface-strong: #ffffff;
+  --sn-surface-secondary: #f2f2f7;
+  --sn-text: #1d1d1f;
+  --sn-text-secondary: #6e6e73;
+  --sn-text-tertiary: #8e8e93;
+  --sn-separator: rgba(60, 60, 67, 0.12);
+  --sn-shadow: 0 1px 2px rgba(0, 0, 0, 0.045);
+  color: var(--sn-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "PingFang SC", "Helvetica Neue", sans-serif;
+  letter-spacing: 0;
+
+  .ant-color-picker-trigger {
+    border-color: var(--sn-separator);
+    background: var(--sn-surface-secondary);
+    color: var(--sn-text);
+  }
+
+  .ant-color-picker-trigger-text {
+    color: var(--sn-text-secondary);
+  }
+
+  [data-theme="dark"] & {
+    --sn-page: #111113;
+    --sn-surface: rgba(255, 255, 255, 0.08);
+    --sn-surface-strong: #242426;
+    --sn-surface-secondary: rgba(255, 255, 255, 0.06);
+    --sn-text: #f5f5f7;
+    --sn-text-secondary: #aeaeb2;
+    --sn-text-tertiary: #8e8e93;
+    --sn-separator: rgba(235, 235, 245, 0.12);
+    --sn-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+  }
+`;
+
 const historyControlsClassName = css`
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: 6px;
-  padding: 10px 0 10px 12px;
+  padding: 10px 0 10px 4px;
 
   .app-history-button {
     width: 28px !important;
