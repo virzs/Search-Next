@@ -14,16 +14,8 @@ import { useNavigate } from "react-router";
 import { personalizationRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
 import PreviewCard from "../components/PreviewCard";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const themeViewClassName = css`
-  .apple-theme-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
+import { RiCheckLine } from "@remixicon/react";
 
 const ThemeView: FC = () => {
   const { t } = useI18n();
@@ -42,6 +34,17 @@ const ThemeView: FC = () => {
       ),
     { refreshDeps: [activeCategoryId] },
   );
+  const activeThemeName = useMemo(() => {
+    const activeTheme = themes?.find(
+      (theme) =>
+        theme._id === activeThemeId ||
+        ((activeThemeId === "light" || activeThemeId === "default") &&
+          (theme._id === "light" ||
+            theme._id === "default" ||
+            theme.name === "默认")),
+    );
+    return activeTheme?.name ?? t("ui.default");
+  }, [activeThemeId, t, themes]);
 
   const categoryOptions = useMemo(() => {
     const items: ThemeCategoryApiItem[] = categories ?? [];
@@ -57,7 +60,6 @@ const ThemeView: FC = () => {
 
   return (
     <DefaultAppView
-      className={themeViewClassName}
       headerClassName="items-center px-3 pt-3 pb-2"
       headerLeft={
         <AppSegmented
@@ -70,21 +72,27 @@ const ThemeView: FC = () => {
       contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-5">
-          <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
+        <div className="mb-6 flex items-end justify-between gap-4 max-[640px]:items-start max-[640px]:flex-col">
+          <div>
+          <div className="text-[28px] font-bold leading-[34px] text-[var(--sn-text)]">
             {t("ui.theme")}
           </div>
-          <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
+          <div className="mt-1 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
             {t("ui.theme.chooseDescription")}
+          </div>
+          </div>
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
+            <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
+            <span>{t("ui.currentTheme")} · {activeThemeName}</span>
           </div>
         </div>
 
         {themeLoading || categoryLoading ? (
           <div className="flex h-[220px] w-full items-center justify-center">
-            <div className="text-sm text-[#6e6e73]">{t("ui.loadingThemes")}</div>
+            <div className="text-[13px] text-[var(--sn-text-secondary)]">{t("ui.loadingThemes")}</div>
           </div>
         ) : themes?.length ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {themes.map((theme) => {
               const previewUrl = getThemePreviewImageUrl(theme, 0);
               const active =
@@ -98,29 +106,19 @@ const ThemeView: FC = () => {
                   key={theme._id}
                   active={active}
                   title={theme.name}
-                  description={
-                    active
-                      ? t("ui.inUse")
-                      : theme.description || t("ui.clickTheCardToViewPreviewDetails")
-                  }
-                  status={
-                    active ? (
-                      <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                        {t("ui.current")}
-                      </span>
-                    ) : null
-                  }
+                  description={theme.description || t("ui.clickTheCardToViewPreviewDetails")}
                   action={
+                    active ? null : (
                     <Button
                       size="small"
-                      type={active ? "default" : "primary"}
+                      type="primary"
                       shape="round"
-                      disabled={active}
-                      className={active ? undefined : "apple-theme-action"}
+                      className="px-3! font-semibold!"
                       onClick={() => setActiveThemeId(theme._id)}
                     >
-                      {active ? t("ui.applied") : t("action.apply")}
+                      {t("action.apply")}
                     </Button>
+                    )
                   }
                   onClick={() => openThemeDetail(theme)}
                   cover={
@@ -141,7 +139,7 @@ const ThemeView: FC = () => {
             })}
           </div>
         ) : (
-          <div className="flex h-[220px] w-full items-center justify-center rounded-[22px] bg-white/80">
+          <div className="flex h-[220px] w-full items-center justify-center rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)]">
             <Empty description={t("ui.noThemesAvailable")} />
           </div>
         )}

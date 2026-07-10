@@ -44,7 +44,11 @@ const ThemedConfigProvider: React.FC<{ children: React.ReactNode }> = ({
       <ZsI18nProvider language={language}>
         {/* Keep Search Next translations bound to the app i18n under zs_library's provider. */}
         <I18nextProvider i18n={i18n}>
-          <ConfigProvider locale={antdLocales[language]} theme={themeConfig}>
+          <ConfigProvider
+            locale={antdLocales[language]}
+            theme={themeConfig}
+            button={{ autoInsertSpace: false }}
+          >
             <App>{children}</App>
           </ConfigProvider>
         </I18nextProvider>

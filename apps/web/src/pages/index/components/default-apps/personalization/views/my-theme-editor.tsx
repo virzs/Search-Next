@@ -1,4 +1,4 @@
-import { DefaultAppView } from "@/components";
+import { AppSegmented, DefaultAppView } from "@/components";
 import { App, Button, Card, ColorPicker, Form, Input, Space } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -12,16 +12,7 @@ import {
   writeMyThemes,
   type MyThemeItem,
 } from "../my-assets";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const themeEditorClassName = css`
-  .apple-theme-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
 
 const colorToHex = (color: any, hex?: string) => {
   if (typeof hex === "string" && hex) return hex;
@@ -45,6 +36,7 @@ const ThemeMyThemeEditorView = () => {
   const [lightBackground, setLightBackground] = useState("#ffffff");
   const [darkBackground, setDarkBackground] = useState("#2f3035");
   const [accentColor, setAccentColor] = useState("#007aff");
+  const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
   const [form] = Form.useForm<{ name: string; description?: string }>();
   const watchedName = Form.useWatch("name", form);
   const watchedDescription = Form.useWatch("description", form);
@@ -107,6 +99,17 @@ const ThemeMyThemeEditorView = () => {
     () => toMyThemeConfig(previewTheme),
     [previewTheme],
   );
+
+  const visiblePreviewConfig = useMemo(() => {
+    if (previewMode === "light" || !previewConfig.darkConfig) {
+      return { ...previewConfig, darkConfig: undefined };
+    }
+    return {
+      ...previewConfig,
+      lightConfig: previewConfig.darkConfig,
+      darkConfig: undefined,
+    };
+  }, [previewConfig, previewMode]);
 
   const persist = (nextItems: MyThemeItem[]) => {
     setItems(nextItems);
@@ -185,7 +188,7 @@ const ThemeMyThemeEditorView = () => {
 
   return (
     <DefaultAppView
-      className={`h-full ${themeEditorClassName}`}
+      className="h-full"
       animate
       title={isEdit ? t("ui.editTheme") : t("ui.createTheme")}
       headerRight={
@@ -199,7 +202,6 @@ const ThemeMyThemeEditorView = () => {
           <Button
             type="primary"
             shape="round"
-            className="apple-theme-action"
             onClick={handleSaveAndApply}
           >
             {t("ui.saveAndApply")}
@@ -208,17 +210,15 @@ const ThemeMyThemeEditorView = () => {
       }
       contentClassName="px-4 pb-8 pt-4"
     >
-      <div className="grid grid-cols-[minmax(260px,0.85fr)_minmax(0,1.15fr)] gap-4 max-[760px]:grid-cols-1">
+      <div className="grid grid-cols-[minmax(260px,0.8fr)_minmax(0,1.2fr)] gap-6 max-[760px]:grid-cols-1">
         <Card
-          className="rounded-[16px]"
+          className="rounded-[8px] border-[var(--sn-separator)]! bg-[var(--sn-surface)]! shadow-[var(--sn-shadow)]!"
           styles={{ body: { padding: 16 } }}
-          style={{
-            background: "rgba(255,255,255,0.9)",
-            borderColor: "rgba(255,255,255,0.82)",
-            boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px rgba(15,23,42,0.06)",
-          }}
         >
+          <section>
+            <h2 className="mb-3 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
+              {t("ui.basicInformation")}
+            </h2>
           <Form form={form} layout="vertical">
             <Form.Item
               name="name"
@@ -231,10 +231,15 @@ const ThemeMyThemeEditorView = () => {
               <Input placeholder={t("ui.theme.descriptionPlaceholder")} />
             </Form.Item>
           </Form>
+          </section>
 
+          <section className="mt-5 border-t border-[var(--sn-separator)] pt-5">
+          <h2 className="mb-3 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
+            {t("ui.colors")}
+          </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <div className="mb-2 text-sm font-medium">{t("ui.lightBackground")}</div>
+              <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.lightBackground")}</div>
               <ColorPicker
                 value={lightBackground}
                 onChange={(color, hex) =>
@@ -247,7 +252,7 @@ const ThemeMyThemeEditorView = () => {
               />
             </div>
             <div>
-              <div className="mb-2 text-sm font-medium">{t("ui.darkBackground")}</div>
+              <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.darkBackground")}</div>
               <ColorPicker
                 value={darkBackground}
                 onChange={(color, hex) =>
@@ -262,7 +267,7 @@ const ThemeMyThemeEditorView = () => {
           </div>
 
           <div className="mt-4">
-            <div className="mb-2 text-sm font-medium">{t("ui.accentColor")}</div>
+            <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.accentColor")}</div>
             <ColorPicker
               value={accentColor}
               onChange={(color, hex) => setAccentColor(colorToHex(color, hex))}
@@ -272,16 +277,33 @@ const ThemeMyThemeEditorView = () => {
               styles={{ popup: { root: { zIndex: 6000 } } }}
             />
           </div>
+          </section>
         </Card>
 
         <div>
-          <div className="mb-2 ml-1 text-[13px] font-extrabold text-[#6e6e73]">
-            {t("ui.livePreview")}
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
+                {t("ui.livePreview")}
+              </h2>
+              <div className="mt-1 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
+                {t("ui.previewAppearance")}
+              </div>
+            </div>
+            <AppSegmented
+              size="small"
+              value={previewMode}
+              onChange={(value) => setPreviewMode(value as "light" | "dark")}
+              options={[
+                { label: t("ui.light"), value: "light" },
+                { label: t("ui.dark"), value: "dark" },
+              ]}
+            />
           </div>
-          <div className="aspect-video overflow-hidden rounded-[18px] border border-white/80 bg-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06)]">
-            <ThemeDesktopPreview theme={previewConfig} draggable />
+          <div className="aspect-video overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]">
+            <ThemeDesktopPreview theme={visiblePreviewConfig} />
           </div>
-          <div className="mt-3 rounded-[16px] border border-white/80 bg-white/80 p-3 text-xs leading-5 text-[#6e6e73] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+          <div className="mt-3 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-3 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
             {t("ui.theme.localSaveHint")}
           </div>
         </div>

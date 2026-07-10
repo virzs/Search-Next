@@ -4,6 +4,7 @@ import { Button, Empty, Pagination, Skeleton, Spin, Tag } from "antd";
 import { RiApps2Line } from "@remixicon/react";
 import { AppSegmented, DefaultAppView } from "@/components";
 import { useApp } from "@/hooks/useApp";
+import useDesktopTheme from "@/hooks/useDesktopTheme";
 import type {
   AppApiItem,
   AppScreenshot,
@@ -11,7 +12,9 @@ import type {
 } from "@/types";
 import type { StoreAddPayload } from "../../index";
 import { toBackendAssetUrl } from "@/utils/utils";
-import StoreHeroCard from "../../components/StoreHeroCard";
+import StoreHeroCard, {
+  StoreHeroArtwork,
+} from "../../components/StoreHeroCard";
 import { css } from "@emotion/css";
 import {
   getTabsAppClassifyPublicLevel1,
@@ -29,21 +32,16 @@ import { storeRoute } from "../../route-paths";
 
 type PreviewTheme = "light" | "dark";
 
-const PREVIEW_THEME_OPTIONS = [
-  { label: "ui.light", value: "light" },
-  { label: "ui.dark", value: "dark" },
-];
-
 const appViewClassName = css`
   .apple-store-get-button.ant-btn {
-    border-color: #007aff !important;
-    background: #007aff !important;
+    border-color: var(--sn-accent) !important;
+    background: var(--sn-accent) !important;
     color: #ffffff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
+    box-shadow: none;
   }
 
   .apple-store-get-link.ant-btn {
-    color: #007aff !important;
+    color: var(--sn-accent) !important;
   }
 `;
 
@@ -186,7 +184,7 @@ const AppArtwork = ({
   apps: AppApiItem[];
   getIconUrl: (app: AppApiItem) => string | null;
 }) => (
-  <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[22px] bg-white/35 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+  <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[8px] bg-white/15 p-2">
     {Array.from({ length: 4 }).map((_, idx) => {
       const app = apps[idx];
       const icon = app ? getIconUrl(app) : "";
@@ -194,12 +192,12 @@ const AppArtwork = ({
       return (
         <div
           key={idx}
-          className="flex items-center justify-center overflow-hidden rounded-2xl bg-white/80 shadow-sm"
+          className="flex items-center justify-center overflow-hidden rounded-[7px] bg-white/85"
         >
           {icon ? (
             <img src={icon} alt={name} className="h-full w-full object-contain p-2" />
           ) : (
-            <RiApps2Line className="text-xl text-blue-500" />
+            <RiApps2Line className="text-xl text-[var(--sn-accent)]" />
           )}
         </div>
       );
@@ -217,19 +215,19 @@ const FeaturedCollectionCard = ({
   onOpen: (id: string) => void;
 }) => {
   const apps = getCollectionApps(collection);
-  const accent = collection.accentColor || "#007aff";
+  const accent = collection.accentColor || "var(--sn-accent)";
   return (
     <button
       type="button"
       onClick={() => onOpen(collection._id)}
-      className="group flex min-h-[180px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[28px] border-0 p-5 text-left shadow-[0_18px_42px_rgba(15,23,42,0.13)] transition hover:-translate-y-0.5"
+      className="group flex min-h-[168px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[8px] border-0 p-5 text-left shadow-[var(--sn-shadow)] transition hover:-translate-y-px active:translate-y-0"
       style={{ background: `linear-gradient(135deg, ${accent}, #111827)` }}
     >
       <div className="min-w-0 text-white">
-        <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white/72">
+        <div className="mb-2 text-[11px] font-bold uppercase leading-4 text-white/72">
           {collection.kicker || "App Collection"}
         </div>
-        <div className="line-clamp-2 text-3xl font-extrabold leading-9 tracking-normal">
+        <div className="line-clamp-2 text-[24px] font-bold leading-[30px]">
           {collection.title}
         </div>
         {collection.description ? (
@@ -257,8 +255,8 @@ const AppCompactCard = ({
   const description = resolveAppDescription(app, language);
   const iconUrl = getIconUrl(app);
   return (
-    <div className="flex min-h-[74px] w-64 shrink-0 items-center gap-3 rounded-2xl bg-white/90 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] dark:bg-white/[0.08]">
-      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] dark:bg-white/10">
+    <div className="flex min-h-[76px] w-[252px] shrink-0 snap-start items-center gap-3 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)] max-[640px]:w-[calc(100vw-176px)]">
+      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
         {iconUrl ? (
           <img
             src={iconUrl}
@@ -266,15 +264,15 @@ const AppCompactCard = ({
             className="h-full w-full object-contain p-2.5"
           />
         ) : (
-          <RiApps2Line className="text-2xl text-blue-500" />
+          <RiApps2Line className="text-2xl text-[var(--sn-accent)]" />
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-bold text-gray-950 dark:text-gray-50">
+        <div className="truncate text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
           {displayName}
         </div>
         {description ? (
-          <div className="mt-0.5 line-clamp-1 text-xs font-medium text-gray-500">
+          <div className="mt-0.5 line-clamp-1 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
             {description}
           </div>
         ) : null}
@@ -308,8 +306,8 @@ const AppListCard = ({
   const iconUrl = getIconUrl(app);
 
   return (
-    <article className="flex min-h-[96px] items-center gap-4 rounded-[22px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
-      <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-[17px] bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_1px_2px_rgba(0,0,0,0.08)] dark:bg-white/10">
+    <article className="flex min-h-[96px] items-center gap-4 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px">
+      <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
         {iconUrl ? (
           <img
             src={iconUrl}
@@ -318,15 +316,15 @@ const AppListCard = ({
             loading="lazy"
           />
         ) : (
-          <RiApps2Line className="text-3xl text-blue-500" />
+          <RiApps2Line className="text-3xl text-[var(--sn-accent)]" />
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-base font-bold tracking-normal text-gray-950 dark:text-gray-50">
+        <div className="truncate text-[15px] font-semibold leading-5 text-[var(--sn-text)]">
           {displayName}
         </div>
         {description ? (
-          <div className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-gray-500 dark:text-gray-400">
+          <div className="mt-1 line-clamp-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
             {description}
           </div>
         ) : null}
@@ -334,7 +332,7 @@ const AppListCard = ({
           {(tags.length ? tags.slice(0, 4) : [t("ui.app")]).map((tag) => (
             <Tag
               key={tag}
-              className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!"
+              className="m-0! rounded-full! border-0! bg-[var(--sn-surface-secondary)]! text-xs! font-medium! text-[var(--sn-text-secondary)]!"
             >
               {tag}
             </Tag>
@@ -375,9 +373,9 @@ const AppCard = ({
   const hasScreenshots = previewItems.some((item) => item.screenshot);
 
   return (
-    <article className="overflow-hidden rounded-[22px] border border-white/80 bg-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
+    <article className="overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]">
       <div className="flex items-start gap-3.5 px-5 pt-5">
-        <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_1px_2px_rgba(0,0,0,0.08)] dark:bg-white/10">
+        <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
           {iconUrl ? (
             <img
               src={iconUrl}
@@ -386,18 +384,18 @@ const AppCard = ({
               loading="lazy"
             />
           ) : (
-            <RiApps2Line className="text-3xl text-blue-500" />
+            <RiApps2Line className="text-3xl text-[var(--sn-accent)]" />
           )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3 max-[640px]:flex-col max-[640px]:gap-2">
             <div className="min-w-0">
-              <div className="truncate text-base font-bold tracking-normal text-gray-950 dark:text-gray-50">
+              <div className="truncate text-[15px] font-semibold leading-5 text-[var(--sn-text)]">
                 {displayName}
               </div>
               {description ? (
-                <div className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-gray-500 dark:text-gray-400">
+                <div className="mt-1 line-clamp-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
                   {description}
                 </div>
               ) : null}
@@ -406,10 +404,10 @@ const AppCard = ({
               type="primary"
               size="small"
               shape="round"
-              className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
+              className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold! max-[640px]:self-start"
               onClick={() => onAdd(app, app.defaultSizeId)}
             >
-              {t("ui.get")}
+              {t("ui.getApp")}
             </Button>
           </div>
 
@@ -417,7 +415,7 @@ const AppCard = ({
             {(tags.length ? tags.slice(0, 4) : [t("ui.app")]).map((tag) => (
               <Tag
                 key={tag}
-                className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-xs! font-medium! text-[#6e6e73]! dark:bg-white/10! dark:text-gray-300!"
+                className="m-0! rounded-full! border-0! bg-[var(--sn-surface-secondary)]! text-xs! font-medium! text-[var(--sn-text-secondary)]!"
               >
                 {tag}
               </Tag>
@@ -429,15 +427,15 @@ const AppCard = ({
 
       {hasScreenshots ? (
         <div className="mt-4 overflow-x-auto pb-5">
-          <div className="flex w-max gap-3 px-5">
+          <div className="flex w-max snap-x snap-mandatory gap-3 px-5">
             {previewItems.map((item) => (
               <div
                 key={item.sizeId}
-                className="group shrink-0 rounded-[18px] border border-white/80 bg-[#f5f5f7] p-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-white/[0.06] dark:hover:border-blue-400/80 dark:hover:bg-blue-950/30"
+                className="group shrink-0 snap-start rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-2 text-left transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]"
                 style={{ width: getPreviewTileWidth(item) }}
               >
                 <div
-                  className="flex min-h-[78px] w-full items-center justify-center overflow-hidden rounded-[14px] bg-white p-2 shadow-[0_1px_2px_rgba(0,0,0,0.045)] dark:bg-black/20"
+                  className="flex min-h-[92px] w-full items-center justify-center overflow-hidden rounded-[7px] border border-[var(--sn-separator)] bg-[var(--sn-surface-strong)] p-2"
                   style={{
                     aspectRatio: getPreviewAspectRatio(
                       item.screenshot,
@@ -457,7 +455,7 @@ const AppCard = ({
                   )}
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="truncate text-xs font-semibold text-gray-800 dark:text-gray-100">
+                  <span className="truncate text-[12px] font-semibold text-[var(--sn-text)]">
                     {item.label}
                   </span>
                   <Button
@@ -470,7 +468,7 @@ const AppCard = ({
                     })}
                     onClick={() => onAdd(app, item.sizeId)}
                   >
-                    {t("ui.get")}
+                    {t("ui.addWidgetSize", { size: item.label })}
                   </Button>
                 </div>
               </div>
@@ -479,7 +477,7 @@ const AppCard = ({
         </div>
       ) : (
         <div className="px-5 pb-5 pt-4">
-          <div className="flex h-24 w-full items-center justify-center rounded-[18px] border border-dashed border-white bg-[#f5f5f7] text-sm font-semibold text-[#6e6e73] dark:border-white/10 dark:bg-white/[0.06]">
+          <div className="flex h-24 w-full items-center justify-center rounded-[8px] border border-dashed border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] text-[13px] font-medium text-[var(--sn-text-secondary)]">
             <span>{app.defaultSizeId || "2x2"}</span>
             <Button
               type="link"
@@ -500,7 +498,7 @@ const AppGridSkeleton: React.FC<{ count: number }> = ({ count }) => (
     {Array.from({ length: count }).map((_, idx) => (
       <div
         key={idx}
-        className="rounded-[22px] border border-white/80 bg-white/90 p-5"
+        className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5"
       >
         <Skeleton active avatar paragraph={{ rows: 3 }} />
       </div>
@@ -521,7 +519,7 @@ const AppFeaturedView = ({
   onOpenCollection: (collectionId: string) => void;
   onAdd: (app: AppApiItem, sizeId?: string) => void;
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const appCollections = collectionItems.filter(
     (collection) => getCollectionApps(collection).length > 0,
   );
@@ -531,14 +529,23 @@ const AppFeaturedView = ({
   const normalCollections = appCollections.filter(
     (item) => !featuredCollections.some((c) => c._id === item._id),
   );
+  const heroApps = appCollections.flatMap(getCollectionApps).slice(0, 4);
 
   return (
     <div className="h-full overflow-y-auto px-4 pb-8 pt-4">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
         <StoreHeroCard
           title={t("ui.desktopInfoAtAGlance")}
           description={t("ui.store.appHeroDescription")}
           tone="app"
+          artwork={
+            <StoreHeroArtwork
+              items={heroApps.map((app) => ({
+                src: getIconUrl(app),
+                label: resolveAppDisplayName(app, language),
+              }))}
+            />
+          }
         />
 
         {collectionListLoading ? (
@@ -573,14 +580,14 @@ const AppFeaturedView = ({
               <div className="mb-3 flex items-end justify-between gap-3 px-1">
                 <div className="min-w-0">
                   {collection.kicker ? (
-                    <div className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#0071e3]">
+                    <div className="mb-1 text-[11px] font-bold uppercase leading-4 text-[var(--sn-accent)]">
                       {collection.kicker}
                     </div>
                   ) : null}
-                  <div className="line-clamp-1 text-xl font-bold tracking-normal text-gray-950 dark:text-gray-50">
+                  <div className="line-clamp-1 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
                     {collection.title}
                   </div>
-                  <div className="mt-1 line-clamp-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <div className="mt-1 line-clamp-1 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
                     {collection.description ||
                       t("ui.storeItemCount", {
                         count: collection.total ?? apps.length,
@@ -589,13 +596,13 @@ const AppFeaturedView = ({
                 </div>
                 <Button
                   type="link"
-                  className="px-0! font-bold! text-[#0071e3]!"
+                  className="px-0! font-semibold! text-[var(--sn-accent)]!"
                   onClick={() => onOpenCollection(collection._id)}
                 >
                   {t("ui.viewMore")}
                 </Button>
               </div>
-              <div className="-mx-1 flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
+              <div className="-mx-1 flex snap-x snap-mandatory flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
                 {apps.map((app) => (
                   <AppCompactCard
                     key={app._id}
@@ -621,27 +628,20 @@ const AppView: React.FC<AppViewProps> = ({
   const { t, language } = useI18n();
   const navigate = useNavigate();
   const isWidgetView = variant === "widget";
+  const { resolvedColorScheme } = useDesktopTheme();
   const {
     refresh,
     getIconUrl,
     apps: allApps,
     loading: appLoading,
   } = useApp();
-  const [previewTheme, setPreviewTheme] = useState<PreviewTheme>("light");
+  const previewTheme: PreviewTheme =
+    resolvedColorScheme === "dark" ? "dark" : "light";
   const [activeView, setActiveView] = useState<string>(
     variant === "app" ? "featured" : "all",
   );
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-
-  const previewThemeOptions = useMemo(
-    () =>
-      PREVIEW_THEME_OPTIONS.map((option) => ({
-        ...option,
-        label: t(option.label),
-      })),
-    [t],
-  );
 
   const {
     data: collectionListData,
@@ -722,6 +722,21 @@ const AppView: React.FC<AppViewProps> = ({
     const start = (page - 1) * pageSize;
     return filteredListItems.slice(start, start + pageSize);
   }, [filteredListItems, page, pageSize]);
+  const widgetHeroItems = useMemo(
+    () =>
+      visibleApps.slice(0, 4).map((app) => {
+        const preview = getPreviewItems(app, previewTheme).find(
+          (item) => item.screenshot,
+        );
+        return {
+          src: preview?.screenshot
+            ? getScreenshotUrl(preview.screenshot)
+            : getIconUrl(app),
+          label: resolveAppDisplayName(app, language),
+        };
+      }),
+    [getIconUrl, language, previewTheme, visibleApps],
+  );
   const listLoading = appLoading;
   const collectionItems = useMemo(
     () => ((collectionListData as any[]) || []) as AppCollectionPublicItem[],
@@ -789,14 +804,6 @@ const AppView: React.FC<AppViewProps> = ({
           className="max-w-full overflow-auto"
         />
       }
-      headerRight={isWidgetView ? (
-        <AppSegmented
-          size="small"
-          options={previewThemeOptions}
-          value={previewTheme}
-          onChange={(value) => setPreviewTheme(value as PreviewTheme)}
-        />
-      ) : null}
     >
       {!isWidgetView && activeView === "featured" ? (
         <AppFeaturedView
@@ -815,16 +822,17 @@ const AppView: React.FC<AppViewProps> = ({
                   title={t("ui.desktopInfoAtAGlance")}
                   description={t("ui.store.widgetHeroDescription")}
                   tone="widget"
-                  className="mb-5"
+                  artwork={<StoreHeroArtwork items={widgetHeroItems} />}
+                  className="mb-6"
                 />
               ) : null}
 
               <div className="mb-4 px-1">
-                <div className="text-[30px] font-extrabold leading-9 tracking-normal text-gray-950 dark:text-gray-50">
+                <div className="text-[28px] font-bold leading-[34px] text-[var(--sn-text)]">
                   {activeCategory?.label ??
                     t(isWidgetView ? "ui.allWidgets" : "ui.allApps")}
                 </div>
-                <div className="mt-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
+                <div className="mt-1 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
                   {t("ui.storeItemCount", { count: listTotal })}
                 </div>
               </div>
@@ -874,7 +882,8 @@ const AppView: React.FC<AppViewProps> = ({
             </div>
           </div>
 
-          <div className="shrink-0 px-4 pb-4 pt-2">
+          {listTotal > pageSize ? (
+          <div className="shrink-0 border-t border-[var(--sn-separator)] px-4 pb-4 pt-3">
             <Pagination
               size="small"
               current={page}
@@ -890,6 +899,7 @@ const AppView: React.FC<AppViewProps> = ({
               className="flex justify-end"
             />
           </div>
+          ) : null}
         </div>
       )}
     </DefaultAppView>

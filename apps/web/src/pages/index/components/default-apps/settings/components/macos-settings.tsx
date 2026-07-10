@@ -50,19 +50,19 @@ export const MacSettingsView: FC<MacSettingsViewProps> = ({
   }, [effectiveNavigationTitle, isRoutedPageActive, routedHeaderContext]);
 
   return (
-    <div className="h-full overflow-y-auto bg-[#f5f5f7] px-6 pb-8 pt-1 dark:bg-[#111113]">
+    <div className="h-full overflow-y-auto bg-[var(--sn-page)] px-6 pb-8 pt-1 max-[640px]:px-4">
       <div className="mx-auto w-full max-w-[700px]">
         {showPageHeader && (title || description || action) && (
           <div className="mb-5 flex items-end justify-between gap-4 pt-1">
             {title || description ? (
               <div className="min-w-0">
                 {title ? (
-                  <div className="truncate text-[28px] font-bold tracking-normal text-[#1d1d1f] dark:text-[#f5f5f7]">
+                  <div className="truncate text-[28px] font-bold leading-[34px] tracking-normal text-[var(--sn-text)]">
                     {title}
                   </div>
                 ) : null}
                 {description ? (
-                  <div className="mt-1 text-sm font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
+                  <div className="mt-1 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
                     {description}
                   </div>
                 ) : null}
@@ -71,7 +71,7 @@ export const MacSettingsView: FC<MacSettingsViewProps> = ({
             <div className="shrink-0">{action}</div>
           </div>
         )}
-        <div className="grid gap-[18px]">{children}</div>
+        <div className="grid min-w-0 gap-[18px]">{children}</div>
       </div>
     </div>
   );
@@ -97,11 +97,11 @@ export const MacSettingsHero: FC<MacSettingsHeroProps> = ({
       {icon}
     </MacSettingsIcon>
     <div className="min-w-0">
-      <div className="truncate text-[18px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
+      <div className="truncate text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
         {title}
       </div>
       {description ? (
-        <div className="mt-1 text-[13px] leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
+        <div className="mt-1 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
           {description}
         </div>
       ) : null}
@@ -121,9 +121,9 @@ export const MacSettingsSection: FC<MacSettingsSectionProps> = ({
   title,
   children,
 }) => (
-  <section>
+  <section className="min-w-0">
     {title ? (
-      <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73] dark:text-[#aeaeb2]">
+      <div className="mb-2 ml-1 text-[13px] font-semibold leading-5 text-[var(--sn-text-secondary)]">
         {title}
       </div>
     ) : null}
@@ -173,23 +173,23 @@ export const MacSettingsRow: FC<MacSettingsRowProps> = ({
           : null,
       )}
     >
-      <div className="grid min-h-[50px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-2.5">
+      <div className="grid min-h-[50px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-2.5 max-[640px]:grid-cols-1 max-[640px]:gap-2">
         <div className="flex min-w-0 items-center gap-3">
           {icon ? (
             <MacSettingsIcon tone={iconTone}>{icon}</MacSettingsIcon>
           ) : null}
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
+            <div className="truncate text-[13px] font-semibold leading-5 text-[var(--sn-text)]">
               {title}
             </div>
             {description ? (
-              <div className="mt-0.5 text-xs leading-[18px] text-[#6e6e73] dark:text-[#aeaeb2]">
+              <div className="mt-0.5 break-words text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
                 {description}
               </div>
             ) : null}
           </div>
         </div>
-        {extra ? <div className="shrink-0">{extra}</div> : null}
+        {extra ? <div className="shrink-0 max-[640px]:pl-[42px]">{extra}</div> : null}
       </div>
       {children ? <div className="px-4 pb-4">{children}</div> : null}
     </div>
@@ -227,7 +227,7 @@ export const MacSettingsChevron = () => (
 );
 
 export const MacSettingsValue: FC<{ children: ReactNode }> = ({ children }) => (
-  <span className="max-w-[220px] truncate text-[13px] font-semibold text-[#6e6e73] dark:text-[#aeaeb2]">
+  <span className="max-w-[220px] truncate text-[13px] font-medium text-[var(--sn-text-secondary)]">
     {children}
   </span>
 );
@@ -241,10 +241,10 @@ export const MacSettingsInfoGrid: FC<{
         key={index}
         className="rounded-[12px] bg-[#f2f2f7] p-3 dark:bg-white/[0.06]"
       >
-        <div className="text-[11px] font-bold text-[#6e6e73] dark:text-[#aeaeb2]">
+        <div className="text-[11px] font-semibold text-[var(--sn-text-secondary)]">
           {item.label}
         </div>
-        <div className="mt-1 truncate text-sm font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">
+        <div className="mt-1 truncate text-[13px] font-semibold leading-5 text-[var(--sn-text)]">
           {item.value}
         </div>
       </div>
@@ -253,7 +253,7 @@ export const MacSettingsInfoGrid: FC<{
 );
 
 const toneClassName: Record<SettingsIconTone, string> = {
-  blue: "bg-[#007aff]",
+  blue: "bg-[var(--sn-accent)]",
   green: "bg-[#34c759]",
   orange: "bg-[#ff9500]",
   red: "bg-[#ff3b30]",

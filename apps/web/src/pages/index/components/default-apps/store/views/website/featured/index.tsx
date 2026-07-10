@@ -1,7 +1,9 @@
 import { Button, Empty, Skeleton } from "antd";
 import type React from "react";
-import StoreHeroCard from "../../../components/StoreHeroCard";
-import { getWebsiteIconUrl, getWebsiteId } from "../../../utils";
+import StoreHeroCard, {
+  StoreHeroArtwork,
+} from "../../../components/StoreHeroCard";
+import { getWebsiteIconUrl, getWebsiteId, getWebsiteName } from "../../../utils";
 import WebsiteCard from "../../../components/WebsiteCard";
 import { useI18n } from "@/i18n";
 
@@ -16,12 +18,12 @@ export interface FeaturedViewProps {
 
 const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
   return (
-    <div className="flex flex-nowrap gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1">
+    <div className="-mx-1 flex snap-x snap-mandatory flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
       {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className="w-56 shrink-0">
+        <div key={idx} className="w-[252px] shrink-0 snap-start max-[640px]:w-[calc(100vw-176px)]">
           <Skeleton.Image
             active
-            style={{ width: 224, height: 120, borderRadius: 16 }}
+            style={{ width: 252, height: 76, borderRadius: 8 }}
           />
           <div className="mt-2 px-1">
             <Skeleton
@@ -39,13 +41,13 @@ const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
 const CollectionArtwork = ({ items }: { items: any[] }) => {
   const icons = items.map(getWebsiteIconUrl).filter(Boolean).slice(0, 6);
   return (
-    <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[22px] bg-white/35 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+    <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[8px] bg-white/15 p-2">
       {Array.from({ length: 4 }).map((_, idx) => {
         const icon = icons[idx];
         return (
           <div
             key={idx}
-            className="flex items-center justify-center overflow-hidden rounded-2xl bg-white/80 shadow-sm"
+            className="flex items-center justify-center overflow-hidden rounded-[7px] bg-white/85"
           >
             {icon ? (
               <img src={icon} alt="" className="h-full w-full object-cover" />
@@ -67,21 +69,21 @@ const FeaturedCollectionCard = ({
   onOpen: (id: string) => void;
 }) => {
   const items = collection.previewWebsites || collection.websites || [];
-  const accent = collection.accentColor || "#007aff";
+  const accent = collection.accentColor || "var(--sn-accent)";
   return (
     <button
       type="button"
       onClick={() => onOpen(collection._id)}
-      className="group flex min-h-[180px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[28px] border-0 p-5 text-left shadow-[0_18px_42px_rgba(15,23,42,0.13)] transition hover:-translate-y-0.5"
+      className="group flex min-h-[168px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[8px] border-0 p-5 text-left shadow-[var(--sn-shadow)] transition hover:-translate-y-px active:translate-y-0"
       style={{
         background: `linear-gradient(135deg, ${accent}, #0f172a)`,
       }}
     >
       <div className="min-w-0 text-white">
-        <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white/72">
-          {collection.kicker || "Featured Collection"}
+        <div className="mb-2 text-[11px] font-bold uppercase leading-4 text-white/72">
+          {collection.kicker || "Featured"}
         </div>
-        <div className="line-clamp-2 text-3xl font-extrabold leading-9 tracking-normal">
+        <div className="line-clamp-2 text-[24px] font-bold leading-[30px]">
           {collection.title}
         </div>
         {collection.description ? (
@@ -110,16 +112,27 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
   const normalCollections = collectionItems.filter(
     (item: any) => !featuredCollections.some((c: any) => c._id === item._id),
   );
+  const heroWebsites = collectionItems
+    .flatMap((item: any) => item.previewWebsites || item.websites || [])
+    .slice(0, 4);
   return (
     <div
       ref={featuredHomeScrollRef}
-      className="flex-1 overflow-y-auto px-3 pb-6"
+      className="flex-1 overflow-y-auto px-4 pb-8"
     >
       <StoreHeroCard
         title={t("ui.curatedProductivityWebsites")}
         description={t("ui.store.websiteHeroDescription")}
         tone="website"
-        className="mb-5"
+        artwork={
+          <StoreHeroArtwork
+            items={heroWebsites.map((item: any) => ({
+              src: getWebsiteIconUrl(item),
+              label: getWebsiteName(item),
+            }))}
+          />
+        }
+        className="mb-6"
       />
 
       <div className="mt-2">
@@ -144,7 +157,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
             {collectionItems.length === 0 ? (
               <Empty className="mt-4" description={t("ui.noCollections")} />
             ) : (
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-6">
                 {featuredCollections.length ? (
                   <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                     {featuredCollections.map((c: any) => (
@@ -162,29 +175,32 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                     <div className="mb-3 flex items-end justify-between gap-3 px-1">
                       <div className="min-w-0">
                         {c.kicker ? (
-                          <div className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#0071e3]">
+                          <div className="mb-1 text-[11px] font-bold uppercase leading-4 text-[var(--sn-accent)]">
                             {c.kicker}
                           </div>
                         ) : null}
-                        <div className="line-clamp-1 text-xl font-bold tracking-normal text-gray-950 dark:text-gray-50">
+                        <div className="line-clamp-1 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
                           {c.title}
                         </div>
-                        <div className="mt-1 line-clamp-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <div className="mt-1 line-clamp-1 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
                           {c.description ||
                             t("ui.storeItemCount", { count: c.total ?? (c.websites || []).length })}
                         </div>
                       </div>
                       <Button
                         type="link"
-                        className="px-0! font-bold! text-[#0071e3]!"
+                        className="px-0! font-semibold! text-[var(--sn-accent)]!"
                         onClick={() => onOpenCollection(c._id)}
                       >
                         {t("ui.viewMore")}
                       </Button>
                     </div>
-                    <div className="-mx-1 flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
+                    <div className="-mx-1 flex snap-x snap-mandatory flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
                       {(c.previewWebsites || c.websites || []).map((item: any) => (
-                        <div key={getWebsiteId(item)} className="w-64 shrink-0">
+                        <div
+                          key={getWebsiteId(item)}
+                          className="w-[252px] shrink-0 snap-start max-[640px]:w-[calc(100vw-176px)]"
+                        >
                           <WebsiteCard
                             item={item}
                             layout="grid"

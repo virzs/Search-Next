@@ -6,6 +6,16 @@ export const getWebsiteIconUrl = (item: any) => item?.iconEdited?.url ?? item?.i
 
 export const getWebsiteUrl = (item: any) => item?.url ?? item?.link ?? item?.href;
 
+export const getWebsiteDomain = (item: any) => {
+  const value = getWebsiteUrl(item);
+  if (!value) return "";
+  try {
+    return new URL(value).hostname.replace(/^www\./, "");
+  } catch {
+    return String(value).replace(/^https?:\/\//, "").split("/")[0] ?? "";
+  }
+};
+
 export type WebsiteCategory = {
   key: string;
   label: string;

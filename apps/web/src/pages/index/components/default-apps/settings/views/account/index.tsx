@@ -29,8 +29,8 @@ const AccountView = () => {
   const renderUnloggedView = () => (
     <>
       <MacSettingsSection>
-        <div className="px-6 py-6">
-          <div className="mx-auto w-full max-w-[520px]">
+        <div className="px-6 py-6 max-[640px]:px-3 max-[640px]:py-4">
+          <div className="mx-auto w-full max-w-[440px]">
             <UnloggedView
               mode="inline"
               title={t("ui.welcome")}
@@ -50,7 +50,7 @@ const AccountView = () => {
 
     return (
       <>
-        <div className="rounded-[20px] border border-white/80 bg-white/80 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+        <div className="rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
           <div className="flex items-center gap-5 max-[640px]:items-start">
             <Avatar
               size={88}
@@ -67,13 +67,13 @@ const AccountView = () => {
               }}
             />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[26px] font-extrabold leading-8 text-[#1d1d1f]">
+              <div className="truncate text-[24px] font-bold leading-[30px] text-[var(--sn-text)]">
                 {user.username}
               </div>
-              <div className="mt-1 truncate text-sm text-[#6e6e73]">
+              <div className="mt-1 truncate text-[13px] leading-5 text-[var(--sn-text-secondary)]">
                 {user.email}
               </div>
-              <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#f2f2f7] px-2.5 py-1 text-xs font-semibold text-[#6e6e73]">
+              <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-[var(--sn-surface-secondary)] px-2.5 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 <RiShieldCheckLine size={14} />
                 <span>{t("ui.signedIn")}</span>
               </div>

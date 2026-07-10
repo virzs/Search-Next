@@ -36,14 +36,13 @@ const SEARCH_PAGE_SIZE = 12;
 
 const storeSearchClassName = css`
   .apple-store-get-button.ant-btn {
-    border-color: #007aff !important;
-    background: #007aff !important;
+    border-color: var(--sn-accent) !important;
+    background: var(--sn-accent) !important;
     color: #ffffff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
   }
 
   .apple-link.ant-btn-text {
-    color: #007aff !important;
+    color: var(--sn-accent) !important;
   }
 `;
 
@@ -116,10 +115,10 @@ const ResultSection = ({
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3 px-1">
         <div>
-          <div className="text-base font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
+          <div className="text-[17px] font-semibold leading-[22px] tracking-normal text-[var(--sn-text)]">
             {t(title)}
           </div>
-          <div className="mt-0.5 text-xs font-semibold text-gray-500">
+          <div className="mt-0.5 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
             {t("ui.countResults", { count })}
           </div>
         </div>
@@ -146,8 +145,8 @@ const AppResultCard = ({
   const description = resolveAppDescription(item, language);
   const tags = getAppTags(item, language);
   return (
-  <article className="flex min-h-[112px] items-start gap-3.5 rounded-[20px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.08]">
-    <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[15px] bg-[#f2f2f7] text-[#007aff] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_1px_2px_rgba(0,0,0,0.08)]">
+  <article className="flex min-h-[112px] items-start gap-3.5 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]">
+    <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
       {iconUrl ? (
         <img
           src={iconUrl}
@@ -160,15 +159,15 @@ const AppResultCard = ({
       )}
     </div>
     <div className="min-w-0 flex-1">
-      <div className="truncate text-sm font-extrabold tracking-normal text-gray-950 dark:text-gray-50">
+      <div className="truncate text-[14px] font-semibold leading-5 tracking-normal text-[var(--sn-text)]">
         {displayName}
       </div>
-      <div className="mt-1 line-clamp-2 text-xs font-medium leading-5 text-gray-500 dark:text-gray-400">
-        {description}
+      <div className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
+        {description || t("ui.app")}
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {showSize ? (
-          <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!">
+          <Tag className="m-0! border-0! bg-[var(--sn-surface-secondary)]! text-[11px]! font-medium! text-[var(--sn-text-secondary)]!">
             {getAppDefaultSizeId(item)}
           </Tag>
         ) : null}
@@ -177,7 +176,7 @@ const AppResultCard = ({
           .map((tag) => (
             <Tag
               key={tag}
-              className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-semibold! text-[#6e6e73]!"
+              className="m-0! border-0! bg-[var(--sn-surface-secondary)]! text-[11px]! font-medium! text-[var(--sn-text-secondary)]!"
             >
               {tag}
             </Tag>

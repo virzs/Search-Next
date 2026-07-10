@@ -12,16 +12,7 @@ import {
   type WallpaperCategoryApiItem,
 } from "@/services/desktop";
 import PreviewCard from "../components/PreviewCard";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const wallpaperCategoryClassName = css`
-  .apple-theme-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
 
 const WallpaperCategoryView: FC = () => {
   const { t } = useI18n();
@@ -72,7 +63,7 @@ const WallpaperCategoryView: FC = () => {
 
   return (
     <DefaultAppView
-      className={`h-full ${wallpaperCategoryClassName}`}
+      className="h-full"
       animate
       title={
         activeCategory?.name ? (
@@ -85,11 +76,11 @@ const WallpaperCategoryView: FC = () => {
     >
       {categoryLoading || wallpaperLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <div className="text-sm text-gray-500">{t("ui.loadingWallpapers")}</div>
+          <div className="text-[13px] text-[var(--sn-text-secondary)]">{t("ui.loadingWallpapers")}</div>
         </div>
       ) : visibleWallpapers.length ? (
         <div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {visibleWallpapers.map((w) => {
               const url = getWallpaperImageUrl(w);
               const active = url ? isImageActive(url) : false;
@@ -99,29 +90,16 @@ const WallpaperCategoryView: FC = () => {
                   active={active}
                   disabled={!url}
                   title={w.name}
-                  description={
-                    active
-                      ? t("ui.inUse")
-                      : w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))
-                  }
-                  status={
-                    active ? (
-                      <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                        {t("ui.current")}
-                      </span>
-                    ) : null
-                  }
+                  description={w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))}
                   action={
-                    url ? (
+                    url && !active ? (
                       <Button
                         size="small"
-                        type={active ? "default" : "primary"}
+                        type="primary"
                         shape="round"
-                        disabled={active}
-                        className={active ? undefined : "apple-theme-action"}
                         onClick={() => handleSelectImage(w)}
                       >
-                        {active ? t("ui.applied") : t("action.apply")}
+                        {t("action.apply")}
                       </Button>
                     ) : null
                   }
@@ -141,7 +119,7 @@ const WallpaperCategoryView: FC = () => {
             })}
           </div>
 
-          <div className="mt-5 flex justify-end">
+          {total > pageSize ? <div className="mt-5 flex justify-end">
             <Pagination
               current={page}
               pageSize={pageSize}
@@ -153,7 +131,7 @@ const WallpaperCategoryView: FC = () => {
                 if (nextPageSize !== pageSize) setPageSize(nextPageSize);
               }}
             />
-          </div>
+          </div> : null}
         </div>
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">

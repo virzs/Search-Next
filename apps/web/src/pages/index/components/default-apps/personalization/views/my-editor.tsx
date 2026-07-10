@@ -10,16 +10,7 @@ import {
   writeMyWallpapers,
   type MyWallpaperItem,
 } from "../my-assets";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const wallpaperEditorClassName = css`
-  .apple-theme-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
 
 const isValidUrl = (value: string) => {
   try {
@@ -266,7 +257,7 @@ const ThemeMyEditorView = () => {
     if (type === "gradient") {
       return (
         <div
-          className="w-full aspect-video rounded-2xl border overflow-hidden"
+          className="aspect-video w-full overflow-hidden rounded-[8px] border"
           style={{
             background: gradientCss,
             borderColor: "rgba(0,0,0,0.08)",
@@ -279,7 +270,7 @@ const ThemeMyEditorView = () => {
     const safeUrl = url.replace(/"/g, '\\"');
     return (
       <div
-        className="w-full aspect-video rounded-2xl border overflow-hidden"
+        className="aspect-video w-full overflow-hidden rounded-[8px] border"
         style={{
           borderColor: "rgba(0,0,0,0.08)",
           backgroundColor: "rgba(0,0,0,0.06)",
@@ -293,7 +284,7 @@ const ThemeMyEditorView = () => {
 
   return (
     <DefaultAppView
-      className={`h-full ${wallpaperEditorClassName}`}
+      className="h-full"
       animate
       title={isEdit ? t("ui.editWallpaper") : t("ui.addWallpaper")}
       headerRight={
@@ -308,7 +299,6 @@ const ThemeMyEditorView = () => {
             type="primary"
             shape="round"
             disabled={!isEdit || !isReadyToApply || isDirty || applied}
-            className="apple-theme-action"
             onClick={handleApply}
           >
             {applied ? t("ui.applied") : t("action.apply")}
@@ -318,17 +308,11 @@ const ThemeMyEditorView = () => {
       contentClassName="px-4 pb-8 pt-4"
     >
       <Card
-        className="rounded-[20px]"
+        className="rounded-[8px] border-[var(--sn-separator)]! bg-[var(--sn-surface)]! shadow-[var(--sn-shadow)]!"
         styles={{ body: { padding: 16 } }}
-        style={{
-          background: "rgba(255,255,255,0.9)",
-          borderColor: "rgba(255,255,255,0.82)",
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px rgba(15,23,42,0.06)",
-        }}
       >
         <div className="flex items-center justify-between gap-3">
-          <div className="font-medium">{t("ui.type")}</div>
+          <div className="text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">{t("ui.type")}</div>
           <AppSegmented
             value={type}
             disabled={isEdit}
@@ -354,7 +338,7 @@ const ThemeMyEditorView = () => {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <div className="text-sm mb-2">{t("ui.startColor")}</div>
+                    <div className="mb-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">{t("ui.startColor")}</div>
                     <ColorPicker
                       value={gradientStart}
                       onChange={(color, hex) => setGradientStart(colorToHex(color, hex))}
@@ -365,7 +349,7 @@ const ThemeMyEditorView = () => {
                     />
                   </div>
                   <div>
-                    <div className="text-sm mb-2">{t("ui.endColor")}</div>
+                    <div className="mb-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">{t("ui.endColor")}</div>
                     <ColorPicker
                       value={gradientEnd}
                       onChange={(color, hex) => setGradientEnd(colorToHex(color, hex))}
@@ -378,7 +362,7 @@ const ThemeMyEditorView = () => {
                 </div>
 
                 <div className="mt-4">
-                  <div className="text-sm mb-2">{t("ui.angle")}</div>
+                  <div className="mb-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">{t("ui.angle")}</div>
                   <Slider
                     min={0}
                     max={360}

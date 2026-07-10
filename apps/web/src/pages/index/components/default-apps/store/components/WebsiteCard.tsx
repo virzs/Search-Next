@@ -1,6 +1,7 @@
-import { Button, Image } from "antd";
-import { FC } from "react";
-import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../utils";
+import { Button } from "antd";
+import { useState, type FC } from "react";
+import { RiGlobalLine } from "@remixicon/react";
+import { getWebsiteDomain, getWebsiteIconUrl, getWebsiteName } from "../utils";
 import { css, cx } from "@emotion/css";
 import { useI18n } from "@/i18n";
 
@@ -20,70 +21,60 @@ const WebsiteCard: FC<WebsiteCardProps> = ({
   variant = "normal",
 }) => {
   const { t } = useI18n();
+  const [imageFailed, setImageFailed] = useState(false);
   const iconUrl = getWebsiteIconUrl(item);
-  const name = getWebsiteName(item);
-  const url = getWebsiteUrl(item);
-
+  const name = getWebsiteName(item) || t("ui.websites");
+  const domain = getWebsiteDomain(item);
+  const category = item?.classify?.name || item?.category?.name || item?.categoryName;
+  const metadata = category || domain || t("ui.websites");
   const isSmall = variant === "small";
 
   return (
-    <div
+    <article
       className={cx(
         websiteCardClassName,
-        "group relative cursor-pointer bg-white/90 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5",
         layout === "grid"
           ? isSmall
-            ? "flex min-h-[74px] flex-row items-center! gap-3 rounded-2xl p-3"
-            : "flex min-h-[164px] flex-col items-start! gap-3 rounded-2xl p-3"
-          : "flex items-center gap-3 rounded-2xl p-3",
+            ? "flex min-h-[76px] flex-row items-center gap-3 p-3"
+            : "flex min-h-[164px] flex-col items-start gap-3 p-4"
+          : "flex min-h-[72px] items-center gap-3 p-3",
       )}
       onClick={() => onClick(item)}
     >
       <div
         className={cx(
-          "shrink-0 relative",
-          layout === "grid"
-            ? isSmall
-              ? "w-[46px] h-[46px]"
-              : "w-[52px] h-[52px]"
-            : "w-[46px] h-[46px]",
+          "grid shrink-0 place-items-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] text-[var(--sn-text-tertiary)]",
+          isSmall || layout === "list" ? "h-[46px] w-[46px]" : "h-[52px] w-[52px]",
         )}
       >
-        {iconUrl ? (
-          <Image
-            className="w-full! h-full! rounded-xl object-cover shadow-sm"
+        {iconUrl && !imageFailed ? (
+          <img
             src={iconUrl}
-            preview={false}
-            fallback="https://via.placeholder.com/64"
+            alt=""
+            className="h-full w-full object-cover"
+            onError={() => setImageFailed(true)}
           />
+        ) : name.trim().charAt(0) ? (
+          <span className="text-lg font-bold">{name.trim().charAt(0).toUpperCase()}</span>
         ) : (
-          <div className="flex h-full w-full items-center justify-center rounded-xl bg-[linear-gradient(135deg,#f3f4f6,#e5e7eb)] text-xl font-bold text-gray-400">
-            {name?.[0]?.toUpperCase()}
-          </div>
+          <RiGlobalLine size={20} />
         )}
       </div>
-      <div className="flex-1 min-w-0 text-left w-full">
-        <div
-          className={cx(
-            "truncate font-bold tracking-normal text-gray-950 dark:text-gray-50",
-            layout === "grid" ? (isSmall ? "text-sm" : "text-base") : "text-sm",
-          )}
-        >
+
+      <div className="min-w-0 flex-1 text-left">
+        <div className="line-clamp-1 text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
           {name}
         </div>
-        {url ? (
-          <div className="mt-1 truncate text-xs font-medium text-gray-500 dark:text-gray-400">
-            {url}
-          </div>
-        ) : null}
+        <div className="mt-1 truncate text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
+          {metadata}
+        </div>
       </div>
+
       <div
         className={cx(
-          layout === "grid"
-            ? isSmall
-              ? "shrink-0 ml-auto self-center"
-              : "w-full mt-auto pt-1"
-            : "shrink-0",
+          layout === "grid" && !isSmall
+            ? "mt-auto w-full pt-1"
+            : "ml-auto shrink-0 self-center",
         )}
       >
         <Button
@@ -91,48 +82,40 @@ const WebsiteCard: FC<WebsiteCardProps> = ({
           size="small"
           shape="round"
           block={layout === "grid" && !isSmall}
-          className="store-get-button"
-          onClick={(e) => {
-            e.stopPropagation();
+          className="h-7! px-3! text-[12px]! font-semibold!"
+          onClick={(event) => {
+            event.stopPropagation();
             onAdd(item);
           }}
         >
           {t("ui.get")}
         </Button>
       </div>
-    </div>
+    </article>
   );
 };
 
 export default WebsiteCard;
 
 const websiteCardClassName = css`
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 16px 34px rgba(15, 23, 42, 0.055);
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid var(--sn-separator);
+  border-radius: 8px;
+  background: var(--sn-surface);
+  box-shadow: var(--sn-shadow);
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
 
   &:hover {
-    border-color: rgba(0, 113, 227, 0.18);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      0 14px 30px rgba(15, 23, 42, 0.09);
+    border-color: color-mix(in srgb, var(--sn-accent) 28%, var(--sn-separator));
+    background: var(--sn-surface-strong);
+    transform: translateY(-1px);
   }
 
-  .ant-image,
-  .ant-image-img {
-    display: block;
-  }
-
-  .store-get-button {
-    height: 28px;
-    border: 0;
-    background: #007aff !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-    padding: 0 14px;
-    font-size: 12px;
-    font-weight: 700;
+  &:active {
+    transform: translateY(0) scale(0.99);
   }
 `;

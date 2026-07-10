@@ -17,25 +17,17 @@ import {
   gradientWallpaperPresets,
 } from "./wallpaper-gradients";
 import PreviewCard from "../components/PreviewCard";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const wallpaperViewClassName = css`
-  .apple-theme-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-
-  .apple-link.ant-btn-link {
-    color: #007aff !important;
-  }
-`;
+import { RiCheckLine, RiLandscapeLine } from "@remixicon/react";
 
 const WallpaperView: FC = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const { personalization, setWallpaper } = useDesktopTheme();
+  const currentWallpaperName = t(
+    personalization.wallpaper.name ||
+      (personalization.wallpaper.type === "none" ? "ui.none" : "ui.wallpaper"),
+  );
   const [activeType, setActiveType] = useState<"gradient" | "image">(
     "gradient",
   );
@@ -200,27 +192,16 @@ const WallpaperView: FC = () => {
         active={active}
         disabled={disabled}
         title={w.name}
-        description={
-          active ? t("ui.inUse") : w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))
-        }
-        status={
-          active ? (
-            <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-              {t("ui.current")}
-            </span>
-          ) : null
-        }
+        description={w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))}
         action={
-          url ? (
+          url && !active ? (
             <Button
               size="small"
-              type={active ? "default" : "primary"}
+              type="primary"
               shape="round"
-              disabled={active}
-              className={active ? undefined : "apple-theme-action"}
               onClick={() => handleSelectImage(w)}
             >
-              {active ? t("ui.applied") : t("action.apply")}
+              {t("action.apply")}
             </Button>
           ) : null
         }
@@ -237,7 +218,6 @@ const WallpaperView: FC = () => {
 
   return (
     <DefaultAppView
-      className={wallpaperViewClassName}
       headerClassName="items-center px-3 pt-3 pb-2"
       title={
         activeType === "image" && imageViewMode === "category"
@@ -258,56 +238,58 @@ const WallpaperView: FC = () => {
       contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-5">
-          <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
+        <div className="mb-6 flex items-end justify-between gap-4 max-[640px]:items-start max-[640px]:flex-col">
+          <div>
+          <div className="text-[28px] font-bold leading-[34px] text-[var(--sn-text)]">
             {t("ui.wallpaper")}
           </div>
-          <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
+          <div className="mt-1 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">
             {t("ui.wallpaper.chooseDescription")}
+          </div>
+          </div>
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
+            <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
+            <span>{t("ui.currentWallpaper")} · {currentWallpaperName}</span>
           </div>
         </div>
       {activeType === "gradient" ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {gradientWallpaperPresets.map((w) => {
             const active = isGradientActive(w.css);
             const coverBackground =
-              w.id === "none" ? "rgba(0,0,0,0.04)" : w.css;
+              w.id === "none"
+                ? "linear-gradient(135deg, var(--sn-surface-secondary), var(--sn-page))"
+                : w.css;
             return (
               <PreviewCard
                 key={w.id}
                 active={active}
                 title={t(w.name)}
-                description={
-                  active
-                    ? t("ui.inUse")
-                    : w.id === "none"
-                      ? t("ui.useDefaultBackground")
-                      : t("ui.gradientBackground")
-                }
-                status={
-                  active ? (
-                    <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                      {t("ui.current")}
-                    </span>
-                  ) : null
-                }
+                description={w.id === "none" ? t("ui.useDefaultBackground") : t("ui.gradientBackground")}
                 action={
+                  active ? null : (
                   <Button
                     size="small"
-                    type={active ? "default" : "primary"}
+                    type="primary"
                     shape="round"
-                    disabled={active}
-                    className={active ? undefined : "apple-theme-action"}
+                    className="px-3! font-semibold!"
                     onClick={() => handleSelectGradient(w)}
                   >
-                    {active ? t("ui.applied") : t("action.apply")}
+                    {t("action.apply")}
                   </Button>
+                  )
                 }
                 cover={
                   <div
-                    className="h-full w-full"
+                    className="grid h-full w-full place-items-center"
                     style={{ background: coverBackground }}
-                  />
+                  >
+                    {w.id === "none" ? (
+                      <span className="grid h-12 w-12 place-items-center rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] text-[var(--sn-text-tertiary)] shadow-[var(--sn-shadow)]">
+                        <RiLandscapeLine size={22} />
+                      </span>
+                    ) : null}
+                  </div>
                 }
               />
             );
@@ -331,7 +313,7 @@ const WallpaperView: FC = () => {
                   <div key={cardIdx} className="w-56 shrink-0">
                     <Skeleton.Image
                       active
-                      style={{ width: 224, height: 120, borderRadius: 16 }}
+                      style={{ width: 224, height: 120, borderRadius: 8 }}
                     />
                     <div className="mt-2 px-1">
                       <Skeleton
@@ -355,19 +337,19 @@ const WallpaperView: FC = () => {
                 <div key={c._id}>
                   <div className="flex items-end justify-between gap-3 mb-3 px-1">
                     <div className="min-w-0">
-                      <div className="line-clamp-1 text-[13px] font-extrabold text-[#6e6e73]">
+                      <div className="line-clamp-1 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
                         {c.name}
                       </div>
                     </div>
                     <Button
                       type="link"
-                      className="apple-link px-0!"
+                      className="px-0! font-semibold! text-[var(--sn-accent)]!"
                       onClick={() => openCategory(c._id)}
                     >
                       {t("ui.viewMore")}
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {items.map((item) => renderWallpaperCard(item))}
                     {items.length === 0 ? (
                       <Empty className="mt-2" description={t("ui.noWallpapers")} />
@@ -384,14 +366,15 @@ const WallpaperView: FC = () => {
         )
       ) : wallpaperLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <div className="text-sm text-gray-500">{t("ui.loadingWallpapers")}</div>
+          <div className="text-[13px] text-[var(--sn-text-secondary)]">{t("ui.loadingWallpapers")}</div>
         </div>
       ) : visibleWallpapers.length ? (
         <div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {visibleWallpapers.map((w) => renderWallpaperCard(w))}
           </div>
 
+          {total > pageSize ? (
           <div className="mt-5 flex justify-end">
             <Pagination
               current={page}
@@ -405,6 +388,7 @@ const WallpaperView: FC = () => {
               }}
             />
           </div>
+          ) : null}
         </div>
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">

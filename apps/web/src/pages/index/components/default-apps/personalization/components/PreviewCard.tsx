@@ -1,5 +1,6 @@
 import { cx } from "@emotion/css";
 import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
+import { RiCheckLine } from "@remixicon/react";
 import { useI18n } from "@/i18n";
 
 export interface PreviewCardProps {
@@ -31,7 +32,7 @@ const PreviewCard = ({
   className,
   style,
   coverPadding = 0,
-  bodyPadding = "12px 13px 13px",
+  bodyPadding = "13px 14px 14px",
 }: PreviewCardProps) => {
   const { t } = useI18n();
   const clickable = Boolean(onClick) && !disabled;
@@ -43,7 +44,7 @@ const PreviewCard = ({
     if (value == null || value === "") return null;
     if (typeof value === "string") {
       return (
-        <div className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-[#6e6e73]">
+        <div className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
           {value}
         </div>
       );
@@ -64,17 +65,17 @@ const PreviewCard = ({
       role={clickable ? "button" : undefined}
       tabIndex={clickable ? 0 : undefined}
       className={cx(
-        "overflow-hidden rounded-[20px] border bg-white/90 text-left select-none shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_40px_rgba(0,0,0,0.055),inset_0_1px_0_rgba(255,255,255,0.88)] backdrop-blur-xl transition",
+        "relative flex min-h-full flex-col overflow-hidden rounded-[12px] border bg-[var(--sn-surface)] text-left select-none shadow-[var(--sn-shadow)] transition-[transform,box-shadow,background-color] duration-200",
         clickable
-          ? "cursor-pointer hover:-translate-y-[1px] hover:shadow-[0_2px_4px_rgba(0,0,0,0.05),0_22px_48px_rgba(0,0,0,0.075)] active:translate-y-0 active:opacity-90"
+          ? "cursor-pointer hover:-translate-y-px hover:bg-[var(--sn-surface-strong)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.08)] active:translate-y-0 active:scale-[0.99]"
           : null,
         disabled ? "cursor-not-allowed opacity-55" : null,
         className,
       )}
       style={{
-        borderColor: active ? "rgba(0,122,255,0.46)" : "rgba(255,255,255,0.84)",
+        borderColor: active ? "transparent" : "var(--sn-separator)",
         boxShadow: active
-          ? "0 0 0 3px rgba(0,122,255,0.24), 0 16px 38px rgba(0,122,255,0.12), inset 0 1px 0 rgba(255,255,255,0.9)"
+          ? "0 0 0 2px var(--sn-accent), 0 10px 26px color-mix(in srgb, var(--sn-accent) 11%, transparent)"
           : undefined,
         ...style,
       }}
@@ -83,23 +84,32 @@ const PreviewCard = ({
       }}
       onKeyDown={handleKeyDown}
     >
+      {active ? (
+        <span
+          aria-label={t("ui.current")}
+          className="absolute right-3 top-3 z-[2] grid h-7 w-7 place-items-center rounded-full border border-white/60 bg-[var(--sn-accent)] text-white shadow-[0_4px_12px_rgba(0,0,0,0.16)]"
+        >
+          <RiCheckLine size={17} />
+        </span>
+      ) : status ? (
+        <div className="absolute right-3 top-3 z-[2]">{status}</div>
+      ) : null}
       <div
-        className="h-[178px] overflow-hidden border-b border-[rgba(60,60,67,0.08)] bg-[#f2f2f7]"
+        className="aspect-[16/9] overflow-hidden border-b border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]"
         style={{ padding: coverPadding }}
       >
         {cover}
       </div>
-      <div style={{ padding: bodyPadding }}>
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 truncate text-[15px] font-semibold leading-5 text-[#1d1d1f]">
+      <div className="flex min-h-[74px] flex-1 items-center gap-3" style={{ padding: bodyPadding }}>
+        <div className="min-w-0 flex-1 self-start">
+          <div className="truncate text-[15px] font-semibold leading-5 text-[var(--sn-text)]">
             {title}
           </div>
-          {status ? <div className="shrink-0">{status}</div> : null}
+          {descriptionNode}
         </div>
-        {descriptionNode}
         {action ? (
           <div
-            className="mt-3"
+            className="shrink-0 self-center"
             onClick={(event) => event.stopPropagation()}
             onKeyDown={(event) => event.stopPropagation()}
           >

@@ -26,23 +26,23 @@ const AboutView = () => {
 
   return (
     <MacSettingsView>
-      <div className="rounded-[20px] border border-white/80 bg-white/80 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[17px] bg-linear-to-br from-[#0a84ff] to-[#30d158] text-3xl font-black text-white shadow-[0_8px_18px_rgba(0,122,255,0.16)]">
+      <div className="rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
+        <div className="flex items-center gap-4 max-[640px]:flex-col max-[640px]:items-start">
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[14px] bg-[var(--sn-accent)] text-3xl font-bold text-white">
             S
           </div>
-          <div className="min-w-0 flex-1 text-left">
-            <div className="truncate text-[25px] font-extrabold text-[#1d1d1f]">
+          <div className="min-w-0 flex-1 text-left max-[640px]:w-full">
+            <div className="truncate text-[24px] font-bold leading-[30px] text-[var(--sn-text)]">
               {appInfo.name}
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
-              <span className="rounded-full bg-[#f2f2f7] px-3 py-1 text-xs font-bold text-[#555]">
+              <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 v{appInfo.version}
               </span>
-              <span className="rounded-full bg-[#f2f2f7] px-3 py-1 text-xs font-bold text-[#555]">
+              <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 {t("ui.beta")}
               </span>
-              <span className="rounded-full bg-[#f2f2f7] px-3 py-1 text-xs font-bold text-[#555]">
+              <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 {appInfo.license}
               </span>
             </div>
@@ -116,12 +116,12 @@ const AboutView = () => {
         />
       </MacSettingsSection>
 
-      <div className="rounded-[16px] border border-white/80 bg-white/80 p-5 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
-        <div className="text-base font-bold text-[#1d1d1f]">{t("ui.specialThanks")}</div>
-        <div className="mt-2 text-sm leading-6 text-[#6e6e73]">
+      <div className="rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 text-center shadow-[var(--sn-shadow)]">
+        <div className="text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">{t("ui.specialThanks")}</div>
+        <div className="mt-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
           {t("ui.about.thanksBody")}
         </div>
-        <div className="mt-4 text-xs text-[#8e8e93]">
+        <div className="mt-4 text-[12px] text-[var(--sn-text-tertiary)]">
           © 2026 Search Next. All rights reserved.
         </div>
       </div>

@@ -23,8 +23,8 @@ const CollectionArtwork: React.FC<{
   getAppIconUrl: (app: AppApiItem) => string | null;
 }> = ({ items, accent, getAppIconUrl }) => (
   <div
-    className="grid h-32 w-32 shrink-0 grid-cols-3 gap-2 rounded-[30px] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.42)]"
-    style={{ background: accent || "#007aff" }}
+    className="grid h-28 w-28 shrink-0 grid-cols-3 gap-1.5 rounded-[8px] p-2.5"
+    style={{ background: accent || "var(--sn-accent)" }}
   >
     {Array.from({ length: 9 }).map((_, idx) => {
       const app = items[idx];
@@ -32,12 +32,12 @@ const CollectionArtwork: React.FC<{
       return (
         <div
           key={idx}
-          className="flex items-center justify-center overflow-hidden rounded-xl bg-white/85 shadow-sm"
+          className="flex items-center justify-center overflow-hidden rounded-[6px] bg-white/90"
         >
           {icon ? (
             <img src={icon} alt="" className="h-full w-full object-contain p-1.5" />
           ) : (
-            <RiApps2Line className="text-lg text-blue-500" />
+            <RiApps2Line className="text-lg text-black/30" />
           )}
         </div>
       );
@@ -55,20 +55,20 @@ const AppListRow: React.FC<{
   const name = resolveAppDisplayName(item, language);
   const description = resolveAppDescription(item, language);
   return (
-    <div className="flex items-center gap-3 border-b border-black/[0.06] py-3 last:border-b-0 dark:border-white/10">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#f2f2f7] shadow-sm dark:bg-white/10">
+    <div className="flex items-center gap-3 border-b border-[var(--sn-separator)] py-3 last:border-b-0">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[var(--sn-surface-secondary)]">
         {icon ? (
           <img src={icon} alt={name} className="h-full w-full object-contain p-2.5" />
         ) : (
-          <RiApps2Line className="text-2xl text-blue-500" />
+          <RiApps2Line className="text-2xl text-[var(--sn-accent)]" />
         )}
       </div>
       <div className="min-w-0 flex-1 text-left">
-        <div className="truncate text-sm font-bold text-gray-950 dark:text-gray-50">
+        <div className="truncate text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
           {name}
         </div>
         {description ? (
-          <div className="mt-0.5 line-clamp-1 text-xs font-medium text-gray-500">
+          <div className="mt-0.5 line-clamp-1 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
             {description}
           </div>
         ) : null}
@@ -152,26 +152,26 @@ const AppCollectionRoute: FC = () => {
       contentClassName="px-4 pb-6 pt-4"
     >
       <div className="mx-auto max-w-3xl">
-        <div className="mb-5 flex items-end justify-between gap-5 rounded-[28px] bg-white/80 p-5 shadow-[0_16px_38px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] dark:bg-white/[0.08]">
+        <div className="mb-6 flex items-center justify-between gap-5 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)] max-[560px]:items-start">
           <div className="min-w-0">
             {activeCollection?.kicker ? (
-              <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#0071e3]">
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sn-accent)]">
                 {activeCollection.kicker}
               </div>
             ) : null}
             {activeCollection?.title ? (
-              <div className="line-clamp-2 text-[34px] font-extrabold leading-10 tracking-normal text-gray-950 dark:text-gray-50">
+              <div className="line-clamp-2 text-[28px] font-bold leading-[34px] tracking-normal text-[var(--sn-text)]">
                 {activeCollection.title}
               </div>
             ) : (
               <Skeleton.Input active size="large" style={{ width: 180 }} />
             )}
             {activeCollection?.description ? (
-              <div className="mt-2 line-clamp-3 text-sm font-semibold leading-6 text-gray-500 dark:text-gray-400">
+              <div className="mt-2 line-clamp-3 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
                 {activeCollection.description}
               </div>
             ) : null}
-            <div className="mt-3 text-xs font-bold text-gray-400">
+            <div className="mt-3 text-[12px] font-medium text-[var(--sn-text-tertiary)]">
               {t("ui.storeItemCount", { count: total })}
             </div>
           </div>
@@ -183,12 +183,12 @@ const AppCollectionRoute: FC = () => {
         </div>
 
         {collectionAppsLoading ? (
-          <div className="rounded-[24px] bg-white/85 p-4 dark:bg-white/[0.08]">
+          <div className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4">
             <Skeleton active avatar paragraph={{ rows: 5 }} />
           </div>
         ) : (
           <>
-            <div className="rounded-[24px] bg-white/85 px-4 shadow-[0_12px_28px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] dark:bg-white/[0.08]">
+            <div className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-4 shadow-[var(--sn-shadow)]">
               {apps.map((item) => (
                 <AppListRow
                   key={item._id}

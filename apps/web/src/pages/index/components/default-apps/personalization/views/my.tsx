@@ -31,16 +31,7 @@ import {
   type MyThemeItem,
   type MyWallpaperItem,
 } from "../my-assets";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const themeMyClassName = css`
-  .apple-theme-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
@@ -81,11 +72,11 @@ const CurrentDesktopPreview = ({
   theme: ThemeConfigApiItem | null;
 }) => (
   <div
-    className="relative min-h-[250px] overflow-hidden rounded-[15px] border border-[rgba(60,60,67,0.13)] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.045)]"
+    className="relative min-h-[238px] overflow-hidden rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-5 shadow-[var(--sn-shadow)]"
     style={wallpaperStyle}
   >
     <div className="absolute inset-0 bg-white/10" />
-    <div className="relative mx-auto mt-5 h-[132px] w-[66%] min-w-[260px] overflow-hidden rounded-[13px] border border-white/80 bg-white/90 shadow-[0_18px_36px_rgba(0,0,0,0.13)] max-[720px]:min-w-0 max-[720px]:w-[78%]">
+    <div className="relative mx-auto mt-4 h-[132px] w-[66%] min-w-[260px] overflow-hidden rounded-[12px] border border-white/60 bg-white/90 shadow-[0_14px_30px_rgba(0,0,0,0.14)] max-[720px]:min-w-0 max-[720px]:w-[82%]">
       {theme ? (
         <ThemeDesktopPreview theme={theme} />
       ) : (
@@ -95,7 +86,7 @@ const CurrentDesktopPreview = ({
         </div>
       )}
     </div>
-    <div className="absolute bottom-4 left-1/2 flex h-[27px] w-[176px] -translate-x-1/2 items-center justify-center gap-2 rounded-xl border border-white/70 bg-white/60 shadow-[0_12px_28px_rgba(0,0,0,0.12)]">
+    <div className="absolute bottom-4 left-1/2 flex h-8 w-[176px] -translate-x-1/2 items-center justify-center gap-2 rounded-[11px] border border-white/60 bg-white/55 shadow-[0_8px_20px_rgba(0,0,0,0.1)] backdrop-blur-xl">
       {["#0a84ff", "#ff9500", "#34c759", "#af52de", "#8e8e93"].map(
         (color) => (
           <span
@@ -123,66 +114,30 @@ const CurrentStatusCard = ({
   tone: "blue" | "purple" | "green";
 }) => {
   const toneClassName = {
-    blue: "bg-[#007aff]",
+    blue: "bg-[var(--sn-accent)]",
     purple: "bg-[#af52de]",
     green: "bg-[#34c759]",
   }[tone];
 
   return (
-    <div className="rounded-[16px] border border-white/80 bg-white/90 p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+    <div className="rounded-[12px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]">
       <div className="flex items-start gap-3">
         <span
-          className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] ${toneClassName}`}
+          className={`grid h-8 w-8 shrink-0 place-items-center rounded-[8px] text-white ${toneClassName}`}
         >
           {icon}
         </span>
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-[#1d1d1f]">
+          <div className="truncate text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
             {title}
           </div>
-          <div className="mt-1 text-xs leading-[18px] text-[#6e6e73]">
+          <div className="mt-1 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
             {description}
           </div>
-          <div className="mt-1 text-xs font-bold text-[#8e8e93]">{detail}</div>
+          <div className="mt-1 text-[12px] font-semibold text-[var(--sn-text-tertiary)]">{detail}</div>
         </div>
       </div>
     </div>
-  );
-};
-
-const CreateActionCard = ({
-  title,
-  description,
-  action,
-  tone,
-}: {
-  title: string;
-  description: string;
-  action: () => void;
-  tone: "theme" | "wallpaper";
-}) => {
-  const icon =
-    tone === "theme" ? <RiTShirtLine size={18} /> : <RiLandscapeLine size={18} />;
-  const toneClassName =
-    tone === "theme"
-      ? "text-[#007aff]"
-      : "text-[#af52de]";
-
-  return (
-    <button
-      className="min-h-[136px] rounded-[20px] border border-white/80 bg-white/80 p-4 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_34px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition hover:-translate-y-[1px] hover:bg-white"
-      onClick={action}
-    >
-      <span className={`mx-auto mb-3 grid h-10 w-10 place-items-center rounded-[12px] bg-[#f2f2f7] shadow-[0_1px_2px_rgba(0,0,0,0.06)] ${toneClassName}`}>
-        {icon}
-      </span>
-      <span className="block text-sm font-semibold text-[#1d1d1f]">
-        {title}
-      </span>
-      <span className="mx-auto mt-1 block max-w-[230px] text-xs leading-5 text-[#8e8e93]">
-        {description}
-      </span>
-    </button>
   );
 };
 
@@ -264,43 +219,46 @@ const ThemeMyView = () => {
 
   return (
     <DefaultAppView
-      className={themeMyClassName}
-      headerRight={
-        <div className="flex items-center gap-2">
-          <Button onClick={() => navigate(personalizationRoute.path.myThemeCreate)}>
-            {t("ui.createTheme")}
-          </Button>
-          <Button
-            type="primary"
-            icon={<RiAddLine size={16} />}
-            className="apple-theme-action"
-            onClick={() => navigate(personalizationRoute.path.myCreate)}
-          >
-            {t("ui.addWallpaper")}
-          </Button>
-        </div>
-      }
       contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-5">
-          <div className="text-[32px] font-bold leading-10 tracking-normal text-[#1d1d1f]">
-            {t("ui.mine")}
+        <div className="mb-6 flex items-start justify-between gap-4 max-[700px]:flex-col">
+          <div className="min-w-0">
+            <div className="text-[28px] font-bold leading-[34px] text-[var(--sn-text)]">
+              {t("ui.mine")}
+            </div>
+            <div className="mt-1 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
+              {t("ui.personalization.mineDescription")}
+            </div>
           </div>
-          <div className="mt-1 text-[13px] font-medium leading-5 text-[#6e6e73]">
-            {t("ui.personalization.mineDescription")}
+          <div className="flex shrink-0 flex-wrap items-center gap-2 max-[700px]:w-full">
+            <Button
+              shape="round"
+              icon={<RiTShirtLine size={15} />}
+              onClick={() => navigate(personalizationRoute.path.myThemeCreate)}
+            >
+              {t("ui.createTheme")}
+            </Button>
+            <Button
+              type="primary"
+              shape="round"
+              icon={<RiAddLine size={16} />}
+              onClick={() => navigate(personalizationRoute.path.myCreate)}
+            >
+              {t("ui.addWallpaper")}
+            </Button>
           </div>
         </div>
       <section>
-        <div className="mb-2 ml-1 text-[13px] font-extrabold text-[#6e6e73]">
+        <div className="mb-3 ml-1 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
           {t("ui.inUse")}
         </div>
-        <div className="grid grid-cols-[1.2fr_0.8fr] gap-5 max-[760px]:grid-cols-1">
+        <div className="grid grid-cols-[1.2fr_0.8fr] gap-4 max-[760px]:grid-cols-1">
           <CurrentDesktopPreview
             wallpaperStyle={wallpaperPreviewStyle(personalization.wallpaper)}
             theme={currentTheme}
           />
-          <div className="grid gap-3">
+          <div className="grid content-start gap-3">
             <CurrentStatusCard
               icon={<RiTShirtLine size={16} />}
               title={t("ui.currentTheme")}
@@ -321,144 +279,119 @@ const ThemeMyView = () => {
               }
               tone="purple"
             />
-            <CurrentStatusCard
-              icon={<RiAddLine size={16} />}
-              title={t("ui.customContent")}
-              description={t("ui.createAThemeOrAddAWallpaper")}
-              detail={t("ui.manageBelow")}
-              tone="green"
-            />
           </div>
         </div>
       </section>
 
-      <section className="mt-5">
-        <div className="mb-2 ml-1 text-[13px] font-extrabold text-[#6e6e73]">
-          {t("ui.myCreations")}
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <CreateActionCard
-            title={t("ui.createTheme")}
-            description={t("ui.theme.editorDescription")}
-            tone="theme"
-            action={() => navigate(personalizationRoute.path.myThemeCreate)}
-          />
-          <CreateActionCard
-            title={t("ui.addWallpaper")}
-            description={t("ui.wallpaper.editorDescription")}
-            tone="wallpaper"
-            action={() => navigate(personalizationRoute.path.myCreate)}
-          />
-          {sortedThemes.map((theme) => {
-            const config = toMyThemeConfig(theme);
-            const active = activeThemeId === theme.id;
-            return (
-              <PreviewCard
-                key={theme.id}
-                active={active}
-                title={theme.name}
-                description={
-                  active ? t("ui.customThemeInUse") : t("ui.clickTheCardToEditTheme")
-                }
-                status={
-                  active ? (
-                    <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                      {t("ui.current")}
-                    </span>
-                  ) : null
-                }
-                action={
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="small"
+      {sortedThemes.length || sortedWallpapers.length ? (
+        <>
+          {sortedThemes.length ? (
+            <section className="mt-6">
+              <div className="mb-3 ml-1 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
+                {t("ui.theme")}
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {sortedThemes.map((theme) => {
+                  const config = toMyThemeConfig(theme);
+                  const active = activeThemeId === theme.id;
+                  return (
+                    <PreviewCard
+                      key={theme.id}
+                      active={active}
+                      title={theme.name}
+                      description={theme.description || t("ui.clickTheCardToEditTheme")}
+                      action={
+                        !active ? <Button
+                            size="small"
+                            type="primary"
+                            shape="round"
+                            className="px-3! font-semibold!"
+                            onClick={() => setActiveThemeId(theme.id)}
+                          >
+                            {t("action.apply")}
+                          </Button> : null
+                      }
                       onClick={() =>
                         navigate(personalizationRoute.path.myThemeEdit(theme.id))
                       }
-                    >
-                      {t("ui.edit")}
-                    </Button>
-                    <Button
-                      size="small"
-                      type={active ? "default" : "primary"}
-                      shape="round"
-                      disabled={active}
-                      className={active ? undefined : "apple-theme-action"}
-                      onClick={() => setActiveThemeId(theme.id)}
-                    >
-                      {active ? t("ui.applied") : t("action.apply")}
-                    </Button>
-                  </div>
-                }
-                onClick={() => navigate(personalizationRoute.path.myThemeEdit(theme.id))}
-                cover={
-                  <div className="h-full w-full">
-                    <ThemeDesktopPreview theme={config} />
-                  </div>
-                }
-              />
-            );
-          })}
-          {sortedWallpapers.map((item) => {
-            const active =
-              item.type === "gradient"
-                ? personalization.wallpaper.type === "gradient" &&
-                  personalization.wallpaper.css === item.css
-                : personalization.wallpaper.type === "image" &&
-                  personalization.wallpaper.url === item.url;
-            return (
-              <PreviewCard
-                key={item.id}
-                active={active}
-                title={item.name}
-                description={
-                  item.type === "gradient"
-                    ? active ? t("ui.customWallpaperInUse") : t("ui.clickTheCardToEditGradient")
-                    : active ? t("ui.customWallpaperInUse") : t("ui.clickTheCardToEditImage")
-                }
-                status={
-                  active ? (
-                    <span className="rounded-full bg-[#e9f3ff] px-2 py-0.5 text-[11px] font-bold text-[#007aff]">
-                      {t("ui.current")}
-                    </span>
-                  ) : null
-                }
-                action={
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="small"
-                      onClick={() => navigate(personalizationRoute.path.myEdit(item.id))}
-                    >
-                      {t("ui.edit")}
-                    </Button>
-                    <Button
-                      size="small"
-                      type={active ? "default" : "primary"}
-                      shape="round"
-                      disabled={active}
-                      className={active ? undefined : "apple-theme-action"}
-                      onClick={() => applyWallpaper(item)}
-                    >
-                      {active ? t("ui.applied") : t("action.apply")}
-                    </Button>
-                  </div>
-                }
-                onClick={() => navigate(personalizationRoute.path.myEdit(item.id))}
-                cover={
-                  <div
-                    className="h-full w-full"
-                    style={wallpaperPreviewStyle(item)}
-                  />
-                }
-              />
-            );
-          })}
-        </div>
-        {sortedThemes.length || sortedWallpapers.length ? null : (
-          <div className="mt-3 rounded-[14px] border border-[rgba(60,60,67,0.12)] bg-white/70 px-4 py-3 text-xs font-medium text-[#8e8e93]">
+                      cover={<ThemeDesktopPreview theme={config} />}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+
+          {sortedWallpapers.length ? (
+            <section className="mt-6">
+              <div className="mb-3 ml-1 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
+                {t("ui.wallpaper")}
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {sortedWallpapers.map((item) => {
+                  const active =
+                    item.type === "gradient"
+                      ? personalization.wallpaper.type === "gradient" &&
+                        personalization.wallpaper.css === item.css
+                      : personalization.wallpaper.type === "image" &&
+                        personalization.wallpaper.url === item.url;
+                  return (
+                    <PreviewCard
+                      key={item.id}
+                      active={active}
+                      title={item.name}
+                      description={item.type === "gradient" ? t("ui.clickTheCardToEditGradient") : t("ui.clickTheCardToEditImage")}
+                      action={
+                        !active ? <Button
+                            size="small"
+                            type="primary"
+                            shape="round"
+                            className="px-3! font-semibold!"
+                            onClick={() => applyWallpaper(item)}
+                          >
+                            {t("action.apply")}
+                          </Button> : null
+                      }
+                      onClick={() =>
+                        navigate(personalizationRoute.path.myEdit(item.id))
+                      }
+                      cover={
+                        <div
+                          className="h-full w-full"
+                          style={wallpaperPreviewStyle(item)}
+                        />
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+        </>
+      ) : (
+        <section className="mt-6 rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-6 py-8 text-center shadow-[var(--sn-shadow)]">
+          <div className="mx-auto grid h-10 w-10 place-items-center rounded-[12px] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
+            <RiAddLine size={20} />
+          </div>
+          <div className="mt-3 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
+            {t("ui.myCreations")}
+          </div>
+          <div className="mx-auto mt-1 max-w-[420px] text-[13px] leading-5 text-[var(--sn-text-secondary)]">
             {t("ui.personalization.emptyMine")}
           </div>
-        )}
-      </section>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button onClick={() => navigate(personalizationRoute.path.myThemeCreate)}>
+              {t("ui.createTheme")}
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => navigate(personalizationRoute.path.myCreate)}
+            >
+              {t("ui.addWallpaper")}
+            </Button>
+          </div>
+        </section>
+      )}
       </div>
     </DefaultAppView>
   );

@@ -8,9 +8,12 @@ import { useAuth } from "@/hooks/useAuth";
 import type { AuthAction } from "@/types/auth";
 import { accountRoute } from "./route-paths";
 import { useI18n } from "@/i18n";
+import useDesktopTheme from "@/hooks/useDesktopTheme";
 
 const AccountModalRoute = () => {
   const navigate = useNavigate();
+  const { resolvedColorScheme } = useDesktopTheme();
+  const isDark = resolvedColorScheme === "dark";
   const [routeClosing, setRouteClosing] = useState(false);
   const handleClose = () => {
     flushSync(() => setRouteClosing(true));
@@ -31,10 +34,16 @@ const AccountModalRoute = () => {
         panel: {
           overflow: "hidden",
           borderRadius: 24,
-          border: "1px solid rgba(255,255,255,0.72)",
-          background: "rgba(247,247,249,0.94)",
+          border: isDark
+            ? "1px solid rgba(235,235,245,0.14)"
+            : "1px solid rgba(255,255,255,0.72)",
+          background: isDark
+            ? "rgba(28,28,30,0.96)"
+            : "rgba(247,247,249,0.94)",
           boxShadow:
-            "0 24px 70px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.9)",
+            isDark
+              ? "0 24px 70px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.08)"
+              : "0 24px 70px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.9)",
         },
         body: { padding: 0 },
         inner: {
@@ -147,6 +156,10 @@ const accountModalShellClassName = css`
   width: 100%;
   min-height: 100%;
   color: #1d1d1f;
+
+  [data-theme="dark"] & {
+    color: #f5f5f7;
+  }
 `;
 
 const accountAuthPageClassName = css`
@@ -159,6 +172,12 @@ const accountAuthPageClassName = css`
       rgba(246, 246, 248, 0.9)
     ),
     rgba(246, 246, 248, 0.92);
+
+  [data-theme="dark"] & {
+    background:
+      linear-gradient(180deg, rgba(44, 44, 46, 0.96), rgba(28, 28, 30, 0.98)),
+      #1c1c1e;
+  }
 
   .unlogged-view-content {
     width: 100%;
@@ -211,5 +230,13 @@ const accountProfilePageClassName = css`
 
   .apple-account-header {
     padding: 22px 24px;
+  }
+
+  [data-theme="dark"] & {
+    background: #1c1c1e;
+  }
+
+  [data-theme="dark"] & .apple-account-card {
+    background: linear-gradient(180deg, #2c2c2e, #1c1c1e);
   }
 `;

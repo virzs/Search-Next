@@ -19,17 +19,7 @@ import type { DevApp } from "@/contexts/AppContext";
 import DevAppModal, { toSizeConfigs } from "./dev-app-modal";
 import type { DevAppFormValues } from "./dev-app-modal";
 import type { StoreOutletContext } from "../../index";
-import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
-
-const devViewClassName = css`
-  .apple-store-action.ant-btn-primary:not(:disabled) {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
 
 const DevView: React.FC = () => {
   const { t } = useI18n();
@@ -96,18 +86,18 @@ const DevView: React.FC = () => {
 
   return (
     <DefaultAppView
-      className={devViewClassName}
+      className="h-full"
       contentClassName="flex flex-col overflow-hidden px-4 pb-8 pt-4"
     >
       <div className="mb-4 flex shrink-0 items-end justify-between gap-3 px-1">
-        <div className="text-[34px] font-extrabold leading-[38px] tracking-normal text-gray-950 dark:text-gray-50">
+        <div className="text-[28px] font-bold leading-[34px] tracking-normal text-[var(--sn-text)]">
           {t("ui.developer")}
         </div>
         <Button
           type="primary"
           icon={<RiAddLine size={16} />}
           shape="round"
-          className="apple-store-action font-bold!"
+          className="font-semibold!"
           onClick={openAddModal}
         >
           {t("ui.add")}
@@ -132,7 +122,7 @@ const DevView: React.FC = () => {
             return (
               <div
                 key={dw.id}
-                className="rounded-[22px] border border-white/80 bg-white/90 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]"
+                className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]"
               >
                 <div className="flex items-start gap-3">
                   <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#30d158,#00c7be)] text-white">
@@ -141,10 +131,10 @@ const DevView: React.FC = () => {
                   <div className="min-w-0 grow">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="line-clamp-1 font-bold text-gray-950 dark:text-gray-50">
+                        <div className="line-clamp-1 text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
                           {dw.name}
                         </div>
-                        <div className="mt-1 line-clamp-1 break-all text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <div className="mt-1 line-clamp-1 break-all text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
                           {dw.entry}
                         </div>
                       </div>
@@ -160,7 +150,7 @@ const DevView: React.FC = () => {
                           type="primary"
                           size="small"
                           shape="round"
-                          className="apple-store-action font-bold!"
+                          className="font-semibold!"
                           onClick={() =>
                             onAddStoreItem?.({ kind: "app", appId: dw.id })
                           }

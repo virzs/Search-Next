@@ -4,19 +4,9 @@ import { RiExternalLinkLine } from "@remixicon/react";
 import { DefaultAppView, useAppRouteContext } from "@/components";
 import { useLocation, useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
-import { getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
-import { css } from "@emotion/css";
+import { getWebsiteDomain, getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
 import type { StoreOutletContext } from "../../index";
 import { useI18n } from "@/i18n";
-
-const websiteDetailClassName = css`
-  .apple-store-action.ant-btn-primary {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
-`;
 
 const WebsiteDetailView: FC = () => {
   const { t } = useI18n();
@@ -37,35 +27,36 @@ const WebsiteDetailView: FC = () => {
   const iconUrl = getWebsiteIconUrl(item);
   const name = getWebsiteName(item);
   const url = getWebsiteUrl(item);
+  const domain = getWebsiteDomain(item);
   const tags = Array.isArray(item?.tags) ? item.tags : [];
 
   return (
     <DefaultAppView
-      className={`h-full ${websiteDetailClassName}`}
+      className="h-full"
       animate
       contentClassName="px-4 pb-8 pt-4"
     >
-      <div className="min-h-full rounded-[22px] border border-white/80 bg-white/90 p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_44px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
-        <div className="mb-5 flex items-center gap-5 border-b border-black/[0.08] pb-5 dark:border-white/10">
+      <div className="min-h-full rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
+        <div className="mb-5 flex items-center gap-5 border-b border-[var(--sn-separator)] pb-5 max-[560px]:items-start">
           {iconUrl ? (
             <Image
-              className="h-[92px]! w-[92px]! rounded-[22px] bg-white object-cover shadow-sm dark:bg-white/10"
+              className="h-[88px]! w-[88px]! rounded-[8px] bg-[var(--sn-surface-secondary)] object-cover"
               src={iconUrl}
               preview={false}
             />
           ) : (
-            <div className="flex h-[92px] w-[92px] shrink-0 items-center justify-center rounded-[22px] bg-[linear-gradient(135deg,#f3f4f6,#e5e7eb)] text-[42px] font-extrabold text-gray-400 dark:bg-white/10 dark:text-white/60">
+            <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center rounded-[8px] bg-[var(--sn-surface-secondary)] text-[36px] font-bold text-[var(--sn-text-tertiary)]">
               {name?.[0]?.toUpperCase()}
             </div>
           )}
 
           <div className="min-w-0 flex-1 text-left">
-            <h1 className="m-0 line-clamp-1 text-[28px] font-extrabold leading-9 tracking-normal text-gray-950 dark:text-gray-50">
+            <h1 className="m-0 line-clamp-2 text-[28px] font-bold leading-[34px] tracking-normal text-[var(--sn-text)]">
               {name}
             </h1>
-            {url ? (
-              <p className="mt-1 max-w-md break-all text-sm font-medium text-gray-500 dark:text-gray-400">
-                {url}
+            {domain ? (
+              <p className="mt-1 max-w-md truncate text-[13px] leading-5 text-[var(--sn-text-secondary)]">
+                {domain}
               </p>
             ) : null}
             {tags.length ? (
@@ -77,7 +68,7 @@ const WebsiteDetailView: FC = () => {
                   return (
                     <span
                       key={label}
-                      className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 dark:bg-white/10 dark:text-gray-300"
+                      className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[11px] font-medium text-[var(--sn-text-secondary)]"
                     >
                       {label}
                     </span>
@@ -91,7 +82,7 @@ const WebsiteDetailView: FC = () => {
             <Button
               type="primary"
               shape="round"
-              className="apple-store-action h-8! px-5! font-bold!"
+              className="h-8! px-5! font-semibold!"
               onClick={() => onAddStoreItem?.({ kind: "website", site: item })}
             >
               {t("ui.get")}
@@ -108,10 +99,10 @@ const WebsiteDetailView: FC = () => {
 
         {item.description ? (
           <div>
-            <h3 className="mb-3 text-lg font-bold tracking-normal text-gray-950 dark:text-gray-50">
+            <h3 className="mb-3 text-[17px] font-semibold leading-[22px] tracking-normal text-[var(--sn-text)]">
               {t("ui.aboutThisApp")}
             </h3>
-            <p className="max-w-2xl leading-7 text-gray-600 dark:text-gray-300">
+            <p className="max-w-2xl text-[13px] leading-5 text-[var(--sn-text-secondary)]">
               {item.description}
             </p>
           </div>

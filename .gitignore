@@ -31,3 +31,4 @@ apps/api/assets/
 
 *.env
 .sisyphus
+AGENTS.md

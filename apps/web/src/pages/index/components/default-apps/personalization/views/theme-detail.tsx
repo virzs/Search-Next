@@ -66,15 +66,14 @@ const ThemeDetailView: FC = () => {
       }
     >
       {theme.description ? (
-        <div className="text-sm text-gray-600 mt-2 mb-6">
+        <div className="mb-6 mt-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
           {theme.description}
         </div>
       ) : null}
       <div
-        className="w-full aspect-video rounded-3xl border overflow-hidden"
+        className="aspect-video w-full overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]"
         style={{
-          background: "rgba(255,255,255,0.18)",
-          borderColor: "rgba(0,0,0,0.08)",
+          background: "var(--sn-surface)",
         }}
       >
         {coverUrl ? (
@@ -89,8 +88,7 @@ const ThemeDetailView: FC = () => {
           {previewUrls.slice(1, 9).map((url) => (
             <Image
               key={url}
-              className="w-full! h-20! rounded-2xl object-cover border"
-              style={{ borderColor: "rgba(0,0,0,0.08)" }}
+              className="h-20! w-full! rounded-[8px] border border-[var(--sn-separator)] object-cover"
               src={url}
               preview={false}
             />
