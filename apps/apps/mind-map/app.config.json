@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "mind-map",
+  "displayName": "思维导图",
+  "displayNameI18n": {
+    "zh-CN": "思维导图",
+    "en-US": "Mind Map"
+  },
+  "version": "0.2.0",
+  "description": "Apple 风格的本地思维导图应用，支持自由摆放、多种连线、多文档和导入导出",
+  "descriptionI18n": {
+    "zh-CN": "Apple 风格的本地思维导图应用，支持自由摆放、多种连线、多文档和导入导出",
+    "en-US": "An Apple-inspired local mind mapping app with free placement, connector styles, multiple documents, and import/export"
+  },
+  "author": "Search-Next",
+  "entry": "index.js",
+  "icon": "icon.svg",
+  "tags": ["工具", "思维导图", "脑图", "效率"],
+  "tagsI18n": {
+    "zh-CN": ["工具", "思维导图", "脑图", "效率"],
+    "en-US": ["Tools", "Mind Map", "Brainstorm", "Productivity"]
+  },
+  "sizeConfigs": [
+    { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
+    { "row": 2, "col": 4, "name": "4x2", "id": "4x2" }
+  ],
+  "defaultSizeId": "2x2",
+  "supportIconMode": true,
+  "supportAppMode": true,
+  "appIcon": { "type": "image", "src": "icon.svg" },
+  "pagePaths": { "settings": "/settings" },
+  "settingsSchema": [
+    { "key": "showGrid", "label": "显示点阵背景", "type": "switch", "default": true },
+    { "key": "showMinimap", "label": "显示小地图", "type": "switch", "default": true },
+    { "key": "connectorStyle", "label": "连线风格", "type": "select", "default": "curve", "options": [
+      { "label": "曲线", "value": "curve" },
+      { "label": "折线", "value": "elbow" },
+      { "label": "直线", "value": "straight" }
+    ] }
+  ]
+}

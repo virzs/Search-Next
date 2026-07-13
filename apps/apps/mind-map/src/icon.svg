@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="28" y1="20" x2="224" y2="236" gradientUnits="userSpaceOnUse"><stop stop-color="#76A7FF"/><stop offset="1" stop-color="#456EDB"/></linearGradient>
+    <filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#17367F" flood-opacity=".28"/></filter>
+  </defs>
+  <rect width="256" height="256" rx="60" fill="url(#bg)"/>
+  <g filter="url(#s)" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 128H72M128 128h56M72 128V82M72 128v46M184 128V88M184 128v52" opacity=".78"/>
+    <rect x="96" y="103" width="64" height="50" rx="16" fill="#fff" stroke="none"/>
+    <rect x="43" y="62" width="58" height="39" rx="13" fill="#fff" stroke="none" opacity=".96"/>
+    <rect x="43" y="155" width="58" height="39" rx="13" fill="#fff" stroke="none" opacity=".9"/>
+    <rect x="155" y="68" width="58" height="39" rx="13" fill="#fff" stroke="none" opacity=".96"/>
+    <rect x="155" y="160" width="58" height="39" rx="13" fill="#fff" stroke="none" opacity=".9"/>
+  </g>
+</svg>
