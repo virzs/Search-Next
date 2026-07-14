@@ -8,7 +8,13 @@ import {
   RegisterFormData,
 } from "../types/auth";
 import { postLogin, postRegister, postLogout } from "../services/auth";
-import { getToken, setToken, setRefreshToken } from "../utils/token";
+import {
+  getToken,
+  removeRefreshToken,
+  removeToken,
+  setRefreshToken,
+  setToken,
+} from "../utils/token";
 import { notification } from "../utils/globalNotification";
 import { emailToGradient } from "../utils/emailGradient";
 
@@ -114,7 +120,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // 使用 useRequest 封装注册
-  const { loading: registerLoading, runAsync: runRegister } = useRequest(
+  const {
+    loading: registerRequestLoading,
+    runAsync: runRegister,
+  } = useRequest(
     async (data: RegisterFormData) => {
       return await postRegister({
         username: data.username,
@@ -130,32 +139,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: RegisterFormData): Promise<LoginResponse> => {
     try {
-      const res = await runRegister(data);
+      await runRegister(data);
 
-      const userPayload: UserInfo = {
-        _id: String(res._id ?? Date.now()),
-        username: data.username,
+      const loginResponse = await login({
         email: data.email,
-        createdAt: new Date(),
-      };
+        password: data.password,
+        turnstileToken: data.turnstileToken,
+      });
 
-      const response: LoginResponse = {
-        success: true,
-        message: "注册成功",
-        user: userPayload,
-        token: res.access_token,
-        refreshToken: res.refresh_token,
-      };
-
-      if (response.success && response.user && response.token) {
-        setUser(response.user);
-        setIsAuthenticated(true);
-        setToken(response.token);
-        if (response.refreshToken) setRefreshToken(response.refreshToken);
-        localStorage.setItem("user_info", JSON.stringify(response.user));
+      if (!loginResponse.success) {
+        return {
+          ...loginResponse,
+          message: `注册成功，但自动登录失败：${loginResponse.message}`,
+        };
       }
 
-      return response;
+      return {
+        ...loginResponse,
+        message: "注册成功",
+      };
     } catch (error: any) {
       return { success: false, message: error.message || "注册失败" };
     }
@@ -166,22 +168,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await postLogout({});
 
-      // 清除状态
-      setUser(null);
-      setIsAuthenticated(false);
-
-      // 清除本地存储
-      localStorage.removeItem("user_info");
-      sessionStorage.removeItem("user_info");
-
       // 通过全局通知抛出登出成功事件
       notification?.success({ message: "已成功登出" });
 
       return { success: true, message: "登出成功" };
     } catch (error: any) {
-      // 通过全局通知抛出登出失败事件
-      notification?.error({ message: error?.message || "登出失败" });
-      return { success: false, message: error.message || "登出失败" };
+      // 即使服务端会话已过期或网络异常，也允许用户退出本地账号。
+      notification?.warning({
+        message: "本地账号已退出",
+        description: error?.message || "服务端退出请求失败",
+      });
+      return { success: true, message: "本地账号已退出" };
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
+      removeToken();
+      removeRefreshToken();
+      localStorage.removeItem("user_info");
+      sessionStorage.removeItem("user_info");
     }
   };
 
@@ -214,7 +218,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     updateUser,
     loginLoading,
-    registerLoading,
+    registerLoading: registerRequestLoading || loginLoading,
     coverGradientCss,
   };
 

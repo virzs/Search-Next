@@ -256,6 +256,13 @@ const zhCN = {
   "ui.createASearchNextAccount": "创建 Search Next 账号",
   "ui.auth.signInSyncSubtitle": "登录后同步桌面布局、网站、应用和偏好设置。",
   "ui.auth.registerSyncSubtitle": "注册后即可在不同设备间同步您的 Search Next 数据。",
+  "ui.auth.settingsSignedOutTitle": "登录以同步你的空间",
+  "ui.auth.settingsSignedOutDescription":
+    "登录或创建 Search Next 账号，在所有设备间同步桌面布局、网站、应用和偏好设置。",
+  "ui.auth.signInOrRegister": "登录或注册",
+  "ui.auth.cloudSync": "云端同步",
+  "ui.auth.useAcrossDevices": "跨设备使用",
+  "ui.auth.accountSecurity": "账号安全",
   "ui.readingAccountStatus": "正在读取账号状态...",
   "ui.customElement": "自定义元素",
   "ui.appDataCleared": "应用数据已清除",

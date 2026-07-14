@@ -256,6 +256,13 @@ const enUS = {
   "ui.createASearchNextAccount": "Create a Search Next account",
   "ui.auth.signInSyncSubtitle": "Sign in to sync desktop layout, websites, apps, and preferences.",
   "ui.auth.registerSyncSubtitle": "Register to sync your Search Next data across devices.",
+  "ui.auth.settingsSignedOutTitle": "Sign in to sync your space",
+  "ui.auth.settingsSignedOutDescription":
+    "Sign in or create a Search Next account to sync your desktop layout, websites, apps, and preferences across devices.",
+  "ui.auth.signInOrRegister": "Sign in or register",
+  "ui.auth.cloudSync": "Cloud sync",
+  "ui.auth.useAcrossDevices": "Across devices",
+  "ui.auth.accountSecurity": "Account security",
   "ui.readingAccountStatus": "Reading account status...",
   "ui.customElement": "Custom Element",
   "ui.appDataCleared": "App data cleared",

@@ -1,5 +1,10 @@
 import { basePostRequest } from "../../utils/axios";
-import { LoginRequest, LoginResponse, RegisterRequest } from "./interface";
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from "./interface";
 
 interface RefreshTokenRequestData {
   refreshToken: string;
@@ -12,7 +17,8 @@ export const postRefreshToken = (data: RefreshTokenRequestData) => basePostReque
 export const postLogin = (data: LoginRequest): Promise<LoginResponse> => basePostRequest("/auth/login")(data);
 
 // /auth/register post
-export const postRegister = (data: RegisterRequest): Promise<LoginResponse> => basePostRequest("/auth/register")(data);
+export const postRegister = (data: RegisterRequest): Promise<RegisterResponse> =>
+  basePostRequest("/auth/register")(data);
 
 // /system/email/register/captcha
 export const getEmailCaptcha = (email: string) => basePostRequest("/auth/register/captcha")({ email });

@@ -1,5 +1,5 @@
 import { css, cx } from "@emotion/css";
-import { Navigate, Outlet, useNavigate } from "react-router";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import { useState } from "react";
 import { flushSync } from "react-dom";
 import { DesktopNextBaseModal } from "zs_library";
@@ -77,6 +77,7 @@ export const AccountIndexRedirect = () => {
 
 export const AccountAuthView = ({ action }: { action: AuthAction }) => {
   const navigate = useNavigate();
+  const { search } = useLocation();
   const { t } = useI18n();
   const { loading, isAuthenticated } = useAuth();
 
@@ -86,11 +87,13 @@ export const AccountAuthView = ({ action }: { action: AuthAction }) => {
   }
 
   const handleActionChange = (nextAction: AuthAction) => {
-    navigate(
-      nextAction === "login"
-        ? accountRoute.path.login
-        : accountRoute.path.register,
-    );
+    navigate({
+      pathname:
+        nextAction === "login"
+          ? accountRoute.path.login
+          : accountRoute.path.register,
+      search,
+    });
   };
 
   return (

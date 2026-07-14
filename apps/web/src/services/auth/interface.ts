@@ -14,6 +14,10 @@ export interface LoginResponse {
   refresh_token: string;
 }
 
+export interface RegisterResponse {
+  message: string;
+}
+
 export interface RegisterRequest {
   username: string;
   email: string;

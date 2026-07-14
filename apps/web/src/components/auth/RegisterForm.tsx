@@ -1,5 +1,6 @@
 import { Form, Input, Button, Typography, message } from "antd";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router";
 import { cx } from "@emotion/css";
 import {
   RiUserFill,
@@ -34,6 +35,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 }) => {
   const { t } = useI18n();
   const [form] = Form.useForm<RegisterFormData>();
+  const { search } = useLocation();
   const { register, registerLoading: contextRegisterLoading } = useAuth();
   const { projectInfo } = useConfig();
   const [captchaLoading, setCaptchaLoading] = useState(false);
@@ -49,17 +51,27 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const forceEmailCaptcha = projectInfo?.register?.forceEmailCaptcha ?? false;
   const forceInvitationCode = projectInfo?.register?.forceInvitationCode ?? false;
   const shouldRequireCaptcha = requireCaptcha ?? forceEmailCaptcha;
-  const invitationCodeFromUrl =
-    typeof window === "undefined"
-      ? undefined
-      : new URLSearchParams(window.location.search).get("code") || undefined;
+  const invitationCodeFromUrl = useMemo(() => {
+    const searchParams = new URLSearchParams(search);
+    const value = searchParams.get("code");
+
+    return value?.trim() || undefined;
+  }, [search]);
   const shouldShowInvitationCode =
     forceInvitationCode ||
     Boolean(initialValues.invitationCode || invitationCodeFromUrl);
   const resolvedInitialValues = {
-    ...(invitationCodeFromUrl ? { invitationCode: invitationCodeFromUrl } : {}),
     ...initialValues,
+    ...(invitationCodeFromUrl ? { invitationCode: invitationCodeFromUrl } : {}),
   };
+
+  useEffect(() => {
+    if (invitationCodeFromUrl) {
+      (form as any).setFieldsValue({
+        invitationCode: invitationCodeFromUrl,
+      });
+    }
+  }, [form, invitationCodeFromUrl]);
 
   const isLoading = externalLoading || contextRegisterLoading;
 
