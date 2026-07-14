@@ -56,10 +56,6 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
     language,
     appConfig?.description,
   );
-  const appIconType =
-    appConfig?.appIcon?.type === "custom"
-      ? t("ui.customElement")
-      : t("ui.image");
 
   const handleClear = () => {
     const keys = clearAppStorage(appId);
