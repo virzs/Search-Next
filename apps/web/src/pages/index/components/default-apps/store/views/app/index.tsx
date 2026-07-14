@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRequest } from "ahooks";
 import { Button, Empty, Pagination, Skeleton, Spin, Tag } from "antd";
 import { RiApps2Line } from "@remixicon/react";
-import { AppSegmented, DefaultAppView } from "@/components";
+import { AppCategoryRail, DefaultAppView } from "@/components";
 import { useApp } from "@/hooks/useApp";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import type {
@@ -794,25 +794,28 @@ const AppView: React.FC<AppViewProps> = ({
   return (
     <DefaultAppView
       className={appViewClassName}
-      contentClassName="h-full overflow-hidden px-0 pt-0 pb-0"
-      headerClassName="items-center px-3 pt-3 pb-2"
-      headerLeft={
-        <AppSegmented
+      contentClassName="flex h-full flex-col overflow-hidden px-0 pt-0 pb-0"
+    >
+      <div className="shrink-0 px-4 pb-2 pt-3">
+        <AppCategoryRail
           options={viewOptions}
           value={activeView}
           onChange={handleViewChange}
-          className="max-w-full overflow-auto"
+          ariaLabel={t("ui.categories")}
+          previousLabel={t("ui.previousCategories")}
+          nextLabel={t("ui.nextCategories")}
         />
-      }
-    >
+      </div>
       {!isWidgetView && activeView === "featured" ? (
-        <AppFeaturedView
-          collectionItems={collectionItems}
-          collectionListLoading={collectionListLoading}
-          getIconUrl={getIconUrl}
-          onOpenCollection={openCollection}
-          onAdd={handleAddApp}
-        />
+        <div className="min-h-0 flex-1">
+          <AppFeaturedView
+            collectionItems={collectionItems}
+            collectionListLoading={collectionListLoading}
+            getIconUrl={getIconUrl}
+            onOpenCollection={openCollection}
+            onAdd={handleAddApp}
+          />
+        </div>
       ) : (
         <div className="flex h-full min-h-0 flex-col">
           <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">

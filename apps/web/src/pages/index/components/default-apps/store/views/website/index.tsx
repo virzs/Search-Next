@@ -11,7 +11,11 @@ import { useNavigate } from "react-router";
 import { getWebsiteId, type WebsiteCategory } from "../../utils";
 import WebsiteCard from "../../components/WebsiteCard";
 import FeaturedView from "../website/featured";
-import { AppSegmented, DefaultAppView, useAppRouteContext } from "@/components";
+import {
+  AppCategoryRail,
+  DefaultAppView,
+  useAppRouteContext,
+} from "@/components";
 import type { StoreOutletContext } from "../../index";
 import AddWebsiteModal from "./add-website-modal";
 import { storeRoute } from "../../route-paths";
@@ -153,14 +157,6 @@ const WebsiteView: React.FC = () => {
       className="h-full"
       contentClassName="flex flex-col overflow-hidden px-0 pt-0 pb-0"
       headerClassName="items-center px-3 pt-3 pb-2"
-      headerLeft={
-        <AppSegmented
-          options={viewOptions}
-          value={activeView}
-          onChange={handleViewChange}
-          className="max-w-full overflow-auto"
-        />
-      }
       headerRight={
         <Button
           type="primary"
@@ -173,15 +169,27 @@ const WebsiteView: React.FC = () => {
         </Button>
       }
     >
-      {activeView === "featured" ? (
-        <FeaturedView
-          featuredHomeScrollRef={featuredHomeScrollRef}
-          collectionItems={collectionItems}
-          collectionListLoading={collectionListLoading}
-          onOpenCollection={openCollection}
-          onAddFromCard={handleAddFromCard}
-          onOpenWebsiteDetail={openWebsiteDetail}
+      <div className="shrink-0 px-4 pb-2 pt-3">
+        <AppCategoryRail
+          options={viewOptions}
+          value={activeView}
+          onChange={handleViewChange}
+          ariaLabel={t("ui.categories")}
+          previousLabel={t("ui.previousCategories")}
+          nextLabel={t("ui.nextCategories")}
         />
+      </div>
+      {activeView === "featured" ? (
+        <div className="min-h-0 flex-1">
+          <FeaturedView
+            featuredHomeScrollRef={featuredHomeScrollRef}
+            collectionItems={collectionItems}
+            collectionListLoading={collectionListLoading}
+            onOpenCollection={openCollection}
+            onAddFromCard={handleAddFromCard}
+            onOpenWebsiteDetail={openWebsiteDetail}
+          />
+        </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">

@@ -1,4 +1,4 @@
-import { AppSegmented, DefaultAppView } from "@/components";
+import { AppCategoryRail, DefaultAppView } from "@/components";
 import { useRequest } from "ahooks";
 import { Button, Empty } from "antd";
 import { FC, useMemo, useState } from "react";
@@ -60,19 +60,10 @@ const ThemeView: FC = () => {
 
   return (
     <DefaultAppView
-      headerClassName="items-center px-3 pt-3 pb-2"
-      headerLeft={
-        <AppSegmented
-          options={categoryOptions}
-          value={activeCategoryId}
-          onChange={(v) => setActiveCategoryId(String(v))}
-          className="max-w-full overflow-auto"
-        />
-      }
       contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-6 flex items-end justify-between gap-4 max-[640px]:items-start max-[640px]:flex-col">
+        <div className="mb-5 flex items-end justify-between gap-4 max-[640px]:items-start max-[640px]:flex-col">
           <div>
           <div className="text-[28px] font-bold leading-[34px] text-[var(--sn-text)]">
             {t("ui.theme")}
@@ -85,6 +76,17 @@ const ThemeView: FC = () => {
             <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
             <span>{t("ui.currentTheme")} · {activeThemeName}</span>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <AppCategoryRail
+            options={categoryOptions}
+            value={activeCategoryId}
+            onChange={(v) => setActiveCategoryId(String(v))}
+            ariaLabel={t("ui.categories")}
+            previousLabel={t("ui.previousCategories")}
+            nextLabel={t("ui.nextCategories")}
+          />
         </div>
 
         {themeLoading || categoryLoading ? (

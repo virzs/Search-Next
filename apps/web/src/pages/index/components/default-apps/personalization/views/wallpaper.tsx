@@ -1,4 +1,4 @@
-import { AppSegmented, DefaultAppView } from "@/components";
+import { AppCategoryRail, DefaultAppView } from "@/components";
 import { useRequest } from "ahooks";
 import { Button, Empty, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
@@ -47,20 +47,6 @@ const WallpaperView: FC = () => {
     getUserWallpaperCategories,
     { ready: activeType === "image" },
   );
-
-  const categoryNameMap = useMemo(() => {
-    const items: WallpaperCategoryApiItem[] = categories ?? [];
-    const map: Record<string, string> = {};
-    items.forEach((c) => {
-      map[c._id] = c.name;
-    });
-    return map;
-  }, [categories]);
-
-  const activeCategoryName = useMemo(() => {
-    if (!activeCategoryId) return t("ui.wallpaper");
-    return categoryNameMap[activeCategoryId] ?? t("ui.wallpaper");
-  }, [activeCategoryId, categoryNameMap, t]);
 
   const categoryIdList = useMemo(() => {
     const items: WallpaperCategoryApiItem[] = categories ?? [];
@@ -218,27 +204,10 @@ const WallpaperView: FC = () => {
 
   return (
     <DefaultAppView
-      headerClassName="items-center px-3 pt-3 pb-2"
-      title={
-        activeType === "image" && imageViewMode === "category"
-          ? activeCategoryName
-          : undefined
-      }
-      headerLeft={
-        <AppSegmented
-          options={[
-            { label: t("ui.gradient"), value: "gradient" },
-            { label: t("ui.image"), value: "image" },
-          ]}
-          value={activeType}
-          onChange={(v) => setActiveType(v as any)}
-          className="max-w-full overflow-auto"
-        />
-      }
       contentClassName="overflow-y-auto px-6 pb-8 pt-3 max-[640px]:px-4"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-6 flex items-end justify-between gap-4 max-[640px]:items-start max-[640px]:flex-col">
+        <div className="mb-5 flex items-end justify-between gap-4 max-[640px]:items-start max-[640px]:flex-col">
           <div>
           <div className="text-[28px] font-bold leading-[34px] text-[var(--sn-text)]">
             {t("ui.wallpaper")}
@@ -251,6 +220,19 @@ const WallpaperView: FC = () => {
             <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
             <span>{t("ui.currentWallpaper")} · {currentWallpaperName}</span>
           </div>
+        </div>
+        <div className="mb-6">
+          <AppCategoryRail
+            options={[
+              { label: t("ui.gradient"), value: "gradient" },
+              { label: t("ui.image"), value: "image" },
+            ]}
+            value={activeType}
+            onChange={(v) => setActiveType(v)}
+            ariaLabel={t("ui.categories")}
+            previousLabel={t("ui.previousCategories")}
+            nextLabel={t("ui.nextCategories")}
+          />
         </div>
       {activeType === "gradient" ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

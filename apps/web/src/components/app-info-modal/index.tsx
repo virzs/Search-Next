@@ -19,7 +19,13 @@ interface AppInfoModalProps {
   appConfig?: AppConfig;
 }
 
-const InfoRow = ({ label, value }: { label: string; value?: string | number | null }) => (
+const InfoRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number | null;
+}) => (
   <div className="grid grid-cols-[92px_minmax(0,1fr)] items-start gap-3 py-2">
     <div className="text-xs font-semibold text-[#86868b]">{label}</div>
     <div className="min-w-0 break-words text-sm font-medium text-[#1d1d1f]">
@@ -51,7 +57,9 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
     appConfig?.description,
   );
   const appIconType =
-    appConfig?.appIcon?.type === "custom" ? t("ui.customElement") : t("ui.image");
+    appConfig?.appIcon?.type === "custom"
+      ? t("ui.customElement")
+      : t("ui.image");
 
   const handleClear = () => {
     const keys = clearAppStorage(appId);
@@ -69,6 +77,9 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
       onClose={onClose}
       width={520}
       destroyOnClose
+      styles={{
+        body: { padding: 0 },
+      }}
     >
       <div className={appleAppInfoClassName}>
         <div className="flex items-start justify-between gap-4">
@@ -91,15 +102,17 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
           <InfoRow label={t("ui.appID")} value={appId} />
           <InfoRow label={t("ui.version")} value={appConfig?.version} />
           <InfoRow label={t("ui.author")} value={appConfig?.author} />
-          <InfoRow label={t("ui.source")} value={appConfig?.sourceType || "legacy"} />
-          <InfoRow label={t("ui.iconMode")} value={appIconType} />
-          <InfoRow label={t("ui.entry")} value={appConfig?.entry} />
         </div>
 
         <div className="mt-4 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
-          <InfoRow label={t("ui.storageUsed")} value={formatAppStorageSize(stats.byteSize)} />
-          <InfoRow label={t("ui.dataItems")} value={t("ui.countItems", { count: stats.keyCount })} />
-          <InfoRow label={t("ui.namespace")} value={stats.key} />
+          <InfoRow
+            label={t("ui.storageUsed")}
+            value={formatAppStorageSize(stats.byteSize)}
+          />
+          <InfoRow
+            label={t("ui.dataItems")}
+            value={t("ui.countItems", { count: stats.keyCount })}
+          />
         </div>
 
         <div className="mt-5 flex items-center justify-end gap-2">
@@ -129,7 +142,11 @@ const appleAppInfoClassName = css`
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 18px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(245, 245, 247, 0.84)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.88),
+      rgba(245, 245, 247, 0.84)
+    ),
     rgba(245, 245, 247, 0.76);
   padding: 22px;
   box-shadow:

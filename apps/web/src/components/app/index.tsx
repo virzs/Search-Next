@@ -1,5 +1,6 @@
 import AppSidebar from "./sidebar";
 import AppResponsiveOverlay from "./responsive-overlay";
+import AppCategoryRail from "./category-rail";
 import AppSegmented from "./segmented";
 import AppRoutedContainer from "./routed-container";
 import AppRoutedOverlay from "./routed-overlay";
@@ -8,10 +9,16 @@ import StackedFadeOutlet from "./router/stacked-fade-outlet";
 import { AppRouteContextProvider, useAppRouteContext } from "./router/route-context";
 import DefaultAppView from "./default-app-view";
 
+export type {
+  AppCategoryRailOption,
+  AppCategoryRailProps,
+} from "./category-rail";
+
 export {
   AppResponsiveOverlay,
   AppRoutedContainer,
   AppRoutedOverlay,
+  AppCategoryRail,
   AppSidebar,
   AppSegmented,
   DefaultAppView,
