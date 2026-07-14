@@ -22,11 +22,11 @@ const TICK_MARKS = Array.from({ length: 60 }, (_, index) => {
 export const TimeText = ({ h, m, s, showSeconds, className }: { h: string; m: string; s: string; showSeconds: boolean; className?: string }) => (
   <div
     className={cn(
-      "tw:flex tw:items-baseline tw:whitespace-nowrap tw:text-[var(--clock-fg)] tw:font-[-apple-system,BlinkMacSystemFont,SF_Pro_Display,Helvetica_Neue,system-ui,sans-serif] tw:font-[760] tw:leading-none tw:tracking-[0] tw:[font-variant-numeric:tabular-nums]",
+      "tw:flex tw:items-baseline tw:whitespace-nowrap tw:text-[var(--clock-fg)] tw:font-[-apple-system,BlinkMacSystemFont,SF_Pro_Display,Helvetica_Neue,system-ui,sans-serif] tw:font-[680] tw:leading-none tw:tracking-[-0.045em] tw:[font-variant-numeric:tabular-nums]",
       className,
     )}
   >
-    <span>{h}</span><span className="tw:animate-pulse">:</span><span>{m}</span>{showSeconds && <span className="tw:ml-[0.25em] tw:text-[0.42em] tw:font-[650] tw:text-[var(--clock-fg-2)]">{s}</span>}
+    <span>{h}</span><span className="tw:mx-[0.02em] tw:text-[var(--clock-fg-3)]">:</span><span>{m}</span>{showSeconds && <span className="tw:ml-[0.32em] tw:text-[0.36em] tw:font-[620] tw:tracking-[-0.02em] tw:text-[var(--clock-time)]">{s}</span>}
   </div>
 );
 
@@ -53,7 +53,7 @@ export const AnalogClock = ({
   largePin?: boolean;
   showNumbers?: boolean;
 }) => {
-  const seconds = now.getSeconds();
+  const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
   const minutes = now.getMinutes() + seconds / 60;
   const hours = (now.getHours() % 12) + minutes / 60;
   const hourEnd = toPoint(hours * 30, 21);
@@ -63,12 +63,12 @@ export const AnalogClock = ({
   const progress = Math.max(0, Math.min(100, dayProgress(now)));
 
   return (
-    <div className={cn("tw:relative tw:aspect-square tw:flex-none tw:rounded-full", className)} aria-label={label}>
+    <div className={cn("tw:relative tw:aspect-square tw:flex-none tw:rounded-full tw:[filter:drop-shadow(0_12px_24px_rgba(0,0,0,0.14))]", className)} aria-label={label} role="img">
       <svg className="tw:block tw:h-full tw:w-full tw:overflow-visible" viewBox="0 0 100 100" aria-hidden="true">
-        <circle className="tw:fill-[var(--clock-track)]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r="47" />
+        <circle className="tw:fill-[var(--clock-track)]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r="47.5" />
         {showProgress && (
           <circle
-            className="tw:origin-center tw:-rotate-90 tw:fill-none tw:stroke-[var(--clock-accent)] tw:[stroke-linecap:round] tw:[stroke-width:4] tw:[transform-origin:50px_50px]"
+            className="tw:origin-center tw:-rotate-90 tw:fill-none tw:stroke-[var(--clock-time)] tw:[stroke-linecap:round] tw:[stroke-width:3.2] tw:[transform-origin:50px_50px]"
             cx={CLOCK_CENTER}
             cy={CLOCK_CENTER}
             r="45"
@@ -76,7 +76,8 @@ export const AnalogClock = ({
             strokeDasharray={`${progress} 100`}
           />
         )}
-        <circle className="tw:fill-[var(--clock-face)] tw:stroke-[var(--clock-border)] tw:[stroke-width:1]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r="40" />
+        <circle className="tw:fill-[var(--clock-face)] tw:stroke-[var(--clock-border)] tw:[stroke-width:0.8]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r="41" />
+        <circle className="tw:fill-none tw:stroke-white/10 tw:[stroke-width:0.65]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r="39.5" />
         <g>
           {TICK_MARKS.map((tick) => (
             <line
@@ -103,7 +104,8 @@ export const AnalogClock = ({
         {showSeconds && (
           <line className={cn("tw:stroke-[var(--clock-red)] tw:[stroke-linecap:round]", largeSecondHand ? "tw:[stroke-width:2.2]" : "tw:[stroke-width:1.7]")} x1={secondTail.x} y1={secondTail.y} x2={secondEnd.x} y2={secondEnd.y} />
         )}
-        <circle className="tw:fill-[var(--clock-face)] tw:stroke-[var(--clock-red)] tw:[stroke-width:2.2]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={largePin ? 4 : 3.4} />
+        <circle className="tw:fill-[var(--clock-red)]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={largePin ? 3.8 : 3.1} />
+        <circle className="tw:fill-[var(--clock-face)]" cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={largePin ? 1.45 : 1.2} />
       </svg>
     </div>
   );
@@ -143,16 +145,23 @@ export const WeekStrip = ({ days, responsiveCompact }: { days: Array<{ key: stri
 
 export const WorldTimes = ({ items, dayPct, showProgress, compact, wide }: { items: Array<{ city: string; time: string; dayLabel?: string; offsetLabel?: string }>; dayPct: number; showProgress: boolean; compact?: boolean; wide?: boolean }) => (
   <div className={cn("tw:mt-auto tw:min-w-0", compact && "tw:mt-0 tw:self-center")}>
-    <div className={cn("tw:grid tw:grid-cols-3 tw:gap-[7px]", wide && "tw:grid-cols-[repeat(auto-fit,minmax(138px,1fr))]")}>
+    <div className={cn("tw:grid tw:gap-[7px]", compact ? "tw:grid-cols-2" : "tw:grid-cols-3", wide && "tw:grid-cols-2 tw:gap-x-5 tw:gap-y-0 tw:[@container(max-width:720px)]:grid-cols-1")}>
       {items.map((item) => (
-        <div className={cn("tw:flex tw:min-w-0 tw:flex-col tw:gap-[3px] tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-elevated)] tw:p-2", compact && "tw:min-h-[58px] tw:p-[7px]")} key={item.city}>
-          <div className="tw:flex tw:min-w-0 tw:items-center tw:justify-between tw:gap-1.5"><span className={cn("tw:truncate tw:text-[10px] tw:font-[720] tw:text-[var(--clock-fg-3)]", compact && "tw:text-[9px]")}>{item.city}</span><small className={cn("tw:truncate tw:text-[10px] tw:font-[720] tw:text-[var(--clock-fg-3)]", compact && "tw:text-[9px]")}>{item.dayLabel}</small></div>
-          <strong className={cn("tw:truncate tw:text-base tw:font-[760] tw:text-[var(--clock-fg)] tw:[font-variant-numeric:tabular-nums]", compact && "tw:text-[13px]")}>{item.time}</strong>
-          {item.offsetLabel && <em className={cn("tw:truncate tw:text-[10px] tw:not-italic tw:font-[720] tw:text-[var(--clock-fg-3)]", compact && "tw:text-[9px]")}>{item.offsetLabel}</em>}
+        <div className={cn(
+          "tw:flex tw:min-w-0 tw:flex-col tw:gap-[3px] tw:overflow-hidden tw:rounded-xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-elevated)] tw:p-2",
+          compact && "tw:min-h-[54px] tw:p-[7px]",
+          wide && "tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-center tw:gap-x-4 tw:rounded-none tw:border-x-0 tw:border-t-0 tw:bg-transparent tw:px-0 tw:py-3.5",
+        )} key={item.city}>
+          <div className={cn("tw:flex tw:min-w-0 tw:items-center tw:justify-between tw:gap-1.5", wide && "tw:block")}>
+            <span className={cn("tw:truncate tw:text-[10px] tw:font-[720] tw:text-[var(--clock-fg-3)]", compact && "tw:text-[9px]", wide && "tw:block tw:text-[15px] tw:font-[650] tw:text-[var(--clock-fg)]")}>{item.city}</span>
+            <small className={cn("tw:truncate tw:text-[10px] tw:font-[720] tw:text-[var(--clock-fg-3)]", compact && "tw:text-[9px]", wide && "tw:mt-0.5 tw:block tw:text-[11px]")}>{item.dayLabel}{wide && item.offsetLabel ? ` · ${item.offsetLabel}` : ""}</small>
+          </div>
+          <strong className={cn("tw:truncate tw:text-base tw:font-[760] tw:text-[var(--clock-fg)] tw:[font-variant-numeric:tabular-nums]", compact && "tw:text-[13px]", wide && "tw:text-[24px] tw:font-[580] tw:tracking-[-0.03em]")}>{item.time}</strong>
+          {!wide && item.offsetLabel && <em className={cn("tw:truncate tw:text-[10px] tw:not-italic tw:font-[720] tw:text-[var(--clock-fg-3)]", compact && "tw:text-[9px]")}>{item.offsetLabel}</em>}
         </div>
       ))}
     </div>
-    {showProgress && <div className="tw:mt-2.5 tw:h-[5px] tw:overflow-hidden tw:rounded-full tw:bg-[var(--clock-track)]"><span className="tw:block tw:h-full tw:rounded-[inherit] tw:bg-[linear-gradient(90deg,var(--clock-accent),var(--clock-cyan))] tw:transition-[width] tw:duration-[800ms] tw:ease-out" style={{ width: `${dayPct}%` }} /></div>}
+    {showProgress && <div className={cn("tw:overflow-hidden tw:rounded-full tw:bg-[var(--clock-track)]", compact ? "tw:mt-[7px] tw:h-1" : "tw:mt-2.5 tw:h-[5px]")}><span className="tw:block tw:h-full tw:rounded-[inherit] tw:bg-[linear-gradient(90deg,var(--clock-accent),var(--clock-cyan))] tw:transition-[width] tw:duration-[800ms] tw:ease-out" style={{ width: `${dayPct}%` }} /></div>}
   </div>
 );
 

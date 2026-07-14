@@ -2,3 +2,103 @@
 
 @import "tailwindcss/theme" layer(theme) prefix(tw);
 @import "tailwindcss/utilities" layer(utilities) prefix(tw);
+
+.clock-root button,
+.clock-root select,
+.clock-root input {
+  font: inherit;
+}
+
+.clock-root button,
+.clock-root label,
+.clock-root select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.clock-root button {
+  touch-action: manipulation;
+}
+
+.clock-root button:focus-visible,
+.clock-root select:focus-visible,
+.clock-root input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--clock-accent) 42%, transparent);
+  outline-offset: 2px;
+}
+
+.clock-material {
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+.clock-time-compact {
+  letter-spacing: -0.018em;
+}
+
+.clock-widget-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.clock-widget-greeting,
+.clock-widget-date {
+  line-height: 1;
+}
+
+.clock-widget-copy--compact {
+  gap: 2px;
+}
+
+.clock-widget-copy--standard {
+  gap: 3px;
+}
+
+.clock-widget-copy--wide {
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.clock-compact-main {
+  gap: 8px;
+}
+
+.clock-standard-main {
+  gap: 10px;
+}
+
+.clock-wide-main {
+  gap: 8px;
+}
+
+.clock-progress-inline {
+  margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock-root *,
+  .clock-root *::before,
+  .clock-root *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .clock-material {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--clock-material-strong) !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .clock-root {
+    --clock-card: var(--clock-material-strong);
+    --clock-border: currentColor;
+  }
+}

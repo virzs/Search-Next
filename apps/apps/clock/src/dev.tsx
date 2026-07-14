@@ -141,24 +141,6 @@ document.querySelectorAll<HTMLButtonElement>("[data-language]").forEach((button)
 setDevLanguage(currentLanguage);
 
 for (const themeId of ["light", "dark"] as ThemeId[]) {
-  const section = createSection(`Icon Mode - ${themeId}`, "所有 sizeConfigs");
-  const grid = document.createElement("div");
-  grid.className = "demo-grid";
-  section.append(grid);
-
-  for (const size of sizeConfigs) {
-    const sizeId = size.id || `${size.col}x${size.row}`;
-    const previewSize = getPreviewSize(size);
-    const frame = createPreview(grid, size.name || sizeId, previewSize.width, previewSize.height, themeId);
-    mountPreview(frame, {
-      mode: "icon",
-      title: getConfigDisplayName(),
-      sdk: createSdk(sizeId, themeId),
-    });
-  }
-}
-
-for (const themeId of ["light", "dark"] as ThemeId[]) {
   const section = createSection(`Panel Mode - ${themeId}`, "full / settings");
   const grid = document.createElement("div");
   grid.className = "demo-grid";
@@ -178,6 +160,24 @@ for (const themeId of ["light", "dark"] as ThemeId[]) {
       pagePath: config.pagePaths.settings,
       title: getConfigDisplayName(),
       sdk: createSdk(config.defaultSizeId || sizeConfigs[0]?.id || "1x1", themeId),
+    });
+  }
+}
+
+for (const themeId of ["light", "dark"] as ThemeId[]) {
+  const section = createSection(`Icon Mode - ${themeId}`, "所有 sizeConfigs");
+  const grid = document.createElement("div");
+  grid.className = "demo-grid";
+  section.append(grid);
+
+  for (const size of sizeConfigs) {
+    const sizeId = size.id || `${size.col}x${size.row}`;
+    const previewSize = getPreviewSize(size);
+    const frame = createPreview(grid, size.name || sizeId, previewSize.width, previewSize.height, themeId);
+    mountPreview(frame, {
+      mode: "icon",
+      title: getConfigDisplayName(),
+      sdk: createSdk(sizeId, themeId),
     });
   }
 }

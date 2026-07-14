@@ -15,7 +15,7 @@ const Clock = ({ mode = "icon", pagePath, title, sdk }: ClockProps) => {
   const isSettings = mode === "settings";
   const themeKey = themeId === "dark" ? "dark" : "light";
   const shellClassName = cn(
-    "tw:h-full tw:w-full tw:box-border tw:text-[var(--clock-fg)] tw:font-[-apple-system,BlinkMacSystemFont,SF_Pro_Text,Helvetica_Neue,system-ui,sans-serif] tw:tracking-[0] tw:antialiased tw:[container-type:size] tw:[&_*]:box-border",
+    "clock-root tw:h-full tw:w-full tw:box-border tw:text-[var(--clock-fg)] tw:font-[-apple-system,BlinkMacSystemFont,SF_Pro_Text,Helvetica_Neue,system-ui,sans-serif] tw:tracking-[0] tw:antialiased tw:[container-type:size] tw:[font-optical-sizing:auto] tw:[&_*]:box-border",
     isIcon
       ? "tw:flex tw:items-center tw:justify-center tw:overflow-hidden"
       : "tw:overflow-hidden tw:rounded-[18px] tw:bg-[var(--clock-app)]",

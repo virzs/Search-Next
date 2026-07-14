@@ -5,11 +5,11 @@
     "zh-CN": "时钟",
     "en-US": "Clock"
   },
-  "version": "0.1.2",
-  "description": "简洁实时时钟应用，支持世界时区切换",
+  "version": "0.2.0",
+  "description": "Apple 风格时钟应用，包含世界时钟、秒表和计时器",
   "descriptionI18n": {
-    "zh-CN": "简洁实时时钟应用，支持世界时区切换",
-    "en-US": "Clean real-time clock app with world time zone support"
+    "zh-CN": "Apple 风格时钟应用，包含世界时钟、秒表和计时器",
+    "en-US": "Apple-inspired clock app with world clock, stopwatch, and timer"
   },
   "author": "Search-Next",
   "entry": "index.js",
@@ -22,9 +22,7 @@
   "sizeConfigs": [
     { "row": 2, "col": 2, "name": "2x2", "id": "2x2" },
     { "row": 2, "col": 4, "name": "4x2", "id": "4x2" },
-    { "row": 2, "col": 3, "name": "3x2", "id": "3x2" },
-    { "row": 1, "col": 2, "name": "2x1", "id": "2x1" },
-    { "row": 1, "col": 1, "name": "1x1", "id": "1x1" }
+    { "row": 1, "col": 2, "name": "2x1", "id": "2x1" }
   ],
   "defaultSizeId": "2x2",
   "supportIconMode": true,

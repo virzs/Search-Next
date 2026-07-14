@@ -6,18 +6,18 @@ import { timezoneName } from "../time";
 import type { ClockSettings } from "../types";
 import type { AppLanguage, AppTranslationFn } from "../i18n";
 
-const frameClassName = "tw:grid tw:h-full tw:w-full tw:grid-cols-[220px_minmax(0,1fr)] tw:overflow-hidden tw:rounded-[inherit] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-app)] tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:grid-cols-[180px_minmax(0,1fr)] tw:[@container(max-width:700px)]:!grid-cols-1 tw:max-[760px]:!grid-cols-1";
-const sidebarClassName = "tw:flex tw:min-w-0 tw:flex-col tw:gap-[18px] tw:border-r tw:border-[var(--clock-divider)] tw:bg-[var(--clock-sidebar)] tw:px-4 tw:py-5 tw:[@container(max-width:860px)]:px-3.5 tw:[@container(max-width:860px)]:py-[18px] tw:[@container(max-width:700px)]:hidden tw:max-[760px]:hidden";
-const contentClassName = "tw:h-full tw:min-w-0 tw:overflow-auto tw:p-6 tw:[@container(max-width:860px)]:p-[18px] tw:[@container(max-width:700px)]:p-4 tw:max-[520px]:p-[18px]";
+const frameClassName = "tw:grid tw:h-full tw:w-full tw:grid-cols-[210px_minmax(0,1fr)] tw:overflow-hidden tw:rounded-[inherit] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-app)] tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:grid-cols-[180px_minmax(0,1fr)] tw:[@container(max-width:700px)]:!grid-cols-1";
+const sidebarClassName = "clock-material tw:flex tw:min-w-0 tw:flex-col tw:gap-[18px] tw:border-r tw:border-[var(--clock-divider)] tw:bg-[var(--clock-sidebar)] tw:px-4 tw:py-5 tw:[@container(max-width:860px)]:px-3.5 tw:[@container(max-width:860px)]:py-[18px] tw:[@container(max-width:700px)]:hidden";
+const contentClassName = "tw:h-full tw:min-w-0 tw:overflow-auto tw:p-7 tw:[@container(max-width:860px)]:p-5 tw:[@container(max-width:700px)]:p-4 tw:[@container(max-width:520px)]:p-3.5";
 const brandClassName = "tw:flex tw:min-w-0 tw:flex-col tw:gap-1";
 const brandLabelClassName = "tw:truncate tw:text-xs tw:font-[760] tw:text-[var(--clock-fg-3)]";
 const brandTitleClassName = "tw:text-[28px] tw:font-[780] tw:leading-none tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:text-2xl";
 const navClassName = "tw:flex tw:flex-col tw:gap-1.5";
 const navItemClassName = (active = false) => cn(
-  "tw:rounded-[10px] tw:px-3 tw:py-2.5 tw:text-[15px] tw:font-[720] tw:text-[var(--clock-fg-2)] tw:[@container(max-width:860px)]:px-2.5 tw:[@container(max-width:860px)]:py-[9px] tw:[@container(max-width:860px)]:text-sm",
-  active && "tw:bg-[rgba(255,159,10,0.18)] tw:text-[var(--clock-accent)]",
+  "tw:rounded-[10px] tw:px-3 tw:py-2.5 tw:text-[14px] tw:font-[620] tw:text-[var(--clock-fg-2)] tw:[@container(max-width:860px)]:px-2.5 tw:[@container(max-width:860px)]:py-[9px] tw:[@container(max-width:860px)]:text-sm",
+  active && "tw:bg-[var(--clock-accent)] tw:text-[var(--clock-active-fg)]",
 );
-const groupClassName = "tw:mb-3.5 tw:overflow-hidden tw:rounded-3xl tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card)] tw:shadow-[0_18px_36px_rgba(0,0,0,0.26)]";
+const groupClassName = "clock-material tw:mb-4 tw:overflow-hidden tw:rounded-[20px] tw:border tw:border-[var(--clock-border)] tw:bg-[var(--clock-card)] tw:shadow-[var(--clock-shadow-soft)]";
 const rowClassName = "tw:relative tw:flex tw:min-h-16 tw:items-center tw:justify-between tw:gap-[18px] tw:border-b tw:border-[var(--clock-divider)] tw:px-4 tw:py-3 tw:text-[var(--clock-fg)] tw:last:border-b-0 tw:[@container(max-width:520px)]:flex-col tw:[@container(max-width:520px)]:items-start tw:max-[520px]:flex-col tw:max-[520px]:items-start";
 const rowTextClassName = "tw:min-w-0";
 const rowTitleClassName = "tw:block tw:text-[15px] tw:font-[760] tw:text-[var(--clock-fg)]";
@@ -51,8 +51,8 @@ export function SettingsPage({ settings, saving, onSave, t }: { settings: ClockS
       </aside>
       <main className={contentClassName}>
         <header className="tw:mb-[18px]">
-          <h2 className="tw:m-0 tw:mt-1 tw:text-[34px] tw:font-[780] tw:leading-[1.08] tw:tracking-[0] tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:text-[30px] tw:[@container(max-width:700px)]:text-[28px] tw:max-[520px]:text-[28px]">{t("settings.title")}</h2>
-          <p className="tw:m-0 tw:mt-1.5 tw:text-sm tw:font-[650] tw:text-[var(--clock-fg-2)]">{t("settings.subtitle")}</p>
+          <h2 className="tw:m-0 tw:mt-1 tw:text-[36px] tw:font-[720] tw:leading-[1.08] tw:tracking-[-0.035em] tw:text-[var(--clock-fg)] tw:[@container(max-width:860px)]:text-[30px] tw:[@container(max-width:700px)]:text-[28px]">{t("settings.title")}</h2>
+          <p className="tw:m-0 tw:mt-1.5 tw:text-sm tw:font-[580] tw:text-[var(--clock-fg-2)]">{t("settings.subtitle")}</p>
         </header>
 
         <section className={groupClassName}>
@@ -111,7 +111,7 @@ export function SettingsPage({ settings, saving, onSave, t }: { settings: ClockS
           </div>
         </section>
 
-        <button className="tw:w-full tw:cursor-pointer tw:rounded-2xl tw:border-0 tw:bg-[var(--clock-accent)] tw:px-4 tw:py-[13px] tw:text-[15px] tw:font-[780] tw:text-[var(--clock-active-fg)] tw:disabled:cursor-wait tw:disabled:opacity-60" type="button" disabled={saving} onClick={() => onSave(draft)}>{saving ? t("action.saving") : t("action.save")}</button>
+        <button className="tw:w-full tw:cursor-pointer tw:rounded-[14px] tw:border-0 tw:bg-[var(--clock-accent)] tw:px-4 tw:py-[13px] tw:text-[15px] tw:font-[680] tw:text-[var(--clock-active-fg)] tw:shadow-[0_8px_24px_color-mix(in_srgb,var(--clock-accent)_24%,transparent)] tw:transition-transform tw:duration-150 tw:active:scale-[0.985] tw:disabled:cursor-wait tw:disabled:opacity-60" type="button" disabled={saving} onClick={() => onSave(draft)}>{saving ? t("action.saving") : t("action.save")}</button>
       </main>
     </div>
   );
