@@ -132,4 +132,21 @@ describe('PermissionService', () => {
       }),
     );
   });
+
+  it('queries only active permissions for role configuration', async () => {
+    const query = {
+      select: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue([]),
+    };
+    const model = {
+      find: jest.fn().mockReturnValue(query),
+    };
+    const treeService = new PermissionService(model as any);
+
+    await treeService.treeInfo({ activeOnly: true } as any);
+
+    expect(model.find).toHaveBeenCalledWith({ isStale: { $ne: true } });
+  });
 });

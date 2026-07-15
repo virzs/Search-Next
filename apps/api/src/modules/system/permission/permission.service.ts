@@ -43,11 +43,13 @@ export class PermissionService {
   async getTree(params?: TreeDto, parentId = null, level = 0) {
     const keyword = (params?.name || params?.search || '').trim();
     const isSimple = params?.simple === true || `${params?.simple}` === 'true';
+    const activeOnly =
+      params?.activeOnly === true || `${params?.activeOnly}` === 'true';
     const projection = isSimple
       ? '_id name parent type source isStale createdAt updatedAt'
       : '-__v -isDelete';
     const docs = (await this.permissionModel
-      .find({})
+      .find(activeOnly ? { isStale: { $ne: true } } : {})
       .select(projection)
       .sort({ createdAt: 1 })
       .lean()

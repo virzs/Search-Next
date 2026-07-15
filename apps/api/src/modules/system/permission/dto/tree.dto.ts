@@ -19,4 +19,9 @@ export class TreeDto {
   @IsOptional()
   @Expose()
   simple?: boolean;
+
+  @ApiProperty({ description: '是否只返回生效权限', required: false })
+  @IsOptional()
+  @Expose()
+  activeOnly?: boolean;
 }
