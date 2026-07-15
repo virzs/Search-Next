@@ -28,7 +28,6 @@
     "app:screenshots": "node scripts/capture-app-screenshots.mjs",
     "app:pack:clock": "node scripts/pack-app.mjs clock",
     "app:pack:todo": "node scripts/pack-app.mjs todo",
-    "migrate:widget-to-app": "node apps/api/scripts/migrate-widget-to-app.mjs",
     "build:apps": "pnpm --filter './apps/apps/*' build",
     "release": "node scripts/release.cjs release",
     "release:changes": "node scripts/release.cjs changes",

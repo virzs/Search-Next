@@ -1,8 +1,4 @@
-import {
-  isAppStorageKey,
-  listAppStorageKeys,
-  migrateAllLegacyAppStorage,
-} from "./app-storage";
+import { isAppStorageKey, listAppStorageKeys } from "./app-storage";
 
 /**
  * 本地存储桌面配置 key
@@ -49,24 +45,6 @@ export const DEV_MODE_STORAGE_KEY = "SEARCH_NEXT_DEV_MODE";
  */
 export const DEV_APPS_STORAGE_KEY = "SEARCH_NEXT_DEV_APPS";
 
-const LEGACY_INSTALLED_APPS_STORAGE_KEY = "SEARCH_NEXT_INSTALLED_WIDGETS";
-const LEGACY_DEV_APPS_STORAGE_KEY = "SEARCH_NEXT_DEV_WIDGETS";
-
-export const migrateLegacyAppKeys = (storage: Storage = localStorage) => {
-  const pairs: Array<[string, string]> = [
-    [LEGACY_INSTALLED_APPS_STORAGE_KEY, INSTALLED_APPS_STORAGE_KEY],
-    [LEGACY_DEV_APPS_STORAGE_KEY, DEV_APPS_STORAGE_KEY],
-  ];
-
-  for (const [oldKey, newKey] of pairs) {
-    const oldValue = storage.getItem(oldKey);
-    if (oldValue !== null && storage.getItem(newKey) === null) {
-      storage.setItem(newKey, oldValue);
-    }
-    if (oldValue !== null) storage.removeItem(oldKey);
-  }
-};
-
 /**
  * 界面语言设置
  */
@@ -112,11 +90,7 @@ export const isSearchNextBackupKey = (key: string) =>
 
 export const getSearchNextStorageKeys = (
   storage: Storage = localStorage,
-): string[] => {
-  migrateLegacyAppKeys(storage);
-  migrateAllLegacyAppStorage(storage);
-  return [...SEARCH_NEXT_STORAGE_KEYS, ...listAppStorageKeys(storage)];
-};
+): string[] => [...SEARCH_NEXT_STORAGE_KEYS, ...listAppStorageKeys(storage)];
 
 export const SEARCH_NEXT_BACKUP_FILE_MAGIC = "SEARCH_NEXT_BACKUP_V1";
 
@@ -244,21 +218,6 @@ export const applySearchNextStorageBackup = (
   storage: Storage = localStorage,
   options?: { mode?: "strict" | "merge" },
 ) => {
-  migrateLegacyAppKeys(storage);
-  migrateAllLegacyAppStorage(storage);
-  if (
-    backup.items[LEGACY_INSTALLED_APPS_STORAGE_KEY] !== undefined &&
-    backup.items[INSTALLED_APPS_STORAGE_KEY] === undefined
-  ) {
-    backup.items[INSTALLED_APPS_STORAGE_KEY] =
-      backup.items[LEGACY_INSTALLED_APPS_STORAGE_KEY];
-  }
-  if (
-    backup.items[LEGACY_DEV_APPS_STORAGE_KEY] !== undefined &&
-    backup.items[DEV_APPS_STORAGE_KEY] === undefined
-  ) {
-    backup.items[DEV_APPS_STORAGE_KEY] = backup.items[LEGACY_DEV_APPS_STORAGE_KEY];
-  }
   const backupAppKeys = Object.keys(backup.items).filter(isAppStorageKey);
   const keys = [
     ...SEARCH_NEXT_STORAGE_KEYS,

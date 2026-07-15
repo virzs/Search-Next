@@ -19,11 +19,7 @@ import {
   resolveAppDisplayName,
   resolveAppTags,
 } from "@/i18n";
-import {
-  DEV_MODE_STORAGE_KEY,
-  DEV_APPS_STORAGE_KEY,
-  migrateLegacyAppKeys,
-} from "@/utils/storage";
+import { DEV_MODE_STORAGE_KEY, DEV_APPS_STORAGE_KEY } from "@/utils/storage";
 import { toBackendAssetUrl } from "@/utils/utils";
 
 /** 开发者自定义应用（不经过后端，直接提供 ESM 入口地址） */
@@ -105,7 +101,6 @@ const loadDevMode = (): boolean => {
 
 const loadDevApps = (): DevApp[] => {
   try {
-    migrateLegacyAppKeys();
     const raw = localStorage.getItem(DEV_APPS_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);

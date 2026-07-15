@@ -67,7 +67,6 @@ const appProjects = {
 const normalizeProjectName = (value) => {
   const input = String(value || "all").trim() || "all";
   return input
-    .replace(/^apps\//, "")
     .replace(/^apps\//, "app:")
     .replace(/^search-next-/, "")
     .replace(/-app$/, "");
@@ -163,8 +162,38 @@ const resolveReleaseProject = (root = process.cwd(), value = process.env.RELEASE
   throw new Error(`Unknown release project "${value}". Available projects: ${available.join(", ")}`);
 };
 
+const resolveReleaseTag = (root = process.cwd(), value = process.env.RELEASE_TAG || "") => {
+  const tag = String(value || "").trim();
+  let projectInput;
+  let version;
+
+  const completeMatch = tag.match(/^v(.+)$/);
+  const projectMatch = tag.match(/^(.+)-v(.+)$/);
+
+  if (completeMatch) {
+    projectInput = "all";
+    version = completeMatch[1];
+  } else if (projectMatch) {
+    projectInput = projectMatch[1];
+    version = projectMatch[2];
+  } else {
+    throw new Error(`Unsupported release tag "${tag}". Expected v<version> or <project>-v<version>.`);
+  }
+
+  const project = resolveReleaseProject(root, projectInput);
+  return {
+    tag,
+    project,
+    version,
+    releaseName: project.releaseName.replace("${version}", version),
+    tagMatch: completeMatch ? "v*" : `${projectInput}-v*`,
+  };
+};
+
 module.exports = {
   appProjects,
   listAppNames,
+  normalizeProjectName,
   resolveReleaseProject,
+  resolveReleaseTag,
 };

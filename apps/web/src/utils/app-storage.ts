@@ -1,8 +1,5 @@
 export const APP_STORAGE_KEY_PREFIX = "SEARCH_NEXT_APP_STORAGE:";
 
-const LEGACY_APP_STORAGE_KEY_PREFIX = "SEARCH_NEXT_WIDGET_STORAGE:";
-const LEGACY_INLINE_APP_STORAGE_PREFIXES = ["widget:", "app:"];
-
 export const getAppStorageKey = (appId: string) =>
   `${APP_STORAGE_KEY_PREFIX}${appId}`;
 
@@ -42,75 +39,7 @@ const writeAppStorageMap = (
 
 const getUtf8ByteSize = (value: string) => new TextEncoder().encode(value).length;
 
-export const migrateLegacyAppStorage = (
-  appId: string,
-  storage: Storage = localStorage,
-) => {
-  const legacyKeys: string[] = [];
-  for (let index = 0; index < storage.length; index += 1) {
-    const key = storage.key(index);
-    if (
-      key &&
-      LEGACY_INLINE_APP_STORAGE_PREFIXES.some((prefix) =>
-        key.startsWith(`${prefix}${appId}:`),
-      )
-    ) {
-      legacyKeys.push(key);
-    }
-  }
-
-  const oldMapKey = `${LEGACY_APP_STORAGE_KEY_PREFIX}${appId}`;
-  const hasOldMap = storage.getItem(oldMapKey) !== null;
-
-  if (!legacyKeys.length && !hasOldMap) return;
-
-  const values = {
-    ...safeParseMap(storage.getItem(oldMapKey)),
-    ...safeParseMap(storage.getItem(getAppStorageKey(appId))),
-  };
-  for (const key of legacyKeys) {
-    const matchedPrefix = LEGACY_INLINE_APP_STORAGE_PREFIXES.find((prefix) =>
-      key.startsWith(`${prefix}${appId}:`),
-    );
-    if (!matchedPrefix) continue;
-    const fieldKey = key.slice(`${matchedPrefix}${appId}:`.length);
-    if (!fieldKey) continue;
-    const value = storage.getItem(key);
-    if (value !== null) values[fieldKey] = value;
-  }
-
-  writeAppStorageMap(appId, values, storage);
-  storage.removeItem(oldMapKey);
-  legacyKeys.forEach((key) => storage.removeItem(key));
-};
-
-export const migrateAllLegacyAppStorage = (
-  storage: Storage = localStorage,
-) => {
-  const appIds = new Set<string>();
-  for (let index = 0; index < storage.length; index += 1) {
-    const key = storage.key(index);
-    if (!key) continue;
-    if (key.startsWith(LEGACY_APP_STORAGE_KEY_PREFIX)) {
-      const appId = key.slice(LEGACY_APP_STORAGE_KEY_PREFIX.length);
-      if (appId) appIds.add(appId);
-      continue;
-    }
-    const matchedPrefix = LEGACY_INLINE_APP_STORAGE_PREFIXES.find((prefix) =>
-      key.startsWith(prefix),
-    );
-    if (!matchedPrefix) continue;
-    const rest = key.slice(matchedPrefix.length);
-    const separatorIndex = rest.indexOf(":");
-    if (separatorIndex > 0) appIds.add(rest.slice(0, separatorIndex));
-  }
-
-  appIds.forEach((appId) => migrateLegacyAppStorage(appId, storage));
-};
-
 export const listAppStorageKeys = (storage: Storage = localStorage) => {
-  migrateAllLegacyAppStorage(storage);
-
   const keys: string[] = [];
   for (let index = 0; index < storage.length; index += 1) {
     const key = storage.key(index);
@@ -122,10 +51,7 @@ export const listAppStorageKeys = (storage: Storage = localStorage) => {
 export const readAppStorageMap = (
   appId: string,
   storage: Storage = localStorage,
-) => {
-  migrateLegacyAppStorage(appId, storage);
-  return safeParseMap(storage.getItem(getAppStorageKey(appId)));
-};
+) => safeParseMap(storage.getItem(getAppStorageKey(appId)));
 
 export const getAppStorageStats = (
   appId: string,
@@ -156,7 +82,6 @@ export const clearAppStorage = (
   appId: string,
   storage: Storage = localStorage,
 ) => {
-  migrateLegacyAppStorage(appId, storage);
   const values = readAppStorageMap(appId, storage);
   storage.removeItem(getAppStorageKey(appId));
   return Object.keys(values);
