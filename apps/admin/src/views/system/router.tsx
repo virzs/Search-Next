@@ -12,6 +12,7 @@ import Notice from "./notice";
 import NoticeHandle from "./notice/handle";
 import NoticeDetail from "./notice/detail";
 import { RiSettings3Line } from "@remixicon/react";
+import { routeAuth } from "@/contexts/AccessContext";
 
 export const SystemPaths = {
   index: "/system",
@@ -99,6 +100,7 @@ export const SystemMenu: Menu = {
     {
       name: "角色",
       path: SystemPaths.role,
+      auth: routeAuth("GET", "/system/role"),
       hideChildrenInMenu: true,
       children: [
         {
@@ -118,10 +120,12 @@ export const SystemMenu: Menu = {
     {
       name: "权限",
       path: SystemPaths.permission,
+      auth: routeAuth("GET", "/system/permission/tree"),
     },
     {
       name: "版本",
       path: SystemPaths.version,
+      auth: routeAuth("GET", "/system/version"),
       hideChildrenInMenu: true,
       children: [
         {
@@ -141,6 +145,7 @@ export const SystemMenu: Menu = {
     {
       name: "通知",
       path: SystemPaths.notice,
+      auth: routeAuth("GET", "/system/notice"),
       hideChildrenInMenu: true,
       children: [
         {
@@ -160,6 +165,7 @@ export const SystemMenu: Menu = {
     {
       name: "设置",
       path: SystemPaths.setting,
+      auth: routeAuth("GET", "/system/project"),
     },
   ],
 };

@@ -8,6 +8,7 @@ import { message, Image, App } from "antd";
 import { useState } from "react";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import ClassifyHandle from "./handle";
+import { routeAuth } from "@/contexts/AccessContext";
 
 const AppClassify = () => {
   const { modal } = App.useApp();
@@ -73,6 +74,7 @@ const AppClassify = () => {
           columns={[
             {
               title: record.enable ? "禁用" : "启用",
+              auth: routeAuth("PUT", "/tabs/app-classify/:id/enable"),
               onClick: async () => {
                 await updateEnableRun(record._id);
               },
@@ -83,6 +85,7 @@ const AppClassify = () => {
             },
             {
               title: "修改",
+              auth: routeAuth("PUT", "/tabs/app-classify/:id"),
               onClick: () => {
                 setOpen(true);
                 setEditId(record._id);
@@ -90,6 +93,7 @@ const AppClassify = () => {
             },
             {
               title: "删除",
+              auth: routeAuth("DELETE", "/tabs/app-classify/:id"),
               danger: true,
               onClick: () => {
                 modal.confirm({
@@ -115,6 +119,7 @@ const AppClassify = () => {
         pagination={false}
         button={
           <ClassifyHandle
+            auth={routeAuth("POST", "/tabs/app-classify")}
             open={open}
             editId={editId}
             onFinished={() => {

@@ -10,6 +10,7 @@ import { Theme } from "./hooks/useTheme";
 import { Tree, ProFormUpload, ProFormUserSearchSelect } from "./components/pro-form";
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 import MEditor from "./components/pro-form/fields/editor/editor";
+import { AccessProvider } from "./contexts/AccessContext";
 
 const Root = () => {
   const { theme, appId } = useLayout();
@@ -76,7 +77,9 @@ const Root = () => {
               },
             }}
           >
-            <RouterProvider router={router} />
+            <AccessProvider>
+              <RouterProvider router={router} />
+            </AccessProvider>
           </ProConfigProvider>
         </AntdApp>
       </ConfigProvider>

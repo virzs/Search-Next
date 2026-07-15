@@ -2,6 +2,8 @@ import { App, Button, Modal, Space, Table, Tag, Typography } from "antd";
 import { FC, useEffect, useMemo } from "react";
 import { useRequest } from "ahooks";
 import { getAppVersions, publishAppVersion, AppVersionItem } from "@/services/tabs/app";
+import Access from "@/components/Access";
+import { APP_PERMISSIONS } from "./permissions";
 
 const { Text } = Typography;
 
@@ -74,14 +76,16 @@ const AppVersionModal: FC<AppVersionModalProps> = ({
             title: "操作",
             width: 120,
             render: (_, record) => (
-              <Button
-                type="link"
-                disabled={record.active}
-                loading={publishLoading}
-                onClick={() => appId && publishRun(appId, record._id)}
-              >
-                发布
-              </Button>
+              <Access auth={APP_PERMISSIONS.publishVersion}>
+                <Button
+                  type="link"
+                  disabled={record.active}
+                  loading={publishLoading}
+                  onClick={() => appId && publishRun(appId, record._id)}
+                >
+                  发布
+                </Button>
+              </Access>
             ),
           },
         ]}

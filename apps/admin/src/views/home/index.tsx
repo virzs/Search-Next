@@ -1,14 +1,14 @@
-import { useNavigate } from "react-router";
-import { getToken } from "../../utils/token";
+import FullPageContainer from "@/components/containter/full";
+import { SmileOutlined } from "@ant-design/icons";
+import { notification, Result } from "antd";
 import { useEffect } from "react";
-import { notification } from "antd";
-import { AuthPaths } from "../auth/router";
-import { getUserInfo } from "../../utils/userInfo";
+import { useNavigate } from "react-router";
 import { isTauri } from "@/utils/utils";
+import { getToken } from "../../utils/token";
+import { AuthPaths } from "../auth/router";
 
 const HomeView = () => {
   const navigate = useNavigate();
-  const userInfo = getUserInfo();
 
   const checkIsLogin = () => {
     const token = getToken();
@@ -25,7 +25,22 @@ const HomeView = () => {
     checkIsLogin();
   }, []);
 
-  return <div>{JSON.stringify(userInfo)}</div>;
+  return (
+    <FullPageContainer
+      showBackButton={false}
+      cardProps={{
+        bodyStyle: { padding: 0 },
+      }}
+    >
+      <div className="flex h-full min-h-[420px] items-center justify-center px-6 text-center">
+        <Result
+          icon={<SmileOutlined style={{ color: "var(--ant-color-primary)" }} />}
+          title="欢迎回来"
+          subTitle="请从左侧菜单选择功能开始。"
+        />
+      </div>
+    </FullPageContainer>
+  );
 };
 
 export default HomeView;

@@ -2,6 +2,7 @@ import { RouteObject } from "react-router";
 import { Menu } from "@/utils/menu";
 import { UserOutlined } from "@ant-design/icons";
 import User from "./all";
+import { routeAuth } from "@/contexts/AccessContext";
 
 export const UserPaths = {
   index: "/user",
@@ -27,6 +28,7 @@ export const UserMenu: Menu = {
     {
       name: "全部用户",
       path: UserPaths.all,
+      auth: routeAuth("GET", "/users"),
     },
     {
       name: "个人中心",

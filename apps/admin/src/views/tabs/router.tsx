@@ -26,6 +26,8 @@ import AppCollectionHandle from "./app/collection/handle";
 import WebsiteCollection from "./website/collection";
 import WebsiteCollectionHandle from "./website/collection/handle";
 import WebsiteCollectionDetail from "./website/collection/detail";
+import { routeAuth } from "@/contexts/AccessContext";
+import { APP_PERMISSIONS } from "./app/permissions";
 
 export const TabsPaths = {
   index: "/tabs",
@@ -214,6 +216,7 @@ export const TabsMenu: Menu = {
     {
       name: "搜索引擎",
       path: TabsPaths.searchEngine,
+      auth: routeAuth("GET", "/tabs/search-engine"),
       hideChildrenInMenu: true,
       children: [
         {
@@ -232,14 +235,17 @@ export const TabsMenu: Menu = {
         {
           name: "分类",
           path: TabsPaths.websiteClassify,
+          auth: routeAuth("GET", "/tabs/website_classify"),
         },
         {
           name: "标签",
           path: TabsPaths.websiteTag,
+          auth: routeAuth("GET", "/tabs/website_tag"),
         },
         {
           name: "合集",
           path: TabsPaths.websiteCollection,
+          auth: routeAuth("GET", "/tabs/website_collection"),
           hideChildrenInMenu: true,
           children: [
             {
@@ -259,6 +265,7 @@ export const TabsMenu: Menu = {
         {
           name: "网站",
           path: TabsPaths.website,
+          auth: routeAuth("GET", "/tabs/website"),
         },
       ],
     },
@@ -268,10 +275,12 @@ export const TabsMenu: Menu = {
         {
           name: "应用分类",
           path: TabsPaths.appClassify,
+          auth: routeAuth("GET", "/tabs/app-classify"),
         },
         {
           name: "应用合集",
           path: TabsPaths.appCollection,
+          auth: routeAuth("GET", "/tabs/app-collection"),
           hideChildrenInMenu: true,
           children: [
             {
@@ -287,15 +296,18 @@ export const TabsMenu: Menu = {
         {
           name: "应用管理",
           path: TabsPaths.app,
+          auth: APP_PERMISSIONS.list,
           hideChildrenInMenu: true,
           children: [
             {
               name: "新增",
               path: TabsPaths.appHandle,
+              auth: APP_PERMISSIONS.create,
             },
             {
               name: "编辑",
               path: TabsPaths.appHandle + "/:id",
+              auth: APP_PERMISSIONS.update,
             },
           ],
         },
@@ -307,10 +319,12 @@ export const TabsMenu: Menu = {
         {
           name: "分类",
           path: TabsPaths.wallpaperCategory,
+          auth: routeAuth("GET", "/tabs/desktop/wallpaper/category"),
         },
         {
           name: "壁纸",
           path: TabsPaths.wallpaperUpload,
+          auth: routeAuth("GET", "/tabs/desktop/wallpaper/upload"),
           hideChildrenInMenu: true,
           children: [
             {
@@ -334,25 +348,33 @@ export const TabsMenu: Menu = {
         {
           name: "用户限制",
           path: TabsPaths.desktopUserLimit,
+          auth: routeAuth("GET", "/tabs/desktop/user-limit"),
           hideChildrenInMenu: true,
         },
         {
           name: "云同步",
           path: TabsPaths.desktopUserDataSync,
+          auth: routeAuth("GET", "/tabs/user-data/sync/admin"),
           hideChildrenInMenu: true,
         },
         {
           name: "主题配置",
           path: TabsPaths.desktopThemeConfigCategory,
+          auth: [
+            routeAuth("GET", "/tabs/desktop/theme-config-category"),
+            routeAuth("GET", "/tabs/desktop/theme-config"),
+          ],
           hideChildrenInMenu: true,
           children: [
             {
               name: "主题分类",
               path: TabsPaths.desktopThemeConfigCategory,
+              auth: routeAuth("GET", "/tabs/desktop/theme-config-category"),
             },
             {
               name: "主题配置",
               path: TabsPaths.desktopThemeConfigTheme,
+              auth: routeAuth("GET", "/tabs/desktop/theme-config"),
             },
             {
               name: "新增",
@@ -369,6 +391,7 @@ export const TabsMenu: Menu = {
         {
           name: "桌面配置",
           path: TabsPaths.desktopConfig,
+          auth: routeAuth("GET", "/tabs/desktop/config/admin"),
           hideChildrenInMenu: true,
           children: [
             {

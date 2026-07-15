@@ -13,6 +13,10 @@ export const postRefreshToken = (data: RefreshTokenRequestData) =>
 export const postLogin = (data: LoginRequest): Promise<LoginResponse> =>
   basePostRequest("/auth/login")(data);
 
+// /auth/admin/login post
+export const postAdminLogin = (data: LoginRequest): Promise<LoginResponse> =>
+  basePostRequest("/auth/admin/login")(data);
+
 // /auth/register post
 export const postRegister = (data: RegisterRequest): Promise<LoginResponse> =>
   basePostRequest("/auth/register")(data);

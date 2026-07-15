@@ -19,6 +19,8 @@ import { FC, useEffect, useRef, useState } from "react";
 import { getDominantColor } from "@/utils/color";
 import ParseResultModal from "./components/ParseResultModal";
 import IconEditorModal from "./components/IconEditorModal";
+import Access from "@/components/Access";
+import { routeAuth } from "@/contexts/AccessContext";
 
 export interface HandleModalProps {
   onFinished?: (values: any) => void;
@@ -259,15 +261,17 @@ const WebsiteHandle: FC<HandleModalProps> = (props) => {
                 const url = form.getFieldValue("url");
                 const isUrl = reg.test(url);
                 return (
-                  <Button
-                    disabled={!isUrl}
-                    loading={parseLoading}
-                    onClick={() => {
-                      parseRun({ url });
-                    }}
-                  >
-                    解析URL
-                  </Button>
+                  <Access auth={routeAuth("POST", "/tabs/website/parse")}>
+                    <Button
+                      disabled={!isUrl}
+                      loading={parseLoading}
+                      onClick={() => {
+                        parseRun({ url });
+                      }}
+                    >
+                      解析URL
+                    </Button>
+                  </Access>
                 );
               }}
             </ProForm.Item>

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { HomePaths } from "../home/router";
-import { postLogin } from "../../services/auth";
+import { postAdminLogin } from "../../services/auth";
 import { setRefreshToken, setToken } from "../../utils/token";
 import { setUserInfo } from "../../utils/userInfo";
 import { LoginForm, ProFormText } from "@ant-design/pro-components";
@@ -12,9 +12,11 @@ import { Alert, Image, Space, Spin, message } from "antd";
 import { AuthPaths } from "./router";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 import { useCallback, useState } from "react";
+import { useAccess } from "@/contexts/AccessContext";
 
 const LoginView = () => {
   const navigate = useNavigate();
+  const { setAccessUser } = useAccess();
 
   const { data, loading } = useRequest(getPublicProject);
   useRequest(getSetupStatus, {
@@ -71,13 +73,14 @@ const LoginView = () => {
                   return;
                 }
 
-                postLogin({
+                postAdminLogin({
                   ...values,
                   ...(turnstileEnabled ? { turnstileToken } : {}),
                 })
                   .then((res) => {
                     const { access_token, refresh_token, ...rest } = res;
                     setUserInfo(rest);
+                    setAccessUser(rest);
                     setToken(access_token);
                     setRefreshToken(refresh_token);
                     navigate(HomePaths.home);

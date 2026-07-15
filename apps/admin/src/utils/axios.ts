@@ -26,6 +26,11 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
+const replaceAppPath = (path: string) => {
+  window.history.replaceState(null, "", path);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+};
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -59,6 +64,16 @@ axiosInstance.interceptors.response.use(
         message: 400,
         description: errMsg,
       });
+    }
+    if (error.response.status === 403) {
+      const errMsg = error.response.data.message ?? "没有权限";
+      notification.error({
+        message: 403,
+        description: errMsg,
+      });
+      if (!error.config?.url?.includes("/auth/admin/login")) {
+        replaceAppPath("/403");
+      }
     }
     if (error.response.status === 500 && error.config.url.includes("/auth/refresh-token")) {
       history.replace("/login");

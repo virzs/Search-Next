@@ -10,6 +10,7 @@ import {
   TooltipProps,
 } from "antd";
 import { FC } from "react";
+import { useHasPermission, type PermissionAuth } from "@/contexts/AccessContext";
 
 const { useModal } = Modal;
 
@@ -20,16 +21,21 @@ export interface OperationButtonProps extends ButtonProps {
   show?: boolean;
   title?: string;
   // 权限控制，Operation 处控制，此处声明参数实际无用
-  auth?: boolean | string | string[];
+  auth?: PermissionAuth;
   // confirm 提示 delete or ModalFuncProps
   confirm?: "delete" | ModalFuncProps;
 }
 
 const OperationButton: FC<OperationButtonProps> = (props) => {
-  const { tooltip, dropdown, children, title, onClick, confirm, ...rest } =
+  const { tooltip, dropdown, children, title, onClick, confirm, auth, ...rest } =
     props;
 
   const [modal, contextHolder] = useModal();
+  const canAccess = useHasPermission(auth);
+
+  if (!canAccess) {
+    return null;
+  }
 
   const b = (
     <Button

@@ -18,6 +18,15 @@ import FullPageContainer from "@/components/containter/full";
 import TablePage from "@/components/TablePage2";
 import { useTablePage } from "@/hooks/useTablePage2";
 import { WindowTableColumnType } from "@/components/WindowTable";
+import { routeAuth, useHasPermission } from "@/contexts/AccessContext";
+
+const INVITATION_PERMISSIONS = {
+  list: routeAuth("GET", "/users/invitation-code"),
+  invitedUsers: routeAuth("GET", "/users/invitation-code/invited-users"),
+  create: routeAuth("POST", "/users/invitation-code"),
+  delete: routeAuth("DELETE", "/users/invitation-code/:id"),
+  forbidden: routeAuth("PUT", "/users/invitation-code/forbidden/:id"),
+} as const;
 
 interface InvitationCodeRole {
   _id?: string;
@@ -47,9 +56,13 @@ const UserCenter = () => {
   const { token } = theme.useToken();
 
   const { message } = App.useApp();
+  const canViewInvitationCodes = useHasPermission(INVITATION_PERMISSIONS.list);
+  const canViewInvitedUsers = useHasPermission(INVITATION_PERMISSIONS.invitedUsers);
+  const canCreateInvitationCode = useHasPermission(INVITATION_PERMISSIONS.create);
 
   const table = useTablePage<InvitationCodeRecord>(getInvitationCode, {
     pathname: "/user/center/invitation-code",
+    ready: canViewInvitationCodes,
   });
   const { refresh, data: invitationCodes } = table;
 
@@ -79,6 +92,7 @@ const UserCenter = () => {
     {
       pathname: "/user/center/invited-users",
       defaultParams: { page: 1, pageSize: 10 },
+      ready: canViewInvitedUsers,
     }
   );
 
@@ -89,7 +103,9 @@ const UserCenter = () => {
     onSuccess: () => {
       message.success("删除成功");
       refresh();
-      refreshInvitedUsers();
+      if (canViewInvitedUsers) {
+        refreshInvitedUsers();
+      }
     },
   });
 
@@ -166,6 +182,7 @@ const UserCenter = () => {
             },
             {
               show: record.status !== 2,
+              auth: INVITATION_PERMISSIONS.forbidden,
               onClick: () => forbidden(record._id),
               title: "禁用",
               loading: forbiddenLoading,
@@ -176,6 +193,7 @@ const UserCenter = () => {
               },
             },
             {
+              auth: INVITATION_PERMISSIONS.delete,
               onClick: () => deleteCode(record._id),
               title: "删除",
               loading: deleteLoading,
@@ -226,73 +244,85 @@ const UserCenter = () => {
               </Space>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-3">
-            <Card size="small" style={{ background: token.colorFillQuaternary }}>
-              <Typography.Text type="secondary">邀请码总数</Typography.Text>
-              <Typography.Title level={3} style={{ margin: 0 }}>
-                {invitationStats.total}
-              </Typography.Title>
-            </Card>
-            <Card size="small" style={{ background: token.colorInfoBg }}>
-              <Typography.Text type="secondary">生效中</Typography.Text>
-              <Typography.Title level={3} style={{ margin: 0, color: token.colorInfoText }}>
-                {invitationStats.active}
-              </Typography.Title>
-            </Card>
-            <Card size="small" style={{ background: token.colorSuccessBg }}>
-              <Typography.Text type="secondary">累计邀请</Typography.Text>
-              <Typography.Title level={3} style={{ margin: 0, color: token.colorSuccessText }}>
-                {invitationStats.used}
-              </Typography.Title>
-            </Card>
-          </div>
+          {canViewInvitationCodes ? (
+            <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-3">
+              <Card size="small" style={{ background: token.colorFillQuaternary }}>
+                <Typography.Text type="secondary">邀请码总数</Typography.Text>
+                <Typography.Title level={3} style={{ margin: 0 }}>
+                  {invitationStats.total}
+                </Typography.Title>
+              </Card>
+              <Card size="small" style={{ background: token.colorInfoBg }}>
+                <Typography.Text type="secondary">生效中</Typography.Text>
+                <Typography.Title level={3} style={{ margin: 0, color: token.colorInfoText }}>
+                  {invitationStats.active}
+                </Typography.Title>
+              </Card>
+              <Card size="small" style={{ background: token.colorSuccessBg }}>
+                <Typography.Text type="secondary">累计邀请</Typography.Text>
+                <Typography.Title level={3} style={{ margin: 0, color: token.colorSuccessText }}>
+                  {invitationStats.used}
+                </Typography.Title>
+              </Card>
+            </div>
+          ) : null}
         </Card>
 
-        <Card
-          title="我的邀请码"
-          extra={
-            <Button type="primary" icon={<LinkOutlined />} onClick={() => setOpen(true)}>
-              创建邀请码
-            </Button>
-          }
-          styles={{ body: { padding: 0 } }}
-          style={{ borderRadius: token.borderRadiusLG, boxShadow: token.boxShadowTertiary }}
-        >
-          <div className="w-full h-96">
-            <TablePage
-              table={table}
-              pagination={false}
-              columns={columns}
-              cardProps={{ ghost: true }}
-            />
-          </div>
-        </Card>
+        {canViewInvitationCodes ? (
+          <Card
+            title="我的邀请码"
+            extra={
+              canCreateInvitationCode ? (
+                <Button type="primary" icon={<LinkOutlined />} onClick={() => setOpen(true)}>
+                  创建邀请码
+                </Button>
+              ) : null
+            }
+            styles={{ body: { padding: 0 } }}
+            style={{ borderRadius: token.borderRadiusLG, boxShadow: token.boxShadowTertiary }}
+          >
+            <div className="w-full h-96">
+              <TablePage
+                table={table}
+                pagination={false}
+                columns={columns}
+                cardProps={{ ghost: true }}
+              />
+            </div>
+          </Card>
+        ) : null}
 
-        <Card
-          title="邀请用户"
-          styles={{ body: { padding: 0 } }}
-          style={{ borderRadius: token.borderRadiusLG, boxShadow: token.boxShadowTertiary }}
-        >
-          <div className="w-full h-80">
-            <TablePage
-              table={invitedUsersTable}
-              pagination={false}
-              columns={invitedUserColumns}
-              cardProps={{ ghost: true }}
-              showSearch={false}
-            />
-          </div>
-        </Card>
+        {canViewInvitedUsers ? (
+          <Card
+            title="邀请用户"
+            styles={{ body: { padding: 0 } }}
+            style={{ borderRadius: token.borderRadiusLG, boxShadow: token.boxShadowTertiary }}
+          >
+            <div className="w-full h-80">
+              <TablePage
+                table={invitedUsersTable}
+                pagination={false}
+                columns={invitedUserColumns}
+                cardProps={{ ghost: true }}
+                showSearch={false}
+              />
+            </div>
+          </Card>
+        ) : null}
       </Flex>
-      <HandleCode
-        open={open}
-        onCancel={() => setOpen(false)}
-        onOk={() => {
-          setOpen(false);
-          refresh();
-          refreshInvitedUsers();
-        }}
-      />
+      {canViewInvitationCodes && canCreateInvitationCode ? (
+        <HandleCode
+          open={open}
+          onCancel={() => setOpen(false)}
+          onOk={() => {
+            setOpen(false);
+            refresh();
+            if (canViewInvitedUsers) {
+              refreshInvitedUsers();
+            }
+          }}
+        />
+      ) : null}
     </FullPageContainer>
   );
 };

@@ -9,6 +9,7 @@ import ConsumerKeys from "./consumer-keys";
 import RequestLogs from "./request-logs";
 import Balances from "./balances";
 import ProvidersHandle from "./providers/handle";
+import { routeAuth } from "@/contexts/AccessContext";
 
 export const AIPaths = {
   index: "/ai",
@@ -73,34 +74,41 @@ export const AIMenu: Menu = {
       name: "服务商管理",
       path: AIPaths.providers,
       icon: <RiServerLine size={16} />,
+      auth: routeAuth("GET", "/ai/providers"),
     },
     {
       name: "模型管理",
       path: AIPaths.models,
       icon: <RiRobot2Line size={16} />,
+      auth: routeAuth("GET", "/ai/models"),
     },
     {
       name: "API Key管理",
       path: AIPaths.consumerKeys,
       icon: <RiKey2Line size={16} />,
+      auth: routeAuth("GET", "/ai/consumer-keys"),
     },
     {
       name: "调用日志",
       path: AIPaths.requestLogs,
       icon: <RiListCheck2 size={16} />,
+      auth: routeAuth("GET", "/ai/request-logs"),
     },
     {
       name: "余额管理",
       path: AIPaths.balances,
       icon: <RiCoinsLine size={16} />,
+      auth: routeAuth("GET", "/ai/balances"),
     },
     {
       name: "模型预设",
       path: AIPaths.preset,
+      auth: routeAuth("GET", "/ai/preset"),
     },
     {
       name: "模型测试",
       path: AIPaths.playground,
+      auth: routeAuth("POST", "/ai/playground"),
     },
   ],
 };

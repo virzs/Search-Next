@@ -24,6 +24,9 @@ export interface ProjectData {
     siteKey?: string;
     secretKey?: string;
   };
+  adminAccess?: {
+    loginRoleIds?: string[];
+  };
 }
 
 // detail

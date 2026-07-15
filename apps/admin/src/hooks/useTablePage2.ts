@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { shallowEqual } from "react-redux";
 import { useLocation } from "react-router";
 import { useAppDispatch, useAppSelector } from "./useApp";
+import { isEqual } from "lodash";
 
 export interface TabelRequestParams {
   page?: number;
@@ -181,8 +182,10 @@ export function useTablePage<RecordType = any>(
   }, [params]);
 
   useEffect(() => {
-    setParamsStore(mergedParams);
-  }, [mergedParams]);
+    if (!isEqual(paramsStore ?? {}, mergedParams)) {
+      setParamsStore(mergedParams);
+    }
+  }, [mergedParams, paramsStore]);
 
   useEffect(() => {
     if (refreshOption) {

@@ -29,6 +29,8 @@ import { RiAddLine, RiUploadCloud2Line } from "@remixicon/react";
 import { TabsPaths } from "../router";
 import { type ReactNode, useMemo, useState } from "react";
 import AppVersionModal from "./version-modal";
+import Access from "@/components/Access";
+import { APP_PERMISSIONS } from "./permissions";
 
 const { Dragger } = Upload;
 
@@ -361,14 +363,17 @@ const AppIndex = () => {
           columns={[
             {
               title: "修改",
+              auth: APP_PERMISSIONS.update,
               onClick: () => navigate(TabsPaths.appHandle + "/" + record._id),
             },
             {
               title: "版本",
+              auth: APP_PERMISSIONS.versions,
               onClick: () => setVersionTarget(record),
             },
             {
               title: record.enable ? "禁用" : "启用",
+              auth: APP_PERMISSIONS.toggleEnable,
               confirm: record.enable ? { title: "确认禁用?", content: "禁用后前台将不再展示该应用" } : undefined,
               onClick: async () => {
                 await updateEnableRun(record._id);
@@ -376,6 +381,7 @@ const AppIndex = () => {
             },
             {
               title: "删除",
+              auth: APP_PERMISSIONS.delete,
               confirm: "delete",
               onClick: async () => {
                 await delRun(record._id);
@@ -394,12 +400,16 @@ const AppIndex = () => {
         columns={columns}
         button={
           <Space>
-            <Button icon={<RiUploadCloud2Line size={16} />} onClick={() => setBatchUploadOpen(true)}>
-              批量上传
-            </Button>
-            <Button type="primary" icon={<RiAddLine size={16} />} onClick={() => navigate(TabsPaths.appHandle)}>
-              新增
-            </Button>
+            <Access auth={APP_PERMISSIONS.importPackage}>
+              <Button icon={<RiUploadCloud2Line size={16} />} onClick={() => setBatchUploadOpen(true)}>
+                批量上传
+              </Button>
+            </Access>
+            <Access auth={APP_PERMISSIONS.create}>
+              <Button type="primary" icon={<RiAddLine size={16} />} onClick={() => navigate(TabsPaths.appHandle)}>
+                新增
+              </Button>
+            </Access>
           </Space>
         }
       />

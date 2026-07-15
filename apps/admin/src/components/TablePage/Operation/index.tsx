@@ -1,6 +1,7 @@
 import { Space } from "antd";
 import OperationButton, { OperationButtonProps } from "./button";
 import { FC } from "react";
+import { matchPermission, useAccess } from "@/contexts/AccessContext";
 
 type OperationButtonType = typeof OperationButton;
 
@@ -10,12 +11,13 @@ export interface OperationProps {
 
 const PrivOperation: FC<OperationProps> = (props) => {
   const { columns } = props;
+  const access = useAccess();
 
   return (
     <Space onClick={(e) => e.stopPropagation()}>
       {columns
-        // TODO 过滤权限
         .filter((i) => [null, undefined, true].includes(i.show))
+        .filter((i) => matchPermission(i.auth, access))
         .map((column, i) => (
           <OperationButton key={i} {...column} />
         ))}

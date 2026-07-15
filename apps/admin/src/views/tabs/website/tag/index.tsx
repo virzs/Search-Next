@@ -8,6 +8,7 @@ import { message, Modal, Image, Tag } from "antd";
 import { useState } from "react";
 import TagHandle from "./handle";
 import { WindowTableColumnType } from "@/components/WindowTable";
+import { routeAuth } from "@/contexts/AccessContext";
 
 const { useModal } = Modal;
 
@@ -86,6 +87,7 @@ const WebsiteTag = () => {
             columns={[
               {
                 title: "修改",
+                auth: routeAuth("PUT", "/tabs/website_tag/:id"),
                 onClick: () => {
                   setOpen(true);
                   setEditId(record._id);
@@ -93,6 +95,7 @@ const WebsiteTag = () => {
               },
               {
                 title: "删除",
+                auth: routeAuth("DELETE", "/tabs/website_tag/:id"),
                 onClick: () => {
                   modal.confirm({
                     title: "确认删除?",
@@ -119,6 +122,7 @@ const WebsiteTag = () => {
         columns={columns}
         button={
           <TagHandle
+            auth={routeAuth("POST", "/tabs/website_tag")}
             open={open}
             editId={editId}
             onFinished={() => {

@@ -10,6 +10,9 @@ import { getAllAppClassify } from "@/services/tabs/app_classify";
 import FullPageContainer from "@/components/containter/full";
 import ProFormUpload from "@/components/pro-form/fields/upload";
 import { RiUploadCloud2Line } from "@remixicon/react";
+import Access from "@/components/Access";
+import { useHasPermission } from "@/contexts/AccessContext";
+import { APP_PERMISSIONS } from "./permissions";
 
 const { Text } = Typography;
 
@@ -308,6 +311,9 @@ const AppHandle: FC = () => {
   });
 
   const packageMode = packageMeta?.sourceType === "snapp" || !!packageAppId;
+  const canSave = useHasPermission(
+    id || packageAppId ? APP_PERMISSIONS.update : APP_PERMISSIONS.create,
+  );
 
   return (
     <FullPageContainer loading={detailLoading}>
@@ -328,7 +334,8 @@ const AppHandle: FC = () => {
           }}
           submitter={{
             searchConfig: { submitText: "保存" },
-            render: (_, dom) => <div className="flex items-center justify-center gap-2">{...dom}</div>,
+            render: (_, dom) =>
+              canSave ? <div className="flex items-center justify-center gap-2">{...dom}</div> : null,
           }}
           onFinish={async (values: AppItem) => {
             const payload = normalizeAppPayload(values);
@@ -344,18 +351,20 @@ const AppHandle: FC = () => {
         >
           <Card className="mb-5" title="应用包" size="small">
             <Space direction="vertical" className="w-full" size={12}>
-              <Upload
-                accept=".snapp"
-                showUploadList={false}
-                beforeUpload={(file) => {
-                  uploadPackageRun(file, id || packageAppId);
-                  return false;
-                }}
-              >
-                <Button icon={<RiUploadCloud2Line size={16} />} loading={uploadPackageLoading}>
-                  上传并读取 .snapp
-                </Button>
-              </Upload>
+              <Access auth={APP_PERMISSIONS.importPackage}>
+                <Upload
+                  accept=".snapp"
+                  showUploadList={false}
+                  beforeUpload={(file) => {
+                    uploadPackageRun(file, id || packageAppId);
+                    return false;
+                  }}
+                >
+                  <Button icon={<RiUploadCloud2Line size={16} />} loading={uploadPackageLoading}>
+                    上传并读取 .snapp
+                  </Button>
+                </Upload>
+              </Access>
               <Alert
                 type="info"
                 showIcon

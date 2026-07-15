@@ -9,13 +9,19 @@ import {
   ProForm,
   ProFormInstance,
   ProFormDependency,
+  ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
-import { Button, message, Switch } from "antd";
+import { Alert, Button, message, Switch } from "antd";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { RiExternalLinkLine } from "@remixicon/react";
+import {
+  getRoleList,
+  RoleRequest,
+  SYSTEM_ADMIN_ROLE_CODE,
+} from "@/services/system/role";
 
 const TURNSTILE_URL = "https://dash.cloudflare.com/?to=/:account/turnstile";
 
@@ -67,6 +73,7 @@ const SettingSwitchRow = (props: SettingSwitchRowProps) => {
 
 const Setting = () => {
   const { data, loading, run } = useRequest(getProject);
+  const { data: roles = [], loading: rolesLoading } = useRequest(getRoleList);
   const [submitting, setSubmitting] = useState(false);
 
   const ref = useRef<ProFormInstance<ProjectData>>(null);
@@ -152,6 +159,32 @@ const Setting = () => {
                 <ProFormText name={["login", "title"]} label="标题" />
                 <ProFormText name={["login", "subTitle"]} label="副标题" />
               </div>
+            </SettingsSection>
+            <SettingsSection title="后台登录权限">
+              <Alert
+                className="mb-4"
+                type="info"
+                showIcon
+                message="未选择角色时，仅系统管理员角色可登录后台；已选择角色后，系统管理员和所选角色均可登录后台。"
+              />
+              <ProFormSelect
+                name={["adminAccess", "loginRoleIds"]}
+                label="可登录后台的角色"
+                mode="multiple"
+                placeholder="请选择角色"
+                fieldProps={{
+                  loading: rolesLoading,
+                  optionFilterProp: "label",
+                }}
+                options={(roles as RoleRequest[]).map((role) => ({
+                  label:
+                    role.code === SYSTEM_ADMIN_ROLE_CODE
+                      ? `${role.name}（默认允许）`
+                      : role.name,
+                  value: role._id,
+                  disabled: role.code === SYSTEM_ADMIN_ROLE_CODE,
+                }))}
+              />
             </SettingsSection>
             <SettingsSection title="注册页设置">
               <div className="grid gap-4 md:grid-cols-2">

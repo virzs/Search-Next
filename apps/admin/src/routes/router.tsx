@@ -8,6 +8,7 @@ import TabsRouter from "@/views/tabs/router";
 import ResourceRouter from "@/views/resource/router";
 import AIRouter from "@/views/ai/router";
 import NotFound from "../views/error/NotFound";
+import Forbidden from "../views/error/Forbidden";
 import UserCenter from "@/views/user/center";
 
 export interface MyRouteObject {}
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       HomeRouter,
+      {
+        path: "/403",
+        element: <Forbidden />,
+      },
       ...enabledRouters,
       {
         path: "*",

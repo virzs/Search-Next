@@ -5,6 +5,8 @@ import { RiAddLine } from "@remixicon/react";
 import { useRequest } from "ahooks";
 import { Button, message } from "antd";
 import { FC, useEffect, useRef } from "react";
+import Access from "@/components/Access";
+import type { PermissionAuth } from "@/contexts/AccessContext";
 
 export interface HandleModalProps {
   onFinished?: (values: any) => void;
@@ -12,10 +14,11 @@ export interface HandleModalProps {
   editId?: string;
   onClose?: () => void;
   onDetailLoading?: (loading: boolean) => void;
+  auth?: PermissionAuth;
 }
 
 const TagHandle: FC<HandleModalProps> = (props) => {
-  const { onFinished, open, editId, onClose, onDetailLoading } = props;
+  const { onFinished, open, editId, onClose, onDetailLoading, auth } = props;
 
   const ref = useRef<ProFormInstance<WebsiteTag>>(null);
 
@@ -47,9 +50,11 @@ const TagHandle: FC<HandleModalProps> = (props) => {
       open={open}
       formRef={ref}
       trigger={
-        <Button type="primary" icon={<RiAddLine size={16} />}>
-          新增标签
-        </Button>
+        <Access auth={auth}>
+          <Button type="primary" icon={<RiAddLine size={16} />}>
+            新增标签
+          </Button>
+        </Access>
       }
       title={editId ? "编辑标签" : "新增标签"}
       onOpenChange={(visible) => {

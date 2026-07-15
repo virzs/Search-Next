@@ -4,6 +4,8 @@ import { useRequest } from "ahooks";
 import { Button, Form, Input, message, Modal, Select } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
 import { permissionMethodOptions } from "./method";
+import Access from "@/components/Access";
+import type { PermissionAuth } from "@/contexts/AccessContext";
 
 export interface HandleModalProps {
   onFinished?: (values: any) => void;
@@ -12,10 +14,11 @@ export interface HandleModalProps {
   onClose?: () => void;
   onDetailLoading?: (loading: boolean) => void;
   parent?: string;
+  auth?: PermissionAuth;
 }
 
 const PermissionHandle: FC<HandleModalProps> = (props) => {
-  const { onFinished, open, editId, onClose, parent, onDetailLoading } = props;
+  const { onFinished, open, editId, onClose, parent, onDetailLoading, auth } = props;
 
   const [form] = Form.useForm<PermissionListData>();
   const [internalOpen, setInternalOpen] = useState(false);
@@ -90,9 +93,11 @@ const PermissionHandle: FC<HandleModalProps> = (props) => {
 
   return (
     <>
-      <Button type="primary" onClick={() => setInternalOpen(true)}>
-        新增权限
-      </Button>
+      <Access auth={auth}>
+        <Button type="primary" onClick={() => setInternalOpen(true)}>
+          新增权限
+        </Button>
+      </Access>
       <Modal
         open={mergedOpen}
         title={title}

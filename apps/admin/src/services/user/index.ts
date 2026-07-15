@@ -1,4 +1,20 @@
 import { baseDeleteRequest, baseDetailRequest, baseGetRequest, basePostRequest, basePutRequest } from "@/utils/axios";
+import type { PermissionItem } from "@/contexts/AccessContext";
+
+export interface CurrentUserInfo {
+  _id?: string;
+  username?: string;
+  email?: string;
+  nickname?: string;
+  avatar?: any;
+  type?: number;
+  roles?: any[];
+  permissions?: PermissionItem[];
+  isSuperAdmin?: boolean;
+}
+
+// /users/me get
+export const getCurrentUser = () => baseGetRequest<CurrentUserInfo>("/users/me")();
 
 // /users get
 export const getUsers = (params: any) => baseGetRequest("/users")(params);

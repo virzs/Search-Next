@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { Outlet, useLocation } from "react-router";
 import TablePageContainer from "./table";
+import useMenu from "@/hooks/useMenu";
 
 export interface TabRouteContainerProps extends PageContainerProps {
   parent: string;
@@ -16,9 +17,10 @@ const TabRouteContainer: React.FC<TabRouteContainerProps> = (props) => {
   const { parent, hideBreadcrumb, ...rest } = props;
   const navigate = useNavigate();
   const location = useLocation();
+  const menus = useMenu();
 
   const routes: Menu[] = useMemo(() => {
-    const menu = getMenuByPath(parent);
+    const menu = getMenuByPath(parent, menus);
     let res: Menu[] = [];
 
     if (menu?.children?.length) {
@@ -26,7 +28,7 @@ const TabRouteContainer: React.FC<TabRouteContainerProps> = (props) => {
     }
 
     return res;
-  }, [parent]);
+  }, [menus, parent]);
 
   return (
     <TablePageContainer

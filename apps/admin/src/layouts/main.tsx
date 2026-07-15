@@ -4,7 +4,7 @@ import useMenu from "../hooks/useMenu";
 import { Badge, Button, Dropdown, Tooltip } from "antd";
 import { useRequest } from "ahooks";
 import { postLogout } from "@/services/auth";
-import { getUserInfo, removeUserInfo } from "@/utils/userInfo";
+import { removeUserInfo } from "@/utils/userInfo";
 import { getRefreshToken, removeRefreshToken, removeToken } from "@/utils/token";
 import { AuthPaths } from "@/views/auth/router";
 import { UserPaths } from "@/views/user/router";
@@ -12,11 +12,17 @@ import { css, cx } from "@emotion/css";
 import { motion } from "motion/react";
 import { RiLogoutBoxLine, RiMessageLine, RiUserLine } from "@remixicon/react";
 import LayoutThemeToggle from "./components/theme";
+import { useAccess } from "@/contexts/AccessContext";
+import { useEffect } from "react";
 
 const MainLayout = (props: any) => {
   const menus = useMenu();
   const navigate = useNavigate();
-  const userInfo = getUserInfo();
+  const { userInfo, refresh, setAccessUser } = useAccess();
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const { run: logoutRun } = useRequest(postLogout, {
     manual: true,
@@ -24,6 +30,7 @@ const MainLayout = (props: any) => {
       removeUserInfo();
       removeToken();
       removeRefreshToken();
+      setAccessUser({});
       navigate(AuthPaths.login, {
         replace: true,
       });

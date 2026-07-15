@@ -1,7 +1,10 @@
 import Menus from "@/routes/menus";
+import type { PermissionAuth } from "@/contexts/AccessContext";
 import { MenuDataItem } from "@ant-design/pro-components";
 
-export interface Menu extends MenuDataItem {}
+export interface Menu extends MenuDataItem {
+  auth?: PermissionAuth;
+}
 
 export function getMenuByPath(path: string, menus?: Menu[]): Menu | undefined {
   const mergedMenus = menus || Menus;

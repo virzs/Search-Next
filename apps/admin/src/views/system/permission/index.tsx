@@ -9,6 +9,7 @@ import TablePage from "@/components/TablePage2";
 import { useTablePage } from "@/hooks/useTablePage2";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import { PermissionMethodTag } from "./method";
+import { routeAuth } from "@/contexts/AccessContext";
 
 const Permission = () => {
   const table = useTablePage(getPermissionTree);
@@ -79,6 +80,7 @@ const Permission = () => {
             columns={[
               {
                 title: "新增子权限",
+                auth: routeAuth("POST", "/system/permission"),
                 onClick: () => {
                   setParent(record._id);
                   setOpen(true);
@@ -86,6 +88,7 @@ const Permission = () => {
               },
               {
                 title: "修改",
+                auth: routeAuth("PUT", "/system/permission/:id"),
                 onClick: () => {
                   setOpen(true);
                   setEditId(record._id);
@@ -93,6 +96,7 @@ const Permission = () => {
               },
               {
                 title: "删除",
+                auth: routeAuth("DELETE", "/system/permission/:id"),
                 onClick: () => {
                   modal.confirm({
                     title: "确认删除?",
@@ -119,6 +123,7 @@ const Permission = () => {
         pagination={false}
         button={
           <PermissionHandle
+            auth={routeAuth("POST", "/system/permission")}
             parent={parent}
             open={open}
             editId={editId}

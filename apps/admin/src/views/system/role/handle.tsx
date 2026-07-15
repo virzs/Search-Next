@@ -15,22 +15,44 @@ const getRoleFormValues = (role: RoleRequest): RoleRequest => ({
 });
 
 const getPermissionTreeData = (permissions: PermissionListData[] = []): DataNode[] => {
-  return permissions.map((item) => ({
-    title: item.name,
-    key: item._id!,
-    children: item.children?.length ? getPermissionTreeData(item.children) : undefined,
-  }));
+  return permissions
+    .filter((item) => !item.isStale)
+    .map((item) => ({
+      title: item.name,
+      key: item._id!,
+      children: item.children?.length ? getPermissionTreeData(item.children) : undefined,
+    }));
+};
+
+const getAssignablePermissionKeys = (permissions: PermissionListData[] = []): Set<string> => {
+  const keys = new Set<string>();
+
+  const visit = (items: PermissionListData[]) => {
+    items.forEach((item) => {
+      if (!item.isStale && item.type === 1 && item._id) {
+        keys.add(item._id);
+      }
+      if (item.children?.length) {
+        visit(item.children);
+      }
+    });
+  };
+
+  visit(permissions);
+  return keys;
 };
 
 interface PermissionTreeFieldProps {
   value?: string[];
   onChange?: (value: string[]) => void;
   treeData: DataNode[];
+  assignableKeys: Set<string>;
   disabled?: boolean;
 }
 
 const PermissionTreeField: FC<PermissionTreeFieldProps> = (props) => {
-  const { value = [], onChange, treeData, disabled } = props;
+  const { value = [], onChange, treeData, assignableKeys, disabled } = props;
+  const checkedKeys = value.filter((key) => assignableKeys.has(`${key}`));
 
   return (
     <Tree
@@ -38,11 +60,15 @@ const PermissionTreeField: FC<PermissionTreeFieldProps> = (props) => {
       checkable
       disabled={disabled}
       treeData={treeData}
-      checkedKeys={value}
+      checkedKeys={checkedKeys}
       height={420}
       onCheck={(checked) => {
         const keys = Array.isArray(checked) ? checked : checked.checked;
-        onChange?.(keys.map((key: Key) => `${key}`));
+        onChange?.(
+          keys
+            .map((key: Key) => `${key}`)
+            .filter((key) => assignableKeys.has(key)),
+        );
       }}
     />
   );
@@ -55,6 +81,10 @@ const RoleHandle = () => {
 
   const { data: pData = [], loading: pLoading } = useRequest(() => getPermissionTree({ simple: true }));
   const permissionTreeData = useMemo(() => getPermissionTreeData(pData as PermissionListData[]), [pData]);
+  const assignablePermissionKeys = useMemo(
+    () => getAssignablePermissionKeys(pData as PermissionListData[]),
+    [pData],
+  );
 
   const { data, loading, run } = useRequest(detailRolePermissions, {
     manual: true,
@@ -83,7 +113,9 @@ const RoleHandle = () => {
 
     const payload = {
       ...values,
-      permissions: values.permissions ?? [],
+      permissions: (values.permissions ?? []).filter((permissionId) =>
+        assignablePermissionKeys.has(permissionId),
+      ),
     };
 
     try {
@@ -119,8 +151,12 @@ const RoleHandle = () => {
           <Form.Item name="description" label="描述">
             <Input.TextArea rows={3} />
           </Form.Item>
-          <Form.Item name="permissions" label="权限">
-            <PermissionTreeField treeData={permissionTreeData} />
+          <Form.Item
+            name="permissions"
+            label="权限"
+            extra="模块节点仅用于批量选择，实际保存接口权限；自动同步的新接口需要明确勾选后才会授权。"
+          >
+            <PermissionTreeField treeData={permissionTreeData} assignableKeys={assignablePermissionKeys} />
           </Form.Item>
           {!isSystemRole ? (
             <Form.Item wrapperCol={{ offset: 6, span: 14 }}>

@@ -6,6 +6,7 @@ import R2DetailPage from "./qiniu/detail";
 import LocalDetailPage from "./qiniu/detail";
 import RecyclePage from "./recycle/index";
 import LocalPage from "./local";
+import { routeAuth } from "@/contexts/AccessContext";
 
 export const ResourcePaths = {
   index: "/resource",
@@ -50,6 +51,7 @@ export const ResourceMenu: Menu = {
     {
       name: "Cloudflare R2",
       path: ResourcePaths.r2,
+      auth: routeAuth("GET", "/resource/r2"),
       hideChildrenInMenu: true,
       children: [
         {
@@ -61,6 +63,7 @@ export const ResourceMenu: Menu = {
     {
       name: "本地资源",
       path: ResourcePaths.local,
+      auth: routeAuth("GET", "/resource/local"),
       hideChildrenInMenu: true,
       children: [
         {
@@ -72,6 +75,7 @@ export const ResourceMenu: Menu = {
     {
       name: "回收站",
       path: ResourcePaths.recycle,
+      auth: routeAuth("GET", "/resource/recycle"),
     },
   ],
 };
