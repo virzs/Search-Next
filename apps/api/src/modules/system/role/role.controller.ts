@@ -19,6 +19,7 @@ import {
 import { PageDto } from 'src/public/dto/page';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { User } from 'src/public/decorator/route-user.decoratpr';
+import { SkipPermission } from 'src/public/decorator/skip_permission.decorator';
 
 @ApiTags('角色')
 @Controller('system/role')
@@ -33,6 +34,7 @@ export class RoleController {
   }
 
   @Get('/list')
+  @SkipPermission()
   @ApiOperation({ summary: '角色列表' })
   @ApiResponse({ status: 200, type: [CreateRoleDto] })
   list() {
@@ -47,7 +49,9 @@ export class RoleController {
 
   @Get('/permissions/:id')
   @ApiOperation({ summary: '角色权限详情' })
-  detailPermissions(@Param('id') id: string) {
+  detailPermissions(
+    @Param('id') id: string,
+  ): Promise<Record<string, unknown> | null> {
     return this.roleService.detailPermissions(id);
   }
 

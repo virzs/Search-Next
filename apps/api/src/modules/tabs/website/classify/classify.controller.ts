@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClassifyService } from './classify.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { WebsiteClassifyDto } from '../dto/classify';
 import { User } from 'src/public/decorator/route-user.decoratpr';
 import { WebsiteClassify } from '../schemas/classify';
@@ -28,7 +28,7 @@ export class ClassifyController {
   @Get('/tree')
   @ApiOperation({ summary: '用户分类树' })
   @ApiResponse({ status: 200, type: WebsiteClassify, isArray: true })
-  @RequireLogin()
+  @PublicRoute()
   treeInfoForUser() {
     return this.classifyService.getClassifyTree();
   }
@@ -36,7 +36,7 @@ export class ClassifyController {
   @Get('/public/level1')
   @ApiOperation({ summary: '有网站的一级分类' })
   @ApiResponse({ status: 200, type: WebsiteClassify, isArray: true })
-  @RequireLogin()
+  @PublicRoute()
   publicLevel1() {
     return this.classifyService.getPublicLevel1Classifies();
   }

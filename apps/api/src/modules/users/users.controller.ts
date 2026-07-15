@@ -13,6 +13,8 @@ import { UsersService } from './users.service';
 import { PageDto } from 'src/public/dto/page';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SkipPermission } from 'src/public/decorator/skip_permission.decorator';
+import { User } from 'src/public/decorator/route-user.decoratpr';
 
 @ApiTags('用户')
 @Controller('users')
@@ -38,6 +40,13 @@ export class UsersController {
   @ApiParam({ name: 'keyWords', description: '搜索关键词', example: 'test' })
   searchUsers(@Query('keyWords') keyWords: string) {
     return this.usersService.searchUsers(keyWords);
+  }
+
+  @Get('/me')
+  @SkipPermission()
+  @ApiOperation({ summary: '当前用户信息' })
+  currentUser(@User() user): Promise<any> {
+    return this.usersService.currentUser(user);
   }
 
   @Post('/')

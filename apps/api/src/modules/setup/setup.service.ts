@@ -289,7 +289,6 @@ export class SetupService {
       password: hashedPassword,
       salt,
       status: 1,
-      type: 0,
       enable: true,
       roles: [role._id],
       isDelete: false,

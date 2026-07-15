@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsArray,
   IsOptional,
   IsString,
   ValidateNested,
@@ -74,6 +75,15 @@ class TurnstileConfigDto {
   secretKey?: string;
 }
 
+class AdminAccessConfigDto {
+  @ApiProperty({ description: '可登录后台的角色 ID 列表', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  @Expose()
+  loginRoleIds?: string[];
+}
+
 export class ProjectDto {
   @ApiProperty({ description: '项目名称' })
   @IsString()
@@ -109,4 +119,12 @@ export class ProjectDto {
   @Type(() => TurnstileConfigDto)
   @Transform(({ value }) => (value == null ? undefined : value))
   turnstile?: TurnstileConfigDto;
+
+  @ApiProperty({ description: '后台访问控制设置', type: AdminAccessConfigDto })
+  @ValidateNested()
+  @IsOptional()
+  @Expose()
+  @Type(() => AdminAccessConfigDto)
+  @Transform(({ value }) => (value == null ? undefined : value))
+  adminAccess?: AdminAccessConfigDto;
 }

@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 import { Resource } from 'src/modules/resource/schemas/resource';
+import { RoleName } from 'src/modules/system/role/schemas/role';
 import BaseSchema, {
   baseSchemaMiddleware,
 } from 'src/public/schema/base.schema';
@@ -47,6 +49,12 @@ class TurnstileConfig {
   secretKey?: string;
 }
 
+class AdminAccessConfig {
+  // 可登录后台的角色。为空时仅系统管理员角色可登录。
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: RoleName }] })
+  loginRoleIds?: string[];
+}
+
 @Schema({ timestamps: true })
 export class Project extends BaseSchema {
   @Prop({ type: String, required: true })
@@ -74,6 +82,10 @@ export class Project extends BaseSchema {
   // Cloudflare Turnstile 人机验证设置
   @Prop({ type: TurnstileConfig, default: () => ({ enabled: false }) })
   turnstile: TurnstileConfig;
+
+  // 后台访问控制设置
+  @Prop({ type: AdminAccessConfig, default: () => ({ loginRoleIds: [] }) })
+  adminAccess: AdminAccessConfig;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

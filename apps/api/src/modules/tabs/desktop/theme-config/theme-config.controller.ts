@@ -18,7 +18,7 @@ import {
 } from './theme-config.dto';
 import { PageDto } from 'src/public/dto/page';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 
 @ApiTags('新标签页/桌面/主题配置')
 @Controller('tabs/desktop/theme-config')
@@ -32,7 +32,7 @@ export class ThemeConfigController {
   }
 
   @Get('/active')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '启用主题配置列表' })
   getActiveThemeConfigs(@Query() query: ActiveThemeConfigQueryDto) {
     return this.themeConfigService.getActiveThemeConfigs(query);

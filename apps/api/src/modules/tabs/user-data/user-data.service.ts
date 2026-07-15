@@ -368,7 +368,6 @@ export class UserDataService {
       this.stripAppPrefix(item.type),
       this.stripAppPrefix(item.dataType),
       item.data?.appConfig?.id,
-      item.data?.widgetConfig?.id,
     ];
 
     const id = candidates.find(
@@ -384,10 +383,7 @@ export class UserDataService {
       return value.slice('app-launcher:'.length);
     }
     if (value.startsWith('app:')) return value.slice('app:'.length);
-    if (value.startsWith('widget-app:')) {
-      return value.slice('widget-app:'.length);
-    }
-    return value.startsWith('widget:') ? value.slice('widget:'.length) : null;
+    return null;
   }
 
   private escapeRegex(value: string) {

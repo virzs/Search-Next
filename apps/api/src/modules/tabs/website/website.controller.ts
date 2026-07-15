@@ -11,7 +11,7 @@ import {
 import { WebsiteService } from './website.service';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'src/public/dto/page';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import {
   ParseWebsiteDto,
   UpdateWebsitePublicDto,
@@ -47,7 +47,7 @@ export class WebsiteController {
   }
 
   @Get('/public')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '公开网站分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
@@ -80,7 +80,7 @@ export class WebsiteController {
 
   @Get('/top50')
   @ApiOperation({ summary: '网站点击排行' })
-  @RequireLogin()
+  @PublicRoute()
   getTop50() {
     return this.websiteService.getTop50ClicksFromCache();
   }
@@ -121,7 +121,6 @@ export class WebsiteController {
 
   @Post('/parse')
   @ApiOperation({ summary: '解析网站信息' })
-  @RequireLogin()
   parseWebsite(@Body() body: ParseWebsiteDto) {
     return this.websiteService.parseWebsiteMeta(body);
   }

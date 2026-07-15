@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
 import { User } from 'src/public/decorator/route-user.decoratpr';
 import {
   TagDto,
@@ -34,7 +33,6 @@ export class TagController {
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })
   @ApiParam({ name: 'search', description: '搜索关键词', required: false })
   @ApiParam({ name: 'enable', description: '是否启用', required: false })
-  @RequireLogin()
   getTags(@Query() query: TagForAdminDto) {
     return this.tagService.getTags(query);
   }
@@ -63,42 +61,36 @@ export class TagController {
 
   @Post('/quick')
   @ApiOperation({ summary: '快速创建标签' })
-  @RequireLogin()
   quickCreateTag(@Body() body: QuickCreateTagDto, @User('_id') user: string) {
     return this.tagService.quickCreateTag(body, user);
   }
 
   @Post('/')
   @ApiOperation({ summary: '创建标签' })
-  @RequireLogin()
   createTag(@Body() body: TagDto, @User('_id') user: string) {
     return this.tagService.createTag(body, user);
   }
 
   @Put('/batch-status')
   @ApiOperation({ summary: '批量更新标签状态' })
-  @RequireLogin()
   batchUpdateTagStatus(@Body() body: BatchUpdateTagStatusDto) {
     return this.tagService.batchUpdateTagStatus(body);
   }
 
   @Post('/relation')
   @ApiOperation({ summary: '添加网站标签' })
-  @RequireLogin()
   addTagWebsiteRelation(@Body() body: TagWebsiteRelationDto) {
     return this.tagService.manageTagWebsiteRelation(body, 'add');
   }
 
   @Delete('/relation')
   @ApiOperation({ summary: '移除网站标签' })
-  @RequireLogin()
   removeTagWebsiteRelation(@Body() body: TagWebsiteRelationDto) {
     return this.tagService.manageTagWebsiteRelation(body, 'remove');
   }
 
   @Put('/:id')
   @ApiOperation({ summary: '更新标签' })
-  @RequireLogin()
   updateTag(
     @Param('id') id: string,
     @Body() body: UpdateTagDto,
@@ -109,7 +101,6 @@ export class TagController {
 
   @Delete('/:id')
   @ApiOperation({ summary: '删除标签' })
-  @RequireLogin()
   deleteTag(@Param('id') id: string) {
     return this.tagService.deleteTag(id);
   }

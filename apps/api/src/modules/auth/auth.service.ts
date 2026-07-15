@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -23,6 +24,7 @@ import { EmailService } from '../system/email/email.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { MessageService } from '../system/message/message.service';
 import axios from 'axios';
+import { releaseDeletedUserIdentity } from '../users/deleted-user-identity';
 
 interface RedisTokenCache {
   [key: string]: string;
@@ -31,6 +33,10 @@ interface RedisTokenCache {
 interface TurnstileVerifyResponse {
   success: boolean;
   'error-codes'?: string[];
+}
+
+interface LoginOptions {
+  admin?: boolean;
 }
 
 @Injectable()
@@ -117,7 +123,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     // 根据邮箱查找用户
     const user = await this.usersModel
-      .findOne({ email })
+      .findOne({ email, isDelete: { $in: [false, null] } })
       .select(
         '+password +enable +status +roles +type +projects +integral +createdAt',
       )
@@ -162,8 +168,22 @@ export class AuthService {
         throw new BadRequestException('验证码错误');
     }
 
-    const user = await this.usersModel.findOne({ email });
+    await releaseDeletedUserIdentity(this.usersModel, {
+      email,
+      username: rest.username,
+    });
+
+    const user = await this.usersModel.findOne({
+      email,
+      isDelete: { $in: [false, null] },
+    });
     if (user) throw new BadRequestException('邮箱已存在');
+
+    const usernameUser = await this.usersModel.findOne({
+      username: rest.username,
+      isDelete: { $in: [false, null] },
+    });
+    if (usernameUser) throw new BadRequestException('用户名已存在');
 
     if (project?.register?.forceInvitationCode && !invitationCode)
       throw new BadRequestException('邀请码不能为空');
@@ -220,19 +240,62 @@ export class AuthService {
     return this.emailService.sendRegisterEmail(body);
   }
 
-  async login(body: LoginDto, headers) {
+  private getIdString(value: any): string | null {
+    if (!value) {
+      return null;
+    }
+
+    if (typeof value === 'object' && value._id) {
+      return value._id.toString();
+    }
+
+    return value.toString();
+  }
+
+  private async validateAdminLoginAccess(user) {
+    const project: any = await this.projectService.detail();
+    const loginRoleIds = (project?.adminAccess?.loginRoleIds ?? [])
+      .map((role) => this.getIdString(role))
+      .filter(Boolean);
+
+    const result = await this.usersModel
+      .findById(user._id)
+      .select('+roles')
+      .populate('roles')
+      .lean();
+
+    if (!result) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    const roles = result.roles ?? [];
+    const isSystemAdmin = roles.some(
+      (role: any) => role?.isSuperAdmin || role?.code === 'system_admin',
+    );
+
+    if (isSystemAdmin) {
+      return;
+    }
+
+    if (loginRoleIds.length > 0) {
+      const hasConfiguredRole = roles.some((role) =>
+        loginRoleIds.includes(this.getIdString(role)),
+      );
+
+      if (hasConfiguredRole) {
+        return;
+      }
+    }
+
+    throw new ForbiddenException('当前账号没有后台登录权限');
+  }
+
+  async login(body: LoginDto, headers, options: LoginOptions = {}) {
     const { password, email, turnstileToken } = body;
     await this.verifyTurnstileIfEnabled(turnstileToken, headers);
 
     const userAgent = headers['user-agent'];
     const user = await this.validateUser(email, password);
-
-    const access_token = this.jwtService.sign({ ...user, userAgent });
-
-    const refresh_token = this.refreshTokenService.createRefreshToken({
-      ...user,
-      userAgent,
-    });
 
     if (!user) {
       throw new BadRequestException('邮箱或密码错误');
@@ -244,6 +307,17 @@ export class AuthService {
     if (user.isDelete) {
       throw new BadRequestException('用户不存在');
     }
+
+    if (options.admin) {
+      await this.validateAdminLoginAccess(user);
+    }
+
+    const access_token = this.jwtService.sign({ ...user, userAgent });
+
+    const refresh_token = this.refreshTokenService.createRefreshToken({
+      ...user,
+      userAgent,
+    });
 
     const ttl = this.refreshTokenService.getTTL();
 
@@ -274,6 +348,10 @@ export class AuthService {
       access_token,
       refresh_token,
     };
+  }
+
+  async adminLogin(body: LoginDto, headers) {
+    return this.login(body, headers, { admin: true });
   }
 
   async refreshToken(body: RefreshTokenDto, headers) {

@@ -8,11 +8,14 @@ import {
 } from 'src/modules/system/role/schemas/role';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Response } from 'src/utils/response';
+import { Permission } from 'src/schemas/permission';
 
 @Injectable()
 export class RoleService implements OnModuleInit {
   constructor(
     @InjectModel(Role.name) private readonly roleModel: Model<Role>,
+    @InjectModel(Permission.name)
+    private readonly permissionModel: Model<Permission>,
   ) {}
 
   async onModuleInit() {
@@ -72,13 +75,27 @@ export class RoleService implements OnModuleInit {
     return role;
   }
 
-  async detailPermissions(id: string) {
-    const role = await this.roleModel.findById(id);
-    return role;
+  async detailPermissions(
+    id: string,
+  ): Promise<Record<string, unknown> | null> {
+    const role = await this.roleModel.findById(id).lean().exec();
+    if (!role) {
+      return null;
+    }
+
+    return {
+      ...role,
+      permissions: await this.getAssignablePermissionIds(role.permissions),
+    };
   }
 
   async create(body: CreateRoleDto, user: string) {
-    const result = await this.roleModel.create({ ...body, creator: user });
+    const permissions = await this.getAssignablePermissionIds(body.permissions);
+    const result = await this.roleModel.create({
+      ...body,
+      permissions,
+      creator: user,
+    });
     return result;
   }
 
@@ -89,8 +106,10 @@ export class RoleService implements OnModuleInit {
       throw new BadRequestException('系统内置角色不能修改');
     }
 
+    const permissions = await this.getAssignablePermissionIds(body.permissions);
     const result = await this.roleModel.findByIdAndUpdate(id, {
       ...body,
+      permissions,
       updater: user,
     });
     return result;
@@ -110,5 +129,25 @@ export class RoleService implements OnModuleInit {
   async list() {
     const roles = await this.roleModel.find();
     return roles;
+  }
+
+  private async getAssignablePermissionIds(
+    permissions: unknown[] = [],
+  ): Promise<string[]> {
+    if (!permissions.length) {
+      return [];
+    }
+
+    const result = await this.permissionModel
+      .find({
+        _id: { $in: permissions },
+        type: 1,
+        isStale: { $ne: true },
+      })
+      .select('_id')
+      .lean()
+      .exec();
+
+    return result.map((permission) => permission._id.toString());
   }
 }

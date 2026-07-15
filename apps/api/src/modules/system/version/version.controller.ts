@@ -13,7 +13,7 @@ import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'src/public/dto/page';
 import { VersionDto } from './dto/version.dto';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 
 @ApiTags('系统/版本管理')
 @Controller('system/version')
@@ -46,7 +46,7 @@ export class VersionController {
   }
 
   @Get('/latest')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '最新版本' })
   latest(@Query('platform') platform: string) {
     return this.versionService.latest(platform);

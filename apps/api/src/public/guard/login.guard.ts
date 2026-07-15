@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { jwtConfig } from 'src/config/jwt';
+import { PUBLIC_ROUTE_KEY } from '../decorator/public_route.decorator';
 
 declare module 'express' {
   interface Request {
@@ -30,19 +31,19 @@ export class LoginGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest();
 
-    const requireLogin = this.reflector.getAllAndOverride('require-login', [
-      context.getClass(),
+    const publicRoute = this.reflector.getAllAndOverride(PUBLIC_ROUTE_KEY, [
       context.getHandler(),
+      context.getClass(),
     ]);
 
-    if (requireLogin !== undefined) {
-      return requireLogin;
+    if (publicRoute) {
+      return true;
     }
 
     // 可选登录：有效 token 设置 request.user；无 token 或无效 token 都放行
     const optionalLogin = this.reflector.getAllAndOverride('optional-login', [
-      context.getClass(),
       context.getHandler(),
+      context.getClass(),
     ]);
 
     if (optionalLogin) {

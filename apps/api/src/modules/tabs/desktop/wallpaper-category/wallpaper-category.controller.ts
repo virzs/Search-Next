@@ -11,7 +11,7 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'src/public/dto/page';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { WallpaperCategoryService } from './wallpaper-category.service';
 import {
   CreateWallpaperCategoryDto,
@@ -33,7 +33,7 @@ export class WallpaperCategoryController {
   }
 
   @Get('/user')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '用户壁纸分类列表' })
   getUserWallpaperCategories() {
     return this.wallpaperCategoryService.getUserWallpaperCategories();

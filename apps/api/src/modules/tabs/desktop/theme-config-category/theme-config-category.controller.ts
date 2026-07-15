@@ -11,7 +11,7 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'src/public/dto/page';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { ThemeConfigCategoryService } from './theme-config-category.service';
 import {
   CreateThemeCategoryDto,
@@ -33,7 +33,7 @@ export class ThemeConfigCategoryController {
   }
 
   @Get('/user')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '用户主题分类列表' })
   getUserThemeCategories() {
     return this.themeConfigCategoryService.getUserThemeCategories();

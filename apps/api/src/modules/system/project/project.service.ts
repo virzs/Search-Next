@@ -27,6 +27,9 @@ const DEFAULT_PUBLIC_PROJECT: Partial<Project> = {
     enabled: false,
     siteKey: '',
   },
+  adminAccess: {
+    loginRoleIds: [],
+  },
 };
 
 @Injectable()

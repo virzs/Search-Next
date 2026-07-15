@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'src/public/dto/page';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { User } from 'src/public/decorator/route-user.decoratpr';
 import {
   CreateWallpaperDto,
@@ -32,14 +32,14 @@ export class WallpaperController {
   }
 
   @Get('/upload/active')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '用户壁纸分页' })
   getActiveWallpapers(@Query() query: PageDto & { categoryId?: string }) {
     return this.wallpaperService.getActiveWallpapers(query);
   }
 
   @Get('/groups')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '用户分组壁纸' })
   async getWallpaperGroups(@Query() query: WallpaperGroupQueryDto) {
     const uploads =

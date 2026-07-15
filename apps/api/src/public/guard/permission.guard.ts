@@ -1,14 +1,19 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Inject,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
+import { PATH_METADATA } from '@nestjs/common/constants';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { UsersService } from 'src/modules/users/users.service';
-import { normalizePermissionPath } from 'src/modules/system/permission/permission-route.util';
+import {
+  getRoutePermissionPaths,
+  normalizePermissionPath,
+} from 'src/modules/system/permission/permission-route.util';
+import { PUBLIC_ROUTE_KEY } from '../decorator/public_route.decorator';
 
 declare module 'express' {
   interface Request {
@@ -27,40 +32,43 @@ export class PermissionGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
 
-    const requireLogin = this.reflector.getAllAndOverride('require-login', [
-      context.getClass(),
+    const publicRoute = this.reflector.getAllAndOverride(PUBLIC_ROUTE_KEY, [
       context.getHandler(),
+      context.getClass(),
     ]);
 
-    if (requireLogin !== undefined) {
-      return requireLogin;
+    if (publicRoute) {
+      return true;
     }
 
     // 可选登录的路由无需权限校验
     const optionalLogin = this.reflector.getAllAndOverride('optional-login', [
-      context.getClass(),
       context.getHandler(),
+      context.getClass(),
     ]);
     if (optionalLogin) {
       return true;
     }
 
     const skipPermission = this.reflector.getAllAndOverride('skip-permission', [
-      context.getClass(),
       context.getHandler(),
+      context.getClass(),
     ]);
     if (skipPermission) {
       return true;
     }
 
-    const { route, user } = request;
+    const { user } = request;
 
     if (!user) {
       return true;
     }
 
-    const { path, methods } = route;
-    const routePath = normalizePermissionPath(path);
+    const routePaths = getRoutePermissionPaths(
+      this.reflector.get<string | string[]>(PATH_METADATA, context.getClass()),
+      this.reflector.get<string | string[]>(PATH_METADATA, context.getHandler()),
+    );
+    const requestMethod = request.method?.toUpperCase();
     const permissions = await this.userService.getPermissions(user);
 
     if (permissions === true) {
@@ -68,19 +76,15 @@ export class PermissionGuard implements CanActivate {
     }
 
     const hasPermission = !!permissions.find((i) => {
-      const routeMethods = Object.entries(methods)
-        .filter((i) => i[1])
-        .map((d) => d[0]);
-
       return (
         !i.isStale &&
-        normalizePermissionPath(i.url) === routePath &&
-        routeMethods.includes(i.method?.toLowerCase())
+        routePaths.includes(normalizePermissionPath(i.url)) &&
+        i.method?.toUpperCase() === requestMethod
       );
     });
 
     if (!hasPermission) {
-      throw new UnauthorizedException('没有权限');
+      throw new ForbiddenException('没有权限');
     }
 
     return true;

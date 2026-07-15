@@ -53,3 +53,18 @@ export const toPathList = (path?: string | string[]): string[] => {
   }
   return [path ?? ''];
 };
+
+export const getRoutePermissionPaths = (
+  controllerPath?: string | string[],
+  handlerPath?: string | string[],
+): string[] => {
+  const paths = new Set<string>();
+
+  for (const controller of toPathList(controllerPath)) {
+    for (const handler of toPathList(handlerPath)) {
+      paths.add(joinRoutePaths(controller, handler));
+    }
+  }
+
+  return [...paths];
+};

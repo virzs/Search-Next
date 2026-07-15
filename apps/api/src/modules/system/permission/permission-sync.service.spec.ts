@@ -1,9 +1,12 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { MetadataScanner } from '@nestjs/core';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { SkipPermission } from 'src/public/decorator/skip_permission.decorator';
 import { PermissionSyncService } from './permission-sync.service';
+import { AppController } from '../../tabs/app/app.controller';
+import { ComfyuiController } from '../../ai/comfyui/comfyui.controller';
+import { RoleController } from '../role/role.controller';
 
 class FakeQuery<T> {
   constructor(private readonly value: T) {}
@@ -111,7 +114,7 @@ class NoticeController {
   detail() {}
 
   @Post('/public')
-  @RequireLogin()
+  @PublicRoute()
   publicRoute() {}
 
   @Get('/skip')
@@ -160,6 +163,95 @@ describe('PermissionSyncService', () => {
     );
     expect(definitions.some((item) => item.url.endsWith('/public'))).toBe(false);
     expect(definitions.some((item) => item.url.endsWith('/skip'))).toBe(false);
+  });
+
+  it('collects managed app routes and excludes public app routes', () => {
+    const service = createService([new AppController({} as any)]);
+
+    const definitions = service.collectRoutePermissions();
+
+    expect(definitions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          method: 'GET',
+          url: '/tabs/app',
+          name: '应用分页',
+          groupPath: ['新标签页', '应用'],
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          url: '/tabs/app',
+          name: '新增应用',
+        }),
+        expect.objectContaining({
+          method: 'PUT',
+          url: '/tabs/app/:id',
+          name: '更新应用',
+        }),
+        expect.objectContaining({
+          method: 'DELETE',
+          url: '/tabs/app/:id',
+          name: '删除应用',
+        }),
+      ]),
+    );
+    expect(definitions.some((item) => item.url === '/tabs/app/public')).toBe(
+      false,
+    );
+  });
+
+  it('collects ComfyUI management routes and excludes user and relay routes', () => {
+    const service = createService([new ComfyuiController({} as any)]);
+
+    const definitions = service.collectRoutePermissions();
+
+    expect(definitions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          method: 'GET',
+          url: '/ai/comfyui/queue',
+          name: '队列状态',
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          url: '/ai/comfyui/health',
+          name: 'ComfyUI 连接状态',
+        }),
+      ]),
+    );
+    expect(
+      definitions.some((item) =>
+        [
+          '/ai/comfyui/text2image',
+          '/ai/comfyui/image2image',
+          '/ai/comfyui/job/:id',
+          '/ai/comfyui/relay/job/update',
+          '/ai/comfyui/relay/health',
+        ].includes(item.url),
+      ),
+    ).toBe(false);
+  });
+
+  it('keeps the role page protected and excludes the login-only role list', () => {
+    const service = createService([new RoleController({} as any)]);
+
+    const definitions = service.collectRoutePermissions();
+
+    expect(definitions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          method: 'GET',
+          url: '/system/role',
+          name: '角色分页',
+        }),
+      ]),
+    );
+    expect(
+      definitions.some(
+        (item) =>
+          item.method === 'GET' && item.url === '/system/role/list',
+      ),
+    ).toBe(false);
   });
 
   it('migrates manual route permissions and marks removed auto routes stale', async () => {

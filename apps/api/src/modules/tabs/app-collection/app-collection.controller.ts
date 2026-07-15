@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { User } from 'src/public/decorator/route-user.decoratpr';
 import {
   AppCollectionDto,
@@ -25,14 +25,14 @@ export class AppCollectionController {
   constructor(private readonly collectionService: AppCollectionService) {}
 
   @Get('/public/list')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '公开应用合集列表' })
   getAllCollectionsForPublic() {
     return this.collectionService.getAllForPublic();
   }
 
   @Get('/public/:id/apps')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '合集应用分页' })
   @ApiParam({ name: 'page', description: '页码', example: 1 })
   @ApiParam({ name: 'pageSize', description: '每页数量', example: 10 })

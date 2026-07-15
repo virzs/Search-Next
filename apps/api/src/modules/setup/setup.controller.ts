@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { RequireLogin } from "src/public/decorator/require_login.decorator";
+import { PublicRoute } from "src/public/decorator/public_route.decorator";
 import {
   SetupAdminCompleteDto,
   SetupCheckDto,
@@ -13,7 +13,7 @@ import { SetupService } from "./setup.service";
 
 @ApiTags("首次部署引导")
 @Controller("setup")
-@RequireLogin()
+@PublicRoute()
 export class SetupController {
   constructor(private readonly setupService: SetupService) {}
 

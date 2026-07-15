@@ -9,6 +9,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ResetPassowrdDto } from './dto/reset-password.dto';
 import { UsersName } from './schemas/ref-names';
 import { User } from './schemas/user';
+import {
+  markDeletedUser,
+  releaseDeletedUserIdentity,
+} from './deleted-user-identity';
 
 @Injectable()
 export class UsersService {
@@ -35,13 +39,22 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto) {
-    const existEmail = await this.usersModel.findOne({ email: body.email });
+    await releaseDeletedUserIdentity(this.usersModel, {
+      email: body.email,
+      username: body.username,
+    });
+
+    const existEmail = await this.usersModel.findOne({
+      email: body.email,
+      isDelete: { $in: [false, null] },
+    });
     if (existEmail) {
       throw new BadRequestException('邮箱已存在');
     }
 
     const existUsername = await this.usersModel.findOne({
       username: body.username,
+      isDelete: { $in: [false, null] },
     });
     if (existUsername) {
       throw new BadRequestException('用户名已存在');
@@ -72,6 +85,44 @@ export class UsersService {
     return result;
   }
 
+  async currentUser(user): Promise<any> {
+    const result = await this.usersModel
+      .findOne({ _id: user._id, isDelete: { $in: [false, null] } })
+      .select('+roles +status +enable +integral +createdAt')
+      .populate({
+        path: 'roles',
+        populate: {
+          path: 'permissions',
+        },
+      })
+      .lean();
+
+    if (!result) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    const isSuperAdmin = result.roles?.some((role) => role.isSuperAdmin);
+
+    const permissions = isSuperAdmin
+      ? []
+      : (result.roles ?? [])
+          .map((role) => role.permissions ?? [])
+          .flat()
+          .filter((item) => item && !item.isStale)
+          .filter((item, index, self) => {
+            return (
+              index ===
+              self.findIndex((t) => t._id?.toString() === item._id?.toString())
+            );
+          });
+
+    return {
+      ...result,
+      isSuperAdmin,
+      permissions,
+    };
+  }
+
   async update(id: string, body: UpdateUserDto) {
     const result = await this.usersModel.findByIdAndUpdate(
       id,
@@ -87,18 +138,16 @@ export class UsersService {
   }
 
   async delete(id: string) {
-    const result = await this.usersModel.findByIdAndUpdate(
-      id,
-      { isDelete: true },
-      { new: true },
-    );
-    return result;
+    return markDeletedUser(this.usersModel, id);
   }
 
   async resetPassword(body: ResetPassowrdDto) {
     const { email, captcha, password } = body;
 
-    const user = await this.usersModel.findOne({ email });
+    const user = await this.usersModel.findOne({
+      email,
+      isDelete: { $in: [false, null] },
+    });
 
     if (!user) {
       throw new BadRequestException('邮箱不存在');
@@ -110,7 +159,7 @@ export class UsersService {
 
     const result = await this.usersModel
       .findById(_id)
-      .select('+roles +type')
+      .select('+roles')
       .populate({
         path: 'roles',
         populate: {
@@ -119,7 +168,7 @@ export class UsersService {
       })
       .exec();
 
-    if (result.type === 0 || result.roles?.some((role) => role.isSuperAdmin)) {
+    if (result.roles?.some((role) => role.isSuperAdmin)) {
       return true;
     }
 
@@ -138,7 +187,10 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    const result = await this.usersModel.findOne({ email });
+    const result = await this.usersModel.findOne({
+      email,
+      isDelete: { $in: [false, null] },
+    });
     return result;
   }
 

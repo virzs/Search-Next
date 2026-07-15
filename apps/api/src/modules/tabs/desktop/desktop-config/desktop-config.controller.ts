@@ -21,7 +21,8 @@ import {
 } from './dto/desktop-config.dto';
 import { PageDto } from 'src/public/dto/page';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { OptionalLogin } from 'src/public/decorator/optional_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 
 @ApiTags('新标签页/桌面/桌面配置')
 @Controller('tabs/desktop/config')
@@ -36,7 +37,7 @@ export class DesktopConfigController {
   }
 
   @Get('/admin/active')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '当前激活管理员配置' })
   getActiveAdminConfig() {
     return this.desktopConfigService.getActiveAdminConfig();
@@ -90,7 +91,7 @@ export class DesktopConfigController {
   }
 
   @Get('/user/default')
-  @RequireLogin()
+  @OptionalLogin()
   @ApiOperation({ summary: '用户默认配置' })
   getUserDefaultConfig(@User('_id') userId?: string) {
     if (!userId) {

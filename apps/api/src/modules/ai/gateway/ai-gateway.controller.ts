@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response as ExpressResponse } from 'express';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { ConsumerKeyGuard } from '../consumer-key/consumer-key.guard';
 import { AiGatewayService } from './ai-gateway.service';
 
 @ApiTags('AI/OpenAI Compatible Gateway')
-@RequireLogin()
+@PublicRoute()
 @UseGuards(ConsumerKeyGuard)
 @Controller('ai/v1')
 export class AiGatewayController {

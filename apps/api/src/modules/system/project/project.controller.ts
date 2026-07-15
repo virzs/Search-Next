@@ -3,7 +3,7 @@ import { ProjectService } from './project.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProjectDto } from './dto/project.dto';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 
 @ApiTags('项目')
 @Controller('system/project')
@@ -33,7 +33,7 @@ export class ProjectController {
   }
 
   @Get('/public')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '公共项目详情' })
   @ApiResponse({ type: ProjectDto })
   async publicDetail() {

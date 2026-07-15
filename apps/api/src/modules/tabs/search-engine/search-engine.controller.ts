@@ -16,7 +16,7 @@ import {
 } from './dto/search-engine.dto';
 import { PageDto } from 'src/public/dto/page';
 import { User } from 'src/public/decorator/route-user.decoratpr';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 
 @ApiTags('新标签页/搜索引擎')
 @Controller('tabs/search-engine')
@@ -32,7 +32,7 @@ export class SearchEngineController {
   }
 
   @Get('/enabled')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '启用搜索引擎列表' })
   getEnabledList() {
     return this.searchEngineService.listEnabled();

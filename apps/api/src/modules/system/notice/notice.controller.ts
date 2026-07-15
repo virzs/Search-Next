@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { RequireLogin } from 'src/public/decorator/require_login.decorator';
+import { PublicRoute } from 'src/public/decorator/public_route.decorator';
 import { User } from 'src/public/decorator/route-user.decoratpr';
 import {
   SystemNoticeDto,
@@ -24,7 +24,7 @@ export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
   @Get('/public/list')
-  @RequireLogin()
+  @PublicRoute()
   @ApiOperation({ summary: '生效通知列表' })
   @ApiQuery({ name: 'key', description: '模块Key（如 tabs）', required: true })
   getAllForPublic(@Query() query: SystemNoticePublicQueryDto) {

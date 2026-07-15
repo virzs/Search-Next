@@ -6,10 +6,11 @@ import { Model } from 'mongoose';
 import { Permission } from 'src/schemas/permission';
 import {
   getRequestMethodName,
-  joinRoutePaths,
+  getRoutePermissionPaths,
   normalizePermissionPath,
   toPathList,
 } from './permission-route.util';
+import { PUBLIC_ROUTE_KEY } from 'src/public/decorator/public_route.decorator';
 
 const SWAGGER_API_TAGS = 'swagger/apiUseTags';
 const SWAGGER_API_OPERATION = 'swagger/apiOperation';
@@ -90,13 +91,13 @@ export class PermissionSyncService implements OnApplicationBootstrap {
           continue;
         }
 
-        const routePaths = toPathList(
-          Reflect.getMetadata(PATH_METADATA, handler),
-        );
+        const handlerPaths = Reflect.getMetadata(PATH_METADATA, handler);
 
         for (const controllerPath of controllerPaths) {
-          for (const routePath of routePaths) {
-            const url = joinRoutePaths(controllerPath, routePath);
+          for (const url of getRoutePermissionPaths(
+            controllerPath,
+            handlerPaths,
+          )) {
             const syncKey = this.getRouteSyncKey(method, url);
             definitions.set(syncKey, {
               syncKey,
@@ -320,8 +321,8 @@ export class PermissionSyncService implements OnApplicationBootstrap {
   }
 
   private shouldSkipRoute(controller: unknown, handler: unknown) {
-    const requireLogin = this.getMetadata('require-login', controller, handler);
-    if (requireLogin !== undefined) {
+    const publicRoute = this.getMetadata(PUBLIC_ROUTE_KEY, controller, handler);
+    if (publicRoute) {
       return true;
     }
 
