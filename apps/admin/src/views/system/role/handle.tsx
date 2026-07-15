@@ -79,7 +79,9 @@ const RoleHandle = () => {
   const { id } = useParams();
   const [form] = Form.useForm<RoleRequest>();
 
-  const { data: pData = [], loading: pLoading } = useRequest(() => getPermissionTree({ simple: true }));
+  const { data: pData = [], loading: pLoading } = useRequest(() =>
+    getPermissionTree({ simple: true, activeOnly: true }),
+  );
   const permissionTreeData = useMemo(() => getPermissionTreeData(pData as PermissionListData[]), [pData]);
   const assignablePermissionKeys = useMemo(
     () => getAssignablePermissionKeys(pData as PermissionListData[]),
