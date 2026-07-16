@@ -14,6 +14,7 @@ import { resolveLocalizedText, useI18n } from "@/i18n";
 interface AppInfoModalProps {
   visible: boolean;
   onClose: () => void;
+  onStorageChanged?: () => void;
   appId: string;
   appName?: string;
   appConfig?: AppConfig;
@@ -37,6 +38,7 @@ const InfoRow = ({
 const AppInfoModal: FC<AppInfoModalProps> = ({
   visible,
   onClose,
+  onStorageChanged,
   appId,
   appName,
   appConfig,
@@ -64,6 +66,7 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
     });
     sharedEventBus.emit("storage:changed", { appId, key: "*", value: null });
     setVersion((value) => value + 1);
+    onStorageChanged?.();
     message.success(t("ui.appDataCleared"));
   };
 
@@ -120,6 +123,9 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
             description={t("ui.app.clearDataWarning")}
             okText={t("ui.clear")}
             cancelText={t("ui.cancel")}
+            getPopupContainer={(triggerNode) =>
+              triggerNode.parentElement ?? document.body
+            }
             onConfirm={handleClear}
           >
             <Button danger shape="round" disabled={stats.keyCount === 0}>

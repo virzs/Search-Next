@@ -1,5 +1,5 @@
 import { Button, Typography, message, Flex, Input, Modal, Select } from "antd";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useRequest } from "ahooks";
 import {
@@ -42,7 +42,11 @@ import {
   stringifyStorageBackup,
   type StorageBackupV1,
 } from "@/utils/storage";
-import { isAppStorageKey } from "@/utils/app-storage";
+import {
+  getAppIdFromStorageKey,
+  isAppStorageKey,
+  parseAppStorageMap,
+} from "@/utils/app-storage";
 import {
   getUserDataSync,
   putUserDataSync,
@@ -60,7 +64,10 @@ import {
   getSettingsBackupStoragePath,
   settingsRoute,
 } from "../../route-paths";
-import { useI18n } from "@/i18n";
+import { resolveAppDisplayName, useI18n } from "@/i18n";
+import { useApp } from "@/hooks/useApp";
+import AppInfoModal from "@/components/app-info-modal";
+import type { AppConfig } from "@/types";
 
 const { Text } = Typography;
 
@@ -111,6 +118,45 @@ interface StorageUsageSummary {
   itemCount: number;
   categories: StorageCategoryUsage[];
 }
+
+interface AppStorageUsage {
+  appId: string;
+  bytes: number;
+  itemCount: number;
+}
+
+interface AppStorageUsageSummary {
+  totalBytes: number;
+  metadataBytes: number;
+  apps: AppStorageUsage[];
+}
+
+interface AppStorageDisplayEntry extends AppStorageUsage {
+  name: string;
+  description: string;
+  color: string;
+  iconUrl: string | null;
+  isDevApp: boolean;
+  appConfig?: AppConfig;
+}
+
+const APP_STORAGE_COLORS = [
+  "#ff9500",
+  "#ffcc00",
+  "#34c759",
+  "#0a84ff",
+  "#af52de",
+  "#ff3b30",
+  "#64d2ff",
+];
+
+const getAppStorageColor = (appId: string) => {
+  let hash = 0;
+  for (const character of appId) {
+    hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  }
+  return APP_STORAGE_COLORS[hash % APP_STORAGE_COLORS.length];
+};
 
 const STORAGE_CATEGORY_ORDER: StorageCategoryId[] = [
   "desktop",
@@ -277,6 +323,43 @@ const analyzeBackupStorage = (
   };
 };
 
+const analyzeAppStorageUsage = (
+  backup: StorageBackupV1,
+): AppStorageUsageSummary => {
+  const usageByApp = new Map<string, AppStorageUsage>();
+  let metadataBytes = 0;
+
+  for (const [key, value] of Object.entries(backup.items ?? {})) {
+    const bytes = getBackupEntryByteSize(key, value);
+    if (bytes <= 0) continue;
+
+    if (key === INSTALLED_APPS_STORAGE_KEY) {
+      metadataBytes += bytes;
+      continue;
+    }
+
+    const appId = getAppIdFromStorageKey(key);
+    if (!appId) continue;
+    const itemCount = Object.keys(parseAppStorageMap(value)).length;
+    const current = usageByApp.get(appId);
+    usageByApp.set(appId, {
+      appId,
+      bytes: (current?.bytes ?? 0) + bytes,
+      itemCount: (current?.itemCount ?? 0) + itemCount,
+    });
+  }
+
+  const apps = [...usageByApp.values()].sort(
+    (a, b) => b.bytes - a.bytes || a.appId.localeCompare(b.appId),
+  );
+  return {
+    apps,
+    metadataBytes,
+    totalBytes:
+      metadataBytes + apps.reduce((sum, app) => sum + app.bytes, 0),
+  };
+};
+
 const StorageUsageOverview = ({
   usage,
 }: {
@@ -336,25 +419,37 @@ const StorageUsageOverview = ({
 
 const StorageUsageDetailSection = ({
   usage,
+  onOpenApps,
 }: {
   usage: StorageUsageSummary;
+  onOpenApps?: () => void;
 }) => {
   const { t } = useI18n();
   return (
     <MacSettingsSection title={t("ui.usageDetails")}>
       {usage.categories.length ? (
-        usage.categories.map((category) => (
-          <MacSettingsRow
-            key={category.id}
-            icon={category.icon}
-            iconTone={category.tone}
-            title={t(category.label)}
-            description={t(category.description)}
-            extra={
-              <MacSettingsValue>{formatBytes(category.bytes)}</MacSettingsValue>
-            }
-          />
-        ))
+        usage.categories.map((category) => {
+          const openCategory =
+            category.id === "apps" ? onOpenApps : undefined;
+          return (
+            <MacSettingsRow
+              key={category.id}
+              icon={category.icon}
+              iconTone={category.tone}
+              title={t(category.label)}
+              description={t(category.description)}
+              onClick={openCategory}
+              extra={
+                <span className="inline-flex items-center gap-2">
+                  <MacSettingsValue>
+                    {formatBytes(category.bytes)}
+                  </MacSettingsValue>
+                  {openCategory ? <MacSettingsChevron /> : null}
+                </span>
+              }
+            />
+          );
+        })
       ) : (
         <MacSettingsRow
           icon={<RiDatabase2Line size={16} />}
@@ -364,6 +459,232 @@ const StorageUsageDetailSection = ({
         />
       )}
     </MacSettingsSection>
+  );
+};
+
+const AppStorageUsageOverview = ({
+  usage,
+  entries,
+}: {
+  usage: AppStorageUsageSummary;
+  entries: AppStorageDisplayEntry[];
+}) => {
+  const { t } = useI18n();
+  const segments = [
+    ...entries.map((entry) => ({
+      id: entry.appId,
+      label: entry.name,
+      bytes: entry.bytes,
+      color: entry.color,
+    })),
+    ...(usage.metadataBytes > 0
+      ? [
+          {
+            id: "metadata",
+            label: t("ui.appInstallMetadata"),
+            bytes: usage.metadataBytes,
+            color: "#8e8e93",
+          },
+        ]
+      : []),
+  ];
+
+  return (
+    <section>
+      <div className="rounded-[14px] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0 truncate text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
+            {t("ui.appStorageCount", { count: usage.apps.length })}
+          </div>
+          <div className="shrink-0 text-right text-[13px] font-semibold text-[#6e6e73] dark:text-[#aeaeb2]">
+            {t("ui.sizeUsed", { size: formatBytes(usage.totalBytes) })}
+          </div>
+        </div>
+        <div className="mt-3 flex h-[22px] overflow-hidden rounded-[5px] bg-[#d1d1d6] dark:bg-white/15">
+          {segments.length ? (
+            segments.map((segment) => (
+              <div
+                key={segment.id}
+                title={`${segment.label} ${formatBytes(segment.bytes)}`}
+                className="h-full border-r border-white/70 last:border-r-0 dark:border-[#111113]/70"
+                style={{
+                  flexBasis: 0,
+                  flexGrow: segment.bytes,
+                  backgroundColor: segment.color,
+                }}
+              />
+            ))
+          ) : (
+            <div className="h-full flex-1 bg-[#d1d1d6] dark:bg-white/15" />
+          )}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5">
+          {segments.map((segment) => (
+            <span
+              key={segment.id}
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6e6e73] dark:text-[#aeaeb2]"
+            >
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: segment.color }}
+              />
+              {segment.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const AppStorageUsageView = () => {
+  const { apps, devApps, getAppIconUrl } = useApp();
+  const { t, language } = useI18n();
+  const [infoTarget, setInfoTarget] = useState<{
+    appId: string;
+    appName: string;
+    appConfig?: AppConfig;
+  } | null>(null);
+  const [, setStorageVersion] = useState(0);
+  const usage = analyzeAppStorageUsage(createSearchNextStorageBackup());
+  const appMap = new Map(apps.map((app) => [app._id, app]));
+  const devAppMap = new Map(devApps.map((app) => [app.id, app]));
+  const displayEntries: AppStorageDisplayEntry[] = usage.apps.map((entry) => {
+    const app = appMap.get(entry.appId);
+    const devApp = devAppMap.get(entry.appId);
+    const iconUrl = app ? getAppIconUrl(app) : null;
+    const name = app
+      ? resolveAppDisplayName(app, language)
+      : (devApp?.name ?? t("ui.removedApp"));
+    const description = app || devApp
+      ? t("ui.appStorageItemCount", { count: entry.itemCount })
+      : `${entry.appId} · ${t("ui.appStorageItemCount", {
+          count: entry.itemCount,
+        })}`;
+    const snapshot = app?.configSnapshot;
+    const appConfig: AppConfig | undefined = app
+      ? {
+          id: app._id,
+          name,
+          entry: app.entryUrl ?? app.entryFileName ?? "",
+          displayName: snapshot?.displayName ?? app.displayName,
+          displayNameI18n:
+            snapshot?.displayNameI18n ?? app.displayNameI18n,
+          description: snapshot?.description ?? app.description,
+          descriptionI18n:
+            snapshot?.descriptionI18n ?? app.descriptionI18n,
+          version: snapshot?.version ?? app.version,
+          author: snapshot?.author ?? app.author,
+          appIconUrl: iconUrl,
+        }
+      : devApp
+        ? {
+            id: devApp.id,
+            name: devApp.name,
+            entry: devApp.entry,
+          }
+        : undefined;
+
+    return {
+      ...entry,
+      name,
+      description,
+      color: getAppStorageColor(entry.appId),
+      iconUrl,
+      isDevApp: Boolean(devApp),
+      appConfig,
+    };
+  });
+  const hasDetails = usage.apps.length > 0 || usage.metadataBytes > 0;
+
+  return (
+    <>
+      <MacSettingsView
+        navigationTitle={t("ui.appStorageUsage")}
+        showPageHeader={false}
+      >
+        <AppStorageUsageOverview usage={usage} entries={displayEntries} />
+
+        <MacSettingsSection title={t("ui.appStorageDetails")}>
+          {hasDetails ? (
+            <>
+              {displayEntries.map((entry) => (
+                <MacSettingsRow
+                  key={entry.appId}
+                  icon={
+                    entry.iconUrl ? (
+                      <img
+                        src={entry.iconUrl}
+                        alt=""
+                        className="h-[30px] w-[30px] rounded-lg object-cover"
+                      />
+                    ) : entry.isDevApp ? (
+                      <RiCodeSSlashLine size={16} />
+                    ) : (
+                      <RiApps2Line size={16} />
+                    )
+                  }
+                  iconTone={
+                    entry.iconUrl
+                      ? "gray"
+                      : entry.isDevApp
+                        ? "purple"
+                        : "orange"
+                  }
+                  title={entry.name}
+                  description={entry.description}
+                  onClick={() =>
+                    setInfoTarget({
+                      appId: entry.appId,
+                      appName: entry.name,
+                      appConfig: entry.appConfig,
+                    })
+                  }
+                  extra={
+                    <span className="inline-flex items-center gap-2">
+                      <MacSettingsValue>
+                        {formatBytes(entry.bytes)}
+                      </MacSettingsValue>
+                      <MacSettingsChevron />
+                    </span>
+                  }
+                />
+              ))}
+              {usage.metadataBytes > 0 ? (
+                <MacSettingsRow
+                  icon={<RiDatabase2Line size={16} />}
+                  iconTone="gray"
+                  title={t("ui.appInstallMetadata")}
+                  description={t("ui.appInstallMetadataDescription")}
+                  extra={
+                    <MacSettingsValue>
+                      {formatBytes(usage.metadataBytes)}
+                    </MacSettingsValue>
+                  }
+                />
+              ) : null}
+            </>
+          ) : (
+            <MacSettingsRow
+              icon={<RiApps2Line size={16} />}
+              iconTone="gray"
+              title={t("ui.noAppStorageData")}
+              description={t("ui.noAppStorageDataDescription")}
+            />
+          )}
+        </MacSettingsSection>
+      </MacSettingsView>
+      {infoTarget ? (
+        <AppInfoModal
+          visible
+          onClose={() => setInfoTarget(null)}
+          onStorageChanged={() => setStorageVersion((value) => value + 1)}
+          appId={infoTarget.appId}
+          appName={infoTarget.appName}
+          appConfig={infoTarget.appConfig}
+        />
+      ) : null}
+    </>
   );
 };
 
@@ -980,6 +1301,7 @@ const BackupView = () => {
 };
 
 export const StorageUsageView = () => {
+  const navigate = useNavigate();
   const { backupId } = useParams<{ backupId?: string }>();
   const { isAuthenticated } = useAuth();
   const { t } = useI18n();
@@ -1045,7 +1367,14 @@ export const StorageUsageView = () => {
       showPageHeader={false}
     >
       <StorageUsageOverview usage={usage} />
-      <StorageUsageDetailSection usage={usage} />
+      <StorageUsageDetailSection
+        usage={usage}
+        onOpenApps={
+          isCloudBackup
+            ? undefined
+            : () => navigate(settingsRoute.path.backupStorageApps)
+        }
+      />
     </MacSettingsView>
   );
 };

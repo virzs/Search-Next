@@ -6,7 +6,12 @@ export const getAppStorageKey = (appId: string) =>
 export const isAppStorageKey = (key: string) =>
   key.startsWith(APP_STORAGE_KEY_PREFIX);
 
-const safeParseMap = (raw: string | null): Record<string, string> => {
+export const getAppIdFromStorageKey = (key: string) =>
+  isAppStorageKey(key) ? key.slice(APP_STORAGE_KEY_PREFIX.length) || null : null;
+
+export const parseAppStorageMap = (
+  raw: string | null,
+): Record<string, string> => {
   if (!raw) return {};
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -51,13 +56,14 @@ export const listAppStorageKeys = (storage: Storage = localStorage) => {
 export const readAppStorageMap = (
   appId: string,
   storage: Storage = localStorage,
-) => safeParseMap(storage.getItem(getAppStorageKey(appId)));
+) => parseAppStorageMap(storage.getItem(getAppStorageKey(appId)));
 
 export const getAppStorageStats = (
   appId: string,
   storage: Storage = localStorage,
 ) => {
   const values = readAppStorageMap(appId, storage);
+  const keyCount = Object.keys(values).length;
   const serialized = JSON.stringify(values);
   const valueBytes = Object.values(values).reduce(
     (sum, value) => sum + getUtf8ByteSize(value),
@@ -65,8 +71,8 @@ export const getAppStorageStats = (
   );
   return {
     key: getAppStorageKey(appId),
-    keyCount: Object.keys(values).length,
-    byteSize: getUtf8ByteSize(serialized),
+    keyCount,
+    byteSize: keyCount > 0 ? getUtf8ByteSize(serialized) : 0,
     valueBytes,
     values,
   };

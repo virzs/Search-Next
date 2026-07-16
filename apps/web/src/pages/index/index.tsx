@@ -43,7 +43,7 @@ import {
   type DesktopSortItem,
 } from "@search-next/desktop";
 // import SearchWithAI from "../../components/ai-search";
-import { App } from "antd";
+import { App, Button, Checkbox } from "antd";
 import {
   getActiveThemeConfigs,
   getDefaultUserConfig,
@@ -97,6 +97,11 @@ import {
   resolveAppTags,
   useI18n,
 } from "@/i18n";
+import {
+  clearAppStorage,
+  formatAppStorageSize,
+  getAppStorageStats,
+} from "@/utils/app-storage";
 
 type DesktopItem = DesktopSortItem<DesktopItemData>;
 type DesktopNextHandleRef = {
@@ -112,6 +117,30 @@ type DesktopAppAvailability =
       status: "unavailable";
       reason: "disabledOrDeleted" | "verificationFailed";
     };
+
+interface RemoveAppTarget {
+  item: DesktopItem;
+  appId: string;
+  appName: string;
+  icon?: string | null;
+  otherInstanceCount: number;
+  storageBytes: number;
+  storageItemCount: number;
+}
+
+interface PendingRemovalDecision {
+  appId: string;
+  deleteData: boolean;
+}
+
+const countAppInstances = (items: DesktopItem[], appId: string): number =>
+  items.reduce((count, item) => {
+    const ownCount = getDesktopItemAppId(item) === appId ? 1 : 0;
+    const nestedCount = item.children?.length
+      ? countAppInstances(item.children as DesktopItem[], appId)
+      : 0;
+    return count + ownCount + nestedCount;
+  }, 0);
 
 const firstDefined = <T,>(...values: Array<T | null | undefined>) =>
   values.find((value): value is T => value !== undefined && value !== null);
@@ -441,12 +470,49 @@ function Index() {
     appName: string;
     appConfig?: DesktopItemData["appConfig"];
   } | null>(null);
+  const [removeAppTarget, setRemoveAppTarget] =
+    useState<RemoveAppTarget | null>(null);
+  const [deleteAppData, setDeleteAppData] = useState(false);
+  const removeDecisionResolverRef = useRef<
+    ((allowed: boolean) => void) | null
+  >(null);
+  const pendingRemovalDecisionsRef = useRef(
+    new Map<string, PendingRemovalDecision>(),
+  );
   const closeFullApp = useCallback(() => {
     flushSync(() => setFullApp(null));
   }, []);
   const closeInfoModal = useCallback(() => {
     flushSync(() => setInfoTarget(null));
   }, []);
+  const settleRemoveDecision = useCallback((allowed: boolean) => {
+    const resolve = removeDecisionResolverRef.current;
+    removeDecisionResolverRef.current = null;
+    flushSync(() => {
+      setRemoveAppTarget(null);
+      setDeleteAppData(false);
+    });
+    resolve?.(allowed);
+  }, []);
+  const cancelRemoveApp = useCallback(() => {
+    settleRemoveDecision(false);
+  }, [settleRemoveDecision]);
+  const confirmRemoveApp = useCallback(() => {
+    if (!removeAppTarget) return;
+    pendingRemovalDecisionsRef.current.set(String(removeAppTarget.item.id), {
+      appId: removeAppTarget.appId,
+      deleteData: deleteAppData,
+    });
+    settleRemoveDecision(true);
+  }, [deleteAppData, removeAppTarget, settleRemoveDecision]);
+
+  useEffect(
+    () => () => {
+      removeDecisionResolverRef.current?.(false);
+      removeDecisionResolverRef.current = null;
+    },
+    [],
+  );
 
   /** 为指定应用创建 SDK 实例，注入宿主主题/用户/配置/通知等能力 */
   const sdkDepsRef = useRef({
@@ -1238,6 +1304,44 @@ function Index() {
 
   const handleContextMenuItemClick = useCallback(
     (item: DesktopItem, payload: ContextMenuActionPayload) => {
+      if (payload.actionType === "remove") {
+        const decision = pendingRemovalDecisionsRef.current.get(
+          String(item.id),
+        );
+        pendingRemovalDecisionsRef.current.delete(String(item.id));
+
+        const sourceId = String(item.id);
+        const nextDockItems = dockItemsRef.current.filter(
+          (dockItem) => String(dockItem.config?.sourceId) !== sourceId,
+        );
+        if (nextDockItems.length !== dockItemsRef.current.length) {
+          persistDockItems(nextDockItems);
+        }
+
+        if (decision?.deleteData) {
+          const keys = clearAppStorage(decision.appId);
+          keys.forEach((key) => {
+            sharedEventBus.emit("storage:changed", {
+              appId: decision.appId,
+              key,
+              value: null,
+            });
+          });
+          sharedEventBus.emit("storage:changed", {
+            appId: decision.appId,
+            key: "*",
+            value: null,
+          });
+        }
+
+        if (decision) {
+          message.success(
+            t(decision.deleteData ? "ui.removedWithData" : "ui.removed"),
+          );
+        }
+        return;
+      }
+
       if (payload.actionType !== "custom") return;
       const appLauncherDesktopType = getAppLauncherDesktopType(item);
       if (!appLauncherDesktopType) return;
@@ -1278,8 +1382,56 @@ function Index() {
         },
       });
     },
-    [createAppConfigFromApi, devApps, language, t, apps],
+    [
+      apps,
+      createAppConfigFromApi,
+      devApps,
+      language,
+      message,
+      persistDockItems,
+      t,
+    ],
   );
+
+  const handleBeforeRemove = useCallback(
+    (item: DesktopItem): boolean | Promise<boolean> => {
+      const appId = getDesktopItemAppId(item);
+      if (!appId) return true;
+      if (removeDecisionResolverRef.current) return false;
+
+      const appConfig = item.data?.appConfig;
+      const latestApp = appMap.get(appId);
+      const latestDevApp = devAppMap.get(appId);
+      const appName = latestApp
+        ? resolveAppDisplayName(latestApp, language, appConfig)
+        : (latestDevApp?.name ??
+          appConfig?.name ??
+          item.data?.name ??
+          t("ui.app"));
+      const stats = getAppStorageStats(appId);
+      const totalInstances = desktopPagesRef.current.reduce(
+        (count, page) =>
+          count + countAppInstances(page.children as DesktopItem[], appId),
+        0,
+      );
+
+      setDeleteAppData(false);
+      setRemoveAppTarget({
+        item,
+        appId,
+        appName,
+        icon:
+          appConfig?.appIconUrl ??
+          (typeof item.data?.icon === "string" ? item.data.icon : null),
+        otherInstanceCount: Math.max(0, totalInstances - 1),
+        storageBytes: stats.byteSize,
+        storageItemCount: stats.keyCount,
+      });
+
+      return new Promise<boolean>((resolve) => {
+        removeDecisionResolverRef.current = resolve;
+      });
+    }, [appMap, devAppMap, language, t]);
 
   const handleOpenSearchApp = useCallback(
     (app: AppApiItem) => {
@@ -1380,6 +1532,7 @@ function Index() {
           typeConfigMap={typeConfigMap}
           contextMenuProps={{ showRemoveButton: true }}
           dataTypeMenuConfigMap={dataTypeMenuConfigMap}
+          onBeforeRemove={handleBeforeRemove}
           onContextMenuItemClick={handleContextMenuItemClick}
           itemIconBuilder={desktopItemIconBuilder}
           dockProps={{
@@ -1537,6 +1690,114 @@ function Index() {
             >
               {t("ui.close")}
             </button>
+          </div>
+        </DesktopNextBaseModal>
+      )}
+      {removeAppTarget && (
+        <DesktopNextBaseModal
+          visible
+          onClose={cancelRemoveApp}
+          title={t("ui.removeAppTitle", {
+            name: removeAppTarget.appName,
+          })}
+          width={430}
+          destroyOnClose
+          theme={desktopTheme}
+          styles={{
+            header: {
+              position: "absolute",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
+              overflow: "hidden",
+              clip: "rect(0, 0, 0, 0)",
+              whiteSpace: "nowrap",
+              border: 0,
+            },
+            panel: {
+              background: preferDark
+                ? "rgba(28,28,30,0.94)"
+                : "rgba(255,255,255,0.94)",
+              border: preferDark
+                ? "1px solid rgba(255,255,255,0.12)"
+                : "1px solid rgba(255,255,255,0.78)",
+              boxShadow: preferDark
+                ? "0 28px 70px rgba(0,0,0,0.58), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 28px 70px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.92)",
+              backdropFilter: "blur(30px) saturate(1.18)",
+            },
+            body: { padding: "24px" },
+          }}
+        >
+          <div className="text-[#1d1d1f] dark:text-[#f5f5f7]">
+            <div className="flex items-start gap-4">
+              <div className="relative flex h-[64px] w-[64px] shrink-0 items-center justify-center overflow-hidden rounded-[18px] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_26px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e]">
+                {removeAppTarget.icon ? (
+                  <DesktopImageIcon
+                    src={removeAppTarget.icon}
+                    name={removeAppTarget.appName}
+                    objectFit="contain"
+                  />
+                ) : (
+                  <RiApps2Line size={28} className="text-[#8e8e93]" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1 pt-0.5">
+                <div className="text-[21px] font-semibold leading-[26px] tracking-[-0.012em]">
+                  {t("ui.removeAppTitle", {
+                    name: removeAppTarget.appName,
+                  })}
+                </div>
+                <div className="mt-1.5 text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#c7c7cc]">
+                  {t("ui.removeAppDescription")}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-[14px] border border-black/[0.06] bg-black/[0.035] px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.06]">
+              <Checkbox
+                checked={deleteAppData}
+                disabled={removeAppTarget.storageItemCount === 0}
+                onChange={(event) => setDeleteAppData(event.target.checked)}
+              >
+                <span className="font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
+                  {t("ui.deleteAppDataTogether")}
+                </span>
+              </Checkbox>
+              <div className="mt-1 pl-6 text-xs leading-[18px] text-[#6e6e73] dark:text-[#aeaeb2]">
+                {removeAppTarget.storageItemCount > 0
+                  ? t("ui.appStorageSummary", {
+                      size: formatAppStorageSize(
+                        removeAppTarget.storageBytes,
+                      ),
+                      count: removeAppTarget.storageItemCount,
+                    })
+                  : t("ui.noAppDataToDelete")}
+              </div>
+            </div>
+
+            {deleteAppData && removeAppTarget.otherInstanceCount > 0 ? (
+              <div className="mt-3 rounded-[12px] bg-[#ff3b30]/10 px-3.5 py-2.5 text-xs font-medium leading-[18px] text-[#c81e1e] dark:text-[#ff6961]">
+                {t("ui.sharedAppDataWarning", {
+                  count: removeAppTarget.otherInstanceCount,
+                })}
+              </div>
+            ) : null}
+
+            <div className="mt-6 flex justify-end gap-2">
+              <Button autoFocus shape="round" onClick={cancelRemoveApp}>
+                {t("ui.cancel")}
+              </Button>
+              <Button
+                danger
+                type="primary"
+                shape="round"
+                onClick={confirmRemoveApp}
+              >
+                {t("ui.removeApp")}
+              </Button>
+            </div>
           </div>
         </DesktopNextBaseModal>
       )}

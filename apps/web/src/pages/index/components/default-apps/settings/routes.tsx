@@ -4,7 +4,10 @@ import { createRouteObjectsFromDefinitions } from "../route-config";
 import SettingsModalRoute from "./index";
 import AboutView from "./views/about";
 import AccountView from "./views/account";
-import BackupView, { StorageUsageView } from "./views/backup";
+import BackupView, {
+  AppStorageUsageView,
+  StorageUsageView,
+} from "./views/backup";
 import DeveloperView from "./views/developer";
 import LanguageView from "./views/language";
 import PersonalizationView from "./views/personalization";
@@ -19,6 +22,7 @@ const settingsRouteElements = {
   "settings.language": <LanguageView />,
   "settings.backup": <BackupView />,
   "settings.backup-storage": <StorageUsageView />,
+  "settings.backup-storage-apps": <AppStorageUsageView />,
   "settings.backup-storage-detail": <StorageUsageView />,
   "settings.about": <AboutView />,
   "settings.developer": <DeveloperView />,

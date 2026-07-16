@@ -116,6 +116,18 @@ export const settingsRouteDefinitions: DefaultAppRouteDefinition[] = [
     search: false,
   },
   {
+    key: "settings.backup-storage-apps",
+    segment: settingsRoute.segment.backupStorageApps,
+    path: settingsRoute.path.backupStorageApps,
+    meta: {
+      title: "应用占用",
+      description: "查看各应用的本地数据占用",
+      keywords: ["apps", "storage", "应用占用"],
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
     key: "settings.backup-storage-detail",
     segment: settingsRoute.segment.backupStorageDetail,
     path: `${settingsRoute.path.backupStorage}/:backupId`,
