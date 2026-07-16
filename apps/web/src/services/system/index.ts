@@ -27,8 +27,9 @@ export interface NoticeItem {
   _id: string;
   title: string;
   content: string;
-  effectiveStart: string;
-  effectiveEnd: string;
+  effectiveStart?: string | null;
+  effectiveEnd?: string | null;
+  createdAt?: string | null;
   sourceKey?: string;
   sourceUrl?: string;
 }
