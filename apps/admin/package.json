@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@search-next/desktop": "workspace:*",
     "@ant-design/icons": "^6.1.0",
     "@ant-design/pro-components": "^2.8.10",
     "@ant-design/x": "^1.6.0",
@@ -17,6 +16,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@reduxjs/toolkit": "^2.9.1",
     "@remixicon/react": "^4.6.0",
+    "@search-next/desktop": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
     "ahooks": "^3.8.4",
     "antd": "^6.1.1",
@@ -41,7 +41,7 @@
     "react-virtuoso": "^4.14.1",
     "react-window": "^2.2.1",
     "uuid": "^11.0.3",
-    "zs_library": "^0.9.8"
+    "zs_library": "^0.9.9"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.15",
