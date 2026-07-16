@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Response } from 'src/utils/response';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Response } from "src/utils/response";
 import {
   SystemNotice,
   SystemNoticeSchemaName,
-} from 'src/modules/system/notice/notice.schema';
+} from "src/modules/system/notice/notice.schema";
 import {
   SystemNoticeDto,
   SystemNoticeForAdminDto,
-} from 'src/modules/system/notice/notice.dto';
+} from "src/modules/system/notice/notice.dto";
 
 @Injectable()
 export class NoticeService {
@@ -25,10 +25,10 @@ export class NoticeService {
     if (key) finder.key = key;
 
     if (search) {
-      finder.title = { $regex: search, $options: 'i' };
+      finder.title = { $regex: search, $options: "i" };
     }
 
-    if (active === 'true') {
+    if (active === "true") {
       const now = new Date();
       finder.enable = true;
       finder.$and = [
@@ -46,8 +46,8 @@ export class NoticeService {
       .skip((Number(page) - 1) * Number(pageSize))
       .limit(Number(pageSize))
       .sort({ createdAt: -1 })
-      .populate('creator', 'username')
-      .populate('updater', 'username')
+      .populate("creator", "username")
+      .populate("updater", "username")
       .exec();
 
     const total = await this.noticeModel.countDocuments(finder);
@@ -58,8 +58,8 @@ export class NoticeService {
   async detail(id: string) {
     return this.noticeModel
       .findById(id)
-      .populate('creator', 'username')
-      .populate('updater', 'username')
+      .populate("creator", "username")
+      .populate("updater", "username")
       .exec();
   }
 
@@ -84,12 +84,12 @@ export class NoticeService {
       updater: user,
     };
 
-    if ('effectiveStart' in body) {
+    if ("effectiveStart" in body) {
       doc.effectiveStart = effectiveStart
         ? new Date(effectiveStart)
         : undefined;
     }
-    if ('effectiveEnd' in body) {
+    if ("effectiveEnd" in body) {
       doc.effectiveEnd = effectiveEnd ? new Date(effectiveEnd) : undefined;
     }
 
@@ -119,8 +119,58 @@ export class NoticeService {
           },
         ],
       })
-      .select('title content cover effectiveStart effectiveEnd')
+      .select(
+        "title content cover effectiveStart effectiveEnd sourceKey sourceUrl",
+      )
       .sort({ createdAt: -1 })
       .exec();
+  }
+
+  async inbox(key: string) {
+    const now = new Date();
+    return this.noticeModel
+      .find({
+        key,
+        enable: true,
+        $and: [
+          {
+            $or: [{ effectiveStart: null }, { effectiveStart: { $lte: now } }],
+          },
+          {
+            $or: [{ effectiveEnd: null }, { effectiveEnd: { $gte: now } }],
+          },
+        ],
+      })
+      .select(
+        "title content cover effectiveStart effectiveEnd sourceKey sourceUrl createdAt",
+      )
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  async upsertReleaseNotice(payload: {
+    sourceKey: string;
+    key: string;
+    title: string;
+    content: string;
+    releaseUrl: string;
+    user: string;
+  }) {
+    return this.noticeModel.findOneAndUpdate(
+      { sourceKey: payload.sourceKey },
+      {
+        $setOnInsert: {
+          sourceKey: payload.sourceKey,
+          sourceUrl: payload.releaseUrl,
+          key: payload.key,
+          title: payload.title,
+          content: payload.content,
+          enable: true,
+          effectiveStart: new Date(),
+          creator: payload.user,
+        },
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true },
+    );
   }
 }

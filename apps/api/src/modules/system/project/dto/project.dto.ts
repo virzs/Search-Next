@@ -1,26 +1,26 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform, Type } from 'class-transformer';
+import { ApiProperty } from "@nestjs/swagger";
+import { Expose, Transform, Type } from "class-transformer";
 import {
   IsBoolean,
   IsArray,
   IsOptional,
   IsString,
   ValidateNested,
-} from 'class-validator';
-import { ResourceDto } from 'src/public/dto/resource.dto';
+} from "class-validator";
+import { ResourceDto } from "src/public/dto/resource.dto";
 
 class SubObjectDto {
-  @ApiProperty({ description: '标题' })
+  @ApiProperty({ description: "标题" })
   @IsString()
   @Expose()
   title: string;
 
-  @ApiProperty({ description: '副标题' })
+  @ApiProperty({ description: "副标题" })
   @IsString()
   @Expose()
   subTitle: string;
 
-  @ApiProperty({ description: '背景图', type: ResourceDto })
+  @ApiProperty({ description: "背景图", type: ResourceDto })
   @ValidateNested()
   @IsOptional()
   @Expose()
@@ -30,25 +30,25 @@ class SubObjectDto {
 }
 
 class RegisterPageDto extends SubObjectDto {
-  @ApiProperty({ description: '是否需要邮箱验证码注册' })
+  @ApiProperty({ description: "是否需要邮箱验证码注册" })
   @IsBoolean()
   @IsOptional()
   @Expose()
   forceEmailCaptcha: boolean;
 
-  @ApiProperty({ description: '是否需要邀请码注册' })
+  @ApiProperty({ description: "是否需要邀请码注册" })
   @IsBoolean()
   @IsOptional()
   @Expose()
   forceInvitationCode: boolean;
 
-  @ApiProperty({ description: '是否允许注册' })
+  @ApiProperty({ description: "是否允许注册" })
   @IsBoolean()
   @IsOptional()
   @Expose()
   allowRegister: boolean;
 
-  @ApiProperty({ description: '禁止注册时的提示文字' })
+  @ApiProperty({ description: "禁止注册时的提示文字" })
   @IsString()
   @IsOptional()
   @Expose()
@@ -56,19 +56,19 @@ class RegisterPageDto extends SubObjectDto {
 }
 
 class TurnstileConfigDto {
-  @ApiProperty({ description: '是否启用 Cloudflare Turnstile 人机验证' })
+  @ApiProperty({ description: "是否启用 Cloudflare Turnstile 人机验证" })
   @IsBoolean()
   @IsOptional()
   @Expose()
   enabled?: boolean;
 
-  @ApiProperty({ description: 'Cloudflare Turnstile site key' })
+  @ApiProperty({ description: "Cloudflare Turnstile site key" })
   @IsString()
   @IsOptional()
   @Expose()
   siteKey?: string;
 
-  @ApiProperty({ description: 'Cloudflare Turnstile secret key' })
+  @ApiProperty({ description: "Cloudflare Turnstile secret key" })
   @IsString()
   @IsOptional()
   @Expose()
@@ -76,7 +76,7 @@ class TurnstileConfigDto {
 }
 
 class AdminAccessConfigDto {
-  @ApiProperty({ description: '可登录后台的角色 ID 列表', type: [String] })
+  @ApiProperty({ description: "可登录后台的角色 ID 列表", type: [String] })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -84,19 +84,26 @@ class AdminAccessConfigDto {
   loginRoleIds?: string[];
 }
 
+class ReleaseConfigDto {
+  @ApiProperty({ description: "公开 GitHub 仓库地址" })
+  @IsString()
+  @Expose()
+  repositoryUrl: string;
+}
+
 export class ProjectDto {
-  @ApiProperty({ description: '项目名称' })
+  @ApiProperty({ description: "项目名称" })
   @IsString()
   @Expose()
   name: string;
 
-  @ApiProperty({ description: '项目描述' })
+  @ApiProperty({ description: "项目描述" })
   @IsString()
   @IsOptional()
   @Expose()
   description: string;
 
-  @ApiProperty({ description: '登录页设置', type: SubObjectDto })
+  @ApiProperty({ description: "登录页设置", type: SubObjectDto })
   @ValidateNested()
   @IsOptional()
   @Expose()
@@ -104,7 +111,7 @@ export class ProjectDto {
   @Transform(({ value }) => (value == null ? undefined : value))
   login?: SubObjectDto;
 
-  @ApiProperty({ description: '注册页设置', type: SubObjectDto })
+  @ApiProperty({ description: "注册页设置", type: SubObjectDto })
   @ValidateNested()
   @IsOptional()
   @Expose()
@@ -112,7 +119,10 @@ export class ProjectDto {
   @Transform(({ value }) => (value == null ? undefined : value))
   register?: RegisterPageDto;
 
-  @ApiProperty({ description: 'Cloudflare Turnstile 人机验证设置', type: TurnstileConfigDto })
+  @ApiProperty({
+    description: "Cloudflare Turnstile 人机验证设置",
+    type: TurnstileConfigDto,
+  })
   @ValidateNested()
   @IsOptional()
   @Expose()
@@ -120,11 +130,19 @@ export class ProjectDto {
   @Transform(({ value }) => (value == null ? undefined : value))
   turnstile?: TurnstileConfigDto;
 
-  @ApiProperty({ description: '后台访问控制设置', type: AdminAccessConfigDto })
+  @ApiProperty({ description: "后台访问控制设置", type: AdminAccessConfigDto })
   @ValidateNested()
   @IsOptional()
   @Expose()
   @Type(() => AdminAccessConfigDto)
   @Transform(({ value }) => (value == null ? undefined : value))
   adminAccess?: AdminAccessConfigDto;
+
+  @ApiProperty({ description: "Web/Admin 发布设置", type: ReleaseConfigDto })
+  @ValidateNested()
+  @IsOptional()
+  @Expose()
+  @Type(() => ReleaseConfigDto)
+  @Transform(({ value }) => (value == null ? undefined : value))
+  release?: ReleaseConfigDto;
 }

@@ -1,10 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-import { Resource } from 'src/modules/resource/schemas/resource';
-import { RoleName } from 'src/modules/system/role/schemas/role';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import mongoose from "mongoose";
+import { Resource } from "src/modules/resource/schemas/resource";
+import { RoleName } from "src/modules/system/role/schemas/role";
 import BaseSchema, {
   baseSchemaMiddleware,
-} from 'src/public/schema/base.schema';
+} from "src/public/schema/base.schema";
 
 class SubObject {
   @Prop({ type: String })
@@ -31,7 +31,7 @@ class RegisterPage extends SubObject {
   allowRegister: boolean;
 
   // 禁止注册时的提示文字
-  @Prop({ type: String, default: '当前不允许注册' })
+  @Prop({ type: String, default: "当前不允许注册" })
   registerDisabledTip: string;
 }
 
@@ -53,6 +53,12 @@ class AdminAccessConfig {
   // 可登录后台的角色。为空时仅系统管理员角色可登录。
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: RoleName }] })
   loginRoleIds?: string[];
+}
+
+class ReleaseConfig {
+  // 仅支持公开 GitHub 仓库，由服务端拼接固定的 api.github.com 地址。
+  @Prop({ type: String, default: "https://github.com/virzs/Search-Next" })
+  repositoryUrl: string;
 }
 
 @Schema({ timestamps: true })
@@ -86,6 +92,15 @@ export class Project extends BaseSchema {
   // 后台访问控制设置
   @Prop({ type: AdminAccessConfig, default: () => ({ loginRoleIds: [] }) })
   adminAccess: AdminAccessConfig;
+
+  // Web/Admin 手动发布所使用的 GitHub Release 仓库。
+  @Prop({
+    type: ReleaseConfig,
+    default: () => ({
+      repositoryUrl: "https://github.com/virzs/Search-Next",
+    }),
+  })
+  release: ReleaseConfig;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
