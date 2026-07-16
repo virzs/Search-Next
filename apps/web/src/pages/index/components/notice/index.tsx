@@ -10,6 +10,8 @@ import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
 import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
 
+export const OPEN_WEB_NOTICES_EVENT = "search-next:open-web-notices";
+
 const Notice = () => {
   const { t } = useI18n();
   const [open, { setTrue: openModal, setFalse: closeModal }] =
@@ -70,14 +72,30 @@ const Notice = () => {
     return notices.some((n) => !readIdSet.has(n._id));
   }, [notices, readIdSet]);
 
+  const hasUnreadNonRelease = useMemo(() => {
+    return notices.some(
+      (n) => !readIdSet.has(n._id) && !n.sourceKey?.startsWith("github:"),
+    );
+  }, [notices, readIdSet]);
+
   useEffect(() => {
     if (autoOpenCheckedRef.current) return;
     if (data === undefined) return;
     autoOpenCheckedRef.current = true;
-    if (!hasUnread) return;
+    if (!hasUnreadNonRelease) return;
     setActiveId(null);
     openModal();
-  }, [data, hasUnread, openModal]);
+  }, [data, hasUnreadNonRelease, openModal]);
+
+  useEffect(() => {
+    const listener = () => {
+      setActiveId(null);
+      openModal();
+      run();
+    };
+    window.addEventListener(OPEN_WEB_NOTICES_EVENT, listener);
+    return () => window.removeEventListener(OPEN_WEB_NOTICES_EVENT, listener);
+  }, [openModal, run]);
 
   return (
     <div>
@@ -106,7 +124,9 @@ const Notice = () => {
           inner: { width: "100%" },
         }}
       >
-        <div className={`flex w-full overflow-hidden h-[50vh] min-h-full max-h-[500px] ${noticeWindowClassName}`}>
+        <div
+          className={`flex w-full overflow-hidden h-[50vh] min-h-full max-h-[500px] ${noticeWindowClassName}`}
+        >
           <AppSidebar
             activeMenuKey={activeId || undefined}
             menuStyles={{

@@ -29,6 +29,8 @@ export interface NoticeItem {
   content: string;
   effectiveStart: string;
   effectiveEnd: string;
+  sourceKey?: string;
+  sourceUrl?: string;
 }
 
 /**
@@ -39,3 +41,16 @@ export const getNotice = () => {
     key: "tabs",
   });
 };
+
+export interface LatestReleasePublication {
+  component: "web" | "admin";
+  tagName: string;
+  version: string;
+  releaseUrl: string;
+  publishedAt: string;
+}
+
+export const getLatestReleasePublication = (component: "web" | "admin") =>
+  baseGetRequest<LatestReleasePublication | null>(
+    "/system/version/release-publications/latest",
+  )({ component });

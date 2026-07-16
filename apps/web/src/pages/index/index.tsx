@@ -75,6 +75,7 @@ import {
 } from "./components/default-apps/personalization/my-assets";
 import { settingsRoute } from "./components/default-apps/settings/route-paths";
 import Notice from "./components/notice";
+import WebReleaseUpdatePrompt from "./components/release-update";
 import Feedback from "./components/feedback";
 import DesktopImageIcon, {
   getStringIcon,
@@ -1301,12 +1302,12 @@ function Index() {
           width: 100%;
           height: 100%;
         `,
-        createSdk: ({ appId, sizeId, mode }) =>
-          buildSDK(appId, sizeId, mode),
-        resolveAppAvailability: (appId) =>
-          resolveDesktopAppAvailability(appId),
+        createSdk: ({ appId, sizeId, mode }) => buildSDK(appId, sizeId, mode),
+        resolveAppAvailability: (appId) => resolveDesktopAppAvailability(appId),
         resolveAppConfig: ({ app, appConfig }) =>
-          app ? (createAppConfigFromApi(app, appConfig) ?? appConfig) : appConfig,
+          app
+            ? (createAppConfigFromApi(app, appConfig) ?? appConfig)
+            : appConfig,
         renderAvailabilityPlaceholder: ({ status, name, src }) =>
           renderAppAvailabilityPlaceholder({
             status,
@@ -1353,6 +1354,7 @@ function Index() {
         `,
       )}
     >
+      <WebReleaseUpdatePrompt />
       <div className="flex items-center justify-end py-2 px-6 max-w-7xl mx-auto w-full gap-2">
         <Notice />
         <Feedback />
