@@ -37,9 +37,9 @@ const exists = async (file) => {
   }
 };
 
-const run = (cmd, cmdArgs) =>
+const run = (cmd, cmdArgs, env = process.env) =>
   new Promise((resolve, reject) => {
-    const child = spawn(cmd, cmdArgs, { cwd: root, stdio: "inherit", shell: false });
+    const child = spawn(cmd, cmdArgs, { cwd: root, stdio: "inherit", shell: false, env });
     child.on("error", reject);
     child.on("exit", (code) => {
       if (code === 0) resolve();
@@ -212,10 +212,16 @@ const prepare = async () => {
   await mkdir(outputDir, { recursive: true });
 
   const assets = [];
+  const releaseTag =
+    process.env.RELEASE_TAG ||
+    (project.id === "all" ? `v${version}` : `${project.label}-v${version}`);
   console.log(`[release-assets] Project: ${project.id}`);
 
   for (const unit of project.units) {
-    await run(unit.build[0], unit.build[1]);
+    await run(unit.build[0], unit.build[1], {
+      ...process.env,
+      VITE_RELEASE_TAG: releaseTag,
+    });
     if (unit.type === "app") await prepareAppAsset(unit, version, outputDir, assets);
     if (unit.type === "app-package") await prepareAppPackageAsset(unit, outputDir, assets);
     if (unit.type === "app-packages") await prepareAppPackageGroupAssets(outputDir, assets);

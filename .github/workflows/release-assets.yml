@@ -102,6 +102,7 @@ jobs:
       - name: Build release assets
         env:
           APP_SCREENSHOT_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: pnpm release:prepare -- --project "${{ steps.release.outputs.project }}" --version "${{ steps.release.outputs.version }}"
 
       - name: Create or update GitHub Release
