@@ -24,7 +24,7 @@ import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
 
 export const OPEN_WEB_NOTICES_EVENT = "search-next:open-web-notices";
-const NOTICE_POLL_INTERVAL = 5 * 60 * 1000;
+const NOTICE_POLL_INTERVAL = 2 * 60 * 1000;
 
 const formatNoticeDate = (value?: string | null) => {
   if (!value) return "";
@@ -102,15 +102,10 @@ const Notice = () => {
     return notices.find((n) => n._id === activeId) ?? null;
   }, [activeId, notices]);
 
-  const hasUnread = useMemo(() => {
-    return notices.some((n) => !readIdSet.has(n._id));
+  const firstUnreadId = useMemo(() => {
+    return notices.find((n) => !readIdSet.has(n._id))?._id ?? null;
   }, [notices, readIdSet]);
-
-  const hasUnreadNonRelease = useMemo(() => {
-    return notices.some(
-      (n) => !readIdSet.has(n._id) && !n.sourceKey?.startsWith("github:"),
-    );
-  }, [notices, readIdSet]);
+  const hasUnread = Boolean(firstUnreadId);
 
   const activeIsRelease = Boolean(
     activeNotice?.sourceKey?.startsWith("github:"),
@@ -157,10 +152,10 @@ const Notice = () => {
     if (autoOpenCheckedRef.current) return;
     if (data === undefined) return;
     autoOpenCheckedRef.current = true;
-    if (!hasUnreadNonRelease) return;
-    setActiveId(null);
+    if (!firstUnreadId) return;
+    setActiveId(firstUnreadId);
     openModal();
-  }, [data, hasUnreadNonRelease, openModal]);
+  }, [data, firstUnreadId, openModal]);
 
   useEffect(() => {
     const listener = () => {
@@ -192,6 +187,7 @@ const Notice = () => {
       <Badge dot={hasUnread}>
         <Tooltip title={t("ui.notifications")}>
           <Button
+            aria-label={t("ui.notifications")}
             type="text"
             onClick={() => {
               setActiveId(null);
