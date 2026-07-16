@@ -235,8 +235,21 @@ server {
     add_header Cross-Origin-Resource-Policy cross-origin always;
   }
 
+  # SPA 入口必须每次向服务器确认，避免发布后仍加载旧 chunk 清单。
+  location = /index.html {
+    add_header Cache-Control "no-cache, must-revalidate" always;
+  }
+
+  # Vite 构建文件名包含内容 hash，可以永久缓存。
+  location ^~ /assets/ {
+    try_files $uri =404;
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+  }
+
   location / {
     try_files $uri $uri/ /index.html;
+    add_header Cache-Control "no-cache, must-revalidate" always;
   }
 }
 ```
@@ -278,6 +291,17 @@ location / {
 - 主站和后台刷新 `/login`、`/dashboard` 等前端路由都能回退到 `index.html`。
 - 上传目录、MongoDB、Redis 中的重要数据已配置备份。
 - 生产环境不使用仓库中的示例密钥、个人密钥或开发环境配置。
+
+### 手动发布 Web/Admin 公告
+
+Web/Admin 继续采用手动部署。GitHub Actions 完成 Release 构建后，先下载并更新服务器文件，再进入管理后台：
+
+1. 在“系统 → 设置 → 发布设置”确认公开 GitHub 仓库地址。
+2. 打开“系统 → 版本 → Web 发布”，重新读取 GitHub Release。
+3. 在 Web 或 Admin 区域选择已经部署的 Release，生成并编辑公告。
+4. 确认对应构建已经部署后发布。Web 公告进入用户端通知中心，Admin 公告进入后台消息中心。
+
+发布动作只登记当前已部署版本和生成公告，不会连接服务器或执行部署。构建产物内会写入 Release tag；已打开的页面检测到后台登记了不同 tag 后，会提供“查看更新”和“刷新页面”。
 
 ## 应用开发
 
