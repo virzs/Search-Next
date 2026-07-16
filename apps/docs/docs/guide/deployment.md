@@ -57,8 +57,19 @@ server {
     add_header Cross-Origin-Resource-Policy cross-origin always;
   }
 
+  location = /index.html {
+    add_header Cache-Control "no-cache, must-revalidate" always;
+  }
+
+  location ^~ /assets/ {
+    try_files $uri =404;
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+  }
+
   location / {
     try_files $uri $uri/ /index.html;
+    add_header Cache-Control "no-cache, must-revalidate" always;
   }
 }
 ```
@@ -91,8 +102,19 @@ server {
     add_header Cross-Origin-Resource-Policy cross-origin always;
   }
 
+  location = /index.html {
+    add_header Cache-Control "no-cache, must-revalidate" always;
+  }
+
+  location ^~ /assets/ {
+    try_files $uri =404;
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+  }
+
   location / {
     try_files $uri $uri/ /index.html;
+    add_header Cache-Control "no-cache, must-revalidate" always;
   }
 }
 ```
