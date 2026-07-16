@@ -24,6 +24,7 @@ import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
 
 export const OPEN_WEB_NOTICES_EVENT = "search-next:open-web-notices";
+const NOTICE_POLL_INTERVAL = 5 * 60 * 1000;
 
 const formatNoticeDate = (value?: string | null) => {
   if (!value) return "";
@@ -50,7 +51,8 @@ const Notice = () => {
   const autoOpenCheckedRef = useRef(false);
 
   const { data, run } = useRequest(getNotice, {
-    pollingInterval: 60 * 60 * 1000,
+    pollingInterval: NOTICE_POLL_INTERVAL,
+    pollingWhenHidden: false,
   });
 
   const notices = useMemo(() => {
@@ -169,6 +171,21 @@ const Notice = () => {
     window.addEventListener(OPEN_WEB_NOTICES_EVENT, listener);
     return () => window.removeEventListener(OPEN_WEB_NOTICES_EVENT, listener);
   }, [openModal, run]);
+
+  useEffect(() => {
+    const refresh = () => run();
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") run();
+    };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [run]);
 
   return (
     <div>
