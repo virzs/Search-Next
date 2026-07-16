@@ -1,19 +1,25 @@
 import { MenuDataItem, ProLayout } from "@ant-design/pro-components";
 import { Outlet, useNavigate } from "react-router";
 import useMenu from "../hooks/useMenu";
-import { Badge, Button, Dropdown, Tooltip } from "antd";
+import { Dropdown } from "antd";
 import { useRequest } from "ahooks";
 import { postLogout } from "@/services/auth";
 import { removeUserInfo } from "@/utils/userInfo";
-import { getRefreshToken, removeRefreshToken, removeToken } from "@/utils/token";
+import {
+  getRefreshToken,
+  removeRefreshToken,
+  removeToken,
+} from "@/utils/token";
 import { AuthPaths } from "@/views/auth/router";
 import { UserPaths } from "@/views/user/router";
 import { css, cx } from "@emotion/css";
 import { motion } from "motion/react";
-import { RiLogoutBoxLine, RiMessageLine, RiUserLine } from "@remixicon/react";
+import { RiLogoutBoxLine, RiUserLine } from "@remixicon/react";
 import LayoutThemeToggle from "./components/theme";
 import { useAccess } from "@/contexts/AccessContext";
 import { useEffect } from "react";
+import AdminNoticeCenter from "./components/notice";
+import AdminReleaseUpdatePrompt from "./components/release-update";
 
 const MainLayout = (props: any) => {
   const menus = useMenu();
@@ -86,7 +92,7 @@ const MainLayout = (props: any) => {
               margin-block-start: 0 !important;
             }
           }
-        `
+        `,
       )}
       logo={false}
       title="Search Next 管理"
@@ -135,12 +141,8 @@ const MainLayout = (props: any) => {
         },
       }}
       actionsRender={() => [
-        <Tooltip title="消息" placement="left">
-          <Badge>
-            <Button icon={<RiMessageLine size={16} />} size="small" variant="text"></Button>
-          </Badge>
-        </Tooltip>,
-        <LayoutThemeToggle />,
+        <AdminNoticeCenter key="admin-notices" />,
+        <LayoutThemeToggle key="layout-theme" />,
       ]}
       menuFooterRender={(props) => {
         if (props?.collapsed) return undefined;
@@ -152,7 +154,13 @@ const MainLayout = (props: any) => {
       }}
       {...props}
     >
-      <motion.div className={cx("h-full")} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <AdminReleaseUpdatePrompt />
+      <motion.div
+        className={cx("h-full")}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         <Outlet />
       </motion.div>
     </ProLayout>

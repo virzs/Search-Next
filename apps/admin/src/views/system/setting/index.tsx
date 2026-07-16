@@ -154,6 +154,28 @@ const Setting = () => {
                 />
               </div>
             </SettingsSection>
+            <SettingsSection title="发布设置">
+              <Alert
+                className="mb-4"
+                type="info"
+                showIcon
+                message="版本发布页将从该公开 GitHub 仓库读取 Web/Admin Release。仅支持 github.com 仓库地址。"
+              />
+              <ProFormText
+                name={["release", "repositoryUrl"]}
+                label="GitHub 仓库地址"
+                placeholder="https://github.com/owner/repository"
+                initialValue="https://github.com/virzs/Search-Next"
+                rules={[
+                  { required: true, message: "请输入 GitHub 仓库地址" },
+                  {
+                    pattern:
+                      /^https:\/\/github\.com\/[^/?#]+\/[^/?#]+(?:\.git)?\/?$/i,
+                    message: "请输入完整的公开 GitHub 仓库地址",
+                  },
+                ]}
+              />
+            </SettingsSection>
             <SettingsSection title="登录页设置">
               <div className="grid gap-4 md:grid-cols-2">
                 <ProFormText name={["login", "title"]} label="标题" />

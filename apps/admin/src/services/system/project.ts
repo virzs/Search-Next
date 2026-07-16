@@ -27,6 +27,9 @@ export interface ProjectData {
   adminAccess?: {
     loginRoleIds?: string[];
   };
+  release?: {
+    repositoryUrl?: string;
+  };
 }
 
 // detail

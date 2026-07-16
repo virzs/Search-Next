@@ -8,6 +8,7 @@ import RoleDetail from "./role/detail";
 import Version from "./version";
 import VersionHandle from "./version/handle";
 import VersionDetail from "./version/detail";
+import WebRelease from "./version/web-release";
 import Notice from "./notice";
 import NoticeHandle from "./notice/handle";
 import NoticeDetail from "./notice/detail";
@@ -22,6 +23,7 @@ export const SystemPaths = {
   setting: "/system/setting",
   version: "/system/version",
   versionHandle: "/system/version/handle",
+  webRelease: "/system/version/web-release",
   notice: "/system/notice",
   noticeHandle: "/system/notice/handle",
 };
@@ -68,6 +70,10 @@ const SystemRouter: RouteObject = {
     {
       path: SystemPaths.versionHandle + "/:id",
       element: <VersionHandle />,
+    },
+    {
+      path: SystemPaths.webRelease,
+      element: <WebRelease />,
     },
     {
       path: SystemPaths.version + "/:id",
@@ -139,6 +145,11 @@ export const SystemMenu: Menu = {
         {
           name: "详情",
           path: SystemPaths.version + "/:id",
+        },
+        {
+          name: "Web 发布",
+          path: SystemPaths.webRelease,
+          auth: routeAuth("GET", "/system/version/release-candidates"),
         },
       ],
     },

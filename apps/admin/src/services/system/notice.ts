@@ -28,6 +28,17 @@ export interface NoticeRequest {
   enable?: boolean;
 }
 
+export interface NoticeInboxItem {
+  _id: string;
+  title: string;
+  content: string;
+  effectiveStart?: string;
+  effectiveEnd?: string;
+  createdAt?: string;
+  sourceKey?: string;
+  sourceUrl?: string;
+}
+
 export const getNotice = async (params: any) => {
   return baseGetRequest("/system/notice")(params);
 };
@@ -48,3 +59,6 @@ export const detailNotice = async (id: string) => {
   return baseDetailRequest("/system/notice")(id);
 };
 
+export const getNoticeInbox = async (key = "admin") => {
+  return baseGetRequest<NoticeInboxItem[]>("/system/notice/inbox")({ key });
+};
