@@ -159,7 +159,7 @@ const Setting = () => {
                 className="mb-4"
                 type="info"
                 showIcon
-                message="版本发布页将从该公开 GitHub 仓库读取 Web/Admin Release。仅支持 github.com 仓库地址。"
+                message="通知页将从该公开 GitHub 仓库读取 Web/Admin Release。仅支持 github.com 仓库地址。"
               />
               <ProFormText
                 name={["release", "repositoryUrl"]}

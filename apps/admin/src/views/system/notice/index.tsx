@@ -1,14 +1,16 @@
+import Access from "@/components/Access";
 import TablePage from "@/components/TablePage2";
 import Operation from "@/components/TablePage2/Operation";
 import TablePageContainer from "@/components/containter/table";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import { useTablePage } from "@/hooks/useTablePage2";
 import { deleteNotice, getNotice } from "@/services/system/notice";
-import { Button, Tag, message } from "antd";
+import { Button, Space, Tag, message } from "antd";
 import { useRequest } from "ahooks";
 import { useNavigate } from "react-router";
 import { SystemPaths } from "../router";
-import { RiAddLine } from "@remixicon/react";
+import { RiAddLine, RiRocket2Line } from "@remixicon/react";
+import { routeAuth } from "@/contexts/AccessContext";
 
 const Notice = () => {
   const navigate = useNavigate();
@@ -108,15 +110,27 @@ const Notice = () => {
         table={table}
         columns={columns}
         button={
-          <Button
-            type="primary"
-            onClick={() => {
-              navigate(SystemPaths.noticeHandle);
-            }}
-            icon={<RiAddLine size={16} />}
-          >
-            新增
-          </Button>
+          <Space>
+            <Access
+              auth={routeAuth("GET", "/system/version/release-candidates")}
+            >
+              <Button
+                icon={<RiRocket2Line size={16} />}
+                onClick={() => navigate(SystemPaths.noticeRelease)}
+              >
+                版本公告
+              </Button>
+            </Access>
+            <Button
+              type="primary"
+              onClick={() => {
+                navigate(SystemPaths.noticeHandle);
+              }}
+              icon={<RiAddLine size={16} />}
+            >
+              新增
+            </Button>
+          </Space>
         }
         onRow={(r) => ({
           onClick: () => {

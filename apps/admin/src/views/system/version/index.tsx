@@ -7,11 +7,9 @@ import { Button, Space, Tag, message } from "antd";
 import { SystemPaths } from "../router";
 import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
-import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { getPlatformDicLabel, getUpdateTypeDicLabel } from "./dic";
 import { WindowTableColumnType } from "@/components/WindowTable";
-import Access from "@/components/Access";
-import { routeAuth } from "@/contexts/AccessContext";
 
 const Version = () => {
   const navigate = useNavigate();
@@ -105,27 +103,15 @@ const Version = () => {
         table={table}
         columns={columns}
         button={
-          <Space>
-            <Access
-              auth={routeAuth("GET", "/system/version/release-candidates")}
-            >
-              <Button
-                icon={<CloudUploadOutlined />}
-                onClick={() => navigate(SystemPaths.webRelease)}
-              >
-                Web 发布
-              </Button>
-            </Access>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                navigate(SystemPaths.versionHandle);
-              }}
-            >
-              新增客户端版本
-            </Button>
-          </Space>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              navigate(SystemPaths.versionHandle);
+            }}
+          >
+            新增客户端版本
+          </Button>
         }
         onRow={(r) => ({
           onClick: () => {

@@ -18,7 +18,6 @@ import {
   Select,
   Space,
   Tag,
-  Typography,
   message,
 } from "antd";
 import { useRequest } from "ahooks";
@@ -30,7 +29,7 @@ import {
   RiRefreshLine,
   RiRocket2Line,
 } from "@remixicon/react";
-import { SystemPaths } from "../../router";
+import { SystemPaths } from "../router";
 import { routeAuth } from "@/contexts/AccessContext";
 
 interface ReleaseDraft {
@@ -277,7 +276,17 @@ const ReleaseCard = ({
   );
 };
 
-const WebRelease = () => {
+export interface ReleasePublicationPageProps {
+  components: ReleaseComponent[];
+  title: string;
+  description: string;
+}
+
+export const ReleasePublicationPage = ({
+  components,
+  title,
+  description,
+}: ReleasePublicationPageProps) => {
   const {
     data,
     loading,
@@ -287,17 +296,11 @@ const WebRelease = () => {
   const candidates = data as ReleaseCandidatesResponse | undefined;
 
   return (
-    <FullPageContainer loading={loading && !candidates}>
-      <div className="mx-auto max-w-7xl py-4">
-        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <Typography.Title level={3} className="mb-1!">
-              Web 发布
-            </Typography.Title>
-            <Typography.Text type="secondary">
-              手动部署完成后，从 GitHub Release 生成并发布对应端公告。
-            </Typography.Text>
-          </div>
+    <FullPageContainer
+      loading={loading && !candidates}
+      title={title}
+      cardProps={{
+        extra: (
           <Button
             icon={<RiRefreshLine size={15} />}
             loading={loading}
@@ -305,7 +308,11 @@ const WebRelease = () => {
           >
             重新读取仓库
           </Button>
-        </div>
+        ),
+      }}
+    >
+      <div className="mx-auto max-w-7xl py-4">
+        <div className="mb-4 text-sm text-gray-500">{description}</div>
 
         {candidates ? (
           <Alert
@@ -331,21 +338,21 @@ const WebRelease = () => {
           />
         ) : null}
 
-        <div className="grid gap-5 xl:grid-cols-2">
-          <ReleaseCard
-            component="web"
-            releases={candidates?.web || []}
-            onPublished={() => load(false)}
-          />
-          <ReleaseCard
-            component="admin"
-            releases={candidates?.admin || []}
-            onPublished={() => load(false)}
-          />
+        <div
+          className={
+            components.length > 1 ? "grid gap-5 xl:grid-cols-2" : undefined
+          }
+        >
+          {components.map((component) => (
+            <ReleaseCard
+              key={component}
+              component={component}
+              releases={candidates?.[component] || []}
+              onPublished={() => load(false)}
+            />
+          ))}
         </div>
       </div>
     </FullPageContainer>
   );
 };
-
-export default WebRelease;

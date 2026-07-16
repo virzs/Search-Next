@@ -8,10 +8,10 @@ import RoleDetail from "./role/detail";
 import Version from "./version";
 import VersionHandle from "./version/handle";
 import VersionDetail from "./version/detail";
-import WebRelease from "./version/web-release";
 import Notice from "./notice";
 import NoticeHandle from "./notice/handle";
 import NoticeDetail from "./notice/detail";
+import ReleaseNotice from "./notice/release";
 import { RiSettings3Line } from "@remixicon/react";
 import { routeAuth } from "@/contexts/AccessContext";
 
@@ -23,9 +23,9 @@ export const SystemPaths = {
   setting: "/system/setting",
   version: "/system/version",
   versionHandle: "/system/version/handle",
-  webRelease: "/system/version/web-release",
   notice: "/system/notice",
   noticeHandle: "/system/notice/handle",
+  noticeRelease: "/system/notice/release",
 };
 
 const SystemRouter: RouteObject = {
@@ -72,10 +72,6 @@ const SystemRouter: RouteObject = {
       element: <VersionHandle />,
     },
     {
-      path: SystemPaths.webRelease,
-      element: <WebRelease />,
-    },
-    {
       path: SystemPaths.version + "/:id",
       element: <VersionDetail />,
     },
@@ -90,6 +86,10 @@ const SystemRouter: RouteObject = {
     {
       path: SystemPaths.noticeHandle + "/:id",
       element: <NoticeHandle />,
+    },
+    {
+      path: SystemPaths.noticeRelease,
+      element: <ReleaseNotice />,
     },
     {
       path: SystemPaths.notice + "/:id",
@@ -146,11 +146,6 @@ export const SystemMenu: Menu = {
           name: "详情",
           path: SystemPaths.version + "/:id",
         },
-        {
-          name: "Web 发布",
-          path: SystemPaths.webRelease,
-          auth: routeAuth("GET", "/system/version/release-candidates"),
-        },
       ],
     },
     {
@@ -159,6 +154,11 @@ export const SystemMenu: Menu = {
       auth: routeAuth("GET", "/system/notice"),
       hideChildrenInMenu: true,
       children: [
+        {
+          name: "版本公告",
+          path: SystemPaths.noticeRelease,
+          auth: routeAuth("GET", "/system/version/release-candidates"),
+        },
         {
           name: "新增",
           path: SystemPaths.noticeHandle,
