@@ -16,12 +16,13 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
 
 const READ_STORAGE_KEY = "search-next:admin-notice-read-ids";
-const NOTICE_POLL_INTERVAL = 5 * 60 * 1000;
+const NOTICE_POLL_INTERVAL = 2 * 60 * 1000;
 export const OPEN_ADMIN_NOTICES_EVENT = "search-next:open-admin-notices";
 
 const readStoredIds = () => {
@@ -86,7 +87,8 @@ const AdminNoticeCenter = () => {
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>();
   const [readIds, setReadIds] = useState<string[]>(readStoredIds);
-  const { data = [], run } = useRequest(() => getNoticeInbox("admin"), {
+  const autoOpenCheckedRef = useRef(false);
+  const { data, run } = useRequest(() => getNoticeInbox("admin"), {
     pollingInterval: NOTICE_POLL_INTERVAL,
     pollingWhenHidden: false,
   });
@@ -98,7 +100,7 @@ const AdminNoticeCenter = () => {
       return Number.isFinite(timestamp) ? timestamp : 0;
     };
 
-    return [...(data as NoticeInboxItem[])].sort((a, b) => {
+    return [...((data ?? []) as NoticeInboxItem[])].sort((a, b) => {
       const bTime = parseTime(b.effectiveStart) || parseTime(b.createdAt);
       const aTime = parseTime(a.effectiveStart) || parseTime(a.createdAt);
       return bTime - aTime;
@@ -106,7 +108,11 @@ const AdminNoticeCenter = () => {
   }, [data]);
   const active = notices.find((item) => item._id === activeId) || notices[0];
   const readSet = useMemo(() => new Set(readIds), [readIds]);
-  const hasUnread = notices.some((item) => !readSet.has(item._id));
+  const firstUnreadId = useMemo(
+    () => notices.find((item) => !readSet.has(item._id))?._id,
+    [notices, readSet],
+  );
+  const hasUnread = Boolean(firstUnreadId);
   const activeContent = useMemo(() => getNoticeContent(active), [active]);
   const activeIsRelease = Boolean(active?.sourceKey?.startsWith("github:"));
   const activeDate = getNoticeDisplayDate(active, "YYYY-MM-DD HH:mm");
@@ -134,6 +140,14 @@ const AdminNoticeCenter = () => {
     window.addEventListener(OPEN_ADMIN_NOTICES_EVENT, listener);
     return () => window.removeEventListener(OPEN_ADMIN_NOTICES_EVENT, listener);
   }, [show]);
+
+  useEffect(() => {
+    if (autoOpenCheckedRef.current || data === undefined) return;
+    autoOpenCheckedRef.current = true;
+    if (!firstUnreadId) return;
+    setActiveId(firstUnreadId);
+    setOpen(true);
+  }, [data, firstUnreadId]);
 
   useEffect(() => {
     const refresh = () => run();
