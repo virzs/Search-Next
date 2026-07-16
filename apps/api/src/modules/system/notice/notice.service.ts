@@ -120,7 +120,7 @@ export class NoticeService {
         ],
       })
       .select(
-        "title content cover effectiveStart effectiveEnd sourceKey sourceUrl",
+        "title content cover effectiveStart effectiveEnd sourceKey sourceUrl createdAt",
       )
       .sort({ createdAt: -1 })
       .exec();
