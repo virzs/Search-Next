@@ -44,7 +44,7 @@ function Row<RecordType extends object = any>(props: WindowTableRowProps<RecordT
       const fixed = getFixedColumnStyle({
         columns: fixedColumns,
         id: cell.column.columnDef.id!,
-        color: "#fff",
+        color: "var(--ant-table-bg, var(--ant-color-bg-container))",
       });
 
       return (

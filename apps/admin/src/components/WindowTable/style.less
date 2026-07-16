@@ -63,8 +63,8 @@
 
     &-disabled {
       cursor: not-allowed !important;
-      background-color: rgba(153, 153, 153, 0.08);
-      color: rgba(32, 32, 32, 0.5);
+      background-color: var(--ant-color-fill-quaternary);
+      color: var(--ant-color-text-disabled);
       cursor: not-allowed;
 
 
@@ -72,17 +72,17 @@
       .window-table-fixed-right-cell,
       .window-table-fixed-left-cell-last,
       .window-table-fixed-left-cell {
-        background-color: #f7f7f7 !important;
+        background-color: var(--ant-color-fill-quaternary) !important;
       }
 
       &:hover {
-        background-color: rgba(153, 153, 153, 0.16);
+        background-color: var(--ant-color-fill-tertiary);
 
         .window-table-fixed-right-cell-first,
         .window-table-fixed-right-cell,
         .window-table-fixed-left-cell-last,
         .window-table-fixed-left-cell {
-          background-color: #efefef !important;
+          background-color: var(--ant-color-fill-tertiary) !important;
         }
       }
     }

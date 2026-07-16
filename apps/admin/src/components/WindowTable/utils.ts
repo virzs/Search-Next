@@ -201,7 +201,7 @@ export function getColumnValue<ValueType = any, RecordType extends object = any>
 export function getFixedColumnStyle({
   columns = [],
   id,
-  color = "#f7f7f7",
+  color = "var(--ant-table-header-bg, var(--ant-color-bg-container))",
 }: {
   columns?: FixedColumn[];
   id: string;
