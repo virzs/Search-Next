@@ -2,6 +2,8 @@ export const settingsRoute = {
   segment: {
     root: "settings",
     account: "account",
+    accountProfile: "account/profile",
+    accountSecurity: "account/security",
     personalization: "personalization",
     search: "search",
     thirdParty: "third-party",
@@ -21,6 +23,8 @@ export const settingsRoute = {
   path: {
     root: "/settings",
     account: "/settings/account",
+    accountProfile: "/settings/account/profile",
+    accountSecurity: "/settings/account/security",
     personalization: "/settings/personalization",
     search: "/settings/search",
     thirdParty: "/settings/third-party",

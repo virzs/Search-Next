@@ -210,36 +210,18 @@ const accountAuthPageClassName = css`
 
 const accountProfilePageClassName = css`
   width: 100%;
-  padding: 0;
+  padding: 24px;
   background: rgba(246, 246, 248, 0.92);
 
   .account-info {
     width: 100%;
   }
 
-  .apple-account-card {
-    width: 100%;
-    border: 0;
-    border-radius: 0;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.9),
-        rgba(246, 246, 248, 0.9)
-      ),
-      rgba(246, 246, 248, 0.94);
-    box-shadow: none;
-  }
-
-  .apple-account-header {
-    padding: 22px 24px;
-  }
-
   [data-theme="dark"] & {
     background: #1c1c1e;
   }
 
-  [data-theme="dark"] & .apple-account-card {
-    background: linear-gradient(180deg, #2c2c2e, #1c1c1e);
+  @media (max-width: 560px) {
+    padding: 18px;
   }
 `;

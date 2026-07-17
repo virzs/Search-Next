@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, Typography, message } from "antd";
+import { Form, Input, Button, Checkbox, message } from "antd";
 import { useRef, useState } from "react";
 import { cx } from "@emotion/css";
 import {
@@ -21,14 +21,12 @@ import {
 import LegalAgreementText from "@/components/legal/LegalAgreementText";
 import LegalDocumentModal from "@/components/legal/LegalDocumentModal";
 
-const { Link } = Typography;
 const { Item } = Form;
 
 const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
   loading: externalLoading = false,
   showRemember = true,
-  showForgotPassword = true,
   className = "",
   initialValues = {},
 }) => {
@@ -186,19 +184,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
           />
         </Item>
 
-        {/* 记住我和忘记密码 */}
-        {(showRemember || showForgotPassword) && (
+        {/* 记住我 */}
+        {showRemember && (
           <div className="apple-auth-form-options">
-            {showRemember && (
-              <Item name="remember" valuePropName="checked" className="mb-0!">
-                <Checkbox>{t("ui.rememberMe")}</Checkbox>
-              </Item>
-            )}
-            {showForgotPassword && (
-              <Link href="#" className="apple-auth-link">
-                {t("ui.forgotPassword")}
-              </Link>
-            )}
+            <Item name="remember" valuePropName="checked" className="mb-0!">
+              <Checkbox>{t("ui.rememberMe")}</Checkbox>
+            </Item>
           </div>
         )}
 

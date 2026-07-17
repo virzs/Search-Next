@@ -48,6 +48,30 @@ export const settingsRouteDefinitions: DefaultAppRouteDefinition[] = [
     search: { enabled: true, group: "setting" },
   },
   {
+    key: "settings.account-profile",
+    segment: settingsRoute.segment.accountProfile,
+    path: settingsRoute.path.accountProfile,
+    meta: {
+      title: "个人资料",
+      description: "编辑用户名",
+      keywords: ["user", "account", "profile", "username", "个人资料"],
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
+    key: "settings.account-security",
+    segment: settingsRoute.segment.accountSecurity,
+    path: settingsRoute.path.accountSecurity,
+    meta: {
+      title: "登录与安全",
+      description: "修改密码或删除账号",
+      keywords: ["password", "security", "delete account", "密码", "注销"],
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
     key: "settings.personalization",
     segment: settingsRoute.segment.personalization,
     path: settingsRoute.path.personalization,

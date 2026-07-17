@@ -208,6 +208,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const clearSession = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    removeToken();
+    removeRefreshToken();
+    localStorage.removeItem("user_info");
+    sessionStorage.removeItem("user_info");
+  };
+
   // 登出
   const logout = async () => {
     try {
@@ -225,12 +234,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       return { success: true, message: "本地账号已退出" };
     } finally {
-      setUser(null);
-      setIsAuthenticated(false);
-      removeToken();
-      removeRefreshToken();
-      localStorage.removeItem("user_info");
-      sessionStorage.removeItem("user_info");
+      clearSession();
     }
   };
 
@@ -240,16 +244,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
 
-      // 更新本地存储
-      const token =
-        localStorage.getItem("auth_token") ||
-        sessionStorage.getItem("auth_token");
-      if (token) {
-        if (localStorage.getItem("auth_token")) {
-          localStorage.setItem("user_info", JSON.stringify(updatedUser));
-        } else {
-          sessionStorage.setItem("user_info", JSON.stringify(updatedUser));
-        }
+      // 保持用户资料与当前使用的存储位置一致。
+      if (sessionStorage.getItem("user_info")) {
+        sessionStorage.setItem("user_info", JSON.stringify(updatedUser));
+      } else {
+        localStorage.setItem("user_info", JSON.stringify(updatedUser));
       }
     }
   };
@@ -262,6 +261,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updateUser,
+    clearSession,
     loginLoading,
     registerLoading: registerRequestLoading || loginLoading,
     coverGradientCss,

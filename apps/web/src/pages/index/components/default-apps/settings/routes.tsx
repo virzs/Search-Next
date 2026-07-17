@@ -9,6 +9,8 @@ import {
 } from "./views/about/release-history";
 import LegalDocumentView from "./views/about/legal-document";
 import AccountView from "./views/account";
+import ProfileSettingsView from "./views/account/profile";
+import SecuritySettingsView from "./views/account/security";
 import BackupView, {
   AppStorageUsageView,
   StorageUsageView,
@@ -22,6 +24,8 @@ import { settingsRoute } from "./route-paths";
 
 const settingsRouteElements = {
   "settings.account": <AccountView />,
+  "settings.account-profile": <ProfileSettingsView />,
+  "settings.account-security": <SecuritySettingsView />,
   "settings.personalization": <PersonalizationView />,
   "settings.search": <SearchSettingsView />,
   "settings.language": <LanguageView />,

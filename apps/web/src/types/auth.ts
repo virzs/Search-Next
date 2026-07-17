@@ -129,9 +129,6 @@ export interface LoginFormProps {
   // 是否显示记住我选项
   showRemember?: boolean;
 
-  // 是否显示忘记密码链接
-  showForgotPassword?: boolean;
-
   // 自定义样式
   className?: string;
 
@@ -185,6 +182,9 @@ export interface AuthContextValue extends AuthState {
 
   // 更新用户信息
   updateUser: (user: Partial<UserInfo>) => void;
+
+  // 仅清理当前浏览器中的认证状态，不再发起服务端登出请求
+  clearSession: () => void;
 
   // 操作加载状态（由 AuthContext 管理）
   loginLoading: boolean;

@@ -381,41 +381,45 @@ export const appleAuthFormClassName = css`
 `;
 
 export const appleAccountInfoClassName = css`
+  --account-card-surface: var(--sn-surface, rgba(255, 255, 255, 0.84));
+  --account-card-surface-secondary: var(--sn-surface-secondary, #f2f2f7);
+  --account-card-text: var(--sn-text, #1d1d1f);
+  --account-card-text-secondary: var(--sn-text-secondary, #6e6e73);
+  --account-card-separator: var(--sn-separator, rgba(60, 60, 67, 0.12));
+  --account-card-shadow: var(--sn-shadow, 0 1px 2px rgba(0, 0, 0, 0.05));
   display: flex;
   min-height: 0;
   flex-direction: column;
-  gap: 14px;
 
   .apple-account-card {
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.82);
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.84);
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(18px);
+    border: 1px solid var(--account-card-separator);
+    border-radius: 14px;
+    background: var(--account-card-surface);
+    box-shadow: var(--account-card-shadow);
   }
 
   .apple-account-header {
     display: grid;
-    grid-template-columns: 84px minmax(0, 1fr) auto;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
     align-items: center;
-    gap: 16px;
-    padding: 18px;
+    gap: 20px;
+    padding: 20px;
   }
 
   .apple-account-avatar.ant-avatar {
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    box-shadow: none;
+  }
+
+  .apple-account-identity {
+    min-width: 0;
   }
 
   .apple-account-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #1d1d1f;
+    color: var(--account-card-text);
     font-size: 24px;
     font-weight: 800;
     line-height: 30px;
@@ -423,25 +427,43 @@ export const appleAccountInfoClassName = css`
 
   .apple-account-email {
     overflow: hidden;
-    margin-top: 3px;
-    color: #6e6e73;
+    margin-top: 4px;
+    color: var(--account-card-text-secondary);
     font-size: 13px;
     line-height: 20px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
+  .apple-account-status-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 12px;
+  }
+
   .apple-account-badge {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 10px;
+    gap: 4px;
     border-radius: 999px;
-    background: #f2f2f7;
-    padding: 5px 9px;
-    color: #6e6e73;
+    background: var(--account-card-surface-secondary);
+    padding: 4px 10px;
+    color: var(--account-card-text-secondary);
     font-size: 12px;
-    font-weight: 750;
+    font-weight: 650;
+  }
+
+  .apple-account-joined {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--account-card-text-secondary);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 20px;
+    white-space: nowrap;
   }
 
   .apple-account-logout.ant-btn {
@@ -451,7 +473,7 @@ export const appleAccountInfoClassName = css`
     background: rgba(255, 59, 48, 0.07) !important;
     color: #ff3b30 !important;
     font-size: 13px;
-    font-weight: 750;
+    font-weight: 700;
     box-shadow: none !important;
   }
 
@@ -462,37 +484,19 @@ export const appleAccountInfoClassName = css`
     color: #ff3b30 !important;
   }
 
-  .apple-account-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    border-top: 1px solid rgba(60, 60, 67, 0.1);
-    padding: 14px 18px 18px;
-  }
-
-  .apple-account-meta {
-    min-width: 0;
-    border-radius: 14px;
-    background: rgba(242, 242, 247, 0.82);
-    padding: 12px;
-  }
-
-  .apple-account-meta-label {
-    color: #6e6e73;
-    font-size: 11px;
-    font-weight: 800;
-    line-height: 16px;
-  }
-
-  .apple-account-meta-value {
-    overflow: hidden;
-    margin-top: 4px;
-    color: #1d1d1f;
-    font-size: 13px;
-    font-weight: 750;
-    line-height: 18px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  [data-theme="dark"] & {
+    --account-card-surface: var(--sn-surface, rgba(255, 255, 255, 0.08));
+    --account-card-surface-secondary: var(
+      --sn-surface-secondary,
+      rgba(255, 255, 255, 0.06)
+    );
+    --account-card-text: var(--sn-text, #f5f5f7);
+    --account-card-text-secondary: var(--sn-text-secondary, #aeaeb2);
+    --account-card-separator: var(
+      --sn-separator,
+      rgba(235, 235, 245, 0.12)
+    );
+    --account-card-shadow: var(--sn-shadow, 0 1px 2px rgba(0, 0, 0, 0.24));
   }
 
   @media (max-width: 560px) {
@@ -509,10 +513,6 @@ export const appleAccountInfoClassName = css`
     .apple-account-logout.ant-btn {
       grid-column: 1 / -1;
       justify-self: start;
-    }
-
-    .apple-account-meta-grid {
-      grid-template-columns: 1fr;
     }
   }
 `;

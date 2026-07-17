@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosRequestConfig } from "axios";
 import { getApiPrefix } from "./utils";
 import { postRefreshToken } from "../services/auth";
@@ -231,6 +230,19 @@ export const baseDeleteRequest =
         ...getBaseParams(),
         ...params,
       },
+    });
+
+export const baseDeleteRequestNoId =
+  <T = any>(url: string, options?: AxiosRequestConfig) =>
+  async (data?: object, params: object = {}) =>
+    axiosInstance<T, T>(getApiPrefix(url), {
+      ...options,
+      method: "DELETE",
+      params: {
+        ...getBaseParams(),
+        ...params,
+      },
+      data,
     });
 
 export default axiosInstance;

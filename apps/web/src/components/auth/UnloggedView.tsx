@@ -203,7 +203,6 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         onSubmit={handleLogin}
         loading={loginLoading}
         showRemember={true}
-        showForgotPassword={true}
       />
     ) : (
       renderRegisterForm()
