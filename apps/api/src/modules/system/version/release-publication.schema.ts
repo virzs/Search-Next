@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import BaseSchema, {
   baseSchemaMiddleware,
 } from "src/public/schema/base.schema";
-import { SystemNoticeSchemaName } from "../notice/notice.schema";
 
 export const ReleasePublicationName = "ReleasePublication";
 export type ReleaseComponent = "web" | "admin";
@@ -42,10 +41,11 @@ export class ReleasePublication extends BaseSchema {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: SystemNoticeSchemaName,
-    required: true,
+    ref: "SystemNotice",
+    required: false,
   })
-  noticeId: string;
+  // 仅兼容历史发布记录，新版本发布不会再写入通知模块。
+  noticeId?: string;
 
   @Prop({ type: Date, required: true })
   publishedAt: Date;
@@ -58,4 +58,4 @@ ReleasePublicationSchema.index(
   { repositoryUrl: 1, component: 1, githubReleaseId: 1 },
   { unique: true },
 );
-baseSchemaMiddleware(ReleasePublicationSchema);
+baseSchemaMiddleware(ReleasePublicationSchema, { enableSkipMiddleware: true });

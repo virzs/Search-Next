@@ -14,20 +14,38 @@ const githubRelease: GithubReleaseData = {
   prerelease: false,
 };
 
-const query = <T>(value: T) => ({ exec: jest.fn().mockResolvedValue(value) });
+const query = <T>(value: T) => {
+  const chain: any = { exec: jest.fn().mockResolvedValue(value) };
+  chain.setOptions = jest.fn().mockReturnValue(chain);
+  return chain;
+};
+
+const findQuery = <T>(value: T) => {
+  const chain: any = {
+    exec: jest.fn().mockResolvedValue(value),
+  };
+  for (const method of ["sort", "limit", "select", "lean"]) {
+    chain[method] = jest.fn().mockReturnValue(chain);
+  }
+  return chain;
+};
 
 describe("ReleasePublicationService", () => {
   const createService = (
     existing: any = null,
     releases: GithubReleaseData[] = [githubRelease],
+    publications: any[] = [],
   ) => {
+    const publicationQuery = findQuery(publications);
     const publicationModel = {
       findOne: jest.fn().mockReturnValue(query(existing)),
-      find: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          lean: jest.fn().mockReturnValue(query([])),
+      find: jest.fn().mockReturnValue(publicationQuery),
+      findByIdAndUpdate: jest.fn().mockImplementation((_id, value) =>
+        query({
+          _id,
+          ...value,
         }),
-      }),
+      ),
       create: jest.fn().mockImplementation(async (value) => ({
         _id: "publication-id",
         ...value,
@@ -38,24 +56,20 @@ describe("ReleasePublicationService", () => {
         release: { repositoryUrl },
       }),
     };
-    const noticeService = {
-      upsertReleaseNotice: jest.fn().mockResolvedValue({ _id: "notice-id" }),
-    };
     const service = new ReleasePublicationService(
       publicationModel as any,
       projectService as any,
-      noticeService as any,
     );
     (service as any).cache.set(repositoryUrl, {
       data: releases,
       fetchedAt: new Date().toISOString(),
       expiresAt: Date.now() + 60_000,
     });
-    return { service, publicationModel, noticeService };
+    return { service, publicationModel, publicationQuery };
   };
 
-  it("publishes a web release into the tabs notice audience", async () => {
-    const { service, publicationModel, noticeService } = createService();
+  it("publishes a web release only as a version publication", async () => {
+    const { service, publicationModel } = createService();
     const result = await service.publish(
       {
         component: "web",
@@ -68,25 +82,20 @@ describe("ReleasePublicationService", () => {
     );
 
     expect(result.created).toBe(true);
-    expect(noticeService.upsertReleaseNotice).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: "tabs",
-        sourceKey: "github:virzs/Search-Next:web:88",
-      }),
-    );
     expect(publicationModel.create).toHaveBeenCalledWith(
       expect.objectContaining({
         component: "web",
-        noticeId: "notice-id",
         tagName: "web-v1.4.0",
       }),
     );
+    expect(publicationModel.create.mock.calls[0][0]).not.toHaveProperty(
+      "noticeId",
+    );
   });
 
-  it("returns the existing publication without creating another notice", async () => {
+  it("returns the existing publication without creating another record", async () => {
     const existing = { _id: "existing-publication" };
-    const { service, publicationModel, noticeService } =
-      createService(existing);
+    const { service, publicationModel } = createService(existing);
     const result = await service.publish(
       {
         component: "web",
@@ -99,17 +108,43 @@ describe("ReleasePublicationService", () => {
     );
 
     expect(result).toEqual({ publication: existing, created: false });
-    expect(noticeService.upsertReleaseNotice).not.toHaveBeenCalled();
     expect(publicationModel.create).not.toHaveBeenCalled();
   });
 
-  it("publishes an admin release into the authenticated admin audience", async () => {
+  it("restores a deleted publication so the release can be published again", async () => {
+    const existing = { _id: "deleted-publication", isDelete: true };
+    const { service, publicationModel } = createService(existing);
+
+    const result = await service.publish(
+      {
+        component: "web",
+        githubReleaseId: 88,
+        announcementTitle: "Web 1.4.0 更新公告",
+        announcementContent: "New release",
+        deploymentConfirmed: true,
+      },
+      "user-id",
+    );
+
+    expect(result.created).toBe(true);
+    expect(publicationModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      "deleted-publication",
+      expect.objectContaining({
+        isDelete: false,
+        updater: "user-id",
+      }),
+      expect.objectContaining({ new: true, skipMiddleware: true }),
+    );
+    expect(publicationModel.create).not.toHaveBeenCalled();
+  });
+
+  it("publishes an admin release as an admin version publication", async () => {
     const adminRelease: GithubReleaseData = {
       ...githubRelease,
       id: 89,
       tag_name: "admin-v1.4.0",
     };
-    const { service, noticeService } = createService(null, [adminRelease]);
+    const { service, publicationModel } = createService(null, [adminRelease]);
 
     await service.publish(
       {
@@ -122,10 +157,10 @@ describe("ReleasePublicationService", () => {
       "user-id",
     );
 
-    expect(noticeService.upsertReleaseNotice).toHaveBeenCalledWith(
+    expect(publicationModel.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        key: "admin",
-        sourceKey: "github:virzs/Search-Next:admin:89",
+        component: "admin",
+        tagName: "admin-v1.4.0",
       }),
     );
   });
@@ -142,5 +177,40 @@ describe("ReleasePublicationService", () => {
     expect(second.web[0].tagName).toBe("web-v1.4.0");
     expect(githubGet).not.toHaveBeenCalled();
     githubGet.mockRestore();
+  });
+
+  it("returns public version records newest first with public field names", async () => {
+    const publishedAt = new Date("2026-07-16T08:00:00.000Z");
+    const { service, publicationModel, publicationQuery } = createService(
+      null,
+      [githubRelease],
+      [
+        {
+          _id: "publication-id",
+          component: "web",
+          tagName: "web-v1.4.0",
+          version: "1.4.0",
+          releaseUrl: githubRelease.html_url,
+          releasePublishedAt: new Date(githubRelease.published_at!),
+          announcementTitle: "Web 1.4.0 更新",
+          announcementContent: "New release",
+          publishedAt,
+        },
+      ],
+    );
+
+    await expect(service.publicList("web")).resolves.toEqual([
+      expect.objectContaining({
+        _id: "publication-id",
+        component: "web",
+        version: "1.4.0",
+        title: "Web 1.4.0 更新",
+        content: "New release",
+        publishedAt,
+      }),
+    ]);
+    expect(publicationModel.find).toHaveBeenCalledWith({ component: "web" });
+    expect(publicationQuery.sort).toHaveBeenCalledWith({ publishedAt: -1 });
+    expect(publicationQuery.limit).toHaveBeenCalledWith(50);
   });
 });

@@ -25,13 +25,13 @@ export class PublishReleaseDto {
   @Expose()
   githubReleaseId: number;
 
-  @ApiProperty({ description: "公告标题" })
+  @ApiProperty({ description: "版本更新标题" })
   @IsString()
   @IsNotEmpty()
   @Expose()
   announcementTitle: string;
 
-  @ApiProperty({ description: "Markdown 公告内容" })
+  @ApiProperty({ description: "Markdown 版本更新内容" })
   @IsString()
   @IsNotEmpty()
   @Expose()

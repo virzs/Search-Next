@@ -147,30 +147,4 @@ export class NoticeService {
       .sort({ createdAt: -1 })
       .exec();
   }
-
-  async upsertReleaseNotice(payload: {
-    sourceKey: string;
-    key: string;
-    title: string;
-    content: string;
-    releaseUrl: string;
-    user: string;
-  }) {
-    return this.noticeModel.findOneAndUpdate(
-      { sourceKey: payload.sourceKey },
-      {
-        $setOnInsert: {
-          sourceKey: payload.sourceKey,
-          sourceUrl: payload.releaseUrl,
-          key: payload.key,
-          title: payload.title,
-          content: payload.content,
-          enable: true,
-          effectiveStart: new Date(),
-          creator: payload.user,
-        },
-      },
-      { new: true, upsert: true, setDefaultsOnInsert: true },
-    );
-  }
 }

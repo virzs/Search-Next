@@ -7,7 +7,6 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import axios, { AxiosError } from "axios";
 import { Model } from "mongoose";
-import { NoticeService } from "../notice/notice.service";
 import {
   normalizeGithubRepositoryUrl,
   ProjectService,
@@ -43,7 +42,6 @@ export class ReleasePublicationService {
     @InjectModel(ReleasePublicationName)
     private readonly publicationModel: Model<ReleasePublication>,
     private readonly projectService: ProjectService,
-    private readonly noticeService: NoticeService,
   ) {}
 
   async candidates(refresh = false) {
@@ -52,7 +50,9 @@ export class ReleasePublicationService {
     const cache = this.cache.get(repositoryUrl);
     const publications = await this.publicationModel
       .find({ repositoryUrl })
-      .select("component githubReleaseId noticeId")
+      .select(
+        "component githubReleaseId tagName version releaseUrl releasePublishedAt announcementTitle announcementContent publishedAt",
+      )
       .lean()
       .exec();
     const published = new Map(
@@ -80,7 +80,18 @@ export class ReleasePublicationService {
             ...item,
             published: Boolean(publication),
             publicationId: publication?._id,
-            noticeId: publication?.noticeId,
+            publication: publication
+              ? {
+                  _id: publication._id,
+                  tagName: publication.tagName,
+                  version: publication.version,
+                  title: publication.announcementTitle,
+                  content: publication.announcementContent,
+                  releaseUrl: publication.releaseUrl,
+                  releasePublishedAt: publication.releasePublishedAt,
+                  publishedAt: publication.publishedAt,
+                }
+              : undefined,
           };
         });
 
@@ -112,15 +123,38 @@ export class ReleasePublicationService {
   }
 
   async latest(component: ReleaseComponent) {
-    if (!["web", "admin"].includes(component)) {
-      throw new BadRequestException("component 必须是 web 或 admin");
-    }
+    this.validateComponent(component);
     return this.publicationModel
       .findOne({ component })
       .sort({ publishedAt: -1 })
       .select("component tagName version releaseUrl publishedAt")
       .lean()
       .exec();
+  }
+
+  async publicList(component: ReleaseComponent) {
+    this.validateComponent(component);
+    const publications = await this.publicationModel
+      .find({ component })
+      .sort({ publishedAt: -1 })
+      .limit(50)
+      .select(
+        "component tagName version releaseUrl releasePublishedAt announcementTitle announcementContent publishedAt",
+      )
+      .lean()
+      .exec();
+
+    return publications.map((publication) => ({
+      _id: publication._id,
+      component: publication.component,
+      tagName: publication.tagName,
+      version: publication.version,
+      title: publication.announcementTitle,
+      content: publication.announcementContent,
+      releaseUrl: publication.releaseUrl,
+      releasePublishedAt: publication.releasePublishedAt,
+      publishedAt: publication.publishedAt,
+    }));
   }
 
   async publish(body: PublishReleaseDto, user: string) {
@@ -131,8 +165,11 @@ export class ReleasePublicationService {
         component: body.component,
         githubReleaseId: body.githubReleaseId,
       })
+      .setOptions({ skipMiddleware: true })
       .exec();
-    if (existing) return { publication: existing, created: false };
+    if (existing && !existing.isDelete) {
+      return { publication: existing, created: false };
+    }
 
     const release = await this.fetchReleaseById(
       repositoryUrl,
@@ -143,31 +180,38 @@ export class ReleasePublicationService {
       throw new BadRequestException("选择的 Release 与发布端不匹配");
     }
 
-    const { owner, repository } = parseRepositoryCoordinates(repositoryUrl);
-    const sourceKey = `github:${owner}/${repository}:${body.component}:${release.id}`;
-    const notice = await this.noticeService.upsertReleaseNotice({
-      sourceKey,
-      key: body.component === "web" ? "tabs" : "admin",
-      title: body.announcementTitle.trim(),
-      content: body.announcementContent.trim(),
+    const publicationData = {
+      component: body.component,
+      repositoryUrl,
+      githubReleaseId: candidate.githubReleaseId,
+      tagName: candidate.tagName,
+      version: candidate.version,
+      releaseName: candidate.releaseName,
       releaseUrl: candidate.releaseUrl,
-      user,
-    });
+      releasePublishedAt: new Date(candidate.releasePublishedAt),
+      announcementTitle: body.announcementTitle.trim(),
+      announcementContent: body.announcementContent.trim(),
+      publishedAt: new Date(),
+    };
 
     try {
+      if (existing?.isDelete) {
+        const publication = await this.publicationModel
+          .findByIdAndUpdate(
+            existing._id,
+            {
+              ...publicationData,
+              isDelete: false,
+              updater: user,
+            },
+            { new: true, skipMiddleware: true },
+          )
+          .exec();
+        return { publication, created: true };
+      }
+
       const publication = await this.publicationModel.create({
-        component: body.component,
-        repositoryUrl,
-        githubReleaseId: candidate.githubReleaseId,
-        tagName: candidate.tagName,
-        version: candidate.version,
-        releaseName: candidate.releaseName,
-        releaseUrl: candidate.releaseUrl,
-        releasePublishedAt: new Date(candidate.releasePublishedAt),
-        announcementTitle: body.announcementTitle.trim(),
-        announcementContent: body.announcementContent.trim(),
-        noticeId: notice._id,
-        publishedAt: new Date(),
+        ...publicationData,
         creator: user,
       });
       return { publication, created: true };
@@ -179,10 +223,17 @@ export class ReleasePublicationService {
             component: body.component,
             githubReleaseId: body.githubReleaseId,
           })
+          .setOptions({ skipMiddleware: true })
           .exec();
         return { publication, created: false };
       }
       throw error;
+    }
+  }
+
+  private validateComponent(component: ReleaseComponent) {
+    if (!["web", "admin"].includes(component)) {
+      throw new BadRequestException("component 必须是 web 或 admin");
     }
   }
 

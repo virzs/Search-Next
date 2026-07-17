@@ -9,14 +9,12 @@ import {
 } from "./release-publication.schema";
 import { ReleasePublicationService } from "./release-publication.service";
 import { ProjectModule } from "../project/project.module";
-import { NoticeModule } from "../notice/notice.module";
 
 @Module({
   controllers: [VersionController],
   providers: [VersionService, ReleasePublicationService],
   imports: [
     ProjectModule,
-    NoticeModule,
     MongooseModule.forFeature([
       {
         name: VersionName,

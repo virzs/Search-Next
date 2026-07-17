@@ -74,7 +74,7 @@ export class VersionController {
   }
 
   @Post("/release-publications")
-  @ApiOperation({ summary: "发布 Web/Admin Release 公告" })
+  @ApiOperation({ summary: "发布 Web/Admin 版本更新记录" })
   publishRelease(@Body() body: PublishReleaseDto, @User("_id") user: string) {
     return this.releasePublicationService.publish(body, user);
   }
@@ -85,6 +85,14 @@ export class VersionController {
   @ApiOperation({ summary: "最新已发布 Web/Admin 版本" })
   latestReleasePublication(@Query("component") component: ReleaseComponent) {
     return this.releasePublicationService.latest(component);
+  }
+
+  @Get("/release-publications/public/list")
+  @PublicRoute()
+  @Header("Cache-Control", "no-store")
+  @ApiOperation({ summary: "公开 Web/Admin 版本更新记录" })
+  publicReleasePublications(@Query("component") component: ReleaseComponent) {
+    return this.releasePublicationService.publicList(component);
   }
 
   @Get("/:id")
