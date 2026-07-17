@@ -75,6 +75,17 @@ axiosInstance.interceptors.response.use(
         replaceAppPath("/403");
       }
     }
+    if (error.response.status === 428) {
+      const payload = error.response.data;
+      notification.warning({
+        message:
+          payload?.code === "LEGAL_CONFIRMATION_REQUIRED"
+            ? "需要确认最新协议"
+            : "请求需要进一步确认",
+        description:
+          payload?.message ?? "当前操作需要完成前置确认后才能继续",
+      });
+    }
     if (error.response.status === 500 && error.config.url.includes("/auth/refresh-token")) {
       history.replace("/login");
       window.location.reload();

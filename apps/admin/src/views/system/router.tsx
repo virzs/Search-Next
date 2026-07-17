@@ -14,6 +14,10 @@ import NoticeDetail from "./notice/detail";
 import ReleaseNotice from "./notice/release";
 import { RiSettings3Line } from "@remixicon/react";
 import { routeAuth } from "@/contexts/AccessContext";
+import LegalDocumentManagement from "./legal-document";
+import LegalDocumentHandle from "./legal-document/handle";
+import LegalDocumentHistory from "./legal-document/history";
+import LegalDocumentDetail from "./legal-document/detail";
 
 export const SystemPaths = {
   index: "/system",
@@ -26,6 +30,10 @@ export const SystemPaths = {
   notice: "/system/notice",
   noticeHandle: "/system/notice/handle",
   noticeRelease: "/system/notice/release",
+  legalDocuments: "/system/legal-documents",
+  legalDocumentHandle: "/system/legal-documents/handle",
+  legalDocumentHistory: "/system/legal-documents/history",
+  legalDocumentRevision: "/system/legal-documents/revision",
 };
 
 const SystemRouter: RouteObject = {
@@ -94,6 +102,22 @@ const SystemRouter: RouteObject = {
     {
       path: SystemPaths.notice + "/:id",
       element: <NoticeDetail />,
+    },
+    {
+      path: SystemPaths.legalDocuments,
+      element: <LegalDocumentManagement />,
+    },
+    {
+      path: SystemPaths.legalDocumentHandle + "/:type",
+      element: <LegalDocumentHandle />,
+    },
+    {
+      path: SystemPaths.legalDocumentHistory + "/:type",
+      element: <LegalDocumentHistory />,
+    },
+    {
+      path: SystemPaths.legalDocumentRevision + "/:type/:revisionId",
+      element: <LegalDocumentDetail />,
     },
   ],
 };
@@ -170,6 +194,27 @@ export const SystemMenu: Menu = {
         {
           name: "详情",
           path: SystemPaths.notice + "/:id",
+        },
+      ],
+    },
+    {
+      name: "协议与隐私",
+      path: SystemPaths.legalDocuments,
+      auth: routeAuth("GET", "/system/legal-documents/:type/draft"),
+      hideChildrenInMenu: true,
+      children: [
+        {
+          name: "编辑",
+          path: SystemPaths.legalDocumentHandle + "/:type",
+        },
+        {
+          name: "发布历史",
+          path: SystemPaths.legalDocumentHistory + "/:type",
+        },
+        {
+          name: "版本详情",
+          path:
+            SystemPaths.legalDocumentRevision + "/:type/:revisionId",
         },
       ],
     },

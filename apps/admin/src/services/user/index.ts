@@ -13,11 +13,47 @@ export interface CurrentUserInfo {
   isSuperAdmin?: boolean;
 }
 
+export interface UserRoleRecord {
+  _id?: string;
+  code?: string;
+  name?: string;
+  isSuperAdmin?: boolean;
+}
+
+export interface LegalConfirmationRecord {
+  documentType: "terms" | "privacy";
+  revisionId: string;
+  consentVersion: number;
+  firstConfirmedAt: string;
+  lastConfirmedAt: string;
+  confirmationCount: number;
+  firstSource: "register" | "login" | "in_app";
+  lastSource: "register" | "login" | "in_app";
+  locale?: "zh-CN" | "en-US";
+}
+
+export interface UserRecord {
+  _id: string;
+  username: string;
+  email: string;
+  nickname?: string;
+  type?: number;
+  status?: number;
+  enable?: boolean;
+  integral?: number;
+  avatar?: any;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  roles?: UserRoleRecord[];
+  legalConfirmations?: LegalConfirmationRecord[];
+}
+
 // /users/me get
 export const getCurrentUser = () => baseGetRequest<CurrentUserInfo>("/users/me")();
 
 // /users get
-export const getUsers = (params: any) => baseGetRequest("/users")(params);
+export const getUsers = (params: any) =>
+  baseGetRequest<{ data: UserRecord[]; total: number }>("/users")(params);
 
 // /users post
 export const postUsers = (data: any) => basePostRequest("/users")(data);
@@ -32,7 +68,8 @@ export const putEnable = (id: string, data?: any) =>
   basePutRequest("/users/enable")(id, data);
 
 // /users/:id detail
-export const getUserDetail = (id: string) => baseDetailRequest("/users")(id);
+export const getUserDetail = (id: string) =>
+  baseDetailRequest<UserRecord>("/users")(id);
 
 // /users/:id delete
 export const deleteUser = (id: string) => baseDeleteRequest("/users")(id);
