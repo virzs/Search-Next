@@ -1,7 +1,6 @@
 import { getLatestReleasePublication } from "@/services/system/version";
 import { Button, App, Space } from "antd";
 import { useCallback, useEffect } from "react";
-import { OPEN_ADMIN_NOTICES_EVENT } from "../notice";
 
 const POLL_INTERVAL = 5 * 60 * 1000;
 const CURRENT_RELEASE_TAG = import.meta.env.VITE_RELEASE_TAG?.trim() || "dev";
@@ -34,11 +33,11 @@ const AdminReleaseUpdatePrompt = () => {
           <Space>
             <Button
               size="small"
-              onClick={() =>
-                window.dispatchEvent(new Event(OPEN_ADMIN_NOTICES_EVENT))
-              }
+              href={latest.releaseUrl}
+              target="_blank"
+              rel="noreferrer"
             >
-              查看更新
+              查看 Release
             </Button>
             <Button
               size="small"

@@ -38,6 +38,17 @@ export async function getLatestVersion(params: any) {
 
 export type ReleaseComponent = "web" | "admin";
 
+export interface ReleasePublicationSummary {
+  _id: string;
+  tagName: string;
+  version: string;
+  title: string;
+  content: string;
+  releaseUrl: string;
+  releasePublishedAt: string;
+  publishedAt: string;
+}
+
 export interface ReleaseCandidate {
   githubReleaseId: number;
   component: ReleaseComponent;
@@ -51,7 +62,7 @@ export interface ReleaseCandidate {
   announcementContent: string;
   published: boolean;
   publicationId?: string;
-  noticeId?: string;
+  publication?: ReleasePublicationSummary;
 }
 
 export interface ReleaseCandidatesResponse {
@@ -75,9 +86,6 @@ export const getReleaseCandidates = (refresh = false) =>
   )({
     refresh,
   });
-
-export const getReleasePublications = (params: Record<string, unknown> = {}) =>
-  baseGetRequest("/system/version/release-publications")(params);
 
 export const publishReleasePublication = (data: {
   component: ReleaseComponent;

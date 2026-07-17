@@ -1,6 +1,8 @@
 export const platformDicMap = {
   windows: "Windows",
   mac: "Mac",
+  web: "Web",
+  admin: "Admin",
 };
 
 export const getPlatformDicLabel = (

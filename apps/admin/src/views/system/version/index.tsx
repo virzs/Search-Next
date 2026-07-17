@@ -34,26 +34,30 @@ const Version = () => {
       title: "发布平台",
       dataIndex: "platform",
       render: (_, r) => (
-        <Space>
-          {r.platforms.map((i: any) => (
-            <Tag>
-              {getPlatformDicLabel(i.platform)} (
-              {getUpdateTypeDicLabel(i.updateType)})
+        <Space wrap>
+          {r.platforms?.map((i: any) => (
+            <Tag
+              key={i.platform}
+              color={i.platform === "web" ? "blue" : i.platform === "admin" ? "purple" : undefined}
+            >
+              {getPlatformDicLabel(i.platform)}
+              {i.updateType ? ` (${getUpdateTypeDicLabel(i.updateType)})` : ""}
             </Tag>
           ))}
         </Space>
       ),
     },
     {
-      title: "预定发布日期",
+      title: "发布时间",
       dataIndex: "releaseTime",
       render: (v) => {
-        return v === "-" ? "立即生效" : v;
+        return !v || v === "-" ? "立即生效" : v;
       },
     },
     {
       title: "创建人",
       dataIndex: "creator",
+      render: (v) => (typeof v === "string" ? v : (v?.username ?? "-")),
     },
     {
       title: "创建时间",
@@ -62,6 +66,7 @@ const Version = () => {
     {
       title: "更新人",
       dataIndex: "updater",
+      render: (v) => (typeof v === "string" ? v : (v?.username ?? "-")),
     },
     {
       title: "更新时间",
@@ -71,14 +76,23 @@ const Version = () => {
       title: "操作",
       dataIndex: "operation",
       fixed: "right",
-      width: 120,
+      width: 160,
       render: (_, r) => {
         const { _id } = r;
+        const isRelease = r.recordType === "release";
         return (
           <Operation
             columns={[
               {
+                title: "查看",
+                show: isRelease,
+                onClick: () => {
+                  navigate(SystemPaths.version + "/" + r._id);
+                },
+              },
+              {
                 title: "修改",
+                show: !isRelease,
                 onClick: () => {
                   navigate(SystemPaths.versionHandle + "/" + r._id);
                 },
@@ -87,7 +101,12 @@ const Version = () => {
                 title: "删除",
                 loading: delLoading,
                 danger: true,
-                confirm: "delete",
+                confirm: isRelease
+                  ? {
+                      title: "确认删除这条版本记录？",
+                      content: "删除后，该 Web/Admin Release 可以重新发布。",
+                    }
+                  : "delete",
                 onClick: () => delRun(_id),
               },
             ]}
@@ -110,7 +129,7 @@ const Version = () => {
               navigate(SystemPaths.versionHandle);
             }}
           >
-            新增客户端版本
+            新增版本
           </Button>
         }
         onRow={(r) => ({

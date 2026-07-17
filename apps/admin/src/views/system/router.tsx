@@ -11,7 +11,6 @@ import VersionDetail from "./version/detail";
 import Notice from "./notice";
 import NoticeHandle from "./notice/handle";
 import NoticeDetail from "./notice/detail";
-import ReleaseNotice from "./notice/release";
 import { RiSettings3Line } from "@remixicon/react";
 import { routeAuth } from "@/contexts/AccessContext";
 import LegalDocumentManagement from "./legal-document";
@@ -29,7 +28,6 @@ export const SystemPaths = {
   versionHandle: "/system/version/handle",
   notice: "/system/notice",
   noticeHandle: "/system/notice/handle",
-  noticeRelease: "/system/notice/release",
   legalDocuments: "/system/legal-documents",
   legalDocumentHandle: "/system/legal-documents/handle",
   legalDocumentHistory: "/system/legal-documents/history",
@@ -94,10 +92,6 @@ const SystemRouter: RouteObject = {
     {
       path: SystemPaths.noticeHandle + "/:id",
       element: <NoticeHandle />,
-    },
-    {
-      path: SystemPaths.noticeRelease,
-      element: <ReleaseNotice />,
     },
     {
       path: SystemPaths.notice + "/:id",
@@ -178,11 +172,6 @@ export const SystemMenu: Menu = {
       auth: routeAuth("GET", "/system/notice"),
       hideChildrenInMenu: true,
       children: [
-        {
-          name: "版本公告",
-          path: SystemPaths.noticeRelease,
-          auth: routeAuth("GET", "/system/version/release-candidates"),
-        },
         {
           name: "新增",
           path: SystemPaths.noticeHandle,
