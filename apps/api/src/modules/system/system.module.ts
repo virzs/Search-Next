@@ -7,6 +7,7 @@ import { ProjectModule } from './project/project.module';
 import { RoleModule } from './role/role.module';
 import { StorageServiceModule } from './storage-service/storage-service.module';
 import { VersionModule } from './version/version.module';
+import { LegalDocumentModule } from './legal-document/legal-document.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { VersionModule } from './version/version.module';
     StorageServiceModule,
     MessageModule,
     NoticeModule,
+    LegalDocumentModule,
   ],
   exports: [
     PermissionModule,
@@ -28,6 +30,7 @@ import { VersionModule } from './version/version.module';
     StorageServiceModule,
     MessageModule,
     NoticeModule,
+    LegalDocumentModule,
   ],
 })
 export class SystemModule {}

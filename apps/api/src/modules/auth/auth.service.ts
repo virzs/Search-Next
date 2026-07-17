@@ -25,6 +25,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { MessageService } from '../system/message/message.service';
 import axios from 'axios';
 import { releaseDeletedUserIdentity } from '../users/deleted-user-identity';
+import { LegalDocumentService } from '../system/legal-document/legal-document.service';
 
 interface RedisTokenCache {
   [key: string]: string;
@@ -49,6 +50,7 @@ export class AuthService {
     private readonly projectService: ProjectService,
     private readonly emailService: EmailService,
     private readonly messageService: MessageService,
+    private readonly legalDocumentService: LegalDocumentService,
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {}
@@ -144,8 +146,21 @@ export class AuthService {
   }
 
   async register(body: RegisterDto, headers?: Record<string, any>) {
-    const { password, email, captcha, invitationCode, turnstileToken, ...rest } =
-      body;
+    const {
+      password,
+      email,
+      captcha,
+      invitationCode,
+      turnstileToken,
+      legalConfirmations,
+      legalConfirmationLocale,
+      ...rest
+    } = body;
+
+    const legalDocuments =
+      await this.legalDocumentService.validateCurrentConfirmations(
+        legalConfirmations,
+      );
 
     const project = await this.projectService.detail();
 
@@ -206,6 +221,11 @@ export class AuthService {
       salt,
       email,
       roles: codeData?.roles,
+      legalConfirmations: this.legalDocumentService.buildConfirmationRecords(
+        legalDocuments,
+        'register',
+        legalConfirmationLocale,
+      ),
     });
 
     if (invitationCode) {
@@ -227,7 +247,16 @@ export class AuthService {
       },
     });
 
-    return { message: '注册成功' };
+    const {
+      password: _password,
+      salt: _salt,
+      legalConfirmations: _legalConfirmations,
+      ...sessionUser
+    } = newUser.toObject();
+    return {
+      message: '注册成功',
+      ...(await this.createSession(sessionUser, headers, 'web')),
+    };
   }
 
   async sendRegisterCaptcha(body: SendEmailDto) {
@@ -290,11 +319,57 @@ export class AuthService {
     throw new ForbiddenException('当前账号没有后台登录权限');
   }
 
+  private async createSession(
+    user: any,
+    headers: Record<string, any> = {},
+    client: 'web' | 'admin',
+  ) {
+    const userAgent = headers['user-agent'];
+    const access_token = this.jwtService.sign({ ...user, userAgent, client });
+    const refresh_token = this.refreshTokenService.createRefreshToken({
+      ...user,
+      userAgent,
+      client,
+    });
+    const ttl = this.refreshTokenService.getTTL();
+    const cache: RedisTokenCache = await this.cacheManager.get(
+      `${RedisConstants.AUTH_REFRESH_TOKEN_KEY}:${user._id.toString()}`,
+    );
+    const newCache = {
+      ...cache,
+      [userAgent]: refresh_token,
+    };
+    const cacheKeys = Object.keys(newCache);
+    if (cacheKeys.length > jwtConfig.refreshToken.maxDevices) {
+      delete newCache[cacheKeys[0]];
+    }
+    this.cacheManager.set(
+      `${RedisConstants.AUTH_REFRESH_TOKEN_KEY}:${user._id.toString()}`,
+      newCache,
+      ttl,
+    );
+    return {
+      ...user,
+      access_token,
+      refresh_token,
+    };
+  }
+
   async login(body: LoginDto, headers, options: LoginOptions = {}) {
-    const { password, email, turnstileToken } = body;
+    const {
+      password,
+      email,
+      turnstileToken,
+      legalConfirmations,
+      legalConfirmationLocale,
+    } = body;
+    const legalDocuments = options.admin
+      ? []
+      : await this.legalDocumentService.validateCurrentConfirmations(
+          legalConfirmations,
+        );
     await this.verifyTurnstileIfEnabled(turnstileToken, headers);
 
-    const userAgent = headers['user-agent'];
     const user = await this.validateUser(email, password);
 
     if (!user) {
@@ -310,44 +385,16 @@ export class AuthService {
 
     if (options.admin) {
       await this.validateAdminLoginAccess(user);
+    } else {
+      await this.legalDocumentService.confirmDocumentsForUser(
+        String(user._id),
+        legalDocuments,
+        legalConfirmationLocale,
+        'login',
+      );
     }
 
-    const access_token = this.jwtService.sign({ ...user, userAgent });
-
-    const refresh_token = this.refreshTokenService.createRefreshToken({
-      ...user,
-      userAgent,
-    });
-
-    const ttl = this.refreshTokenService.getTTL();
-
-    // 获取当前用户所有的refreshToken
-    const cache: RedisTokenCache = await this.cacheManager.get(
-      `${RedisConstants.AUTH_REFRESH_TOKEN_KEY}:${user._id.toString()}`,
-    );
-
-    // 将新的refreshToken存入缓存，并限制最大设备数
-    const newCache = {
-      ...cache,
-      [userAgent]: refresh_token,
-    };
-    const cacheKeys = Object.keys(newCache);
-    if (cacheKeys.length > jwtConfig.refreshToken.maxDevices) {
-      // 删除最早的一个refreshToken
-      delete newCache[cacheKeys[0]];
-    }
-
-    this.cacheManager.set(
-      `${RedisConstants.AUTH_REFRESH_TOKEN_KEY}:${user._id.toString()}`,
-      newCache,
-      ttl,
-    );
-
-    return {
-      ...user,
-      access_token,
-      refresh_token,
-    };
+    return this.createSession(user, headers, options.admin ? 'admin' : 'web');
   }
 
   async adminLogin(body: LoginDto, headers) {

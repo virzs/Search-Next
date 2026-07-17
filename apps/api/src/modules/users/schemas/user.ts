@@ -6,6 +6,42 @@ import { Project } from '../../system/project/schemas/project';
 import { Resource } from 'src/modules/resource/schemas/resource';
 import { UsersName } from './ref-names';
 
+@Schema({ _id: false })
+export class LegalConfirmation {
+  @Prop({ type: String, enum: ['terms', 'privacy'], required: true })
+  documentType: 'terms' | 'privacy';
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'LegalDocument',
+    required: true,
+  })
+  revisionId: string;
+
+  @Prop({ type: Number, required: true })
+  consentVersion: number;
+
+  @Prop({ type: Date, required: true })
+  firstConfirmedAt: Date;
+
+  @Prop({ type: Date, required: true })
+  lastConfirmedAt: Date;
+
+  @Prop({ type: Number, default: 1 })
+  confirmationCount: number;
+
+  @Prop({ type: String, enum: ['register', 'login', 'in_app'] })
+  firstSource: 'register' | 'login' | 'in_app';
+
+  @Prop({ type: String, enum: ['register', 'login', 'in_app'] })
+  lastSource: 'register' | 'login' | 'in_app';
+
+  @Prop({ type: String, enum: ['zh-CN', 'en-US'], default: 'zh-CN' })
+  locale: 'zh-CN' | 'en-US';
+}
+
+const LegalConfirmationSchema = SchemaFactory.createForClass(LegalConfirmation);
+
 @Schema({ timestamps: true })
 export class User extends BaseSchema {
   @Prop({ type: String })
@@ -55,6 +91,9 @@ export class User extends BaseSchema {
   // 当前积分
   @Prop({ type: Number, default: 0, select: false })
   integral: number;
+
+  @Prop({ type: [LegalConfirmationSchema], default: [], select: false })
+  legalConfirmations: LegalConfirmation[];
 
   @Prop({
     required: false,

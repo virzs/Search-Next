@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -7,7 +7,11 @@ import {
   MaxLength,
   IsEmail,
   IsOptional,
+  IsArray,
+  IsIn,
+  ValidateNested,
 } from 'class-validator';
+import { LegalConfirmationItemDto } from 'src/modules/system/legal-document/legal-document.dto';
 
 export class LoginDto {
   @ApiProperty({ description: '邮箱' })
@@ -29,4 +33,22 @@ export class LoginDto {
   @IsOptional()
   @Expose()
   turnstileToken?: string;
+
+  @ApiProperty({
+    description: '当前服务条款和隐私政策版本确认',
+    type: [LegalConfirmationItemDto],
+    required: false,
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => LegalConfirmationItemDto)
+  @IsOptional()
+  @Expose()
+  legalConfirmations?: LegalConfirmationItemDto[];
+
+  @ApiProperty({ enum: ['zh-CN', 'en-US'], required: false })
+  @IsIn(['zh-CN', 'en-US'])
+  @IsOptional()
+  @Expose()
+  legalConfirmationLocale?: 'zh-CN' | 'en-US';
 }

@@ -10,6 +10,7 @@ import { RefreshTokenService } from '../refresh-token/refresh-token.service';
 import { ProjectModule } from '../system/project/project.module';
 import { EmailModule } from '../system/email/email.module';
 import { MessageModule } from '../system/message/message.module';
+import { LegalDocumentModule } from '../system/legal-document/legal-document.module';
 
 @Module({
   controllers: [AuthController],
@@ -25,6 +26,7 @@ import { MessageModule } from '../system/message/message.module';
     ProjectModule,
     EmailModule,
     MessageModule,
+    LegalDocumentModule,
   ],
 })
 export class AuthModule {}

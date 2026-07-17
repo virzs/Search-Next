@@ -25,6 +25,7 @@ import { TabsModule } from './modules/tabs/tabs.module';
 import { getRuntimeEnvFilePaths } from './config/env';
 import { buildRedisUrl } from './config/redis-uri';
 import { SetupModule } from './modules/setup/setup.module';
+import { LegalConfirmationGuard } from './public/guard/legal-confirmation.guard';
 
 @Module({
   imports: [
@@ -107,6 +108,10 @@ import { SetupModule } from './modules/setup/setup.module';
     {
       provide: APP_GUARD,
       useClass: LoginGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: LegalConfirmationGuard,
     },
     {
       provide: APP_GUARD,

@@ -76,6 +76,9 @@ export class UsersService {
   async detail(id: string) {
     const result = await this.usersModel
       .findOne({ _id: id, isDelete: { $in: [false, null] } })
+      .select(
+        '+legalConfirmations +roles +status +enable +type +integral +createdAt +updatedAt',
+      )
       .populate({
         path: 'roles',
         populate: {
@@ -184,6 +187,17 @@ export class UsersService {
       });
 
     return permissions;
+  }
+
+  async isSuperAdministrator(userId: string) {
+    const result = await this.usersModel
+      .findById(userId)
+      .select('+roles')
+      .populate('roles', 'code isSuperAdmin')
+      .lean()
+      .exec();
+
+    return Boolean(result?.roles?.some((role) => role?.isSuperAdmin));
   }
 
   async findByEmail(email: string) {

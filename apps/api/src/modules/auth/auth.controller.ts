@@ -8,6 +8,7 @@ import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { LogoutDto } from './dtos/logout.dto';
 import { SendEmailDto } from '../system/email/dtos/send.dto';
 import { SkipPermission } from 'src/public/decorator/skip_permission.decorator';
+import { SkipLegalConfirmation } from 'src/public/decorator/skip-legal-confirmation.decorator';
 
 @ApiTags('授权')
 @Controller('auth')
@@ -58,6 +59,7 @@ export class AuthController {
   @ApiBody({ type: LogoutDto })
   @Post('logout')
   @SkipPermission()
+  @SkipLegalConfirmation()
   logout(@Headers('authorization') authorization: string, @Headers() headers) {
     return this.authService.logout(authorization, headers);
   }
