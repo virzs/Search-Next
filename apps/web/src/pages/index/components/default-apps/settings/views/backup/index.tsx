@@ -35,6 +35,7 @@ import {
   SEARCH_NEXT_STORAGE_KEYS,
   SEARCH_SELECTED_ENGINES_STORAGE_KEY,
   UNIFIED_SEARCH_PREFERENCES_STORAGE_KEY,
+  VERSION_UPDATE_READ_IDS_STORAGE_KEY,
   parseStorageBackup,
   applySearchNextStorageBackup,
   createSearchNextStorageBackup,
@@ -267,6 +268,7 @@ const classifyBackupStorageKey = (key: string): StorageCategoryId => {
     case DEV_APPS_STORAGE_KEY:
       return "developer";
     case NOTICE_READ_IDS_STORAGE_KEY:
+    case VERSION_UPDATE_READ_IDS_STORAGE_KEY:
       return "notice";
     default:
       return "other";

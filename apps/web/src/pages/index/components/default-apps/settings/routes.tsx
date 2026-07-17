@@ -3,6 +3,10 @@ import type { ReactNode } from "react";
 import { createRouteObjectsFromDefinitions } from "../route-config";
 import SettingsModalRoute from "./index";
 import AboutView from "./views/about";
+import {
+  ReleaseHistoryDetailView,
+  ReleaseHistoryView,
+} from "./views/about/release-history";
 import LegalDocumentView from "./views/about/legal-document";
 import AccountView from "./views/account";
 import BackupView, {
@@ -26,6 +30,8 @@ const settingsRouteElements = {
   "settings.backup-storage-apps": <AppStorageUsageView />,
   "settings.backup-storage-detail": <StorageUsageView />,
   "settings.about": <AboutView />,
+  "settings.about-releases": <ReleaseHistoryView />,
+  "settings.about-release-detail": <ReleaseHistoryDetailView />,
   "settings.about-terms": <LegalDocumentView type="terms" />,
   "settings.about-privacy": <LegalDocumentView type="privacy" />,
   "settings.developer": <DeveloperView />,

@@ -44,6 +44,7 @@ export const getNotice = () => {
 };
 
 export interface LatestReleasePublication {
+  _id: string;
   component: "web" | "admin";
   tagName: string;
   version: string;
@@ -54,6 +55,23 @@ export interface LatestReleasePublication {
 export const getLatestReleasePublication = (component: "web" | "admin") =>
   baseGetRequest<LatestReleasePublication | null>(
     "/system/version/release-publications/latest",
+  )({ component });
+
+export interface VersionUpdateItem {
+  _id: string;
+  component: "web" | "admin";
+  tagName: string;
+  version: string;
+  title: string;
+  content: string;
+  releaseUrl: string;
+  releasePublishedAt: string;
+  publishedAt: string;
+}
+
+export const getVersionUpdates = (component: "web" | "admin" = "web") =>
+  baseGetRequest<VersionUpdateItem[]>(
+    "/system/version/release-publications/public/list",
   )({ component });
 
 export const LEGAL_DOCUMENT_TYPES = ["terms", "privacy"] as const;

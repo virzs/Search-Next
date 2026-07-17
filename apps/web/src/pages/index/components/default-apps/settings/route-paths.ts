@@ -11,6 +11,8 @@ export const settingsRoute = {
     backupStorageApps: "backup/storage/apps",
     backupStorageDetail: "backup/storage/:backupId",
     about: "about",
+    aboutReleases: "about/releases",
+    aboutReleaseDetail: "about/releases/:releaseId",
     aboutTerms: "about/terms",
     aboutPrivacy: "about/privacy",
     developer: "developer",
@@ -27,11 +29,16 @@ export const settingsRoute = {
     backupStorage: "/settings/backup/storage",
     backupStorageApps: "/settings/backup/storage/apps",
     about: "/settings/about",
+    aboutReleases: "/settings/about/releases",
+    aboutReleaseDetail: "/settings/about/releases/:releaseId",
     aboutTerms: "/settings/about/terms",
     aboutPrivacy: "/settings/about/privacy",
     developer: "/settings/developer",
   },
 } as const;
+
+export const getSettingsAboutReleasePath = (releaseId: string) =>
+  `${settingsRoute.path.aboutReleases}/${encodeURIComponent(releaseId)}`;
 
 export const getSettingsBackupStoragePath = (backupId?: string) =>
   backupId

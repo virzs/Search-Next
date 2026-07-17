@@ -2,7 +2,7 @@ import { getLatestReleasePublication } from "@/services/system";
 import { App, Button, Space } from "antd";
 import { useCallback, useEffect } from "react";
 import { useI18n } from "@/i18n";
-import { OPEN_WEB_NOTICES_EVENT } from "../notice";
+import { openWebMessageCenter } from "@/utils/message-center";
 
 const POLL_INTERVAL = 5 * 60 * 1000;
 const CURRENT_RELEASE_TAG = import.meta.env.VITE_RELEASE_TAG?.trim() || "dev";
@@ -39,7 +39,10 @@ const WebReleaseUpdatePrompt = () => {
             <Button
               size="small"
               onClick={() =>
-                window.dispatchEvent(new Event(OPEN_WEB_NOTICES_EVENT))
+                openWebMessageCenter({
+                  tab: "versions",
+                  recordId: latest._id,
+                })
               }
             >
               {t("ui.releaseUpdate.view")}

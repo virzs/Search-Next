@@ -1,12 +1,26 @@
 import { AppSidebar } from "@/components";
-import { getNotice } from "@/services/system";
+import {
+  getNotice,
+  getVersionUpdates,
+} from "@/services/system";
 import { getNoticeReadIds, setNoticeReadIds } from "@/utils/notice";
 import {
-  RiArrowRightUpLine,
+  getVersionUpdateReadIds,
+  setVersionUpdateReadIds,
+  VERSION_UPDATE_READ_IDS_CHANGED_EVENT,
+} from "@/utils/version-update";
+import { VersionUpdateBody } from "@/components/version-updates";
+import { formatVersionUpdateDate } from "@/components/version-updates/format";
+import {
+  OPEN_WEB_MESSAGE_CENTER_EVENT,
+  type MessageCenterTab,
+  type OpenWebMessageCenterDetail,
+} from "@/utils/message-center";
+import {
   RiCalendarLine,
   RiCheckLine,
+  RiHistoryLine,
   RiNotification3Fill,
-  RiSparkling2Line,
 } from "@remixicon/react";
 import { useBoolean, useRequest } from "ahooks";
 import { Badge, Button, Empty, Tooltip, theme as antdTheme } from "antd";
@@ -23,7 +37,6 @@ import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
 import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
 
-export const OPEN_WEB_NOTICES_EVENT = "search-next:open-web-notices";
 const NOTICE_POLL_INTERVAL = 2 * 60 * 1000;
 
 const formatNoticeDate = (value?: string | null) => {
@@ -46,14 +59,29 @@ const Notice = () => {
   const { token } = antdTheme.useToken();
   const [open, { setTrue: openModal, setFalse: closeModal }] =
     useBoolean(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [readIds, setReadIds] = useState<string[]>(() => getNoticeReadIds());
+  const [activeTab, setActiveTab] =
+    useState<MessageCenterTab>("notifications");
+  const [activeNoticeId, setActiveNoticeId] = useState<string | null>(null);
+  const [activeVersionId, setActiveVersionId] = useState<string | null>(null);
+  const [noticeReadIds, setNoticeReadIdsState] = useState<string[]>(() =>
+    getNoticeReadIds(),
+  );
+  const [versionReadIds, setVersionReadIdsState] = useState<string[]>(() =>
+    getVersionUpdateReadIds(),
+  );
   const autoOpenCheckedRef = useRef(false);
 
-  const { data, run } = useRequest(getNotice, {
+  const { data: noticeData, run: runNotices } = useRequest(getNotice, {
     pollingInterval: NOTICE_POLL_INTERVAL,
     pollingWhenHidden: false,
   });
+  const { data: versionData, run: runVersions } = useRequest(
+    () => getVersionUpdates("web"),
+    {
+      pollingInterval: NOTICE_POLL_INTERVAL,
+      pollingWhenHidden: false,
+    },
+  );
 
   const notices = useMemo(() => {
     const parseTime = (value?: string | null) => {
@@ -62,17 +90,27 @@ const Notice = () => {
       return Number.isFinite(t) ? t : 0;
     };
 
-    return [...(data ?? [])].sort((a, b) => {
+    return [...(noticeData ?? [])].sort((a, b) => {
       const bTime = parseTime(b.effectiveStart) || parseTime(b.createdAt);
       const aTime = parseTime(a.effectiveStart) || parseTime(a.createdAt);
       return bTime - aTime;
     });
-  }, [data]);
+  }, [noticeData]);
+
+  const versions = useMemo(
+    () =>
+      [...(versionData ?? [])].sort(
+        (a, b) =>
+          new Date(b.publishedAt).getTime() -
+          new Date(a.publishedAt).getTime(),
+      ),
+    [versionData],
+  );
 
   useEffect(() => {
     if (!notices.length) return;
     const allowed = new Set(notices.map((n) => n._id));
-    setReadIds((prev) => {
+    setNoticeReadIdsState((prev) => {
       const next = prev.filter((id) => allowed.has(id));
       if (next.length !== prev.length) setNoticeReadIds(next);
       return next;
@@ -80,16 +118,56 @@ const Notice = () => {
   }, [notices]);
 
   useEffect(() => {
-    if (!open) return;
-    if (activeId) return;
-    if (!notices.length) return;
-    setActiveId(notices[0]._id);
-  }, [activeId, notices, open]);
+    if (!versions.length) return;
+    const allowed = new Set(versions.map((version) => version._id));
+    setVersionReadIdsState((previous) => {
+      const next = previous.filter((id) => allowed.has(id));
+      if (next.length !== previous.length) setVersionUpdateReadIds(next);
+      return next;
+    });
+  }, [versions]);
 
-  const readIdSet = useMemo(() => new Set(readIds), [readIds]);
+  useEffect(() => {
+    const syncReadIds = () =>
+      setVersionReadIdsState(getVersionUpdateReadIds());
+    window.addEventListener(
+      VERSION_UPDATE_READ_IDS_CHANGED_EVENT,
+      syncReadIds,
+    );
+    return () =>
+      window.removeEventListener(
+        VERSION_UPDATE_READ_IDS_CHANGED_EVENT,
+        syncReadIds,
+      );
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    if (activeTab === "notifications") {
+      if (!activeNoticeId && notices[0]) setActiveNoticeId(notices[0]._id);
+      return;
+    }
+    if (!activeVersionId && versions[0]) setActiveVersionId(versions[0]._id);
+  }, [
+    activeNoticeId,
+    activeTab,
+    activeVersionId,
+    notices,
+    open,
+    versions,
+  ]);
+
+  const noticeReadSet = useMemo(
+    () => new Set(noticeReadIds),
+    [noticeReadIds],
+  );
+  const versionReadSet = useMemo(
+    () => new Set(versionReadIds),
+    [versionReadIds],
+  );
 
   const markNoticeRead = useCallback((id: string) => {
-    setReadIds((prev) => {
+    setNoticeReadIdsState((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
       setNoticeReadIds(next);
@@ -97,80 +175,88 @@ const Notice = () => {
     });
   }, []);
 
+  const markVersionRead = useCallback((id: string) => {
+    setVersionReadIdsState((previous) => {
+      if (previous.includes(id)) return previous;
+      const next = [...previous, id];
+      setVersionUpdateReadIds(next);
+      return next;
+    });
+  }, []);
+
   const activeNotice = useMemo(() => {
-    if (!activeId) return null;
-    return notices.find((n) => n._id === activeId) ?? null;
-  }, [activeId, notices]);
+    if (!activeNoticeId) return null;
+    return notices.find((notice) => notice._id === activeNoticeId) ?? null;
+  }, [activeNoticeId, notices]);
 
-  const firstUnreadId = useMemo(() => {
-    return notices.find((n) => !readIdSet.has(n._id))?._id ?? null;
-  }, [notices, readIdSet]);
-  const hasUnread = Boolean(firstUnreadId);
+  const activeVersion = useMemo(() => {
+    if (!activeVersionId) return null;
+    return (
+      versions.find((version) => version._id === activeVersionId) ?? null
+    );
+  }, [activeVersionId, versions]);
 
-  const activeIsRelease = Boolean(
-    activeNotice?.sourceKey?.startsWith("github:"),
+  const firstUnreadNoticeId = useMemo(
+    () => notices.find((notice) => !noticeReadSet.has(notice._id))?._id ?? null,
+    [noticeReadSet, notices],
   );
-
-  const activeContent = useMemo(() => {
-    const raw = activeNotice?.content?.trim() ?? "";
-    if (!raw || !activeNotice?.sourceKey?.startsWith("github:")) return raw;
-
-    let leadingTitleRemoved = false;
-    return raw
-      .split(/\r?\n/)
-      .filter((line) => {
-        const trimmed = line.trim();
-        if (/^(Project|Range|Paths):\s*/i.test(trimmed)) return false;
-        if (
-          activeNotice.sourceUrl &&
-          /^\[.*GitHub Release.*\]\(.*\)$/i.test(trimmed)
-        ) {
-          return false;
-        }
-        if (
-          !leadingTitleRemoved &&
-          /^#\s+(Web|Admin|Search Next)\s*$/i.test(trimmed)
-        ) {
-          leadingTitleRemoved = true;
-          return false;
-        }
-        return true;
-      })
-      .map((line) =>
-        /^##\s+Changes\s*$/i.test(line.trim())
-          ? `## ${t("ui.notice.whatsNew")}`
-          : line,
-      )
-      .join("\n")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-  }, [activeNotice, t]);
+  const firstUnreadVersionId = useMemo(
+    () =>
+      versions.find((version) => !versionReadSet.has(version._id))?._id ?? null,
+    [versionReadSet, versions],
+  );
+  const hasUnreadNotice = Boolean(firstUnreadNoticeId);
+  const hasUnreadVersion = Boolean(firstUnreadVersionId);
+  const hasUnread = hasUnreadNotice || hasUnreadVersion;
 
   const activeNoticeDate = getNoticeDisplayDate(activeNotice);
+  const activeVersionDate = formatVersionUpdateDate(
+    activeVersion?.publishedAt,
+  );
+  const visibleDate =
+    activeTab === "notifications" ? activeNoticeDate : activeVersionDate;
 
   useEffect(() => {
     if (autoOpenCheckedRef.current) return;
-    if (data === undefined) return;
+    if (noticeData === undefined) return;
     autoOpenCheckedRef.current = true;
-    if (!firstUnreadId) return;
-    setActiveId(firstUnreadId);
+    if (!firstUnreadNoticeId) return;
+    setActiveTab("notifications");
+    setActiveNoticeId(firstUnreadNoticeId);
     openModal();
-  }, [data, firstUnreadId, openModal]);
+  }, [firstUnreadNoticeId, noticeData, openModal]);
 
   useEffect(() => {
-    const listener = () => {
-      setActiveId(null);
+    const listener = (event: Event) => {
+      const detail = (event as CustomEvent<OpenWebMessageCenterDetail>)
+        .detail;
+      const nextTab = detail?.tab ?? "notifications";
+      setActiveTab(nextTab);
+      if (detail?.recordId) {
+        if (nextTab === "versions") {
+          setActiveVersionId(detail.recordId);
+          markVersionRead(detail.recordId);
+        } else {
+          setActiveNoticeId(detail.recordId);
+          markNoticeRead(detail.recordId);
+        }
+      }
       openModal();
-      run();
+      runNotices();
+      runVersions();
     };
-    window.addEventListener(OPEN_WEB_NOTICES_EVENT, listener);
-    return () => window.removeEventListener(OPEN_WEB_NOTICES_EVENT, listener);
-  }, [openModal, run]);
+    window.addEventListener(OPEN_WEB_MESSAGE_CENTER_EVENT, listener);
+    return () =>
+      window.removeEventListener(OPEN_WEB_MESSAGE_CENTER_EVENT, listener);
+  }, [markNoticeRead, markVersionRead, openModal, runNotices, runVersions]);
 
   useEffect(() => {
-    const refresh = () => run();
+    const refresh = () => {
+      runNotices();
+      runVersions();
+    };
     const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") run();
+      if (document.visibilityState === "visible") refresh();
     };
     window.addEventListener("focus", refresh);
     window.addEventListener("online", refresh);
@@ -180,7 +266,32 @@ const Notice = () => {
       window.removeEventListener("online", refresh);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, [run]);
+  }, [runNotices, runVersions]);
+
+  const activeId =
+    activeTab === "notifications" ? activeNoticeId : activeVersionId;
+  const visibleNotice = activeTab === "notifications" ? activeNotice : null;
+  const visibleVersion = activeTab === "versions" ? activeVersion : null;
+  const currentItems =
+    activeTab === "notifications"
+      ? notices.map((notice) => ({
+          id: notice._id,
+          title: notice.title,
+          date: getNoticeDisplayDate(notice),
+          unread: !noticeReadSet.has(notice._id),
+        }))
+      : versions.map((version) => ({
+          id: version._id,
+          title: version.title,
+          date: formatVersionUpdateDate(version.publishedAt),
+          unread: !versionReadSet.has(version._id),
+        }));
+
+  const selectTab = (tab: MessageCenterTab) => {
+    setActiveTab(tab);
+    if (tab === "notifications") runNotices();
+    else runVersions();
+  };
 
   return (
     <div>
@@ -190,9 +301,10 @@ const Notice = () => {
             aria-label={t("ui.notifications")}
             type="text"
             onClick={() => {
-              setActiveId(null);
+              setActiveTab("notifications");
               openModal();
-              run();
+              runNotices();
+              runVersions();
             }}
             icon={<RiNotification3Fill color="#fff" size={20} />}
           ></Button>
@@ -202,7 +314,6 @@ const Notice = () => {
         visible={open}
         onClose={() => {
           closeModal();
-          setActiveId(null);
         }}
         width={940}
         floatingControls
@@ -223,64 +334,115 @@ const Notice = () => {
           <AppSidebar
             className={noticeSidebarClassName}
             activeMenuKey={activeId || undefined}
-            menuItems={notices.map((notice) => {
-              const noticeDate = getNoticeDisplayDate(notice);
-              const unread = !readIdSet.has(notice._id);
-              return {
-                key: notice._id,
+            header={
+              <div
+                className="message-center-tabs"
+                role="tablist"
+                aria-label={t("ui.messageCenter.categories")}
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "notifications"}
+                  data-active={activeTab === "notifications"}
+                  onClick={() => selectTab("notifications")}
+                >
+                  {t("ui.notifications")}
+                  {hasUnreadNotice ? <span className="tab-unread-dot" /> : null}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "versions"}
+                  data-active={activeTab === "versions"}
+                  onClick={() => selectTab("versions")}
+                >
+                  {t("ui.versionHistory")}
+                  {hasUnreadVersion ? <span className="tab-unread-dot" /> : null}
+                </button>
+              </div>
+            }
+            menuItems={currentItems.map((item) => ({
+                key: item.id,
                 label: (
                   <div className="notice-menu-label">
                     <div className="notice-menu-meta">
-                      {noticeDate ? <time>{noticeDate}</time> : <span />}
-                      {unread ? <span className="notice-unread-dot" /> : null}
+                      {item.date ? <time>{item.date}</time> : <span />}
+                      {item.unread ? (
+                        <span className="notice-unread-dot" />
+                      ) : null}
                     </div>
-                    <div className="notice-menu-title">{notice.title}</div>
+                    <div className="notice-menu-title">{item.title}</div>
                   </div>
                 ),
-              };
-            })}
+              }))}
             onMenuSelect={(key) => {
-              setActiveId(key);
-              markNoticeRead(key);
+              if (activeTab === "notifications") {
+                setActiveNoticeId(key);
+                markNoticeRead(key);
+              } else {
+                setActiveVersionId(key);
+                markVersionRead(key);
+              }
             }}
-            emptyText={t("ui.noNotifications")}
+            emptyText={
+              activeTab === "notifications"
+                ? t("ui.noNotifications")
+                : t("ui.versionHistory.empty")
+            }
           />
 
           <main className="notice-reader">
-            {activeNotice ? (
-              <article key={activeNotice._id} className="notice-article">
+            {visibleNotice || visibleVersion ? (
+              <article key={activeId} className="notice-article">
                 <header className="notice-article-header">
                   <div className="notice-kind">
-                    {activeIsRelease ? (
-                      <RiSparkling2Line size={13} />
+                    {activeTab === "versions" ? (
+                      <RiHistoryLine size={13} />
                     ) : (
                       <RiNotification3Fill size={13} />
                     )}
                     <span>
-                      {activeIsRelease
-                        ? t("ui.notice.release")
+                      {activeTab === "versions"
+                        ? t("ui.versionHistory")
                         : t("ui.notice.system")}
                     </span>
                   </div>
                   <div className="notice-article-heading">
-                    <h1 title={activeNotice.title}>{activeNotice.title}</h1>
+                    <h1 title={visibleNotice?.title ?? visibleVersion?.title}>
+                      {visibleNotice?.title ?? visibleVersion?.title}
+                    </h1>
                     <div className="notice-article-actions">
-                      {activeNoticeDate ? (
+                      {visibleDate ? (
                         <div className="notice-article-meta">
                           <RiCalendarLine size={14} />
-                          <time dateTime={activeNoticeDate}>
-                            {activeNoticeDate}
+                          <time
+                            dateTime={
+                              visibleNotice?.effectiveStart ??
+                              visibleNotice?.createdAt ??
+                              visibleVersion?.publishedAt
+                            }
+                          >
+                            {visibleDate}
                           </time>
                         </div>
                       ) : null}
-                      {!readIdSet.has(activeNotice._id) ? (
+                      {(visibleNotice &&
+                        !noticeReadSet.has(visibleNotice._id)) ||
+                      (visibleVersion &&
+                        !versionReadSet.has(visibleVersion._id)) ? (
                         <Button
                           className="notice-read-button"
                           type="text"
                           size="small"
                           shape="round"
                           icon={<RiCheckLine size={14} />}
-                          onClick={() => markNoticeRead(activeNotice._id)}
+                          onClick={() => {
+                            if (visibleNotice)
+                              markNoticeRead(visibleNotice._id);
+                            if (visibleVersion)
+                              markVersionRead(visibleVersion._id);
+                          }}
                         >
                           {t("ui.markAsRead")}
                         </Button>
@@ -288,39 +450,41 @@ const Notice = () => {
                     </div>
                   </div>
                 </header>
-                <SimpleEditorViewer
-                  value={activeContent}
-                  sanitize
-                  className="notice-richtext"
-                />
-                {activeNotice.sourceUrl ? (
-                  <footer className="notice-article-footer">
-                    <Button
-                      className="notice-release-button"
-                      type="primary"
-                      shape="round"
-                      href={activeNotice.sourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      icon={<RiArrowRightUpLine size={15} />}
-                    >
-                      {t("ui.notice.viewRelease")}
-                    </Button>
-                  </footer>
-                ) : null}
+                {visibleVersion ? (
+                  <VersionUpdateBody
+                    update={visibleVersion}
+                    viewerClassName="notice-richtext"
+                    footerClassName="notice-article-footer"
+                    buttonClassName="notice-release-button"
+                  />
+                ) : (
+                  <SimpleEditorViewer
+                    value={visibleNotice?.content ?? ""}
+                    sanitize
+                    className="notice-richtext"
+                  />
+                )}
               </article>
             ) : activeId ? (
               <div className="notice-empty-state">
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={t("ui.notice.missingDescription")}
+                  description={
+                    activeTab === "notifications"
+                      ? t("ui.notice.missingDescription")
+                      : t("ui.versionHistory.missingDescription")
+                  }
                 />
               </div>
             ) : (
               <div className="notice-empty-state">
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={t("ui.notice.selectPlaceholder")}
+                  description={
+                    activeTab === "notifications"
+                      ? t("ui.notice.selectPlaceholder")
+                      : t("ui.versionHistory.selectPlaceholder")
+                  }
                 />
               </div>
             )}
@@ -665,6 +829,81 @@ const noticeSidebarClassName = css`
   width: 224px !important;
   flex: 0 0 224px;
 
+  .message-center-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px;
+    border: 1px solid rgba(60, 60, 67, 0.1);
+    border-radius: 10px;
+    padding: 3px;
+    background: rgba(118, 118, 128, 0.1);
+  }
+
+  .message-center-tabs button {
+    position: relative;
+    display: inline-flex;
+    min-width: 0;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 0;
+    border-radius: 7px;
+    padding: 0 7px;
+    color: rgba(60, 60, 67, 0.68);
+    background: transparent;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      transform 100ms ease-out,
+      background-color 140ms ease-out;
+  }
+
+  .message-center-tabs button[data-active="true"] {
+    color: #1d1d1f;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  }
+
+  .message-center-tabs button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--sn-accent, #007aff) 65%, white);
+    outline-offset: 1px;
+  }
+
+  .message-center-tabs button:active {
+    transform: scale(0.97);
+  }
+
+  .tab-unread-dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--sn-accent, #007aff);
+  }
+
+  [data-theme="dark"] & .message-center-tabs {
+    border-color: rgba(235, 235, 245, 0.1);
+    background: rgba(118, 118, 128, 0.2);
+  }
+
+  [data-theme="dark"] & .message-center-tabs button {
+    color: rgba(235, 235, 245, 0.64);
+  }
+
+  [data-theme="dark"] & .message-center-tabs button[data-active="true"] {
+    color: #f5f5f7;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
   .ant-menu-item {
     height: 64px !important;
     margin-block: 4px !important;
@@ -734,5 +973,15 @@ const noticeSidebarClassName = css`
 
   @media (prefers-reduced-transparency: reduce) {
     backdrop-filter: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .message-center-tabs button {
+      transition: none;
+    }
+
+    .message-center-tabs button:active {
+      transform: none;
+    }
   }
 `;

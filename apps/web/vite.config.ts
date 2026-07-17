@@ -17,9 +17,14 @@ function pathResolve(dir: string) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const proxyTarget = process.env.VITE_API_PROXY_TARGET ?? env.VITE_API_PROXY_TARGET ?? "http://localhost:5151";
+  const buildTime =
+    process.env.VITE_BUILD_TIME ?? env.VITE_BUILD_TIME ?? new Date().toISOString();
 
   return {
     plugins: [react(), tailwindcss()],
+    define: {
+      "import.meta.env.VITE_BUILD_TIME": JSON.stringify(buildTime),
+    },
     server: {
       port: 8132,
       strictPort: true,

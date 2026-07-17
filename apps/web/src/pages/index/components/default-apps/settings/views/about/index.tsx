@@ -6,6 +6,7 @@ import {
   RiQuestionLine,
   RiShieldCheckLine,
   RiInformationLine,
+  RiHistoryLine,
 } from "@remixicon/react";
 import {
   MacSettingsChevron,
@@ -17,17 +18,23 @@ import {
 import { useI18n } from "@/i18n";
 import { useNavigate } from "react-router";
 import { settingsRoute } from "../../route-paths";
+import { getWebBuildInfo } from "@/utils/version-update";
+import { formatVersionUpdateDate } from "@/components/version-updates/format";
 
 const AboutView = () => {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const navigate = useNavigate();
+  const buildInfo = getWebBuildInfo();
   const appInfo = {
     name: "Search Next",
-    version: "1.0.0",
-    buildDate: "2024-01-15",
+    version: buildInfo.version,
+    buildDate:
+      formatVersionUpdateDate(buildInfo.buildTime, language, true) || "-",
     author: "Vir",
     license: "MIT License",
   };
+  const versionLabel =
+    appInfo.version === "dev" ? appInfo.version : `v${appInfo.version}`;
 
   return (
     <MacSettingsView>
@@ -42,7 +49,7 @@ const AboutView = () => {
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
               <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
-                v{appInfo.version}
+                {versionLabel}
               </span>
               <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 {t("ui.beta")}
@@ -64,6 +71,17 @@ const AboutView = () => {
           />
         </div>
       </div>
+
+      <MacSettingsSection title={t("ui.versionHistory")}>
+        <MacSettingsRow
+          icon={<RiHistoryLine size={16} />}
+          iconTone="blue"
+          title={t("ui.versionHistory")}
+          description={t("ui.versionHistory.description")}
+          extra={<MacSettingsChevron />}
+          onClick={() => navigate(settingsRoute.path.aboutReleases)}
+        />
+      </MacSettingsSection>
 
       <MacSettingsSection title={t("ui.contact")}>
         <MacSettingsRow

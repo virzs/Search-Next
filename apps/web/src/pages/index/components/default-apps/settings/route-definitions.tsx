@@ -154,6 +154,30 @@ export const settingsRouteDefinitions: DefaultAppRouteDefinition[] = [
     search: { enabled: true, group: "setting" },
   },
   {
+    key: "settings.about-releases",
+    segment: settingsRoute.segment.aboutReleases,
+    path: settingsRoute.path.aboutReleases,
+    meta: {
+      title: "版本记录",
+      description: "查看历史版本更新",
+      keywords: ["release", "version", "history", "版本记录"],
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
+    key: "settings.about-release-detail",
+    segment: settingsRoute.segment.aboutReleaseDetail,
+    path: settingsRoute.path.aboutReleaseDetail,
+    meta: {
+      title: "版本详情",
+      description: "查看版本更新内容",
+      keywords: ["release", "version", "版本详情"],
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
     key: "settings.about-terms",
     segment: settingsRoute.segment.aboutTerms,
     path: settingsRoute.path.aboutTerms,
