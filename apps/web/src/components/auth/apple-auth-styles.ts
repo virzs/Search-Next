@@ -204,6 +204,22 @@ export const appleAuthFormClassName = css`
     color: color-mix(in srgb, var(--auth-accent, #0a84ff) 84%, white) !important;
   }
 
+  .legal-agreement-link {
+    margin-inline: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    line-height: inherit;
+  }
+
+  .legal-agreement-link:focus-visible {
+    outline: 2px solid var(--auth-accent, #0a84ff);
+    outline-offset: 2px;
+  }
+
   .apple-auth-icon-button.ant-btn {
     display: grid;
     min-width: 24px !important;

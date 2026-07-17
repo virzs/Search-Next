@@ -15,6 +15,12 @@ export interface LoginFormData {
   password: string;
   remember?: boolean;
   turnstileToken?: string;
+  legalAccepted?: boolean;
+  legalConfirmations?: Array<{
+    documentType: "terms" | "privacy";
+    revisionId: string;
+  }>;
+  legalConfirmationLocale?: "zh-CN" | "en-US";
 }
 
 // 注册表单数据
@@ -26,6 +32,12 @@ export interface RegisterFormData {
   captcha?: string;
   invitationCode?: string;
   turnstileToken?: string;
+  legalAccepted?: boolean;
+  legalConfirmations?: Array<{
+    documentType: "terms" | "privacy";
+    revisionId: string;
+  }>;
+  legalConfirmationLocale?: "zh-CN" | "en-US";
 }
 
 // 登录响应
@@ -35,6 +47,8 @@ export interface LoginResponse {
   user?: UserInfo;
   token?: string;
   refreshToken?: string;
+  legalConfirmationRequired?: boolean;
+  legalDocuments?: import("@/services/system").LegalDocumentVersion[];
 }
 
 // 未登录视图显示模式

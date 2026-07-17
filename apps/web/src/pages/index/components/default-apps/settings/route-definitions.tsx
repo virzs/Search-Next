@@ -154,6 +154,28 @@ export const settingsRouteDefinitions: DefaultAppRouteDefinition[] = [
     search: { enabled: true, group: "setting" },
   },
   {
+    key: "settings.about-terms",
+    segment: settingsRoute.segment.aboutTerms,
+    path: settingsRoute.path.aboutTerms,
+    meta: {
+      title: "服务条款",
+      description: "查看当前服务条款",
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
+    key: "settings.about-privacy",
+    segment: settingsRoute.segment.aboutPrivacy,
+    path: settingsRoute.path.aboutPrivacy,
+    meta: {
+      title: "隐私政策",
+      description: "查看当前隐私政策",
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
     key: "settings.developer",
     segment: settingsRoute.segment.developer,
     path: settingsRoute.path.developer,

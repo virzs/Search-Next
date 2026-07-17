@@ -129,6 +129,9 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         password: data.password,
         remember: data.remember,
         turnstileToken: data.turnstileToken,
+        legalAccepted: data.legalAccepted,
+        legalConfirmations: data.legalConfirmations,
+        legalConfirmationLocale: data.legalConfirmationLocale,
       });
 
       if (response.success && response.user) {
@@ -157,6 +160,9 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
         captcha: data.captcha,
         invitationCode: data.invitationCode,
         turnstileToken: data.turnstileToken,
+        legalAccepted: data.legalAccepted,
+        legalConfirmations: data.legalConfirmations,
+        legalConfirmationLocale: data.legalConfirmationLocale,
       });
 
       if (response.success && response.user) {

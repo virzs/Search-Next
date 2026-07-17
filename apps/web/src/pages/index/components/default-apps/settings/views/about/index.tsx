@@ -4,6 +4,8 @@ import {
   RiMailLine,
   RiBugLine,
   RiQuestionLine,
+  RiShieldCheckLine,
+  RiInformationLine,
 } from "@remixicon/react";
 import {
   MacSettingsChevron,
@@ -13,9 +15,12 @@ import {
   MacSettingsView,
 } from "../../components/macos-settings";
 import { useI18n } from "@/i18n";
+import { useNavigate } from "react-router";
+import { settingsRoute } from "../../route-paths";
 
 const AboutView = () => {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const appInfo = {
     name: "Search Next",
     version: "1.0.0",
@@ -113,6 +118,25 @@ const AboutView = () => {
               "_blank",
             );
           }}
+        />
+      </MacSettingsSection>
+
+      <MacSettingsSection title={t("ui.legal.documents")}>
+        <MacSettingsRow
+          icon={<RiInformationLine size={16} />}
+          iconTone="purple"
+          title={t("ui.termsOfService")}
+          description={t("ui.legal.documentsDescription")}
+          extra={<MacSettingsChevron />}
+          onClick={() => navigate(settingsRoute.path.aboutTerms)}
+        />
+        <MacSettingsRow
+          icon={<RiShieldCheckLine size={16} />}
+          iconTone="blue"
+          title={t("ui.privacyPolicy")}
+          description={t("ui.legal.documentsDescription")}
+          extra={<MacSettingsChevron />}
+          onClick={() => navigate(settingsRoute.path.aboutPrivacy)}
         />
       </MacSettingsSection>
 

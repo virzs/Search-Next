@@ -11,6 +11,8 @@ export const settingsRoute = {
     backupStorageApps: "backup/storage/apps",
     backupStorageDetail: "backup/storage/:backupId",
     about: "about",
+    aboutTerms: "about/terms",
+    aboutPrivacy: "about/privacy",
     developer: "developer",
     wildcard: "*",
   },
@@ -25,6 +27,8 @@ export const settingsRoute = {
     backupStorage: "/settings/backup/storage",
     backupStorageApps: "/settings/backup/storage/apps",
     about: "/settings/about",
+    aboutTerms: "/settings/about/terms",
+    aboutPrivacy: "/settings/about/privacy",
     developer: "/settings/developer",
   },
 } as const;

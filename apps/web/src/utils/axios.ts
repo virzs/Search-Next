@@ -4,6 +4,7 @@ import { getApiPrefix } from "./utils";
 import { postRefreshToken } from "../services/auth";
 import { notification } from "./globalNotification";
 import { getRefreshToken, getToken, setRefreshToken, setToken } from "./token";
+import { LEGAL_CONFIRMATION_REQUIRED_EVENT } from "./legal-confirmation";
 
 const axiosInstance = axios.create({});
 
@@ -49,6 +50,16 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
     const requestUrl = String(error.config?.url ?? "");
+    if (
+      error.response.status === 428 &&
+      error.response.data?.code === "LEGAL_CONFIRMATION_REQUIRED"
+    ) {
+      window.dispatchEvent(
+        new CustomEvent(LEGAL_CONFIRMATION_REQUIRED_EVENT, {
+          detail: error.response.data,
+        }),
+      );
+    }
     if (error.response.status === 400) {
       const errMsg = error.response.data.message;
       notification.error({

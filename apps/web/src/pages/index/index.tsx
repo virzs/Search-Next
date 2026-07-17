@@ -76,6 +76,7 @@ import {
 import { settingsRoute } from "./components/default-apps/settings/route-paths";
 import Notice from "./components/notice";
 import WebReleaseUpdatePrompt from "./components/release-update";
+import LegalDocumentGate from "./components/legal/LegalDocumentGate";
 import Feedback from "./components/feedback";
 import DesktopImageIcon, {
   getStringIcon,
@@ -1507,6 +1508,7 @@ function Index() {
       )}
     >
       <WebReleaseUpdatePrompt />
+      <LegalDocumentGate />
       <div className="flex items-center justify-end py-2 px-6 max-w-7xl mx-auto w-full gap-2">
         <Notice />
         <Feedback />

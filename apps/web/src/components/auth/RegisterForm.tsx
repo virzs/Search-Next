@@ -1,5 +1,5 @@
-import { Form, Input, Button, Typography, message } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { Form, Input, Button, Checkbox, message } from "antd";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { cx } from "@emotion/css";
 import {
@@ -21,8 +21,14 @@ import { appleAuthFormClassName } from "./apple-auth-styles";
 import useConfig from "@/hooks/useConfig";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 import { useI18n } from "@/i18n";
+import { useRequest } from "ahooks";
+import {
+  getLegalDocumentVersions,
+  type LegalDocumentType,
+} from "@/services/system";
+import LegalAgreementText from "@/components/legal/LegalAgreementText";
+import LegalDocumentModal from "@/components/legal/LegalDocumentModal";
 
-const { Text } = Typography;
 const { Item } = Form;
 
 const RegisterForm: React.FC<RegisterFormProps> = ({
@@ -33,7 +39,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   className = "",
   initialValues = {},
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [form] = Form.useForm<RegisterFormData>();
   const { search } = useLocation();
   const { register, registerLoading: contextRegisterLoading } = useAuth();
@@ -45,6 +51,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalInitialType, setLegalInitialType] =
+    useState<LegalDocumentType>();
+  const pendingValuesRef = useRef<RegisterFormData | null>(null);
+  const {
+    data: legalVersions = [],
+    loading: legalVersionsLoading,
+    runAsync: refreshLegalVersions,
+  } = useRequest(getLegalDocumentVersions);
 
   const turnstileEnabled = projectInfo?.turnstile?.enabled ?? false;
   const turnstileSiteKey = projectInfo?.turnstile?.siteKey ?? "";
@@ -61,6 +76,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     forceInvitationCode ||
     Boolean(initialValues.invitationCode || invitationCodeFromUrl);
   const resolvedInitialValues = {
+    legalAccepted: false,
     ...initialValues,
     ...(invitationCodeFromUrl ? { invitationCode: invitationCodeFromUrl } : {}),
   };
@@ -73,7 +89,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   }, [form, invitationCodeFromUrl]);
 
-  const isLoading = externalLoading || contextRegisterLoading;
+  const isLoading =
+    externalLoading || contextRegisterLoading || legalVersionsLoading;
 
   const resetTurnstile = () => {
     setTurnstileToken("");
@@ -137,8 +154,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   };
 
-  // 表单提交处理
-  const handleSubmit = async (values: RegisterFormData) => {
+  const executeRegister = async (values: RegisterFormData) => {
     try {
       if (turnstileEnabled && !turnstileSiteKey) {
         message.error(t("ui.auth.turnstileConfigMissing"));
@@ -154,11 +170,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       const result = await submitHandler({
         ...values,
         ...(turnstileEnabled ? { turnstileToken } : {}),
+        legalConfirmations: legalVersions.map((document) => ({
+          documentType: document.type,
+          revisionId: document.revisionId,
+        })),
+        legalConfirmationLocale: language,
       });
 
       if (result.success) {
         message.success(result.message || t("ui.registeredSuccessfully2"));
         (form as any).resetFields();
+      } else if (result.legalConfirmationRequired) {
+        pendingValuesRef.current = values;
+        (form as any).setFieldsValue({ legalAccepted: false });
+        await refreshLegalVersions();
+        setLegalInitialType(undefined);
+        setLegalModalOpen(true);
       } else {
         message.error(result.message || t("ui.registrationFailed"));
         resetTurnstile();
@@ -174,6 +201,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         message: errorMessage,
       };
     }
+  };
+
+  const handleSubmit = async (values: RegisterFormData) => {
+    if (legalVersionsLoading) return;
+    if (legalVersions.length && !values.legalAccepted) {
+      pendingValuesRef.current = values;
+      setLegalInitialType(undefined);
+      setLegalModalOpen(true);
+      return;
+    }
+    return executeRegister(values);
   };
 
   return (
@@ -372,6 +410,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </Item>
         )}
 
+        {legalVersions.length ? (
+          <Item
+            name="legalAccepted"
+            valuePropName="checked"
+            className="mb-4! mt-4!"
+          >
+            <Checkbox>
+              <LegalAgreementText
+                onOpenDocument={(type) => {
+                  pendingValuesRef.current = null;
+                  setLegalInitialType(type);
+                  setLegalModalOpen(true);
+                }}
+              />
+            </Checkbox>
+          </Item>
+        ) : null}
+
         {/* 注册按钮 */}
         <Item className="mb-0! mt-6!">
           <Button
@@ -386,20 +442,31 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </Button>
         </Item>
       </Form>
-
-      {/* 注册提示 */}
-      <div className="apple-auth-terms">
-        <Text type="secondary">
-          {t("ui.byRegisteringYouAgreeToOur")}
-          <a href="#" className="apple-auth-link mx-1">
-            {t("ui.termsOfService")}
-          </a>
-          {t("ui.and")}
-          <a href="#" className="apple-auth-link mx-1">
-            {t("ui.privacyPolicy")}
-          </a>
-        </Text>
-      </div>
+      <LegalDocumentModal
+        open={legalModalOpen}
+        versions={legalVersions}
+        initialActiveType={legalInitialType}
+        confirmText={t(
+          pendingValuesRef.current
+            ? "ui.legal.agreeAndRegister"
+            : "ui.legal.agreeAndContinue",
+        )}
+        onCancel={() => {
+          setLegalModalOpen(false);
+          setLegalInitialType(undefined);
+          pendingValuesRef.current = null;
+        }}
+        onConfirm={async () => {
+          const values = pendingValuesRef.current;
+          (form as any).setFieldsValue({ legalAccepted: true });
+          setLegalModalOpen(false);
+          setLegalInitialType(undefined);
+          pendingValuesRef.current = null;
+          if (values) {
+            await executeRegister({ ...values, legalAccepted: true });
+          }
+        }}
+      />
     </div>
   );
 };

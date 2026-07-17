@@ -17,6 +17,7 @@ import {
 } from "../utils/token";
 import { notification } from "../utils/globalNotification";
 import { emailToGradient } from "../utils/emailGradient";
+import { getLegalConfirmationPayload } from "../utils/legal-confirmation";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -29,6 +30,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [coverGradientCss, setCoverGradientCss] = useState<string | null>(null);
+
+  const completeAuthentication = (
+    res: {
+      _id?: string;
+      username?: string;
+      createdAt?: Date;
+      access_token?: string;
+      refresh_token?: string;
+    },
+    email: string,
+    successMessage: string,
+  ): LoginResponse => {
+    if (!res._id || !res.username || !res.access_token) {
+      return { success: false, message: successMessage };
+    }
+    const userPayload: UserInfo = {
+      _id: res._id,
+      username: res.username,
+      email,
+      createdAt: res.createdAt ?? new Date(),
+    };
+    setUser(userPayload);
+    setIsAuthenticated(true);
+    setToken(res.access_token);
+    if (res.refresh_token) setRefreshToken(res.refresh_token);
+    localStorage.setItem("user_info", JSON.stringify(userPayload));
+    return {
+      success: true,
+      message: successMessage,
+      user: userPayload,
+      token: res.access_token,
+      refreshToken: res.refresh_token,
+    };
+  };
 
   // 初始化时检查本地存储的用户信息
   useEffect(() => {
@@ -81,6 +116,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: data.email,
         password: data.password,
         turnstileToken: data.turnstileToken,
+        legalConfirmations: data.legalConfirmations,
+        legalConfirmationLocale: data.legalConfirmationLocale,
       });
     },
     { manual: true },
@@ -90,31 +127,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const res = await runLogin(data);
 
-      const userPayload: UserInfo = {
-        _id: res._id,
-        username: res.username,
-        email: data.email,
-        createdAt: res.createdAt,
-      };
-
-      const response: LoginResponse = {
-        success: true,
-        message: "登录成功",
-        user: userPayload,
-        token: res.access_token,
-        refreshToken: res.refresh_token,
-      };
-
-      if (response.success && response.user && response.token) {
-        setUser(response.user);
-        setIsAuthenticated(true);
-        setToken(response.token);
-        if (response.refreshToken) setRefreshToken(response.refreshToken);
-        localStorage.setItem("user_info", JSON.stringify(response.user));
-      }
-
-      return response;
+      return completeAuthentication(res, data.email, "登录成功");
     } catch (error: any) {
+      const legalPayload = getLegalConfirmationPayload(error);
+      if (legalPayload) {
+        return {
+          success: false,
+          message: legalPayload.message || "请确认最新协议",
+          legalConfirmationRequired: true,
+          legalDocuments: legalPayload.documents,
+        };
+      }
       return { success: false, message: error.message || "登录失败" };
     }
   };
@@ -132,6 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         captcha: Number(data.captcha) || undefined,
         invitationCode: data.invitationCode ?? "",
         turnstileToken: data.turnstileToken,
+        legalConfirmations: data.legalConfirmations,
+        legalConfirmationLocale: data.legalConfirmationLocale,
       });
     },
     { manual: true },
@@ -139,12 +164,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: RegisterFormData): Promise<LoginResponse> => {
     try {
-      await runRegister(data);
+      const registerResponse = await runRegister(data);
+
+      if (registerResponse.access_token) {
+        return completeAuthentication(
+          registerResponse,
+          data.email,
+          "注册成功",
+        );
+      }
 
       const loginResponse = await login({
         email: data.email,
         password: data.password,
         turnstileToken: data.turnstileToken,
+        legalAccepted: data.legalAccepted,
+        legalConfirmations: data.legalConfirmations,
+        legalConfirmationLocale: data.legalConfirmationLocale,
       });
 
       if (!loginResponse.success) {
@@ -159,6 +195,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         message: "注册成功",
       };
     } catch (error: any) {
+      const legalPayload = getLegalConfirmationPayload(error);
+      if (legalPayload) {
+        return {
+          success: false,
+          message: legalPayload.message || "请确认最新协议",
+          legalConfirmationRequired: true,
+          legalDocuments: legalPayload.documents,
+        };
+      }
       return { success: false, message: error.message || "注册失败" };
     }
   };
