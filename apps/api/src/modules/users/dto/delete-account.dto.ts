@@ -3,12 +3,11 @@ import { Expose } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
-  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
-export class ChangePasswordDto {
+export class DeleteAccountDto {
   @ApiProperty({ description: '当前密码' })
   @IsString()
   @IsNotEmpty({ message: '当前密码不能为空' })
@@ -17,13 +16,10 @@ export class ChangePasswordDto {
   @Expose()
   currentPassword: string;
 
-  @ApiProperty({ description: '新密码' })
+  @ApiProperty({ description: '删除确认文本，必须与当前用户名一致' })
   @IsString()
-  @MinLength(6, { message: '新密码长度不能小于6位' })
-  @MaxLength(20, { message: '新密码长度不能大于20位' })
-  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)/, {
-    message: '新密码必须包含字母和数字',
-  })
+  @IsNotEmpty({ message: '请输入用户名确认删除' })
+  @MaxLength(20, { message: '确认用户名长度不能大于20位' })
   @Expose()
-  newPassword: string;
+  confirmation: string;
 }

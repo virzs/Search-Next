@@ -1,12 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { PageDto } from 'src/public/dto/page';
 import { Response } from 'src/utils/response';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ResetPassowrdDto } from './dto/reset-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { DeleteAccountDto } from './dto/delete-account.dto';
+import { RedisConstants } from 'src/common/constants/redis';
 import { UsersName } from './schemas/ref-names';
 import { User } from './schemas/user';
 import {
@@ -18,7 +24,23 @@ import {
 export class UsersService {
   constructor(
     @InjectModel(UsersName) private readonly usersModel: Model<User>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
+
+  private refreshTokenCacheKey(userId: string) {
+    return `${RedisConstants.AUTH_REFRESH_TOKEN_KEY}:${userId}`;
+  }
+
+  private async clearRefreshSessions(userId: string) {
+    await this.cacheManager.del(this.refreshTokenCacheKey(userId));
+  }
+
+  private activeUserFilter(userId: string) {
+    return {
+      _id: userId,
+      isDelete: { $in: [false, null] },
+    };
+  }
 
   async getNormalUser(query: PageDto) {
     const { page = 1, pageSize = 10 } = query;
@@ -126,6 +148,127 @@ export class UsersService {
     };
   }
 
+  async validateSession(userId: string, sessionVersion?: number) {
+    const user = await this.usersModel
+      .findOne(this.activeUserFilter(userId))
+      .select('+enable +sessionVersion')
+      .lean();
+
+    if (!user?.enable) {
+      return false;
+    }
+
+    return (
+      Number(user.sessionVersion ?? 0) === Number(sessionVersion ?? 0)
+    );
+  }
+
+  async updateProfile(userId: string, body: UpdateProfileDto) {
+    const currentUser = await this.usersModel
+      .findOne(this.activeUserFilter(userId))
+      .lean();
+
+    if (!currentUser) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    const duplicate = await this.usersModel.findOne({
+      _id: { $ne: userId },
+      username: body.username,
+      isDelete: { $in: [false, null] },
+    });
+
+    if (duplicate) {
+      throw new BadRequestException('用户名已存在');
+    }
+
+    const updated = await this.usersModel
+      .findOneAndUpdate(
+        this.activeUserFilter(userId),
+        { $set: { username: body.username } },
+        { new: true },
+      )
+      .select('+createdAt')
+      .lean();
+
+    if (!updated) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    return {
+      _id: updated._id,
+      username: updated.username,
+      email: updated.email,
+      avatar: updated.avatar,
+      createdAt: updated.createdAt,
+    };
+  }
+
+  async changePassword(userId: string, body: ChangePasswordDto) {
+    const user = await this.usersModel
+      .findOne(this.activeUserFilter(userId))
+      .select('+password')
+      .exec();
+
+    if (!user) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(
+      body.currentPassword,
+      user.password,
+    );
+    if (!currentPasswordMatches) {
+      throw new BadRequestException('当前密码错误');
+    }
+
+    const passwordUnchanged = await bcrypt.compare(
+      body.newPassword,
+      user.password,
+    );
+    if (passwordUnchanged) {
+      throw new BadRequestException('新密码不能与当前密码相同');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const password = await bcrypt.hash(body.newPassword, salt);
+    await this.usersModel.updateOne(this.activeUserFilter(userId), {
+      $set: { password, salt },
+      $inc: { sessionVersion: 1 },
+    });
+    await this.clearRefreshSessions(userId);
+
+    return Response.success();
+  }
+
+  async deleteAccount(userId: string, body: DeleteAccountDto) {
+    const user = await this.usersModel
+      .findOne(this.activeUserFilter(userId))
+      .select('+password')
+      .exec();
+
+    if (!user) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      body.currentPassword,
+      user.password,
+    );
+    if (!passwordMatches) {
+      throw new BadRequestException('当前密码错误');
+    }
+
+    if (body.confirmation !== user.username) {
+      throw new BadRequestException('确认文本与当前用户名不一致');
+    }
+
+    await markDeletedUser(this.usersModel, userId);
+    await this.clearRefreshSessions(userId);
+
+    return Response.success();
+  }
+
   async update(id: string, body: UpdateUserDto) {
     const result = await this.usersModel.findByIdAndUpdate(
       id,
@@ -141,11 +284,13 @@ export class UsersService {
   }
 
   async delete(id: string) {
-    return markDeletedUser(this.usersModel, id);
+    const result = await markDeletedUser(this.usersModel, id);
+    await this.clearRefreshSessions(id);
+    return result;
   }
 
   async resetPassword(body: ResetPassowrdDto) {
-    const { email, captcha, password } = body;
+    const { email } = body;
 
     const user = await this.usersModel.findOne({
       email,

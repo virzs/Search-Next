@@ -127,7 +127,7 @@ export class AuthService {
     const user = await this.usersModel
       .findOne({ email, isDelete: { $in: [false, null] } })
       .select(
-        '+password +enable +status +roles +type +projects +integral +createdAt',
+        '+password +enable +status +roles +type +projects +integral +createdAt +sessionVersion',
       )
       .lean();
     if (!user) {
@@ -247,12 +247,10 @@ export class AuthService {
       },
     });
 
-    const {
-      password: _password,
-      salt: _salt,
-      legalConfirmations: _legalConfirmations,
-      ...sessionUser
-    } = newUser.toObject();
+    const sessionUser = newUser.toObject();
+    Reflect.deleteProperty(sessionUser, 'password');
+    Reflect.deleteProperty(sessionUser, 'salt');
+    Reflect.deleteProperty(sessionUser, 'legalConfirmations');
     return {
       message: '注册成功',
       ...(await this.createSession(sessionUser, headers, 'web')),
@@ -325,9 +323,17 @@ export class AuthService {
     client: 'web' | 'admin',
   ) {
     const userAgent = headers['user-agent'];
-    const access_token = this.jwtService.sign({ ...user, userAgent, client });
-    const refresh_token = this.refreshTokenService.createRefreshToken({
+    const sessionUser = {
       ...user,
+      sessionVersion: Number(user.sessionVersion ?? 0),
+    };
+    const access_token = this.jwtService.sign({
+      ...sessionUser,
+      userAgent,
+      client,
+    });
+    const refresh_token = this.refreshTokenService.createRefreshToken({
+      ...sessionUser,
       userAgent,
       client,
     });
@@ -348,8 +354,10 @@ export class AuthService {
       newCache,
       ttl,
     );
+    const publicUser = { ...sessionUser };
+    Reflect.deleteProperty(publicUser, 'sessionVersion');
     return {
-      ...user,
+      ...publicUser,
       access_token,
       refresh_token,
     };
@@ -428,6 +436,26 @@ export class AuthService {
       );
     }
 
+    if (refreshToken !== postRefreshToken) {
+      throw new UnauthorizedException('登录已过期 refresh token changed');
+    }
+
+    const sessionUser = await this.usersModel
+      .findOne({
+        _id: decoded._id,
+        isDelete: { $in: [false, null] },
+      })
+      .select('+enable +sessionVersion')
+      .lean();
+
+    if (
+      !sessionUser?.enable ||
+      Number(sessionUser.sessionVersion ?? 0) !==
+        Number(decoded.sessionVersion ?? 0)
+    ) {
+      throw new UnauthorizedException('登录已过期 session changed');
+    }
+
     const isExpired =
       await this.refreshTokenService.isRefreshTokenExpired(refreshToken);
 
@@ -438,7 +466,9 @@ export class AuthService {
       throw new UnauthorizedException('登录已过期 expired');
     }
 
-    const { exp, iat, ...tokenRest } = decoded;
+    const tokenRest = { ...decoded };
+    Reflect.deleteProperty(tokenRest, 'exp');
+    Reflect.deleteProperty(tokenRest, 'iat');
 
     const newAccessToken = this.jwtService.sign({
       ...tokenRest,
@@ -456,7 +486,7 @@ export class AuthService {
       `${RedisConstants.AUTH_REFRESH_TOKEN_KEY}:${decoded._id.toString()}`,
       {
         ...cache,
-        [userAgent]: newRefreshToken,
+        [userAgent]: isExpiresSoon ? newRefreshToken : refreshToken,
       },
       newTTL,
     );

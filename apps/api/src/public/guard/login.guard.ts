@@ -8,8 +8,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { Observable } from 'rxjs';
 import { jwtConfig } from 'src/config/jwt';
+import { UsersService } from 'src/modules/users/users.service';
 import { PUBLIC_ROUTE_KEY } from '../decorator/public_route.decorator';
 
 declare module 'express' {
@@ -26,9 +26,12 @@ export class LoginGuard implements CanActivate {
   @Inject()
   private readonly reflector: Reflector;
 
-  canActivate(
+  @Inject(UsersService)
+  private readonly usersService: UsersService;
+
+  async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
 
     const publicRoute = this.reflector.getAllAndOverride(PUBLIC_ROUTE_KEY, [
@@ -54,8 +57,13 @@ export class LoginGuard implements CanActivate {
           const data = this.jwtService.verify(token, {
             secret: jwtConfig.accessToken.secret,
           });
-          request.user = data.user ?? data;
-        } catch (e) {
+          const user = data.user ?? data;
+          const sessionValid = await this.usersService.validateSession(
+            user._id,
+            user.sessionVersion,
+          );
+          request.user = sessionValid ? user : undefined;
+        } catch {
           request.user = undefined;
         }
       }
@@ -75,9 +83,18 @@ export class LoginGuard implements CanActivate {
         secret: jwtConfig.accessToken.secret,
       });
 
-      request.user = data.user ?? data;
+      const user = data.user ?? data;
+      const sessionValid = await this.usersService.validateSession(
+        user._id,
+        user.sessionVersion,
+      );
+      if (!sessionValid) {
+        throw new UnauthorizedException('登录已过期，请重新登录');
+      }
+
+      request.user = user;
       return true;
-    } catch (e) {
+    } catch {
       throw new UnauthorizedException('token 失效，请重新登录');
     }
   }

@@ -30,4 +30,14 @@ describe('UsersSchema', () => {
 
     expect(nicknameIndex).toBeUndefined();
   });
+
+  it('starts new accounts at session version zero', () => {
+    const user = new userModel({
+      username: 'session-user',
+      email: 'session-user@example.com',
+      password: 'hashed-password',
+    });
+
+    expect(user.sessionVersion).toBe(0);
+  });
 });

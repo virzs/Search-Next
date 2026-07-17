@@ -88,6 +88,10 @@ export class User extends BaseSchema {
   @Prop({ type: Boolean, default: true, select: false })
   enable: boolean;
 
+  // 修改密码或删除账号时递增，用于立即撤销已签发的会话。
+  @Prop({ type: Number, default: 0, select: false })
+  sessionVersion: number;
+
   // 当前积分
   @Prop({ type: Number, default: 0, select: false })
   integral: number;
@@ -126,6 +130,7 @@ export const UsersSchema = SchemaFactory.createForClass(User);
 UsersSchema.pre('find', baseSchemaPreFind);
 
 UsersSchema.methods.toJSON = function () {
-  const { __v, ...data } = this.toObject();
+  const data = this.toObject();
+  Reflect.deleteProperty(data, '__v');
   return data;
 };

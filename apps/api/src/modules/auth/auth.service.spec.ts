@@ -208,4 +208,58 @@ describe('AuthService legal confirmations', () => {
       refresh_token: 'refresh-token',
     });
   });
+
+  it('rejects a submitted refresh token that no longer matches the cached session', async () => {
+    jwtService.verifyAsync = jest.fn().mockResolvedValue({
+      _id: 'user-1',
+      userAgent: 'jest',
+      sessionVersion: 0,
+    });
+    cacheManager.get.mockResolvedValue({ jest: 'current-refresh-token' });
+    const service = createService();
+
+    await expect(
+      service.refreshToken(
+        { refreshToken: 'replaced-refresh-token' },
+        { 'user-agent': 'jest' },
+      ),
+    ).rejects.toThrow('登录已过期 refresh token changed');
+  });
+
+  it('keeps the current refresh token cached until rotation is required', async () => {
+    jwtService.verifyAsync = jest.fn().mockResolvedValue({
+      _id: 'user-1',
+      userAgent: 'jest',
+      sessionVersion: 0,
+    });
+    refreshTokenService.isRefreshTokenExpired = jest
+      .fn()
+      .mockResolvedValue(false);
+    refreshTokenService.isRefreshTokenExpiresSoon = jest
+      .fn()
+      .mockResolvedValue(false);
+    cacheManager.get.mockResolvedValue({ jest: 'current-refresh-token' });
+    const query: any = {
+      select: jest.fn(),
+      lean: jest
+        .fn()
+        .mockResolvedValue({ enable: true, sessionVersion: 0 }),
+    };
+    query.select.mockReturnValue(query);
+    usersModel.findOne = jest.fn().mockReturnValue(query);
+    const service = createService();
+
+    await expect(
+      service.refreshToken(
+        { refreshToken: 'current-refresh-token' },
+        { 'user-agent': 'jest' },
+      ),
+    ).resolves.toEqual({ access_token: 'access-token' });
+
+    expect(cacheManager.set).toHaveBeenCalledWith(
+      'auth:refresh-token:user-1',
+      { jest: 'current-refresh-token' },
+      60_000,
+    );
+  });
 });

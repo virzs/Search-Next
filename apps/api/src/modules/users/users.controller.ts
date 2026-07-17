@@ -15,6 +15,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SkipPermission } from 'src/public/decorator/skip_permission.decorator';
 import { User } from 'src/public/decorator/route-user.decoratpr';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { DeleteAccountDto } from './dto/delete-account.dto';
+import { SkipLegalConfirmation } from 'src/public/decorator/skip-legal-confirmation.decorator';
 
 @ApiTags('用户')
 @Controller('users')
@@ -47,6 +51,38 @@ export class UsersController {
   @ApiOperation({ summary: '当前用户信息' })
   currentUser(@User() user): Promise<any> {
     return this.usersService.currentUser(user);
+  }
+
+  @Put('/me/profile')
+  @SkipPermission()
+  @ApiOperation({ summary: '更新当前用户资料' })
+  updateProfile(
+    @User('_id') userId: string,
+    @Body() body: UpdateProfileDto,
+  ) {
+    return this.usersService.updateProfile(userId, body);
+  }
+
+  @Put('/me/password')
+  @SkipPermission()
+  @SkipLegalConfirmation()
+  @ApiOperation({ summary: '修改当前用户密码' })
+  changePassword(
+    @User('_id') userId: string,
+    @Body() body: ChangePasswordDto,
+  ) {
+    return this.usersService.changePassword(userId, body);
+  }
+
+  @Delete('/me')
+  @SkipPermission()
+  @SkipLegalConfirmation()
+  @ApiOperation({ summary: '删除当前用户账号' })
+  deleteAccount(
+    @User('_id') userId: string,
+    @Body() body: DeleteAccountDto,
+  ) {
+    return this.usersService.deleteAccount(userId, body);
   }
 
   @Post('/')

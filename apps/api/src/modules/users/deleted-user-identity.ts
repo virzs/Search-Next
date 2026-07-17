@@ -60,9 +60,12 @@ export async function markDeletedUser(usersModel: Model<User>, id: string) {
     .findByIdAndUpdate(
       id,
       {
-        isDelete: true,
-        email: markValueDeleted(user.email, id),
-        username: markValueDeleted(user.username, id),
+        $set: {
+          isDelete: true,
+          email: markValueDeleted(user.email, id),
+          username: markValueDeleted(user.username, id),
+        },
+        $inc: { sessionVersion: 1 },
       },
       { new: true },
     )
