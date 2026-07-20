@@ -7,7 +7,7 @@ export default function AppSegmented<ValueType extends string | number = string>
   props: SegmentedProps<ValueType>,
 ) {
   const { shape, classNames, styles, ...rest } = props;
-  const mergedShape = shape ?? "round";
+  const mergedShape = shape ?? "default";
   const semanticInfo = {
     props: {
       ...props,
@@ -45,13 +45,13 @@ export default function AppSegmented<ValueType extends string | number = string>
 }
 
 const appSegmentedRootStyle: CSSProperties = {
-  borderRadius: 999,
+  borderRadius: "var(--sn-radius-control)",
   background: "rgba(118, 118, 128, 0.14)",
   padding: 3,
 };
 
 const appSegmentedItemStyle: CSSProperties = {
-  borderRadius: 999,
+  borderRadius: "var(--sn-radius-control)",
   fontSize: 12,
   fontWeight: 700,
 };

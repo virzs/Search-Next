@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, message } from "antd";
+import { message } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { cx } from "@emotion/css";
@@ -6,8 +6,6 @@ import {
   RiUserFill,
   RiMailFill,
   RiLockFill,
-  RiEyeFill,
-  RiEyeOffFill,
   RiShieldCheckFill,
 } from "@remixicon/react";
 import {
@@ -26,10 +24,16 @@ import {
   getLegalDocumentVersions,
   type LegalDocumentType,
 } from "@/services/system";
-import LegalAgreementText from "@/components/legal/LegalAgreementText";
 import LegalDocumentModal from "@/components/legal/LegalDocumentModal";
+import LegalAgreementField from "@/components/legal/LegalAgreementField";
+import AuthPasswordVisibilityButton from "./AuthPasswordVisibilityButton";
+import {
+  AppButton,
+  AppForm,
+  AppInput,
+} from "@/components/ui";
 
-const { Item } = Form;
+const { Item } = AppForm;
 
 const RegisterForm: React.FC<RegisterFormProps> = ({
   onSubmit,
@@ -40,7 +44,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   initialValues = {},
 }) => {
   const { t, language } = useI18n();
-  const [form] = Form.useForm<RegisterFormData>();
+  const [form] = AppForm.useForm<RegisterFormData>();
   const { search } = useLocation();
   const { register, registerLoading: contextRegisterLoading } = useAuth();
   const { projectInfo } = useConfig();
@@ -216,7 +220,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <div className={cx("register-form", appleAuthFormClassName, className)}>
-      <Form
+      <AppForm
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
@@ -236,7 +240,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             },
           ]}
         >
-          <Input
+          <AppInput
             prefix={<RiUserFill size={16} className="apple-auth-field-icon" />}
             placeholder={t("ui.enterAUsername")}
             autoComplete="username"
@@ -252,7 +256,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             { type: "email", message: t("ui.enterAValidEmailAddress") },
           ]}
         >
-          <Input
+          <AppInput
             prefix={<RiMailFill size={16} className="apple-auth-field-icon" />}
             placeholder={t("ui.enterYourEmailAddress")}
             autoComplete="email"
@@ -270,7 +274,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               },
             ]}
           >
-            <Input
+            <AppInput
               prefix={
                 <RiShieldCheckFill
                   size={16}
@@ -294,7 +298,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             ]}
           >
             <div className="apple-auth-captcha-row">
-              <Input
+              <AppInput
                 prefix={
                   <RiShieldCheckFill
                     size={16}
@@ -304,14 +308,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 placeholder={t("ui.enterThe6DigitCode")}
                 maxLength={6}
               />
-              <Button
+              <AppButton
+                size="default"
                 onClick={handleGetCaptcha}
                 loading={captchaLoading}
                 disabled={captchaSent}
-                className="apple-auth-code-button"
               >
                 {captchaSent ? `${countdown}s` : t("ui.getCode")}
-              </Button>
+              </AppButton>
             </div>
           </Item>
         )}
@@ -329,24 +333,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             },
           ]}
         >
-          <Input
+          <AppInput
             prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showPassword ? "text" : "password"}
             placeholder={t("ui.auth.passwordPlaceholder")}
             autoComplete="new-password"
             suffix={
-              <Button
-                type="text"
-                size="small"
-                icon={
-                  showPassword ? (
-                    <RiEyeOffFill size={16} />
-                  ) : (
-                    <RiEyeFill size={16} />
-                  )
-                }
-                onClick={() => setShowPassword(!showPassword)}
-                className="apple-auth-icon-button"
+              <AuthPasswordVisibilityButton
+                visible={showPassword}
+                onToggle={() => setShowPassword(!showPassword)}
               />
             }
           />
@@ -369,24 +364,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             }),
           ]}
         >
-          <Input
+          <AppInput
             prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showConfirmPassword ? "text" : "password"}
             placeholder={t("ui.enterYourPasswordAgain")}
             autoComplete="new-password"
             suffix={
-              <Button
-                type="text"
-                size="small"
-                icon={
-                  showConfirmPassword ? (
-                    <RiEyeOffFill size={16} />
-                  ) : (
-                    <RiEyeFill size={16} />
-                  )
-                }
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="apple-auth-icon-button"
+              <AuthPasswordVisibilityButton
+                visible={showConfirmPassword}
+                onToggle={() => setShowConfirmPassword(!showConfirmPassword)}
               />
             }
           />
@@ -416,32 +402,29 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             valuePropName="checked"
             className="mb-4! mt-4!"
           >
-            <Checkbox>
-              <LegalAgreementText
-                onOpenDocument={(type) => {
-                  pendingValuesRef.current = null;
-                  setLegalInitialType(type);
-                  setLegalModalOpen(true);
-                }}
-              />
-            </Checkbox>
+            <LegalAgreementField
+              onOpenDocument={(type) => {
+                pendingValuesRef.current = null;
+                setLegalInitialType(type);
+                setLegalModalOpen(true);
+              }}
+            />
           </Item>
         ) : null}
 
         {/* 注册按钮 */}
         <Item className="mb-0! mt-6!">
-          <Button
-            type="primary"
+          <AppButton
+            intent="primary"
             htmlType="submit"
             loading={isLoading}
             block
             size="large"
-            className="apple-auth-primary-button"
           >
             {t(isLoading ? "ui.registering" : "ui.registerAccount")}
-          </Button>
+          </AppButton>
         </Item>
-      </Form>
+      </AppForm>
       <LegalDocumentModal
         open={legalModalOpen}
         versions={legalVersions}

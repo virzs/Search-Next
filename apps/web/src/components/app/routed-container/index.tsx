@@ -12,12 +12,13 @@ import AppResponsiveOverlay, {
   AppResponsiveOverlayProps,
 } from "../responsive-overlay";
 import AppSidebar, { AppSidebarProps } from "../sidebar";
-import { Button, ConfigProvider, theme as antdTheme } from "antd";
+import { ConfigProvider, theme as antdTheme } from "antd";
 import type { ConfigProviderProps } from "antd";
 import type { CSSProperties } from "react";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { css, cx } from "@emotion/css";
 import { AppRoutedHeaderContext } from "./header-context";
+import { AppIconButton } from "@/components/ui";
 
 export interface AppRoutedContainerProps {
   open: boolean;
@@ -233,20 +234,18 @@ const AppRoutedContainer: FC<AppRoutedContainerProps> = ({
                 <div className={routedHeaderClassName}>
                   {showHistoryControls ? (
                     <div className={historyControlsClassName}>
-                      <Button
-                        type="text"
+                      <AppIconButton
+                        intent="quiet"
                         size="small"
                         aria-label="后退"
-                        className="app-history-button"
                         icon={<RiArrowLeftLine size={16} />}
                         disabled={!canBack}
                         onClick={handleBack}
                       />
-                      <Button
-                        type="text"
+                      <AppIconButton
+                        intent="quiet"
                         size="small"
                         aria-label="前进"
-                        className="app-history-button"
                         icon={<RiArrowRightLine size={16} />}
                         disabled={!canForward}
                         onClick={handleForward}
@@ -301,11 +300,7 @@ const routedHeaderClassName = css`
     font-size: 13px;
     font-weight: 700;
     line-height: 20px;
-    color: #424245;
-  }
-
-  [data-theme="dark"] & .app-route-title {
-    color: #d1d1d6;
+    color: var(--sn-text-secondary);
   }
 `;
 
@@ -353,41 +348,4 @@ const historyControlsClassName = css`
   align-items: center;
   gap: 6px;
   padding: 10px 0 10px 4px;
-
-  .app-history-button {
-    width: 28px !important;
-    height: 28px !important;
-    border: 0 !important;
-    border-radius: 999px !important;
-    background: transparent !important;
-    color: #5f6368 !important;
-    box-shadow: none !important;
-  }
-
-  .app-history-button:not(:disabled):not(.ant-btn-disabled):hover {
-    background: rgba(60, 60, 67, 0.08) !important;
-    color: #1d1d1f !important;
-  }
-
-  .app-history-button:disabled,
-  .app-history-button.ant-btn-disabled {
-    opacity: 0.38;
-    color: #6e6e73 !important;
-    background: transparent !important;
-  }
-
-  [data-theme="dark"] & .app-history-button {
-    color: #d1d1d6 !important;
-  }
-
-  [data-theme="dark"] &
-    .app-history-button:not(:disabled):not(.ant-btn-disabled):hover {
-    background: rgba(235, 235, 245, 0.12) !important;
-    color: #f5f5f7 !important;
-  }
-
-  [data-theme="dark"] & .app-history-button:disabled,
-  [data-theme="dark"] & .app-history-button.ant-btn-disabled {
-    color: #8e8e93 !important;
-  }
 `;

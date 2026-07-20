@@ -1,7 +1,8 @@
-import { Input, Menu } from "antd";
+import { Menu } from "antd";
 import type { MenuProps } from "antd";
 import { css, cx } from "@emotion/css";
 import { FC, ReactNode } from "react";
+import { AppInput } from "@/components/ui";
 
 export interface AppSidebarMenuItem {
   key: string;
@@ -65,8 +66,10 @@ const AppSidebar: FC<AppSidebarProps> = ({
 
       {search ? (
         <div className="px-2 pb-2">
-          <Input
+          <AppInput
+            size="small"
             allowClear={search.allowClear ?? true}
+            aria-label={search.placeholder ?? "搜索"}
             value={search.value}
             onChange={(e) => search.onChange(e.target.value)}
             prefix={search.prefix}
@@ -136,35 +139,6 @@ const appSidebarClassName = css`
     color: rgba(60, 60, 67, 0.64) !important;
   }
 
-  .ant-input-affix-wrapper {
-    height: 30px;
-    border-radius: 999px;
-    border-color: rgba(60, 60, 67, 0.14);
-    background: rgba(255, 255, 255, 0.58);
-    box-shadow:
-      inset 0 1px 1px rgba(0, 0, 0, 0.06),
-      0 1px 0 rgba(255, 255, 255, 0.66);
-  }
-
-  .ant-input-affix-wrapper:hover,
-  .ant-input-affix-wrapper-focused {
-    border-color: color-mix(in srgb, var(--sn-accent) 35%, transparent);
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow:
-      0 0 0 3px color-mix(in srgb, var(--sn-accent) 12%, transparent),
-      inset 0 1px 1px rgba(0, 0, 0, 0.04);
-  }
-
-  .ant-input {
-    background: transparent;
-    color: #1d1d1f;
-    font-size: 13px;
-  }
-
-  .ant-input::placeholder {
-    color: rgba(60, 60, 67, 0.58);
-  }
-
   .ant-menu {
     border-inline-end: 0 !important;
     background: transparent;
@@ -178,7 +152,7 @@ const appSidebarClassName = css`
     height: 38px;
     line-height: 38px;
     margin: 2px 0;
-    border-radius: 7px;
+    border-radius: var(--sn-radius-compact);
     color: #1d1d1f;
     font-size: 13px;
     font-weight: 600;
@@ -229,31 +203,6 @@ const appSidebarClassName = css`
   [data-theme="dark"] & .app-sidebar-header [class*="text-gray-500"],
   [data-theme="dark"] & .app-sidebar-header [class*="dark:text-gray-400"] {
     color: rgba(235, 235, 245, 0.62) !important;
-  }
-
-  [data-theme="dark"] & .ant-input-affix-wrapper {
-    border-color: rgba(235, 235, 245, 0.12);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow:
-      inset 0 1px 1px rgba(0, 0, 0, 0.3),
-      0 1px 0 rgba(255, 255, 255, 0.04);
-  }
-
-  [data-theme="dark"] & .ant-input-affix-wrapper:hover,
-  [data-theme="dark"] & .ant-input-affix-wrapper-focused {
-    border-color: color-mix(in srgb, var(--sn-accent) 50%, transparent);
-    background: rgba(255, 255, 255, 0.12);
-    box-shadow:
-      0 0 0 3px color-mix(in srgb, var(--sn-accent) 18%, transparent),
-      inset 0 1px 1px rgba(0, 0, 0, 0.22);
-  }
-
-  [data-theme="dark"] & .ant-input {
-    color: #f5f5f7;
-  }
-
-  [data-theme="dark"] & .ant-input::placeholder {
-    color: rgba(235, 235, 245, 0.48);
   }
 
   [data-theme="dark"] & .ant-menu-item {

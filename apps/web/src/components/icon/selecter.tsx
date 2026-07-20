@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from "react";
-import { Input, Empty, List, Pagination } from "antd";
+import { Empty, List, Pagination } from "antd";
 import iconTags from "../../assets/tags.json";
 import { css, cx } from "@emotion/css";
 import { useI18n } from "@/i18n";
+import { AppInput } from "@/components/ui";
 
 // 图标数据类型定义
 type IconTagsType = {
@@ -28,20 +29,23 @@ const IconItem: React.FC<{
   isSelected?: boolean;
 }> = ({ iconName, iconType, onClick, isSelected = false }) => {
   return (
-    <div
+    <button
+      type="button"
+      aria-label={iconName}
+      aria-pressed={isSelected}
       className={cx(
-        "flex flex-col items-center justify-center p-2 m-1 cursor-pointer rounded-md relative aspect-video",
-        isSelected ? "bg-blue-100" : "bg-gray-50 hover:bg-gray-100"
+        "relative m-1 flex aspect-video w-[calc(100%_-_0.5rem)] cursor-pointer flex-col items-center justify-center rounded-[var(--sn-radius-control)] border-0 p-2 focus-visible:outline-3 focus-visible:outline-[var(--sn-accent)]",
+        isSelected ? "bg-blue-100" : "bg-gray-50 hover:bg-gray-100",
       )}
       onClick={onClick}
     >
       <i
         className={cx(
           `ri-${iconName}-${iconType}`,
-          isSelected && "text-blue-600"
+          isSelected && "text-blue-600",
         )}
       />
-    </div>
+    </button>
   );
 };
 
@@ -132,7 +136,7 @@ const IconSelecter: React.FC<IconSelecterProps> = ({
   return (
     <div>
       <div className="mb-4 flex items-center">
-        <Input
+        <AppInput
           placeholder={t("ui.searchIcons")}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -150,7 +154,7 @@ const IconSelecter: React.FC<IconSelecterProps> = ({
                 margin-left: 0 !important;
                 margin-right: 0 !important;
               }
-            `
+            `,
           )}
         >
           <List

@@ -1,12 +1,7 @@
-import { Form, Input, Button, Checkbox, message } from "antd";
+import { message } from "antd";
 import { useRef, useState } from "react";
 import { cx } from "@emotion/css";
-import {
-  RiMailFill,
-  RiLockFill,
-  RiEyeFill,
-  RiEyeOffFill,
-} from "@remixicon/react";
+import { RiLockFill, RiMailFill } from "@remixicon/react";
 import { LoginFormProps, LoginFormData, LoginResponse } from "../../types/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { appleAuthFormClassName } from "./apple-auth-styles";
@@ -18,10 +13,17 @@ import {
   getLegalDocumentVersions,
   type LegalDocumentType,
 } from "@/services/system";
-import LegalAgreementText from "@/components/legal/LegalAgreementText";
 import LegalDocumentModal from "@/components/legal/LegalDocumentModal";
+import LegalAgreementField from "@/components/legal/LegalAgreementField";
+import AuthPasswordVisibilityButton from "./AuthPasswordVisibilityButton";
+import {
+  AppButton,
+  AppCheckbox,
+  AppForm,
+  AppInput,
+} from "@/components/ui";
 
-const { Item } = Form;
+const { Item } = AppForm;
 
 const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
@@ -31,7 +33,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   initialValues = {},
 }) => {
   const { t, language } = useI18n();
-  const [form] = Form.useForm<LoginFormData>();
+  const [form] = AppForm.useForm<LoginFormData>();
   const { login, loginLoading: contextLoginLoading } = useAuth();
   const { projectInfo } = useConfig();
   const [showPassword, setShowPassword] = useState(false);
@@ -125,7 +127,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <div className={cx("login-form", appleAuthFormClassName, className)}>
-      <Form
+      <AppForm
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
@@ -145,7 +147,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             { type: "email", message: t("ui.enterAValidEmailAddress") },
           ]}
         >
-          <Input
+          <AppInput
             prefix={<RiMailFill size={16} className="apple-auth-field-icon" />}
             placeholder={t("ui.enterYourEmailAddress")}
             autoComplete="email"
@@ -161,24 +163,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
             { min: 6, message: t("ui.passwordMustBeAtLeast6Characters") },
           ]}
         >
-          <Input
+          <AppInput
             prefix={<RiLockFill size={16} className="apple-auth-field-icon" />}
             type={showPassword ? "text" : "password"}
             placeholder={t("ui.enterYourPassword")}
             autoComplete="current-password"
             suffix={
-              <Button
-                type="text"
-                size="small"
-                icon={
-                  showPassword ? (
-                    <RiEyeOffFill size={16} />
-                  ) : (
-                    <RiEyeFill size={16} />
-                  )
-                }
-                onClick={() => setShowPassword(!showPassword)}
-                className="apple-auth-icon-button"
+              <AuthPasswordVisibilityButton
+                visible={showPassword}
+                onToggle={() => setShowPassword(!showPassword)}
               />
             }
           />
@@ -188,7 +181,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         {showRemember && (
           <div className="apple-auth-form-options">
             <Item name="remember" valuePropName="checked" className="mb-0!">
-              <Checkbox>{t("ui.rememberMe")}</Checkbox>
+              <AppCheckbox>{t("ui.rememberMe")}</AppCheckbox>
             </Item>
           </div>
         )}
@@ -217,33 +210,29 @@ const LoginForm: React.FC<LoginFormProps> = ({
             valuePropName="checked"
             className="mb-4!"
           >
-            <Checkbox>
-              <LegalAgreementText
-                onOpenDocument={(type) => {
-                  pendingValuesRef.current = null;
-                  setLegalInitialType(type);
-                  setLegalModalOpen(true);
-                }}
-              />
-            </Checkbox>
+            <LegalAgreementField
+              onOpenDocument={(type) => {
+                pendingValuesRef.current = null;
+                setLegalInitialType(type);
+                setLegalModalOpen(true);
+              }}
+            />
           </Item>
         ) : null}
 
         {/* 登录按钮 */}
         <Item className="mb-0!">
-          <Button
-            type="primary"
+          <AppButton
+            intent="primary"
             htmlType="submit"
-            autoInsertSpace={false}
             loading={isLoading}
             block
             size="large"
-            className="apple-auth-primary-button"
           >
             <span>{t(isLoading ? "ui.signingIn" : "ui.signIn")}</span>
-          </Button>
+          </AppButton>
         </Item>
-      </Form>
+      </AppForm>
       <LegalDocumentModal
         open={legalModalOpen}
         versions={legalVersions}

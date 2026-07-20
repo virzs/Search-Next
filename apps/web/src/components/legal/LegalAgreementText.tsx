@@ -1,5 +1,6 @@
 import { useI18n } from "@/i18n";
 import type { LegalDocumentType } from "@/services/system";
+import { AppButton } from "@/components/ui";
 
 interface LegalAgreementTextProps {
   onOpenDocument: (type: LegalDocumentType) => void;
@@ -18,23 +19,25 @@ const LegalAgreementText = ({ onOpenDocument }: LegalAgreementTextProps) => {
   return (
     <span>
       {t("ui.legal.confirmPrefix")}
-      <button
-        type="button"
+      <AppButton
+        intent="link"
+        size="small"
         aria-haspopup="dialog"
-        className="apple-auth-link legal-agreement-link"
+        className="mx-1"
         onClick={openDocument("terms")}
       >
         {t("ui.termsOfService")}
-      </button>
+      </AppButton>
       {t("ui.and")}
-      <button
-        type="button"
+      <AppButton
+        intent="link"
+        size="small"
         aria-haspopup="dialog"
-        className="apple-auth-link legal-agreement-link"
+        className="mx-1"
         onClick={openDocument("privacy")}
       >
         {t("ui.privacyPolicy")}
-      </button>
+      </AppButton>
     </span>
   );
 };

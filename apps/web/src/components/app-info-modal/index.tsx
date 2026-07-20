@@ -1,5 +1,5 @@
 import { DesktopNextBaseModal } from "zs_library";
-import { App, Button, Popconfirm, Tag } from "antd";
+import { App, Popconfirm, Tag } from "antd";
 import { useState, type FC } from "react";
 import { css } from "@emotion/css";
 import type { AppConfig } from "@/types";
@@ -10,6 +10,7 @@ import {
   getAppStorageStats,
 } from "@/utils/app-storage";
 import { resolveLocalizedText, useI18n } from "@/i18n";
+import { AppButton } from "@/components/ui";
 
 interface AppInfoModalProps {
   visible: boolean;
@@ -92,18 +93,18 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
               </div>
             ) : null}
           </div>
-          <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! px-3! py-1! text-xs! font-bold! text-[#6e6e73]!">
+          <Tag className="m-0! rounded-[var(--sn-radius-round)]! border-0! bg-[#f2f2f7]! px-3! py-1! text-xs! font-bold! text-[#6e6e73]!">
             {t("ui.appInfo")}
           </Tag>
         </div>
 
-        <div className="mt-5 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
+        <div className="mt-5 rounded-[var(--sn-radius-surface)] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
           <InfoRow label={t("ui.appID")} value={appId} />
           <InfoRow label={t("ui.version")} value={appConfig?.version} />
           <InfoRow label={t("ui.author")} value={appConfig?.author} />
         </div>
 
-        <div className="mt-4 rounded-[14px] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
+        <div className="mt-4 rounded-[var(--sn-radius-surface)] bg-white/72 px-4 py-2 shadow-[inset_0_0_0_1px_rgba(60,60,67,0.08)]">
           <InfoRow
             label={t("ui.storageUsed")}
             value={formatAppStorageSize(stats.byteSize)}
@@ -115,9 +116,9 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
         </div>
 
         <div className="mt-5 flex items-center justify-end gap-2">
-          <Button shape="round" onClick={onClose}>
+          <AppButton size="default" onClick={onClose}>
             {t("ui.close")}
-          </Button>
+          </AppButton>
           <Popconfirm
             title={t("ui.clearAppData")}
             description={t("ui.app.clearDataWarning")}
@@ -128,9 +129,13 @@ const AppInfoModal: FC<AppInfoModalProps> = ({
             }
             onConfirm={handleClear}
           >
-            <Button danger shape="round" disabled={stats.keyCount === 0}>
+            <AppButton
+              danger
+              size="default"
+              disabled={stats.keyCount === 0}
+            >
               {t("ui.clearAppData2")}
-            </Button>
+            </AppButton>
           </Popconfirm>
         </div>
       </div>
@@ -142,7 +147,7 @@ export default AppInfoModal;
 
 const appleAppInfoClassName = css`
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 18px;
+  border-radius: var(--sn-radius-panel);
   background:
     linear-gradient(
       180deg,

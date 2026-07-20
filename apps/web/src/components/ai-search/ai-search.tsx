@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from "react";
 import { Sender, Bubble, Conversations } from "@ant-design/x";
-import { Select, Space, Typography, Button, message, Drawer } from "antd";
+import { Space, Typography, message, Drawer } from "antd";
 import { RiGlobalLine, RiRobot2Line, RiHistoryLine } from "@remixicon/react";
 import { css, cx } from "@emotion/css";
 import { DesktopNextBaseModal } from "zs_library";
 import { performAISearch, isDeepSeekConfigured } from "../../services/ai-search";
 import { useI18n } from "@/i18n";
+import { AppButton, AppIconButton, AppSelect } from "@/components/ui";
 
 interface SearchEngine {
   value: string;
@@ -191,7 +192,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
           {/* 标题栏 */}
           <div
             className={cx(
-              "bg-gray-50 rounded-lg",
+              "bg-gray-50 rounded-[var(--sn-radius-surface)]",
               css`
                 display: flex;
                 justify-content: space-between;
@@ -216,8 +217,15 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
             </div>
 
             <Space>
-              <Button icon={<RiHistoryLine />} onClick={handleDrawerOpen} type="text" title={t("ui.conversationHistory")} />
-              <Select
+              <AppIconButton
+                aria-label={t("ui.conversationHistory")}
+                icon={<RiHistoryLine />}
+                onClick={handleDrawerOpen}
+                intent="quiet"
+                size="small"
+                title={t("ui.conversationHistory")}
+              />
+              <AppSelect
                 role="combobox"
                 value={selectedEngine}
                 onChange={setSelectedEngine}
@@ -232,16 +240,20 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ visible, onClose }) => {
                   ),
                 }))}
               />
-              <Button onClick={clearMessages} type="text">
+              <AppButton
+                onClick={clearMessages}
+                intent="quiet"
+                size="small"
+              >
                 {t("ui.clearConversation")}
-              </Button>
+              </AppButton>
             </Space>
           </div>
 
           {/* 对话内容区域 */}
           <div
             className={cx(
-              "bg-gray-50 my-4 rounded-lg",
+              "bg-gray-50 my-4 rounded-[var(--sn-radius-surface)]",
               css`
                 flex: 1;
                 display: flex;

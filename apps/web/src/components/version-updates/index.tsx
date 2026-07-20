@@ -1,16 +1,15 @@
-import { Button } from "antd";
 import { RiArrowRightUpLine } from "@remixicon/react";
 import { SimpleEditorViewer } from "zs_library";
 import { useI18n } from "@/i18n";
 import type { VersionUpdateItem } from "@/services/system";
 import { normalizeVersionUpdateContent } from "./format";
+import { AppButton } from "@/components/ui";
 
 export interface VersionUpdateBodyProps {
   update: VersionUpdateItem;
   className?: string;
   viewerClassName?: string;
   footerClassName?: string;
-  buttonClassName?: string;
 }
 
 export const VersionUpdateBody = ({
@@ -18,7 +17,6 @@ export const VersionUpdateBody = ({
   className,
   viewerClassName,
   footerClassName,
-  buttonClassName,
 }: VersionUpdateBodyProps) => {
   const { t } = useI18n();
   const content = normalizeVersionUpdateContent(
@@ -35,17 +33,16 @@ export const VersionUpdateBody = ({
       />
       {update.releaseUrl ? (
         <footer className={footerClassName}>
-          <Button
-            className={buttonClassName}
-            type="primary"
-            shape="round"
+          <AppButton
+            intent="primary"
+            size="small"
             href={update.releaseUrl}
             target="_blank"
             rel="noreferrer"
             icon={<RiArrowRightUpLine size={15} />}
           >
             {t("ui.notice.viewRelease")}
-          </Button>
+          </AppButton>
         </footer>
       ) : null}
     </div>

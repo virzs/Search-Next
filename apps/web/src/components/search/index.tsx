@@ -1,8 +1,14 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Input, Button, Space, Typography, Tag, AutoComplete, message } from "antd";
+import { Space, Typography, Tag, message } from "antd";
 import { RiGlobalLine, RiRobot2Line, RiSearchLine, RiArrowLeftLine } from "@remixicon/react";
 import { css } from "@emotion/css";
 import { tryFetchRealSuggestions } from "../../services/search-suggestions";
+import {
+  AppAutoComplete,
+  AppButton,
+  AppIconButton,
+  AppInput,
+} from "@/components/ui";
 
 interface SearchEngine {
   value: string;
@@ -171,8 +177,10 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
         `}
       >
         {searchMode === "ai" && (
-          <Button
-            type="text"
+          <AppIconButton
+            aria-label="返回"
+            intent="quiet"
+            size="small"
             icon={<RiArrowLeftLine size={18} />}
             onClick={handleBackToNormal}
             className={css`
@@ -185,7 +193,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
           />
         )}
 
-        <AutoComplete
+        <AppAutoComplete
           role="combobox"
           value={searchQuery}
           onChange={setSearchQuery}
@@ -200,7 +208,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
           notFoundContent={null}
           allowClear
         >
-          <Input
+          <AppInput
             size="large"
             prefix={
               searchMode === "ai" ? (
@@ -210,28 +218,23 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
               )
             }
             className={css`
-              border-radius: 25px;
-              height: 50px;
               font-size: 16px;
               ${searchMode === "ai" ? "border-color: #667eea;" : ""}
             `}
             onKeyDown={handleKeyPress}
           />
-        </AutoComplete>
+        </AppAutoComplete>
 
-        <Button
-          type="primary"
-          size="large"
+        <AppButton
+          intent="primary"
+          size="default"
           onClick={searchMode === "ai" ? onAISearchClick : handleSearch}
           className={css`
-            border-radius: 25px;
-            height: 50px;
-            padding: 0 24px;
             ${searchMode === "ai" ? "background-color: #667eea; border-color: #667eea;" : ""}
           `}
         >
           {searchMode === "ai" ? "AI 搜索" : "搜索"}
-        </Button>
+        </AppButton>
       </div>
 
       {/* 搜索引擎选择器 - 仅在普通搜索模式下显示 */}
@@ -258,7 +261,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
                   align-items: center;
                   gap: 4px;
                   padding: 4px 12px;
-                  border-radius: 16px;
+                  border-radius: var(--sn-radius-panel);
                   cursor: pointer;
                   transition: all 0.2s;
 
@@ -304,14 +307,14 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
           `}
         >
           <Typography.Text type="secondary">或者</Typography.Text>
-          <Button
-            type="dashed"
+          <AppButton
+            intent="secondary"
+            size="default"
             icon={<RiRobot2Line />}
             onClick={handleAISearchClick}
             className={css`
               border-color: #667eea;
               color: #667eea;
-              border-radius: 20px;
               &:hover {
                 border-color: #667eea;
                 color: #667eea;
@@ -320,7 +323,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onAISearchClick, show
             `}
           >
             使用 AI 搜索
-          </Button>
+          </AppButton>
         </div>
       )}
 

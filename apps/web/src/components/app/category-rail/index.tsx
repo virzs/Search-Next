@@ -1,5 +1,6 @@
 import { css, cx } from "@emotion/css";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
+import { AppButton, AppIconButton } from "@/components/ui";
 import {
   useCallback,
   useEffect,
@@ -140,14 +141,14 @@ export default function AppCategoryRail<
       data-scroll-right={canScrollRight || undefined}
     >
       {canScrollLeft ? (
-        <button
-          type="button"
+        <AppIconButton
+          intent="quiet"
+          size="small"
           className="category-scroll-button category-scroll-button-left"
           aria-label={previousLabel}
+          icon={<RiArrowLeftSLine size={17} />}
           onClick={() => scrollByPage(-1)}
-        >
-          <RiArrowLeftSLine size={17} />
-        </button>
+        />
       ) : null}
 
       <div
@@ -160,9 +161,10 @@ export default function AppCategoryRail<
         {options.map((option, index) => {
           const selected = option.value === value;
           return (
-            <button
+            <AppButton
               key={String(option.value)}
-              type="button"
+              intent="quiet"
+              size="small"
               role="radio"
               aria-checked={selected}
               disabled={option.disabled}
@@ -172,20 +174,20 @@ export default function AppCategoryRail<
               onKeyDown={(event) => handleKeyDown(event, index)}
             >
               <span>{option.label}</span>
-            </button>
+            </AppButton>
           );
         })}
       </div>
 
       {canScrollRight ? (
-        <button
-          type="button"
+        <AppIconButton
+          intent="quiet"
+          size="small"
           className="category-scroll-button category-scroll-button-right"
           aria-label={nextLabel}
+          icon={<RiArrowRightSLine size={17} />}
           onClick={() => scrollByPage(1)}
-        >
-          <RiArrowRightSLine size={17} />
-        </button>
+        />
       ) : null}
     </div>
   );
@@ -208,7 +210,7 @@ const appCategoryRailClassName = css`
     overflow-y: hidden;
     padding: 3px;
     border: 1px solid var(--sn-separator, rgba(60, 60, 67, 0.12));
-    border-radius: 12px;
+    border-radius: var(--sn-radius-surface);
     background: color-mix(
       in srgb,
       var(--sn-surface-secondary, #f2f2f7) 88%,
@@ -226,50 +228,15 @@ const appCategoryRailClassName = css`
   }
 
   &[data-scroll-left] .category-scroll-area {
-    padding-left: 34px;
+    padding-left: 32px;
   }
 
   &[data-scroll-right] .category-scroll-area {
-    padding-right: 34px;
+    padding-right: 32px;
   }
 
   .category-item {
-    display: inline-flex;
-    min-height: 30px;
-    flex: 0 0 auto;
-    cursor: pointer;
     scroll-snap-align: center;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    border-radius: 9px;
-    background: transparent;
-    padding: 5px 11px;
-    color: var(--sn-text-secondary, #6e6e73);
-    font: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 18px;
-    white-space: nowrap;
-    transition:
-      transform 100ms ease-out,
-      border-color 140ms ease,
-      background-color 140ms ease,
-      color 140ms ease,
-      box-shadow 140ms ease;
-  }
-
-  .category-item:hover:not(:disabled) {
-    background: color-mix(
-      in srgb,
-      var(--sn-surface-strong, #fff) 68%,
-      transparent
-    );
-    color: var(--sn-text, #1d1d1f);
-  }
-
-  .category-item:active:not(:disabled) {
-    transform: scale(0.97);
   }
 
   .category-item[aria-checked="true"] {
@@ -285,29 +252,11 @@ const appCategoryRailClassName = css`
       inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
 
-  .category-item:focus-visible,
-  .category-scroll-button:focus-visible {
-    outline: 2px solid
-      color-mix(in srgb, var(--sn-accent, #007aff) 62%, transparent);
-    outline-offset: 1px;
-  }
-
-  .category-item:disabled {
-    cursor: default;
-    opacity: 0.45;
-  }
-
   .category-scroll-button {
     position: absolute;
     z-index: 2;
     top: 50%;
-    display: grid;
-    width: 26px;
-    height: 26px;
-    cursor: pointer;
-    place-items: center;
     border: 1px solid var(--sn-separator, rgba(60, 60, 67, 0.12));
-    border-radius: 8px;
     background: color-mix(
       in srgb,
       var(--sn-surface-strong, #fff) 92%,
@@ -315,12 +264,8 @@ const appCategoryRailClassName = css`
     );
     color: var(--sn-text, #1d1d1f);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    transform: translateY(-50%);
+    translate: 0 -50%;
     backdrop-filter: blur(16px) saturate(1.25);
-  }
-
-  .category-scroll-button:active {
-    transform: translateY(-50%) scale(0.94);
   }
 
   .category-scroll-button-left {
@@ -329,12 +274,6 @@ const appCategoryRailClassName = css`
 
   .category-scroll-button-right {
     right: 5px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .category-item {
-      transition: none;
-    }
   }
 
   @media (prefers-reduced-transparency: reduce) {

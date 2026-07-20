@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -11,7 +12,8 @@ import {
   desktopNextThemeLight,
 } from "zs_library";
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react";
-import { App as AntdApp, Button, Empty, Spin, Tag } from "antd";
+import { App as AntdApp, Empty, Spin, Tag } from "antd";
+import { AppButton, AppIconButton } from "@/components/ui";
 import { css, cx } from "@emotion/css";
 import {
   RiApps2Line,
@@ -480,6 +482,10 @@ const UnifiedSearch = ({
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const shouldRestoreFocusRef = useRef(false);
+  const searchInputId = useId();
+  const searchListboxId = `${searchInputId}-listbox`;
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedEngineIds, setSelectedEngineIds] = useState(
@@ -667,6 +673,19 @@ const UnifiedSearch = ({
   ]);
 
   useEffect(() => {
+    if (variant !== "spotlight" || !open) return;
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLElement &&
+      activeElement !== document.body &&
+      !rootRef.current?.contains(activeElement)
+    ) {
+      returnFocusRef.current = activeElement;
+    }
+    shouldRestoreFocusRef.current = false;
+  }, [open, variant]);
+
+  useEffect(() => {
     if (!open || !autoFocus) return;
     const timer = window.setTimeout(() => inputRef.current?.focus(), 40);
     return () => window.clearTimeout(timer);
@@ -729,6 +748,17 @@ const UnifiedSearch = ({
       setSpotlightMounted(false);
       setSpotlightClosing(false);
       setActiveItemId(null);
+      const returnFocusTarget = returnFocusRef.current;
+      const shouldRestoreFocus = shouldRestoreFocusRef.current;
+      returnFocusRef.current = null;
+      shouldRestoreFocusRef.current = false;
+      if (shouldRestoreFocus && returnFocusTarget?.isConnected) {
+        window.requestAnimationFrame(() => {
+          if (!rootRef.current && returnFocusTarget.isConnected) {
+            returnFocusTarget.focus({ preventScroll: true });
+          }
+        });
+      }
     }, SPOTLIGHT_CLOSE_ANIMATION_MS);
 
     return () => window.clearTimeout(timer);
@@ -1052,6 +1082,17 @@ const UnifiedSearch = ({
     [focusableItems],
   );
 
+  const getOptionDomId = useCallback(
+    (itemId: string) =>
+      `${searchListboxId}-option-${encodeURIComponent(itemId)}`,
+    [searchListboxId],
+  );
+
+  const activeOptionDomId =
+    activeItemId && navigationIndexById.has(activeItemId)
+      ? getOptionDomId(activeItemId)
+      : undefined;
+
   useEffect(() => {
     if (!activeItemId || navigationIndexById.has(activeItemId)) return;
     setActiveItemId(null);
@@ -1072,12 +1113,13 @@ const UnifiedSearch = ({
       const index = navigationIndexById.get(itemId) ?? 0;
       return {
         itemId,
+        optionId: getOptionDomId(itemId),
         navigationRow: Math.floor(index / 2),
         navigationCol: index % 2,
         onMouseEnter: () => setActiveItemId(itemId),
       };
     },
-    [navigationIndexById],
+    [getOptionDomId, navigationIndexById],
   );
 
   const moveActiveItemLinear = useCallback(
@@ -1212,6 +1254,7 @@ const UnifiedSearch = ({
 
   const closeSpotlight = useCallback(() => {
     if (variant !== "spotlight") return;
+    shouldRestoreFocusRef.current = false;
     onClose?.();
     setActiveItemId(null);
   }, [onClose, variant]);
@@ -1221,6 +1264,7 @@ const UnifiedSearch = ({
     setExpandedSuggestionEngineIds([]);
 
     if (variant === "spotlight") {
+      shouldRestoreFocusRef.current = true;
       onClose?.();
       return;
     }
@@ -1615,6 +1659,11 @@ const UnifiedSearch = ({
     closeUnifiedSearch();
   };
 
+  const comboboxExpanded =
+    variant === "spotlight"
+      ? open && spotlightMounted && !spotlightClosing
+      : (desktopPanelShouldOpen || desktopPanelMounted) && !desktopClosing;
+
   const renderSearchInput = () => (
     <div
       className={cx(
@@ -1627,7 +1676,17 @@ const UnifiedSearch = ({
     >
       <RiSearchLine size={21} className="shrink-0 text-[#6e6e73]" />
       <input
+        id={searchInputId}
         ref={inputRef}
+        role="combobox"
+        aria-label={t("ui.search.placeholder")}
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        aria-expanded={comboboxExpanded}
+        aria-controls={comboboxExpanded ? searchListboxId : undefined}
+        aria-activedescendant={
+          comboboxExpanded ? activeOptionDomId : undefined
+        }
         value={query}
         onChange={(event) => {
           if (desktopClosing) {
@@ -1652,23 +1711,24 @@ const UnifiedSearch = ({
         className="min-w-0 flex-1 border-0 bg-transparent text-[15px] font-semibold text-[#1d1d1f] outline-none placeholder:text-[#8e8e93] dark:text-[#f5f5f7]"
       />
       {query ? (
-        <button
-          type="button"
+        <AppIconButton
           aria-label={t("ui.clearAll")}
-          className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-[#8e8e93] hover:bg-black/5 dark:hover:bg-white/10"
+          intent="quiet"
+          size="small"
+          className="text-[#8e8e93]"
+          icon={<RiCloseLine size={18} />}
           onClick={() => {
             setQuery("");
             inputRef.current?.focus();
           }}
-        >
-          <RiCloseLine size={18} />
-        </button>
+        />
       ) : (
         <span className="flex shrink-0 items-center gap-1.5">
-          <button
-            type="button"
+          <AppButton
+            intent="quiet"
+            size="small"
             title={t("ui.quickSearchCommands")}
-            className="h-6 cursor-pointer rounded-md border-0 bg-black/[0.06] px-2 text-[11px] font-bold text-[#6e6e73] hover:bg-black/[0.09] dark:bg-white/10 dark:text-[#aeaeb2] dark:hover:bg-white/[0.14]"
+            className="bg-black/[0.06] text-[#6e6e73] hover:bg-black/[0.09] dark:bg-white/10 dark:text-[#aeaeb2] dark:hover:bg-white/[0.14]"
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => {
               setQuery("@");
@@ -1676,13 +1736,13 @@ const UnifiedSearch = ({
             }}
           >
             {t("ui.atCommands")}
-          </button>
+          </AppButton>
           {showShortcutHint ? (
             <span className="flex items-center gap-1">
               {getUnifiedSearchShortcutParts(shortcut).map((part, index) => (
                 <kbd
                   key={`${part}-${index}`}
-                  className="min-w-5 rounded-md bg-black/[0.06] px-1.5 py-0.5 text-center text-[11px] font-bold not-italic text-[#6e6e73] dark:bg-white/10 dark:text-[#aeaeb2]"
+                  className="min-w-5 rounded-[var(--sn-radius-compact)] bg-black/[0.06] px-1.5 py-0.5 text-center text-[11px] font-bold not-italic text-[#6e6e73] dark:bg-white/10 dark:text-[#aeaeb2]"
                 >
                   {part}
                 </kbd>
@@ -1776,24 +1836,25 @@ const UnifiedSearch = ({
         {engines.map((engine) => {
           const checked = selectedEngineIds.includes(engine._id);
           return (
-            <button
-              type="button"
+            <AppButton
               key={engine._id}
+              intent={checked ? "primary" : "secondary"}
+              size="small"
+              aria-pressed={checked}
               onClick={() => toggleEngine(engine._id)}
-              className={cx(
-                "inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-full border px-2.5 text-xs font-bold transition",
-                checked
-                  ? "border-[#007aff] bg-[#007aff] text-white shadow-[0_8px_18px_rgba(0,122,255,0.20)]"
-                  : "border-black/10 bg-white/70 text-[#424245] hover:border-[#007aff]/40 dark:border-white/10 dark:bg-white/10 dark:text-[#f5f5f7]",
-              )}
-            >
-              {renderInlineSvgIcon(
+              icon={renderInlineSvgIcon(
                 engine.icon,
                 <RiGlobalLine size={14} />,
                 engine.name,
               )}
+              className={cx(
+                checked
+                  ? "border-[#007aff] bg-[#007aff] text-white shadow-[0_8px_18px_rgba(0,122,255,0.20)]"
+                  : "border-black/10 bg-white/70 text-[#424245] shadow-none hover:border-[#007aff]/40 dark:border-white/10 dark:bg-white/10 dark:text-[#f5f5f7]",
+              )}
+            >
               <span className="max-w-[90px] truncate">{engine.name}</span>
-            </button>
+            </AppButton>
           );
         })}
       </div>
@@ -1871,16 +1932,17 @@ const UnifiedSearch = ({
                     {group.engine.name}
                   </span>
                   {canToggle ? (
-                    <button
-                      type="button"
-                      className="cursor-pointer rounded-full border-0 bg-transparent px-1.5 py-0.5 text-[11px] font-extrabold text-[#007aff] hover:bg-[#007aff]/10 dark:text-[#64a9ff]"
+                    <AppButton
+                      intent="quiet"
+                      size="small"
+                      className="text-[#007aff] hover:bg-[#007aff]/10 hover:text-[#007aff] dark:text-[#64a9ff] dark:hover:text-[#64a9ff]"
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() =>
                         toggleSuggestionEngineExpanded(group.engine._id)
                       }
                     >
                       {t(expanded ? "ui.collapse" : "ui.expand")}
-                    </button>
+                    </AppButton>
                   ) : null}
                 </div>
                 <div className="grid gap-1">
@@ -1946,7 +2008,7 @@ const UnifiedSearch = ({
                     <img
                       src={iconUrl}
                       alt={name}
-                      className="h-full w-full rounded-lg object-cover"
+                      className="h-full w-full rounded-[var(--sn-radius-surface)] object-cover"
                     />
                   ) : (
                     <RiGlobalLine size={17} />
@@ -2002,7 +2064,7 @@ const UnifiedSearch = ({
                     <img
                       src={iconUrl}
                       alt={displayName}
-                      className="h-full w-full rounded-lg object-contain p-1"
+                      className="h-full w-full rounded-[var(--sn-radius-surface)] object-contain p-1"
                     />
                   ) : (
                     <RiApps2Line size={17} />
@@ -2138,10 +2200,9 @@ const UnifiedSearch = ({
             <div className="flex items-center justify-between gap-3 px-1 pb-3">
               {enginePicker}
               {variant === "spotlight" ? (
-                <Button
-                  type="text"
+                <AppIconButton
+                  intent="quiet"
                   size="small"
-                  shape="circle"
                   aria-label={t("ui.close")}
                   icon={<RiCloseLine size={17} />}
                   onClick={closeUnifiedSearch}
@@ -2150,6 +2211,9 @@ const UnifiedSearch = ({
             </div>
           ) : null}
           <div
+            id={searchListboxId}
+            role="listbox"
+            aria-label={t("ui.search")}
             className={cx(
               unifiedSearchPanelBodyClassName,
               variant === "desktop"
@@ -2226,7 +2290,7 @@ const UnifiedSearch = ({
         }}
       >
         <div className="flex flex-col items-center text-center text-[#1d1d1f] dark:text-[#f5f5f7]">
-          <div className="relative flex h-[78px] w-[78px] items-center justify-center rounded-[22px] border border-black/5 bg-[#f2f2f7] text-[#8e8e93] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:text-[#aeaeb2] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
+          <div className="relative flex h-[78px] w-[78px] items-center justify-center rounded-[var(--sn-radius-panel)] border border-black/5 bg-[#f2f2f7] text-[#8e8e93] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:text-[#aeaeb2] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
             <RiApps2Line size={31} />
           </div>
           <div className="mt-5 max-w-full truncate text-[21px] font-semibold tracking-normal">
@@ -2235,13 +2299,14 @@ const UnifiedSearch = ({
           <div className="mt-2 max-w-[306px] text-sm font-medium leading-6 text-[#6e6e73] dark:text-[#c7c7cc]">
             {t("ui.appUnavailableMessage")}
           </div>
-          <button
-            type="button"
-            className="mt-6 rounded-full border border-white/20 bg-[#007aff] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(0,122,255,0.24)] transition hover:bg-[#0a84ff] active:scale-[0.98]"
+          <AppButton
+            intent="primary"
+            size="default"
+            className="mt-6"
             onClick={() => setUnavailableAppModal(null)}
           >
             {t("ui.close")}
-          </button>
+          </AppButton>
         </div>
       </DesktopNextBaseModal>
     ) : null;
@@ -2262,6 +2327,7 @@ const UnifiedSearch = ({
           ref={rootRef}
           role="dialog"
           aria-modal="true"
+          aria-label={t("ui.search")}
           className={cx(
             unifiedSearchIntegratedSurfaceClassName,
             unifiedSearchSpotlightClassName,
@@ -2312,17 +2378,24 @@ const SearchSection = ({
 }: {
   title: string;
   children: ReactNode;
-}) => (
-  <section>
-    <div className="mb-2 px-1 text-[12px] font-extrabold text-[#6e6e73] dark:text-[#aeaeb2]">
-      {title}
-    </div>
-    {children}
-  </section>
-);
+}) => {
+  const headingId = useId();
+  return (
+    <section role="group" aria-labelledby={headingId}>
+      <div
+        id={headingId}
+        className="mb-2 px-1 text-[12px] font-extrabold text-[#6e6e73] dark:text-[#aeaeb2]"
+      >
+        {title}
+      </div>
+      {children}
+    </section>
+  );
+};
 
 const SearchResultButton = ({
   itemId,
+  optionId,
   navigationRow,
   navigationCol,
   icon,
@@ -2335,6 +2408,7 @@ const SearchResultButton = ({
   onClick,
 }: {
   itemId?: string;
+  optionId?: string;
   navigationRow?: number;
   navigationCol?: number;
   icon: ReactNode;
@@ -2347,7 +2421,11 @@ const SearchResultButton = ({
   onClick: () => void;
 }) => (
   <button
+    id={optionId}
     type="button"
+    role="option"
+    aria-selected={active ?? false}
+    tabIndex={-1}
     data-search-item-id={itemId}
     data-search-active={active ? "true" : undefined}
     data-search-row={navigationRow}
@@ -2355,14 +2433,14 @@ const SearchResultButton = ({
     onMouseEnter={onMouseEnter}
     onClick={onClick}
     className={cx(
-      "grid w-full cursor-pointer grid-cols-[34px_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border px-3 text-left transition",
+      "grid w-full cursor-pointer grid-cols-[34px_minmax(0,1fr)_auto] items-center gap-3 rounded-[var(--sn-radius-surface)] border px-3 text-left transition",
       compact ? "min-h-10 py-1.5" : "min-h-[54px] py-2",
       active
         ? "border-[#007aff]/45 bg-[#e8f2ff] shadow-[0_8px_18px_rgba(0,122,255,0.10)] dark:bg-[#0a84ff]/20"
         : "border-transparent bg-white/65 hover:bg-white/95 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]",
     )}
   >
-    <span className="grid h-[34px] w-[34px] place-items-center overflow-hidden rounded-[10px] bg-[#f2f2f7] text-[#007aff] dark:bg-white/10">
+    <span className="grid h-[34px] w-[34px] place-items-center overflow-hidden rounded-[var(--sn-radius-control)] bg-[#f2f2f7] text-[#007aff] dark:bg-white/10">
       {icon}
     </span>
     <span className="min-w-0">
@@ -2376,7 +2454,7 @@ const SearchResultButton = ({
       ) : null}
     </span>
     {tag ? (
-      <Tag className="m-0! rounded-full! border-0! bg-[#f2f2f7]! text-[11px]! font-bold! text-[#6e6e73]! dark:bg-white/10! dark:text-[#aeaeb2]!">
+      <Tag className="m-0! rounded-[var(--sn-radius-round)]! border-0! bg-[#f2f2f7]! text-[11px]! font-bold! text-[#6e6e73]! dark:bg-white/10! dark:text-[#aeaeb2]!">
         {tag}
       </Tag>
     ) : (
@@ -2427,7 +2505,7 @@ const unifiedSearchDesktopShellActiveClassName = css`
 
 const unifiedSearchIntegratedSurfaceClassName = css`
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: var(--sn-radius-panel);
   border: 1px solid rgba(255, 255, 255, 0.68);
   background: rgba(245, 245, 247, 0.94);
   box-shadow:
@@ -2436,7 +2514,7 @@ const unifiedSearchIntegratedSurfaceClassName = css`
   backdrop-filter: blur(34px) saturate(1.22);
 
   [data-search-item-id] > span:first-of-type {
-    border-radius: 10px;
+    border-radius: var(--sn-radius-control);
     background: rgba(255, 255, 255, 0.62);
   }
 
@@ -2537,7 +2615,7 @@ const unifiedSearchInputClassName = css`
   width: 100%;
   align-items: center;
   gap: 10px;
-  border-radius: 999px;
+  border-radius: var(--sn-radius-round);
   border: 1px solid transparent;
   padding: 0 12px 0 16px;
   transition:
@@ -2642,7 +2720,7 @@ const unifiedSearchPanelClassName = css`
   display: grid;
   grid-template-rows: 1fr;
   width: 100%;
-  border-radius: 18px;
+  border-radius: var(--sn-radius-panel);
   border: 1px solid rgba(255, 255, 255, 0.62);
   padding: 14px;
   backdrop-filter: blur(30px) saturate(1.18);

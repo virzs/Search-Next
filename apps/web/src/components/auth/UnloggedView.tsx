@@ -16,6 +16,7 @@ import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { appleAuthPanelClassName } from "./apple-auth-styles";
 import { AppSegmented } from "@/components";
+import { AppButton } from "@/components/ui";
 import { useI18n } from "@/i18n";
 
 const authActions: AuthAction[] = ["login", "register"];
@@ -246,14 +247,16 @@ const UnloggedView: React.FC<UnloggedViewProps> = ({
       {!showToggle && (
         <div className="apple-auth-switch-row">
           {t(currentAction === "login" ? "ui.noAccountYet" : "ui.alreadyHaveAnAccount")}
-          <button
-            type="button"
+          <AppButton
+            intent="link"
+            size="small"
+            className="ml-1.5"
             onClick={() =>
               setCurrentAction(currentAction === "login" ? "register" : "login")
             }
           >
             {t(currentAction === "login" ? "ui.registerNow" : "ui.signInNow")}
-          </button>
+          </AppButton>
         </div>
       )}
     </div>
