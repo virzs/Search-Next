@@ -35,8 +35,10 @@ export class WallpaperCategoryController {
   @Get('/user')
   @PublicRoute()
   @ApiOperation({ summary: '用户壁纸分类列表' })
-  getUserWallpaperCategories() {
-    return this.wallpaperCategoryService.getUserWallpaperCategories();
+  getUserWallpaperCategories(
+    @Query('type') type?: 'image' | 'application',
+  ) {
+    return this.wallpaperCategoryService.getUserWallpaperCategories(type);
   }
 
   @Get('/admin/enabled')

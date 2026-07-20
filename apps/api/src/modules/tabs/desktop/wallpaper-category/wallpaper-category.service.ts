@@ -58,9 +58,17 @@ export class WallpaperCategoryService {
     return Response.page(data, { page, pageSize, total });
   }
 
-  async getUserWallpaperCategories() {
+  async getUserWallpaperCategories(type?: 'image' | 'application') {
+    if (type && type !== 'image' && type !== 'application') {
+      throw new BadRequestException('壁纸类型不正确');
+    }
+    const finder: any = { isActive: true };
+    if (type === 'application') finder.type = 'application';
+    if (type === 'image') {
+      finder.$or = [{ type: 'image' }, { type: { $exists: false } }];
+    }
     const usedCategoryIds = await this.wallpaperModel
-      .distinct('categoryId', { isActive: true })
+      .distinct('categoryId', finder)
       .exec();
 
     return this.wallpaperCategoryModel

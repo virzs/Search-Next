@@ -1,9 +1,16 @@
-export type DesktopConfigWallpaperType = 'image' | 'gradient' | 'none';
+export type DesktopConfigWallpaperType =
+  | 'image'
+  | 'gradient'
+  | 'application'
+  | 'none';
 
 export type DesktopConfigWallpaper = {
   type: DesktopConfigWallpaperType;
   url?: string;
   css?: string;
+  id?: string;
+  revision?: string;
+  previewUrl?: string;
   name: string;
 };
 
