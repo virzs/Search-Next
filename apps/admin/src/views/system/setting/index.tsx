@@ -38,18 +38,26 @@ const passwordFieldProps = {
 
 interface SettingsSectionProps {
   title: string;
+  description: string;
   action?: ReactNode;
   children: ReactNode;
 }
 
 const SettingsSection = (props: SettingsSectionProps) => {
-  const { title, action, children } = props;
+  const { title, description, action, children } = props;
 
   return (
-    <section className="border-b border-gray-100 pb-6 last:border-b-0 last:pb-0">
-      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h2 className="m-0 text-base font-semibold text-gray-900">{title}</h2>
-        {action ? <div className="shrink-0">{action}</div> : null}
+    <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-6">
+      <div className="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <h2 className="m-0 text-base font-semibold tracking-[-0.01em] text-gray-950">
+            {title}
+          </h2>
+          <p className="mb-0 mt-1 text-sm leading-5 text-gray-500">
+            {description}
+          </p>
+        </div>
+        {action ? <div className="shrink-0 md:pt-0.5">{action}</div> : null}
       </div>
       {children}
     </section>
@@ -59,14 +67,22 @@ const SettingsSection = (props: SettingsSectionProps) => {
 interface SettingSwitchRowProps {
   name: any;
   title: string;
+  description?: string;
 }
 
 const SettingSwitchRow = (props: SettingSwitchRowProps) => {
-  const { name, title } = props;
+  const { name, title, description } = props;
 
   return (
-    <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-gray-100 px-4 py-3 last:border-b-0">
-      <div className="min-w-0 text-sm font-medium text-gray-900">{title}</div>
+    <div className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-gray-100 px-4 py-3.5 transition-colors last:border-b-0 hover:bg-gray-50/70">
+      <div className="min-w-0">
+        <div className="text-sm font-medium text-gray-900">{title}</div>
+        {description ? (
+          <div className="mt-0.5 text-xs leading-5 text-gray-500">
+            {description}
+          </div>
+        ) : null}
+      </div>
       <ProForm.Item name={name} valuePropName="checked" noStyle>
         <Switch />
       </ProForm.Item>
@@ -110,6 +126,13 @@ const Setting = () => {
       loading={loading}
       showBackButton={false}
       cardProps={{
+        headerBordered: true,
+        headStyle: {
+          minHeight: 64,
+          paddingTop: 16,
+          paddingBottom: 16,
+        },
+        bodyStyle: { background: "#f7f8fa" },
         extra: (
           <>
             <Button onClick={resetForm} disabled={submitting}>
@@ -143,8 +166,11 @@ const Setting = () => {
           }}
           submitter={false}
         >
-          <div className="space-y-2">
-            <SettingsSection title="基础设置">
+          <div className="space-y-5 pb-6 [&_.ant-form-item]:mb-0 [&_.ant-form-item-extra]:mt-1 [&_.ant-form-item-extra]:text-xs [&_.ant-form-item-extra]:leading-5 [&_.ant-form-item-extra]:text-gray-500 [&_.ant-form-item-label]:pb-1.5 [&_.ant-form-item-label>label]:font-medium [&_.ant-form-item-label>label]:text-gray-800">
+            <SettingsSection
+              title="基础设置"
+              description="控制站点在浏览器与管理后台中展示的品牌信息。"
+            >
               <div className="grid gap-4">
                 <ProFormText
                   name="name"
@@ -153,33 +179,37 @@ const Setting = () => {
                   rules={[{ required: true, message: "请输入名称" }]}
                 />
                 <div className="grid gap-4 md:grid-cols-2">
-                  <ProFormUpload
-                    name={["site", "icon"]}
-                    label="站点图标"
-                    extra="用于 Web 和 Admin 的浏览器标签图标。"
-                    fieldProps={{
-                      maxCount: 1,
-                      listType: "picture-card",
-                      dir: "system-site",
-                      accept:
-                        "image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon",
-                    }}
-                  />
-                  <ProFormColorPicker
-                    name={["site", "themeColor"]}
-                    label="主题色"
-                    extra="用于 Web 和 Admin 的按钮、选中态、焦点环等组件强调状态。"
-                    formItemProps={{
-                      rules: [{ required: true, message: "请选择主题色" }],
-                      getValueFromEvent: (color: any) =>
-                        color?.toRgbString?.(),
-                    }}
-                    fieldProps={{
-                      format: "rgb",
-                      showText: true,
-                      disabledAlpha: true,
-                    } as any}
-                  />
+                  <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+                    <ProFormUpload
+                      name={["site", "icon"]}
+                      label="站点图标"
+                      extra="用于 Web 和 Admin 的浏览器标签图标。"
+                      fieldProps={{
+                        maxCount: 1,
+                        listType: "picture-card",
+                        dir: "system-site",
+                        accept:
+                          "image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon",
+                      }}
+                    />
+                  </div>
+                  <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+                    <ProFormColorPicker
+                      name={["site", "themeColor"]}
+                      label="主题色"
+                      extra="用于 Web 和 Admin 的按钮、选中态、焦点环等组件强调状态。"
+                      formItemProps={{
+                        rules: [{ required: true, message: "请选择主题色" }],
+                        getValueFromEvent: (color: any) =>
+                          color?.toRgbString?.(),
+                      }}
+                      fieldProps={{
+                        format: "rgb",
+                        showText: true,
+                        disabledAlpha: true,
+                      } as any}
+                    />
+                  </div>
                 </div>
                 <ProFormTextArea
                   name="description"
@@ -188,7 +218,10 @@ const Setting = () => {
                 />
               </div>
             </SettingsSection>
-            <SettingsSection title="发布设置">
+            <SettingsSection
+              title="发布设置"
+              description="配置通知页读取公开版本信息的来源。"
+            >
               <Alert
                 className="mb-4"
                 type="info"
@@ -210,13 +243,19 @@ const Setting = () => {
                 ]}
               />
             </SettingsSection>
-            <SettingsSection title="登录页设置">
+            <SettingsSection
+              title="登录页设置"
+              description="调整后台登录页的主标题与辅助文案。"
+            >
               <div className="grid gap-4 md:grid-cols-2">
                 <ProFormText name={["login", "title"]} label="标题" />
                 <ProFormText name={["login", "subTitle"]} label="副标题" />
               </div>
             </SettingsSection>
-            <SettingsSection title="后台登录权限">
+            <SettingsSection
+              title="后台登录权限"
+              description="选择除系统管理员外可以进入管理后台的角色。"
+            >
               <Alert
                 className="mb-4"
                 type="info"
@@ -242,7 +281,10 @@ const Setting = () => {
                 }))}
               />
             </SettingsSection>
-            <SettingsSection title="注册页设置">
+            <SettingsSection
+              title="注册页设置"
+              description="管理注册入口、验证要求以及不可用时的提示。"
+            >
               <div className="grid gap-4 md:grid-cols-2">
                 <ProFormText name={["register", "title"]} label="标题" />
                 <ProFormText name={["register", "subTitle"]} label="副标题" />
@@ -251,14 +293,17 @@ const Setting = () => {
                 <SettingSwitchRow
                   name={["register", "allowRegister"]}
                   title="允许注册"
+                  description="关闭后，用户将无法通过注册页创建账号。"
                 />
                 <SettingSwitchRow
                   name={["register", "forceInvitationCode"]}
                   title="强制需要邀请码注册"
+                  description="开启后，注册时必须填写有效的邀请码。"
                 />
                 <SettingSwitchRow
                   name={["register", "forceEmailCaptcha"]}
                   title="强制邮箱验证码注册"
+                  description="开启后，注册前需要完成邮箱验证码校验。"
                 />
               </div>
 
@@ -272,6 +317,7 @@ const Setting = () => {
             </SettingsSection>
             <SettingsSection
               title="Cloudflare 人机验证"
+              description="使用 Turnstile 为公开访问流程增加机器人防护。"
               action={
                 <Button
                   type="link"
@@ -289,6 +335,7 @@ const Setting = () => {
                 <SettingSwitchRow
                   name={["turnstile", "enabled"]}
                   title="启用 Turnstile"
+                  description="启用后，将使用下方密钥校验相关访问请求。"
                 />
               </div>
               <ProFormDependency name={["turnstile"]}>
