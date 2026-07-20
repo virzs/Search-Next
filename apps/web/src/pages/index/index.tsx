@@ -77,6 +77,7 @@ import Notice from "./components/notice";
 import WebReleaseUpdatePrompt from "./components/release-update";
 import LegalDocumentGate from "./components/legal/LegalDocumentGate";
 import Feedback from "./components/feedback";
+import { DEFAULT_THEME_COLOR } from "@/theme/color";
 import DesktopImageIcon, {
   getStringIcon,
 } from "./components/desktop-image-icon";
@@ -235,7 +236,9 @@ function Index() {
   const { message } = App.useApp();
   const { t, locale, language } = useI18n();
   const { coverGradientCss, user, isAuthenticated } = useAuth();
-  const { userLimit } = useConfig();
+  const { userLimit, projectInfo } = useConfig();
+  const systemThemeColor =
+    projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
   const {
     activeThemeId,
     appearanceMode,
@@ -256,7 +259,9 @@ function Index() {
   } = useApp();
 
   const { data: themeConfigs } = useRequest(getActiveThemeConfigs);
-  const [myThemeConfigs, setMyThemeConfigs] = useState(getMyThemeConfigs);
+  const [myThemeConfigs, setMyThemeConfigs] = useState(() =>
+    getMyThemeConfigs(systemThemeColor),
+  );
   const preferDark = resolvedColorScheme === "dark";
   const { preferences: searchPreferences } = useUnifiedSearchPreferences();
   const appMap = useMemo(
@@ -404,25 +409,43 @@ function Index() {
   }, [locale]);
 
   useEffect(() => {
-    const reloadMyThemes = () => setMyThemeConfigs(getMyThemeConfigs());
+    const reloadMyThemes = () =>
+      setMyThemeConfigs(getMyThemeConfigs(systemThemeColor));
+    reloadMyThemes();
     window.addEventListener("storage", reloadMyThemes);
     window.addEventListener(MY_THEMES_CHANGED_EVENT, reloadMyThemes);
     return () => {
       window.removeEventListener("storage", reloadMyThemes);
       window.removeEventListener(MY_THEMES_CHANGED_EVENT, reloadMyThemes);
     };
-  }, []);
+  }, [systemThemeColor]);
 
   const desktopTheme = useMemo(() => {
     const mergedThemeConfigs = [...(themeConfigs ?? []), ...myThemeConfigs];
-    return (
+    const resolved =
       resolveDesktopThemeFromConfigs(
         mergedThemeConfigs,
         activeThemeId,
         preferDark,
-      ) ?? (preferDark ? desktopNextThemeDark : desktopNextThemeLight)
-    );
-  }, [activeThemeId, myThemeConfigs, preferDark, themeConfigs]);
+      ) ?? (preferDark ? desktopNextThemeDark : desktopNextThemeLight);
+
+    return {
+      ...resolved,
+      token: {
+        ...resolved.token,
+        contextMenu: {
+          ...resolved.token.contextMenu,
+          activeColor: systemThemeColor,
+        },
+      },
+    };
+  }, [
+    activeThemeId,
+    myThemeConfigs,
+    preferDark,
+    systemThemeColor,
+    themeConfigs,
+  ]);
 
   const persistDesktopPages = useCallback(
     (pages: DesktopPage[], remountDesktop: boolean) => {

@@ -205,7 +205,7 @@ const releaseHistoryDetailClassName = css`
     gap: 5px;
     border-radius: var(--sn-radius-round);
     padding: 4px 8px;
-    color: var(--sn-accent);
+    color: var(--sn-accent-text);
     background: color-mix(in srgb, var(--sn-accent) 9%, transparent);
     font-size: 11px;
     font-weight: 700;

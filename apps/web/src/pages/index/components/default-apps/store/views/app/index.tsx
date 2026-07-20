@@ -185,7 +185,7 @@ const AppArtwork = ({
           {icon ? (
             <img src={icon} alt={name} className="h-full w-full object-contain p-2" />
           ) : (
-            <RiApps2Line className="text-xl text-[var(--sn-accent)]" />
+            <RiApps2Line className="text-xl text-[var(--sn-accent-text)]" />
           )}
         </div>
       );
@@ -252,7 +252,7 @@ const AppCompactCard = ({
             className="h-full w-full object-contain p-2.5"
           />
         ) : (
-          <RiApps2Line className="text-2xl text-[var(--sn-accent)]" />
+          <RiApps2Line className="text-2xl text-[var(--sn-accent-text)]" />
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -300,7 +300,7 @@ const AppListCard = ({
             loading="lazy"
           />
         ) : (
-          <RiApps2Line className="text-3xl text-[var(--sn-accent)]" />
+          <RiApps2Line className="text-3xl text-[var(--sn-accent-text)]" />
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -364,7 +364,7 @@ const AppCard = ({
               loading="lazy"
             />
           ) : (
-            <RiApps2Line className="text-3xl text-[var(--sn-accent)]" />
+            <RiApps2Line className="text-3xl text-[var(--sn-accent-text)]" />
           )}
         </div>
 
@@ -556,7 +556,7 @@ const AppFeaturedView = ({
               <div className="mb-3 flex items-end justify-between gap-3 px-1">
                 <div className="min-w-0">
                   {collection.kicker ? (
-                    <div className="mb-1 text-[11px] font-bold uppercase leading-4 text-[var(--sn-accent)]">
+                    <div className="mb-1 text-[11px] font-bold uppercase leading-4 text-[var(--sn-accent-text)]">
                       {collection.kicker}
                     </div>
                   ) : null}

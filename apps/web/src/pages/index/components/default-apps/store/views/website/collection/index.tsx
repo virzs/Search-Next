@@ -186,7 +186,7 @@ const WebsiteCollectionRoute: FC = () => {
         <div className="mb-6 flex items-center justify-between gap-5 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)] max-[560px]:items-start">
           <div className="min-w-0">
             {activeCollection?.kicker ? (
-              <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sn-accent)]">
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sn-accent-text)]">
                 {activeCollection.kicker}
               </div>
             ) : null}

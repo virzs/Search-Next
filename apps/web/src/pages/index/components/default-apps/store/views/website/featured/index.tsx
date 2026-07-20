@@ -180,7 +180,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                     <div className="mb-3 flex items-end justify-between gap-3 px-1">
                       <div className="min-w-0">
                         {c.kicker ? (
-                          <div className="mb-1 text-[11px] font-bold uppercase leading-4 text-[var(--sn-accent)]">
+                          <div className="mb-1 text-[11px] font-bold uppercase leading-4 text-[var(--sn-accent-text)]">
                             {c.kicker}
                           </div>
                         ) : null}

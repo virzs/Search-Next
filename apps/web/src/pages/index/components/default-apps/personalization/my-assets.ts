@@ -94,7 +94,10 @@ export const writeMyThemes = (items: MyThemeItem[]) => {
   window.dispatchEvent(new Event(MY_THEMES_CHANGED_EVENT));
 };
 
-export const toMyThemeConfig = (theme: MyThemeItem): ThemeConfigApiItem => {
+export const toMyThemeConfig = (
+  theme: MyThemeItem,
+  accentColor = theme.accentColor,
+): ThemeConfigApiItem => {
   const makeConfig = (backgroundColor: string, preferDark = false) => {
     const textColor = preferDark ? "rgba(255,255,255,0.86)" : "rgba(0,0,0,0.82)";
     const borderColor = preferDark
@@ -138,7 +141,7 @@ export const toMyThemeConfig = (theme: MyThemeItem): ThemeConfigApiItem => {
         },
         contextMenu: {
           textColor,
-          activeColor: theme.accentColor,
+          activeColor: accentColor,
           dangerColor: "#ff3b30",
           backgroundColor: preferDark
             ? "rgba(28,28,30,0.82)"
@@ -160,4 +163,5 @@ export const toMyThemeConfig = (theme: MyThemeItem): ThemeConfigApiItem => {
   };
 };
 
-export const getMyThemeConfigs = () => readMyThemes().map(toMyThemeConfig);
+export const getMyThemeConfigs = (accentColor?: string) =>
+  readMyThemes().map((theme) => toMyThemeConfig(theme, accentColor));

@@ -155,7 +155,7 @@ const legalDocumentPageClassName = css`
 
   .legal-page-richtext .simple-editor a,
   .legal-page-richtext .simple-editor li::marker {
-    color: var(--sn-accent) !important;
+    color: var(--sn-accent-text) !important;
   }
 
   @media (max-width: 640px) {

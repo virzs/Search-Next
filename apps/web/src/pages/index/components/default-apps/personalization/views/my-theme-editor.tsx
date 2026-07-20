@@ -19,6 +19,8 @@ import {
   type MyThemeItem,
 } from "../my-assets";
 import { useI18n } from "@/i18n";
+import { useConfig } from "@/hooks/useConfig";
+import { DEFAULT_THEME_COLOR } from "@/theme/color";
 
 const colorToHex = (color: any, hex?: string) => {
   if (typeof hex === "string" && hex) return hex;
@@ -37,11 +39,12 @@ const ThemeMyThemeEditorView = () => {
   const editId = params.id ? decodeURIComponent(String(params.id)) : null;
   const isEdit = Boolean(editId);
   const { activeThemeId, setActiveThemeId } = useDesktopTheme();
+  const { projectInfo } = useConfig();
+  const accentColor = projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
   const [items, setItems] = useState<MyThemeItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [lightBackground, setLightBackground] = useState("#ffffff");
   const [darkBackground, setDarkBackground] = useState("#2f3035");
-  const [accentColor, setAccentColor] = useState("#007aff");
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
   const [form] = AppForm.useForm<{ name: string; description?: string }>();
   const watchedName = AppForm.useWatch("name", form);
@@ -76,7 +79,6 @@ const ThemeMyThemeEditorView = () => {
     });
     setLightBackground(currentItem.lightBackground);
     setDarkBackground(currentItem.darkBackground);
-    setAccentColor(currentItem.accentColor);
   }, [currentItem, form]);
 
   const previewTheme = useMemo<MyThemeItem>(() => {
@@ -102,8 +104,8 @@ const ThemeMyThemeEditorView = () => {
   ]);
 
   const previewConfig = useMemo(
-    () => toMyThemeConfig(previewTheme),
-    [previewTheme],
+    () => toMyThemeConfig(previewTheme, accentColor),
+    [accentColor, previewTheme],
   );
 
   const visiblePreviewConfig = useMemo(() => {
@@ -283,16 +285,17 @@ const ThemeMyThemeEditorView = () => {
             </div>
           </div>
 
-          <div className="mt-4">
-            <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.accentColor")}</div>
-            <AppColorPicker
-              value={accentColor}
-              onChange={(color, hex) => setAccentColor(colorToHex(color, hex))}
-              showText
-              format="hex"
-              getPopupContainer={() => document.body}
-              styles={{ popup: { root: { zIndex: 6000 } } }}
-            />
+          <div className="mt-4 rounded-[var(--sn-radius-control)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-3">
+            <div className="text-[13px] font-medium leading-5 text-[var(--sn-text)]">
+              {t("ui.accentColor")}
+            </div>
+            <div className="mt-1 flex items-center gap-2 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
+              <span
+                className="h-3 w-3 shrink-0 rounded-[var(--sn-radius-round)] bg-[var(--sn-accent)]"
+                aria-hidden="true"
+              />
+              {t("ui.accentColorManaged")}
+            </div>
           </div>
           </section>
         </Card>

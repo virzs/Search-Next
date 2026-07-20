@@ -256,7 +256,8 @@ export const MacSettingsIcon: FC<MacSettingsIconProps> = ({
 }) => (
   <span
     className={cx(
-      "grid shrink-0 place-items-center text-white shadow-[0_1px_2px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.35)]",
+      "grid shrink-0 place-items-center shadow-[0_1px_2px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.35)]",
+      tone === "blue" ? "text-[var(--sn-on-accent)]" : "text-white",
       size === "large"
         ? "h-[52px] w-[52px] rounded-[var(--sn-radius-surface)] text-2xl max-[760px]:h-12 max-[760px]:w-12"
         : "h-[30px] w-[30px] rounded-[var(--sn-radius-control)] text-[15px]",

@@ -34,6 +34,8 @@ import {
   type MyWallpaperItem,
 } from "../my-assets";
 import { useI18n } from "@/i18n";
+import { useConfig } from "@/hooks/useConfig";
+import { DEFAULT_THEME_COLOR } from "@/theme/color";
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
@@ -125,7 +127,7 @@ const CurrentStatusCard = ({
     <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]">
       <div className="flex items-start gap-3">
         <span
-          className={`grid h-8 w-8 shrink-0 place-items-center rounded-[var(--sn-radius-compact)] text-white ${toneClassName}`}
+          className={`grid h-8 w-8 shrink-0 place-items-center rounded-[var(--sn-radius-compact)] ${tone === "blue" ? "text-[var(--sn-on-accent)]" : "text-white"} ${toneClassName}`}
         >
           {icon}
         </span>
@@ -149,6 +151,9 @@ const ThemeMyView = () => {
   const navigate = useNavigate();
   const { activeThemeId, personalization, setActiveThemeId, setWallpaper } =
     useDesktopTheme();
+  const { projectInfo } = useConfig();
+  const systemThemeColor =
+    projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
   const [wallpapers, setWallpapers] = useState<MyWallpaperItem[]>([]);
   const [themes, setThemes] = useState<MyThemeItem[]>([]);
   const { data: activeThemes } = useRequest(getActiveThemeConfigs);
@@ -179,8 +184,8 @@ const ThemeMyView = () => {
   }, []);
 
   const customThemeConfigs = useMemo(
-    () => themes.map(toMyThemeConfig),
-    [themes],
+    () => themes.map((theme) => toMyThemeConfig(theme, systemThemeColor)),
+    [systemThemeColor, themes],
   );
 
   const currentTheme = useMemo<ThemeConfigApiItem | null>(() => {
@@ -295,7 +300,7 @@ const ThemeMyView = () => {
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {sortedThemes.map((theme) => {
-                  const config = toMyThemeConfig(theme);
+                  const config = toMyThemeConfig(theme, systemThemeColor);
                   const active = activeThemeId === theme.id;
                   return (
                     <PreviewCard
@@ -369,7 +374,7 @@ const ThemeMyView = () => {
         </>
       ) : (
         <section className="mt-6 rounded-[var(--sn-radius-panel)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-6 py-8 text-center shadow-[var(--sn-shadow)]">
-          <div className="mx-auto grid h-10 w-10 place-items-center rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
+          <div className="mx-auto grid h-10 w-10 place-items-center rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent-text)]">
             <RiAddLine size={20} />
           </div>
           <div className="mt-3 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">

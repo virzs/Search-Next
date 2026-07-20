@@ -160,7 +160,7 @@ const appSidebarClassName = css`
 
   .ant-menu-item .ant-menu-item-icon,
   .ant-menu-item svg {
-    color: var(--sn-accent);
+    color: var(--sn-accent-text);
   }
 
   .ant-menu-item:hover {

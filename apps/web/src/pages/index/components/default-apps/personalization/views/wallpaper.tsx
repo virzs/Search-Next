@@ -217,7 +217,7 @@ const WallpaperView: FC = () => {
           </div>
           </div>
           <div className="inline-flex shrink-0 items-center gap-1.5 rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
-            <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
+            <RiCheckLine size={13} className="text-[var(--sn-accent-text)]" />
             <span>{t("ui.currentWallpaper")} · {currentWallpaperName}</span>
           </div>
         </div>
@@ -326,7 +326,7 @@ const WallpaperView: FC = () => {
                     <AppButton
                       intent="link"
                       size="small"
-                      className="text-[var(--sn-accent)]!"
+                      className="text-[var(--sn-accent-text)]!"
                       onClick={() => openCategory(c._id)}
                     >
                       {t("ui.viewMore")}

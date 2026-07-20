@@ -1,4 +1,10 @@
 import { baseGetRequest, basePostRequest } from "@/utils/axios";
+import type { Resource } from "@/types";
+
+export interface ProjectSiteConfig {
+  icon?: Resource;
+  themeColor: string;
+}
 
 export interface ProjectPublicInfo {
   name: string;
@@ -13,6 +19,7 @@ export interface ProjectPublicInfo {
     enabled?: boolean;
     siteKey?: string;
   };
+  site?: ProjectSiteConfig;
 }
 
 /**

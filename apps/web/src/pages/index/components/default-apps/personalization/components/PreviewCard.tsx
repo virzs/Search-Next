@@ -114,7 +114,7 @@ const PreviewCard = ({
     >
       {active ? (
         <span
-          className="absolute right-3 top-3 z-[3] grid h-7 w-7 place-items-center rounded-[var(--sn-radius-round)] border border-white/60 bg-[var(--sn-accent)] text-white shadow-[0_4px_12px_rgba(0,0,0,0.16)]"
+          className="absolute right-3 top-3 z-[3] grid h-7 w-7 place-items-center rounded-[var(--sn-radius-round)] border border-white/60 bg-[var(--sn-accent)] text-[var(--sn-on-accent)] shadow-[0_4px_12px_rgba(0,0,0,0.16)]"
         >
           <RiCheckLine size={17} aria-hidden="true" />
           <span className="sr-only">{t("ui.current")}</span>

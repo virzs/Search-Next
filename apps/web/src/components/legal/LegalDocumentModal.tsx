@@ -211,7 +211,7 @@ const legalModalClassName = css`
   --legal-text: #1d1d1f;
   --legal-text-secondary: #6e6e73;
   --legal-text-meta: #6e6e73;
-  --legal-accent: var(--sn-accent, #fa541c);
+  --legal-accent: var(--sn-accent-text, #9a3412);
 
   color: var(--legal-text);
 

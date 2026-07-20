@@ -135,7 +135,7 @@ const AppResultCard = ({
   const tags = getAppTags(item, language);
   return (
     <article className="flex min-h-[112px] items-start gap-3.5 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]">
-      <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
+      <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent-text)]">
         {iconUrl ? (
           <img
             src={iconUrl}
@@ -353,7 +353,7 @@ const StoreSearchView = () => {
                   intent="quiet"
                   size="small"
                   icon={<RiLinksLine size={15} />}
-                  className="text-[var(--sn-accent)]!"
+                  className="text-[var(--sn-accent-text)]!"
                   onClick={() => navigateFromSearch(storeRoute.path.website.root)}
                 >
                   {t("ui.viewWebsites")}
@@ -392,7 +392,7 @@ const StoreSearchView = () => {
                   intent="quiet"
                   size="small"
                   icon={<RiArrowRightUpLine size={15} />}
-                  className="text-[var(--sn-accent)]!"
+                  className="text-[var(--sn-accent-text)]!"
                   onClick={() => navigateFromSearch(storeRoute.path.app)}
                 >
                   {t("ui.viewApps")}
@@ -421,7 +421,7 @@ const StoreSearchView = () => {
                   intent="quiet"
                   size="small"
                   icon={<RiArrowRightUpLine size={15} />}
-                  className="text-[var(--sn-accent)]!"
+                  className="text-[var(--sn-accent-text)]!"
                   onClick={() => navigateFromSearch(storeRoute.path.widget)}
                 >
                   {t("ui.viewWidgets")}

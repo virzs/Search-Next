@@ -625,7 +625,7 @@ const noticeAppWindowClassName = css`
     gap: 5px;
     border-radius: var(--sn-radius-round);
     padding: 4px 8px;
-    color: var(--sn-accent, #007aff);
+    color: var(--sn-accent-text, #0066cc);
     background: color-mix(
       in srgb,
       var(--sn-accent, #007aff) 9%,
@@ -737,7 +737,7 @@ const noticeAppWindowClassName = css`
 
   .notice-richtext .simple-editor a,
   .notice-richtext .simple-editor li::marker {
-    color: var(--sn-accent, #007aff) !important;
+    color: var(--sn-accent-text, #0066cc) !important;
   }
 
   .notice-richtext .simple-editor a {

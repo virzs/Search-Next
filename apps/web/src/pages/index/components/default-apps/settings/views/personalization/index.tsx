@@ -21,6 +21,8 @@ import {
 } from "../../components/macos-settings";
 import { useI18n } from "@/i18n";
 import { AppButton } from "@/components/ui";
+import { useConfig } from "@/hooks/useConfig";
+import { DEFAULT_THEME_COLOR } from "@/theme/color";
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
@@ -51,14 +53,20 @@ const PersonalizationView = () => {
     setAppearanceMode,
   } = useDesktopTheme();
   const { data: themes } = useRequest(getActiveThemeConfigs);
+  const { projectInfo } = useConfig();
+  const systemThemeColor =
+    projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
 
   const activeTheme = useMemo(() => {
     const id = personalization.themeId;
     return (
-      [...(themes ?? []), ...getMyThemeConfigs()].find((t) => t._id === id) ??
+      [
+        ...(themes ?? []),
+        ...getMyThemeConfigs(systemThemeColor),
+      ].find((t) => t._id === id) ??
       null
     );
-  }, [personalization.themeId, themes]);
+  }, [personalization.themeId, systemThemeColor, themes]);
 
   const wallpaperName = t(resolveWallpaperName(personalization.wallpaper));
   const themeName = t(resolveThemeName(

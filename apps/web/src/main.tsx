@@ -23,6 +23,12 @@ import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 import useDesktopTheme from "./hooks/useDesktopTheme";
 import { i18n, useI18n, type AppLanguage } from "./i18n";
 import { installAppThemeCssVariables } from "./theme/tokens";
+import { useConfig } from "./hooks/useConfig";
+import {
+  DEFAULT_THEME_COLOR,
+  installAccentThemeCssVariables,
+} from "./theme/color";
+import { applyWebSiteMetadata } from "./utils/siteMetadata";
 
 installAppThemeCssVariables();
 
@@ -39,10 +45,20 @@ const ThemedConfigProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { resolvedColorScheme } = useDesktopTheme();
   const { language } = useI18n();
+  const { projectInfo } = useConfig();
+  const themeColor = projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
   const themeConfig = React.useMemo(
-    () => createThemeConfig(resolvedColorScheme),
-    [resolvedColorScheme],
+    () => createThemeConfig(resolvedColorScheme, themeColor),
+    [resolvedColorScheme, themeColor],
   );
+
+  React.useEffect(() => {
+    installAccentThemeCssVariables(themeColor, resolvedColorScheme);
+  }, [resolvedColorScheme, themeColor]);
+
+  React.useEffect(() => {
+    applyWebSiteMetadata(projectInfo);
+  }, [projectInfo]);
 
   return (
     <Theme appearance={resolvedColorScheme}>

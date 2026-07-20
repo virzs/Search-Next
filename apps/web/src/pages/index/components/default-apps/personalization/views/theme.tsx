@@ -75,7 +75,7 @@ const ThemeView: FC = () => {
           </div>
           </div>
           <div className="inline-flex shrink-0 items-center gap-1.5 rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
-            <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
+            <RiCheckLine size={13} className="text-[var(--sn-accent-text)]" />
             <span>{t("ui.currentTheme")} · {activeThemeName}</span>
           </div>
         </div>

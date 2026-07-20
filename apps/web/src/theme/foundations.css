@@ -1,5 +1,10 @@
 :root {
   --sn-accent: #fa541c;
+  --sn-accent-hover: #ff6832;
+  --sn-accent-active: #dc4412;
+  --sn-accent-text: #9a3412;
+  --sn-on-accent: #ffffff;
+  --sn-accent-soft: rgba(250, 84, 28, 0.1);
   --sn-surface-strong: #ffffff;
   --sn-surface-secondary: #f2f2f7;
   --sn-text: #1d1d1f;

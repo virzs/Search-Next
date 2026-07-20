@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-[var(--sn-accent)] text-white shadow-[0_8px_18px_rgba(0,0,0,0.16)] hover:brightness-105 active:brightness-95",
+          "border-transparent bg-[var(--sn-accent)] text-[var(--sn-on-accent)] shadow-[0_8px_18px_rgba(0,0,0,0.16)] hover:bg-[var(--sn-accent-hover)] active:bg-[var(--sn-accent-active)]",
         destructive:
           "border-transparent bg-[#ff3b30] text-white shadow-[0_8px_18px_rgba(255,59,48,0.2)] hover:bg-[#ff453a]",
         outline:
@@ -20,7 +20,7 @@ const buttonVariants = cva(
         ghost:
           "border-transparent bg-transparent text-[var(--sn-text-secondary)] shadow-none hover:bg-[var(--sn-surface-secondary)] hover:text-[var(--sn-text)]",
         link:
-          "border-transparent bg-transparent px-0! text-[var(--sn-accent)] shadow-none underline-offset-4 hover:underline",
+          "border-transparent bg-transparent px-0! text-[var(--sn-accent-text)] shadow-none underline-offset-4 hover:underline",
         destructiveOutline:
           "border-[#ff3b30]/45 bg-transparent text-[#d92d20] shadow-none hover:bg-[#ff3b30]/10 dark:text-[#ff6961]",
         destructiveGhost:

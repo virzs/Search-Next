@@ -40,7 +40,7 @@ const AboutView = () => {
     <MacSettingsView>
       <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
         <div className="flex items-center gap-4 max-[640px]:flex-col max-[640px]:items-start">
-          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--sn-radius-surface)] bg-[var(--sn-accent)] text-3xl font-bold text-white">
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--sn-radius-surface)] bg-[var(--sn-accent)] text-3xl font-bold text-[var(--sn-on-accent)]">
             S
           </div>
           <div className="min-w-0 flex-1 text-left max-[640px]:w-full">

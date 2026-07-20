@@ -1,20 +1,23 @@
 import type { ThemeConfig } from "antd";
 import { appControlHeights, appRadii } from "./tokens";
-
-const primaryColor = "rgb(250, 84, 28)";
-const primaryColorHover = "rgb(255, 104, 50)";
-const primaryColorActive = "rgb(224, 68, 18)";
+import { createAccentPalette, DEFAULT_THEME_COLOR } from "./color";
 
 export type AppColorScheme = "light" | "dark";
 
-export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
+export const createThemeConfig = (
+  colorScheme: AppColorScheme,
+  themeColor = DEFAULT_THEME_COLOR,
+): ThemeConfig => {
   const isDark = colorScheme === "dark";
+  const accent = createAccentPalette(themeColor, colorScheme);
 
   return {
     token: {
-      colorPrimary: primaryColor,
-      colorPrimaryHover: primaryColorHover,
-      colorPrimaryActive: primaryColorActive,
+      colorPrimary: accent.primary,
+      colorPrimaryHover: accent.hover,
+      colorPrimaryActive: accent.active,
+      colorPrimaryText: accent.text,
+      colorTextLightSolid: accent.onAccent,
       borderRadius: appRadii.control,
       borderRadiusXS: appRadii.control,
       borderRadiusSM: appRadii.control,
@@ -35,12 +38,12 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
       controlHeight: appControlHeights.default,
       controlHeightSM: appControlHeights.small,
       controlHeightLG: appControlHeights.large,
-      controlOutline: "rgba(250, 84, 28, 0.14)",
+      controlOutline: accent.alpha(0.14),
     },
     components: {
       Button: {
         defaultShadow: "none",
-        primaryShadow: "0 8px 18px rgba(250, 84, 28, 0.22)",
+        primaryShadow: `0 8px 18px ${accent.alpha(0.22)}`,
         borderRadius: appRadii.control,
         borderRadiusSM: appRadii.control,
         borderRadiusLG: appRadii.control,
@@ -69,36 +72,34 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
         borderRadius: appRadii.control,
         borderRadiusSM: appRadii.control,
         borderRadiusLG: appRadii.control,
-        activeBorderColor: primaryColor,
-        activeShadow: "0 0 0 3px rgba(250, 84, 28, 0.12)",
+        activeBorderColor: accent.primary,
+        activeShadow: `0 0 0 3px ${accent.alpha(0.12)}`,
         addonBg: isDark
           ? "rgba(255, 255, 255, 0.10)"
           : "rgba(255, 255, 255, 0.58)",
-        hoverBorderColor: "rgba(250, 84, 28, 0.42)",
+        hoverBorderColor: accent.alpha(0.42),
       },
       InputNumber: {
         borderRadius: appRadii.control,
         borderRadiusSM: appRadii.control,
         borderRadiusLG: appRadii.control,
-        activeBorderColor: primaryColor,
-        activeShadow: "0 0 0 3px rgba(250, 84, 28, 0.12)",
-        hoverBorderColor: "rgba(250, 84, 28, 0.42)",
+        activeBorderColor: accent.primary,
+        activeShadow: `0 0 0 3px ${accent.alpha(0.12)}`,
+        hoverBorderColor: accent.alpha(0.42),
       },
       Select: {
         borderRadius: appRadii.control,
         borderRadiusSM: appRadii.control,
         borderRadiusLG: appRadii.control,
-        optionSelectedBg: "rgba(250, 84, 28, 0.1)",
-        optionSelectedColor: isDark
-          ? "rgb(255, 214, 199)"
-          : "rgb(154, 52, 18)",
-        activeBorderColor: primaryColor,
-        activeOutlineColor: "rgba(250, 84, 28, 0.12)",
-        hoverBorderColor: "rgba(250, 84, 28, 0.42)",
+        optionSelectedBg: accent.alpha(0.1),
+        optionSelectedColor: accent.text,
+        activeBorderColor: accent.primary,
+        activeOutlineColor: accent.alpha(0.12),
+        hoverBorderColor: accent.alpha(0.42),
       },
       Switch: {
-        colorPrimary: primaryColor,
-        colorPrimaryHover: primaryColorHover,
+        colorPrimary: accent.primary,
+        colorPrimaryHover: accent.hover,
       },
       Checkbox: {
         borderRadiusSM: appRadii.compact,

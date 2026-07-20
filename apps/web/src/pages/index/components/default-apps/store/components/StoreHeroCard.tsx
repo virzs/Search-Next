@@ -68,7 +68,7 @@ const StoreHeroCard: FC<StoreHeroCardProps> = ({
   return (
     <section className={cx(heroBaseClassName, heroToneClassName[tone], className)}>
       <div className="relative z-[1] min-w-0">
-        <div className="text-[11px] font-semibold leading-4 text-[var(--sn-accent)]">
+        <div className="text-[11px] font-semibold leading-4 text-[var(--sn-accent-text)]">
           {eyebrow ?? t("ui.featuredToday")}
         </div>
         <h1 className="mt-2 text-[26px] font-bold leading-8 tracking-[-0.01em] text-[var(--sn-text)]">
