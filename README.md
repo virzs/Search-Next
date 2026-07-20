@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="apps/docs/docs/public/search-next-icon.png" alt="Search Next 图标" width="128" height="128" />
+</p>
+
 # Search Next
 
 Search Next 是一个桌面化的导航与搜索入口，支持网站收藏、应用/应用、统一搜索、主题壁纸、用户数据同步与后台管理。当前仓库采用 pnpm workspace 组织，前端、后台、后端 API 与内置应用都在同一个仓库中维护。
