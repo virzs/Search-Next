@@ -3,6 +3,7 @@ import Operation from "@/components/TablePage2/Operation";
 import { useTablePage } from "@/hooks/useTablePage2";
 import {
   deleteDesktopWallpaper,
+  getApplicationWallpaperPreviewUrl,
   getDesktopWallpapers,
   toggleDesktopWallpaper,
 } from "@/services/tabs/desktop/wallpaper";
@@ -44,9 +45,13 @@ const WallpaperIndex = () => {
   const columns: WindowTableColumnType<any>[] = [
     {
       title: "图片",
-      dataIndex: "thumbnail",
+      dataIndex: "preview",
       width: 92,
-      render: (img: any) => {
+      render: (_, record: any) => {
+        const img =
+          record.type === "application"
+            ? getApplicationWallpaperPreviewUrl(record)
+            : record.thumbnail;
         const src = typeof img === "string" ? img : img?.url;
         if (!src) return "-";
         return (
@@ -61,7 +66,40 @@ const WallpaperIndex = () => {
         );
       },
     },
+    {
+      title: "类型",
+      dataIndex: "type",
+      width: 100,
+      render: (type) => (type === "application" ? "网页壁纸" : "图片壁纸"),
+    },
     { title: "名称", dataIndex: "name" },
+    {
+      title: "版本",
+      dataIndex: ["application", "version"],
+      width: 100,
+      render: (version) => version || "-",
+    },
+    {
+      title: "作者",
+      dataIndex: "author",
+      width: 140,
+      render: (author, record) => author || record.application?.author || "-",
+    },
+    {
+      title: "项目",
+      dataIndex: "url",
+      width: 90,
+      render: (url, record) => {
+        const href = url || record.application?.projectUrl;
+        return href ? (
+          <a href={href} target="_blank" rel="noopener noreferrer">
+            查看
+          </a>
+        ) : (
+          "-"
+        );
+      },
+    },
     { title: "描述", dataIndex: "description" },
     {
       title: "分类",
@@ -138,7 +176,7 @@ const WallpaperIndex = () => {
         columns={columns}
         rowKey="_id"
         showSearch
-        searchPlaceholder="搜索壁纸名称/描述"
+        searchPlaceholder="搜索壁纸名称/描述/作者/URL"
         button={
           <Button
             type="primary"
