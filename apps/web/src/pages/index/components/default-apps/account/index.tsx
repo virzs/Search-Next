@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import { useState } from "react";
 import { flushSync } from "react-dom";
 import { DesktopNextBaseModal } from "zs_library";
-import { AccountInfo, UnloggedView } from "@/components/auth";
+import { AccountInfo, LocalAccountInfo, UnloggedView } from "@/components/auth";
 import { useAuth } from "@/hooks/useAuth";
 import type { AuthAction } from "@/types/auth";
 import { accountRoute } from "./route-paths";
@@ -64,15 +64,10 @@ const AccountModalRoute = () => {
 export default AccountModalRoute;
 
 export const AccountIndexRedirect = () => {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading } = useAuth();
   if (loading) return <AccountLoadingView />;
 
-  return (
-    <Navigate
-      to={isAuthenticated ? accountRoute.path.profile : accountRoute.path.login}
-      replace
-    />
-  );
+  return <Navigate to={accountRoute.path.profile} replace />;
 };
 
 export const AccountAuthView = ({ action }: { action: AuthAction }) => {
@@ -126,16 +121,22 @@ export const AccountAuthView = ({ action }: { action: AuthAction }) => {
 };
 
 export const AccountProfileView = () => {
+  const navigate = useNavigate();
   const { loading, isAuthenticated } = useAuth();
 
   if (loading) return <AccountLoadingView />;
-  if (!isAuthenticated) {
-    return <Navigate to={accountRoute.path.login} replace />;
-  }
 
   return (
     <div className={accountProfilePageClassName}>
-      <AccountInfo showActions className="w-full" />
+      {isAuthenticated ? (
+        <AccountInfo showActions className="w-full" />
+      ) : (
+        <LocalAccountInfo
+          showActions
+          className="w-full"
+          onAuthenticate={() => navigate(accountRoute.path.login)}
+        />
+      )}
     </div>
   );
 };

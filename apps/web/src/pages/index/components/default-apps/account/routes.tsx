@@ -26,7 +26,7 @@ export const accountRoutes = {
     ),
     {
       path: accountRoute.segment.wildcard,
-      element: <Navigate to={accountRoute.path.login} replace />,
+      element: <Navigate to={accountRoute.path.profile} replace />,
     },
   ],
 };

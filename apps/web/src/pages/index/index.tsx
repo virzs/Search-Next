@@ -21,7 +21,6 @@ import {
   RiInformationLine,
   RiBrushLine,
   RemixiconComponentType,
-  RiUserLine,
 } from "@remixicon/react";
 import {
   createDesktopItemIconBuilder,
@@ -83,6 +82,7 @@ import DesktopImageIcon, {
 } from "./components/desktop-image-icon";
 import { accountRoute } from "./components/default-apps/account/route-paths";
 import BoringAccountAvatar from "@/components/auth/BoringAccountAvatar";
+import { LOCAL_ACCOUNT_AVATAR_SEED } from "@/components/auth/local-account";
 import { getPublicAppDetail } from "@/services/app";
 import type { AppApiItem } from "@/types";
 import {
@@ -1027,7 +1027,7 @@ function Index() {
       case "*:my":
         return createFixedItem({
           key: "my",
-          name: t("ui.account"),
+          name: isAuthenticated ? t("ui.account") : t("ui.account.localName"),
           IconComponent: isAuthenticated
             ? () => (
                 <BoringAccountAvatar
@@ -1036,16 +1036,18 @@ function Index() {
                   aria-hidden
                 />
               )
-            : RiUserLine,
-          tintStyle:
-            coverGradientCss ??
-            "linear-gradient(135deg, rgba(255, 59, 48, 0.92) 0%, rgba(175, 82, 222, 0.9) 100%)",
-          onClick: () =>
-            navigate(
-              isAuthenticated
-                ? accountRoute.path.profile
-                : accountRoute.path.login,
-            ),
+            : () => (
+                <BoringAccountAvatar
+                  seed={LOCAL_ACCOUNT_AVATAR_SEED}
+                  className="h-full w-full pointer-events-none"
+                  aria-hidden
+                />
+              ),
+          tintStyle: isAuthenticated
+            ? coverGradientCss ??
+              "linear-gradient(135deg, rgba(255, 59, 48, 0.92) 0%, rgba(175, 82, 222, 0.9) 100%)"
+            : "linear-gradient(135deg, rgba(52, 199, 89, 0.92) 0%, rgba(10, 132, 255, 0.9) 52%, rgba(255, 159, 10, 0.9) 100%)",
+          onClick: () => navigate(accountRoute.path.profile),
         });
       case "*:personalization":
         return createFixedItem({
@@ -1545,7 +1547,9 @@ function Index() {
                 id: "*:my",
                 type: "app",
                 data: {
-                  name: t("ui.account"),
+                  name: isAuthenticated
+                    ? t("ui.account")
+                    : t("ui.account.localName"),
                 },
               },
               {

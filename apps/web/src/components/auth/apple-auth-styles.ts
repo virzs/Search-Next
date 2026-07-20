@@ -221,7 +221,7 @@ export const appleAccountInfoClassName = css`
     background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.12));
   }
 
-  .apple-account-cover .apple-account-logout.sn-button {
+  .apple-account-cover .apple-account-action.sn-button {
     position: absolute;
     z-index: 1;
     top: 14px;
@@ -248,6 +248,14 @@ export const appleAccountInfoClassName = css`
     border-color: rgba(255, 59, 48, 0.3);
     background: var(--account-card-action-surface-hover);
     color: var(--account-card-action-text-hover);
+  }
+
+  .apple-account-cover .apple-account-login.sn-button:hover,
+  .apple-account-cover .apple-account-login.sn-button:focus-visible,
+  .apple-account-cover .apple-account-login.sn-button:active {
+    border-color: rgba(10, 132, 255, 0.34);
+    background: var(--account-card-action-surface-hover);
+    color: #0568c9;
   }
 
   .apple-account-profile {
@@ -313,6 +321,14 @@ export const appleAccountInfoClassName = css`
     white-space: nowrap;
   }
 
+  .apple-account-local-description {
+    max-width: 360px;
+    margin: 8px 0 0;
+    color: var(--account-card-text-secondary);
+    font-size: 12px;
+    line-height: 18px;
+  }
+
   [data-theme="dark"] & {
     --account-card-surface: var(--sn-surface, rgba(255, 255, 255, 0.08));
     --account-card-text: var(--sn-text, #f5f5f7);
@@ -340,7 +356,7 @@ export const appleAccountInfoClassName = css`
       min-height: 96px;
     }
 
-    .apple-account-cover .apple-account-logout.sn-button {
+    .apple-account-cover .apple-account-action.sn-button {
       top: 12px;
       right: 12px;
     }
@@ -374,7 +390,7 @@ export const appleAccountInfoClassName = css`
     --account-card-action-surface: #f2f2f7;
     --account-card-action-surface-hover: #ffffff;
 
-    .apple-account-cover .apple-account-logout.sn-button {
+    .apple-account-cover .apple-account-action.sn-button {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
@@ -388,7 +404,7 @@ export const appleAccountInfoClassName = css`
 
   @media (prefers-contrast: more) {
     .apple-account-card,
-    .apple-account-cover .apple-account-logout.sn-button {
+    .apple-account-cover .apple-account-action.sn-button {
       border-width: 2px;
     }
   }

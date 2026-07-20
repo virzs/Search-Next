@@ -51,7 +51,7 @@ const AccountInfo: React.FC<AccountInfoProps> = ({
               size="small"
               icon={<RiLogoutBoxRLine size={16} />}
               onClick={handleLogout}
-              className="apple-account-logout"
+              className="apple-account-action apple-account-logout"
               aria-label={t("ui.signOut")}
               title={t("ui.signOut")}
             >

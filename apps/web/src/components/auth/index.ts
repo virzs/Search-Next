@@ -4,6 +4,7 @@ export { default as LoginForm } from './LoginForm';
 export { default as RegisterForm } from './RegisterForm';
 export { default as AccountInfo } from './AccountInfo';
 export { default as BoringAccountAvatar } from './BoringAccountAvatar';
+export { default as LocalAccountInfo } from './LocalAccountInfo';
 
 // 认证上下文与 hooks 导出
 export { AuthProvider } from '../../contexts/AuthContext';
