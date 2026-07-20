@@ -1,6 +1,6 @@
-import { Select } from "antd";
 import { RiTranslate } from "@remixicon/react";
 import { useI18n, type AppLanguage } from "@/i18n";
+import { AppSelect } from "@/components/ui";
 import {
   MacSettingsRow,
   MacSettingsSection,
@@ -31,8 +31,9 @@ const LanguageView = () => {
               : undefined
           }
           extra={
-            <Select
+            <AppSelect
               size="small"
+              aria-label={t("ui.interfaceLanguage")}
               value={language}
               onChange={handleLanguageChange}
               options={languages.map((language) => ({

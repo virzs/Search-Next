@@ -1,6 +1,6 @@
-import { Button, Typography, message, Flex, Input, Modal, Select } from "antd";
+import { Typography, message, Flex, Modal } from "antd";
 import { useEffect, useRef, useState } from "react";
-import type { KeyboardEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useRequest } from "ahooks";
 import {
   RiApps2Line,
@@ -69,6 +69,7 @@ import { resolveAppDisplayName, useI18n } from "@/i18n";
 import { useApp } from "@/hooks/useApp";
 import AppInfoModal from "@/components/app-info-modal";
 import type { AppConfig } from "@/types";
+import { AppButton, AppInput, AppSelect } from "@/components/ui";
 
 const { Text } = Typography;
 
@@ -370,7 +371,7 @@ const StorageUsageOverview = ({
   const { t } = useI18n();
   return (
     <section>
-      <div className="rounded-[14px] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
+      <div className="rounded-[var(--sn-radius-surface)] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0 truncate text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
             {t("ui.categoryCountCategoriesItemCountItems", {
@@ -382,7 +383,7 @@ const StorageUsageOverview = ({
             {t("ui.sizeUsed", { size: formatBytes(usage.totalBytes) })}
           </div>
         </div>
-        <div className="mt-3 flex h-[22px] overflow-hidden rounded-[5px] bg-[#d1d1d6] dark:bg-white/15">
+        <div className="mt-3 flex h-[22px] overflow-hidden rounded-[var(--sn-radius-compact)] bg-[#d1d1d6] dark:bg-white/15">
           {usage.categories.length ? (
             usage.categories.map((category) => (
               <div
@@ -407,7 +408,7 @@ const StorageUsageOverview = ({
               className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6e6e73] dark:text-[#aeaeb2]"
             >
               <span
-                className="h-2 w-2 rounded-full"
+                className="h-2 w-2 rounded-[var(--sn-radius-round)]"
                 style={{ backgroundColor: category.color }}
               />
               {t(category.label)}
@@ -493,7 +494,7 @@ const AppStorageUsageOverview = ({
 
   return (
     <section>
-      <div className="rounded-[14px] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
+      <div className="rounded-[var(--sn-radius-surface)] border border-white/80 bg-white/80 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.08]">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0 truncate text-[13px] font-medium leading-5 text-[#6e6e73] dark:text-[#aeaeb2]">
             {t("ui.appStorageCount", { count: usage.apps.length })}
@@ -502,7 +503,7 @@ const AppStorageUsageOverview = ({
             {t("ui.sizeUsed", { size: formatBytes(usage.totalBytes) })}
           </div>
         </div>
-        <div className="mt-3 flex h-[22px] overflow-hidden rounded-[5px] bg-[#d1d1d6] dark:bg-white/15">
+        <div className="mt-3 flex h-[22px] overflow-hidden rounded-[var(--sn-radius-compact)] bg-[#d1d1d6] dark:bg-white/15">
           {segments.length ? (
             segments.map((segment) => (
               <div
@@ -527,7 +528,7 @@ const AppStorageUsageOverview = ({
               className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6e6e73] dark:text-[#aeaeb2]"
             >
               <span
-                className="h-2 w-2 rounded-full"
+                className="h-2 w-2 rounded-[var(--sn-radius-round)]"
                 style={{ backgroundColor: segment.color }}
               />
               {segment.label}
@@ -618,7 +619,7 @@ export const AppStorageUsageView = () => {
                       <img
                         src={entry.iconUrl}
                         alt=""
-                        className="h-[30px] w-[30px] rounded-lg object-cover"
+                        className="h-[30px] w-[30px] rounded-[var(--sn-radius-control)] object-cover"
                       />
                     ) : entry.isDevApp ? (
                       <RiCodeSSlashLine size={16} />
@@ -881,7 +882,7 @@ const BackupView = () => {
           <Text type="secondary">
             {t("ui.backup.chooseOverwriteDescription")}
           </Text>
-          <Select
+          <AppSelect
             placeholder={t("ui.chooseACloudBackupToOverwrite")}
             style={{ width: "100%" }}
             options={backups.map((backup) => ({
@@ -955,7 +956,7 @@ const BackupView = () => {
               max: cloudSync?.maxSyncBackups ?? 1,
             })}
           </Text>
-          <Input
+          <AppInput
             defaultValue={name}
             maxLength={100}
             placeholder={t("ui.enterABackupName")}
@@ -1042,7 +1043,7 @@ const BackupView = () => {
     confirmInSettings({
       title: t("ui.setBackupName"),
       content: (
-        <Input
+        <AppInput
           defaultValue={nextName}
           maxLength={100}
           placeholder={t("ui.enterABackupName")}
@@ -1062,15 +1063,6 @@ const BackupView = () => {
         return renameCloudBackup(backup._id, trimmed);
       },
     });
-  };
-
-  const handleCloudBackupKeyDown = (
-    event: KeyboardEvent<HTMLDivElement>,
-    backup: CloudBackupItem,
-  ) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    openCloudStorageDetail(backup);
   };
 
   const renderCurrentStorageSection = () => {
@@ -1107,7 +1099,7 @@ const BackupView = () => {
           <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73]">
             {t("ui.cloudBackupList")}
           </div>
-          <div className="rounded-xl border border-[rgba(60,60,67,0.12)] bg-white/70 px-4 py-5 text-sm text-[#6e6e73]">
+          <div className="rounded-[var(--sn-radius-surface)] border border-[rgba(60,60,67,0.12)] bg-white/70 px-4 py-5 text-sm text-[#6e6e73]">
             {t("ui.readingCloudBackups")}
           </div>
         </section>
@@ -1120,7 +1112,7 @@ const BackupView = () => {
           <div className="mb-2 ml-1 text-[13px] font-bold text-[#6e6e73]">
             {t("ui.cloudBackupList")}
           </div>
-          <div className="rounded-xl border border-dashed border-[rgba(60,60,67,0.18)] bg-white/50 px-4 py-5 text-sm text-[#6e6e73]">
+          <div className="rounded-[var(--sn-radius-surface)] border border-dashed border-[rgba(60,60,67,0.18)] bg-white/50 px-4 py-5 text-sm text-[#6e6e73]">
             {t("ui.backup.emptyCloudBackups")}
           </div>
         </section>
@@ -1140,56 +1132,51 @@ const BackupView = () => {
           {backups.map((backup) => (
             <div
               key={backup._id}
-              role="button"
-              tabIndex={0}
-              onClick={() => openCloudStorageDetail(backup)}
-              onKeyDown={(event) => handleCloudBackupKeyDown(event, backup)}
-              className="grid min-h-[68px] cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-xl border border-[rgba(60,60,67,0.12)] bg-white/75 px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,0.035)] backdrop-blur-xl transition hover:bg-white max-[640px]:grid-cols-1"
+              className="grid min-h-[68px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-[var(--sn-radius-surface)] border border-[rgba(60,60,67,0.12)] bg-white/75 px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,0.035)] backdrop-blur-xl max-[640px]:grid-cols-1"
             >
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-[#1d1d1f]">
-                  {backup.name || t("ui.untitledBackup")}
+              <button
+                type="button"
+                onClick={() => openCloudStorageDetail(backup)}
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[var(--sn-radius-control)] border-0 bg-transparent p-1 text-left transition-colors duration-150 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sn-accent)] motion-reduce:transition-none"
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-[#1d1d1f]">
+                    {backup.name || t("ui.untitledBackup")}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs leading-[18px] text-[#6e6e73]">
+                    <span>{formatDateTime(backup.lastSyncedAt)}</span>
+                    <span>{formatBytes(backup.byteSize)}</span>
+                    <span>{t("ui.countItems", { count: backup.itemCount })}</span>
+                  </div>
                 </div>
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs leading-[18px] text-[#6e6e73]">
-                  <span>{formatDateTime(backup.lastSyncedAt)}</span>
-                  <span>{formatBytes(backup.byteSize)}</span>
-                  <span>{t("ui.countItems", { count: backup.itemCount })}</span>
-                </div>
-              </div>
+                <RiArrowRightSLine
+                  size={20}
+                  aria-hidden
+                  className="shrink-0 text-[#b0b0b4]"
+                />
+              </button>
               <Flex gap={8} wrap="wrap" justify="flex-end">
-                <Button
+                <AppButton
                   size="small"
                   loading={renameLoading}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleRenameCloud(backup);
-                  }}
+                  onClick={() => handleRenameCloud(backup)}
                 >
                   {t("ui.rename")}
-                </Button>
-                <Button
+                </AppButton>
+                <AppButton
                   size="small"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleRestoreCloud(backup);
-                  }}
+                  onClick={() => handleRestoreCloud(backup)}
                 >
                   {t("ui.restore")}
-                </Button>
-                <Button
+                </AppButton>
+                <AppButton
                   size="small"
                   danger
                   loading={uploadLoading}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleOverwriteCloud(backup);
-                  }}
+                  onClick={() => handleOverwriteCloud(backup)}
                 >
                   {t("ui.overwrite")}
-                </Button>
-                <span className="grid h-6 w-5 shrink-0 place-items-center text-[#b0b0b4]">
-                  <RiArrowRightSLine size={20} />
-                </span>
+                </AppButton>
               </Flex>
             </div>
           ))}
@@ -1206,9 +1193,9 @@ const BackupView = () => {
         title={t("ui.exportData")}
         description={t("ui.saveAsASnbakBackupFile")}
         extra={
-          <Button size="small" onClick={handleExportData}>
+          <AppButton size="small" onClick={handleExportData}>
             {t("ui.export")}
-          </Button>
+          </AppButton>
         }
       />
       <MacSettingsRow
@@ -1217,9 +1204,9 @@ const BackupView = () => {
         title={t("ui.importData")}
         description={t("ui.backup.importDescription")}
         extra={
-          <Button size="small" onClick={handleImportData}>
+          <AppButton size="small" onClick={handleImportData}>
             {t("ui.import")}
-          </Button>
+          </AppButton>
         }
       />
       <MacSettingsRow
@@ -1278,13 +1265,13 @@ const BackupView = () => {
           title={t("ui.uploadCloudBackup")}
           description={t("ui.backup.cloudUploadHint")}
           extra={
-            <Button
+            <AppButton
               size="small"
               loading={uploadLoading}
               onClick={handleUploadCloud}
             >
               {t("ui.upload")}
-            </Button>
+            </AppButton>
           }
         />
       </MacSettingsSection>

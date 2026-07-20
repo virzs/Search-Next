@@ -1,6 +1,6 @@
 import { AppCategoryRail, DefaultAppView } from "@/components";
 import { useRequest } from "ahooks";
-import { Button, Empty } from "antd";
+import { Empty } from "antd";
 import { FC, useMemo, useState } from "react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import {
@@ -13,7 +13,9 @@ import {
 import { useNavigate } from "react-router";
 import { personalizationRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
-import PreviewCard from "../components/PreviewCard";
+import PreviewCard, {
+  PreviewCardAction,
+} from "../components/PreviewCard";
 import { useI18n } from "@/i18n";
 import { RiCheckLine } from "@remixicon/react";
 
@@ -72,7 +74,7 @@ const ThemeView: FC = () => {
             {t("ui.theme.chooseDescription")}
           </div>
           </div>
-          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
             <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
             <span>{t("ui.currentTheme")} · {activeThemeName}</span>
           </div>
@@ -111,15 +113,11 @@ const ThemeView: FC = () => {
                   description={theme.description || t("ui.clickTheCardToViewPreviewDetails")}
                   action={
                     active ? null : (
-                    <Button
-                      size="small"
-                      type="primary"
-                      shape="round"
-                      className="px-3! font-semibold!"
+                    <PreviewCardAction
                       onClick={() => setActiveThemeId(theme._id)}
                     >
                       {t("action.apply")}
-                    </Button>
+                    </PreviewCardAction>
                     )
                   }
                   onClick={() => openThemeDetail(theme)}
@@ -141,7 +139,7 @@ const ThemeView: FC = () => {
             })}
           </div>
         ) : (
-          <div className="flex h-[220px] w-full items-center justify-center rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)]">
+          <div className="flex h-[220px] w-full items-center justify-center rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)]">
             <Empty description={t("ui.noThemesAvailable")} />
           </div>
         )}

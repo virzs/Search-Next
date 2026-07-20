@@ -1,6 +1,6 @@
 import { DefaultAppView } from "@/components";
+import { AppButton } from "@/components/ui";
 import { useRequest } from "ahooks";
-import { Button } from "antd";
 import {
   RiAddLine,
   RiLandscapeLine,
@@ -19,7 +19,9 @@ import {
   getActiveThemeConfigs,
   type ThemeConfigApiItem,
 } from "@/services/desktop";
-import PreviewCard from "../components/PreviewCard";
+import PreviewCard, {
+  PreviewCardAction,
+} from "../components/PreviewCard";
 import { personalizationRoute } from "../route-paths";
 import { ThemeDesktopPreview } from "./theme-preview";
 import {
@@ -72,11 +74,11 @@ const CurrentDesktopPreview = ({
   theme: ThemeConfigApiItem | null;
 }) => (
   <div
-    className="relative min-h-[238px] overflow-hidden rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-5 shadow-[var(--sn-shadow)]"
+    className="relative min-h-[238px] overflow-hidden rounded-[var(--sn-radius-panel)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-5 shadow-[var(--sn-shadow)]"
     style={wallpaperStyle}
   >
     <div className="absolute inset-0 bg-white/10" />
-    <div className="relative mx-auto mt-4 h-[132px] w-[66%] min-w-[260px] overflow-hidden rounded-[12px] border border-white/60 bg-white/90 shadow-[0_14px_30px_rgba(0,0,0,0.14)] max-[720px]:min-w-0 max-[720px]:w-[82%]">
+    <div className="relative mx-auto mt-4 h-[132px] w-[66%] min-w-[260px] overflow-hidden rounded-[var(--sn-radius-surface)] border border-white/60 bg-white/90 shadow-[0_14px_30px_rgba(0,0,0,0.14)] max-[720px]:min-w-0 max-[720px]:w-[82%]">
       {theme ? (
         <ThemeDesktopPreview theme={theme} />
       ) : (
@@ -86,12 +88,12 @@ const CurrentDesktopPreview = ({
         </div>
       )}
     </div>
-    <div className="absolute bottom-4 left-1/2 flex h-8 w-[176px] -translate-x-1/2 items-center justify-center gap-2 rounded-[11px] border border-white/60 bg-white/55 shadow-[0_8px_20px_rgba(0,0,0,0.1)] backdrop-blur-xl">
+    <div className="absolute bottom-4 left-1/2 flex h-8 w-[176px] -translate-x-1/2 items-center justify-center gap-2 rounded-[var(--sn-radius-control)] border border-white/60 bg-white/55 shadow-[0_8px_20px_rgba(0,0,0,0.1)] backdrop-blur-xl">
       {["#0a84ff", "#ff9500", "#34c759", "#af52de", "#8e8e93"].map(
         (color) => (
           <span
             key={color}
-            className="h-3 w-3 rounded-[4px]"
+            className="h-3 w-3 rounded-[var(--sn-radius-round)]"
             style={{ background: color }}
           />
         ),
@@ -120,10 +122,10 @@ const CurrentStatusCard = ({
   }[tone];
 
   return (
-    <div className="rounded-[12px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]">
+    <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]">
       <div className="flex items-start gap-3">
         <span
-          className={`grid h-8 w-8 shrink-0 place-items-center rounded-[8px] text-white ${toneClassName}`}
+          className={`grid h-8 w-8 shrink-0 place-items-center rounded-[var(--sn-radius-compact)] text-white ${toneClassName}`}
         >
           {icon}
         </span>
@@ -232,21 +234,22 @@ const ThemeMyView = () => {
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-2 max-[700px]:w-full">
-            <Button
-              shape="round"
+            <AppButton
+              intent="secondary"
+              size="default"
               icon={<RiTShirtLine size={15} />}
               onClick={() => navigate(personalizationRoute.path.myThemeCreate)}
             >
               {t("ui.createTheme")}
-            </Button>
-            <Button
-              type="primary"
-              shape="round"
+            </AppButton>
+            <AppButton
+              intent="primary"
+              size="default"
               icon={<RiAddLine size={16} />}
               onClick={() => navigate(personalizationRoute.path.myCreate)}
             >
               {t("ui.addWallpaper")}
-            </Button>
+            </AppButton>
           </div>
         </div>
       <section>
@@ -301,15 +304,13 @@ const ThemeMyView = () => {
                       title={theme.name}
                       description={theme.description || t("ui.clickTheCardToEditTheme")}
                       action={
-                        !active ? <Button
-                            size="small"
-                            type="primary"
-                            shape="round"
-                            className="px-3! font-semibold!"
+                        !active ? (
+                          <PreviewCardAction
                             onClick={() => setActiveThemeId(theme.id)}
                           >
                             {t("action.apply")}
-                          </Button> : null
+                          </PreviewCardAction>
+                        ) : null
                       }
                       onClick={() =>
                         navigate(personalizationRoute.path.myThemeEdit(theme.id))
@@ -342,15 +343,13 @@ const ThemeMyView = () => {
                       title={item.name}
                       description={item.type === "gradient" ? t("ui.clickTheCardToEditGradient") : t("ui.clickTheCardToEditImage")}
                       action={
-                        !active ? <Button
-                            size="small"
-                            type="primary"
-                            shape="round"
-                            className="px-3! font-semibold!"
+                        !active ? (
+                          <PreviewCardAction
                             onClick={() => applyWallpaper(item)}
                           >
                             {t("action.apply")}
-                          </Button> : null
+                          </PreviewCardAction>
+                        ) : null
                       }
                       onClick={() =>
                         navigate(personalizationRoute.path.myEdit(item.id))
@@ -369,8 +368,8 @@ const ThemeMyView = () => {
           ) : null}
         </>
       ) : (
-        <section className="mt-6 rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-6 py-8 text-center shadow-[var(--sn-shadow)]">
-          <div className="mx-auto grid h-10 w-10 place-items-center rounded-[12px] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
+        <section className="mt-6 rounded-[var(--sn-radius-panel)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-6 py-8 text-center shadow-[var(--sn-shadow)]">
+          <div className="mx-auto grid h-10 w-10 place-items-center rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
             <RiAddLine size={20} />
           </div>
           <div className="mt-3 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
@@ -380,15 +379,20 @@ const ThemeMyView = () => {
             {t("ui.personalization.emptyMine")}
           </div>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Button onClick={() => navigate(personalizationRoute.path.myThemeCreate)}>
+            <AppButton
+              intent="secondary"
+              size="default"
+              onClick={() => navigate(personalizationRoute.path.myThemeCreate)}
+            >
               {t("ui.createTheme")}
-            </Button>
-            <Button
-              type="primary"
+            </AppButton>
+            <AppButton
+              intent="primary"
+              size="default"
               onClick={() => navigate(personalizationRoute.path.myCreate)}
             >
               {t("ui.addWallpaper")}
-            </Button>
+            </AppButton>
           </div>
         </section>
       )}

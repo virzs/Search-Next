@@ -33,7 +33,7 @@ const AccountModalRoute = () => {
       styles={{
         panel: {
           overflow: "hidden",
-          borderRadius: 24,
+          borderRadius: "var(--sn-radius-panel)",
           border: isDark
             ? "1px solid rgba(235,235,245,0.14)"
             : "1px solid rgba(255,255,255,0.72)",
@@ -210,7 +210,6 @@ const accountAuthPageClassName = css`
 
 const accountProfilePageClassName = css`
   width: 100%;
-  padding: 24px;
   background: rgba(246, 246, 248, 0.92);
 
   .account-info {

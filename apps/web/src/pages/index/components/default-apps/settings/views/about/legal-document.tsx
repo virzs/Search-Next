@@ -1,5 +1,5 @@
 import { css } from "@emotion/css";
-import { Alert, Button, Empty, Skeleton } from "antd";
+import { Alert, Empty, Skeleton } from "antd";
 import { useRequest } from "ahooks";
 import { SimpleEditorViewer } from "zs_library";
 import { useI18n } from "@/i18n";
@@ -8,6 +8,7 @@ import {
   type LegalDocumentType,
 } from "@/services/system";
 import { MacSettingsView } from "../../components/macos-settings";
+import { AppButton } from "@/components/ui";
 
 interface LegalDocumentViewProps {
   type: LegalDocumentType;
@@ -36,9 +37,9 @@ const LegalDocumentView = ({ type }: LegalDocumentViewProps) => {
           message={t("ui.legal.loadFailed")}
           description={t("ui.legal.pageRetryDescription")}
           action={
-            <Button size="small" onClick={refresh}>
+            <AppButton size="small" onClick={refresh}>
               {t("ui.legal.retry")}
-            </Button>
+            </AppButton>
           }
         />
       ) : loading ? (
@@ -86,7 +87,7 @@ const legalDocumentPageClassName = css`
   min-height: 420px;
   overflow: hidden;
   border: 1px solid var(--sn-separator);
-  border-radius: 16px;
+  border-radius: var(--sn-radius-panel);
   padding: 22px 24px 28px;
   color: var(--sn-text);
   background: var(--sn-surface);
@@ -159,7 +160,7 @@ const legalDocumentPageClassName = css`
 
   @media (max-width: 640px) {
     min-height: 360px;
-    border-radius: 14px;
+    border-radius: var(--sn-radius-surface);
     padding: 18px 17px 24px;
   }
 

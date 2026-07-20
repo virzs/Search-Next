@@ -1,5 +1,11 @@
 import { AppSegmented, DefaultAppView } from "@/components";
-import { App, Button, Card, ColorPicker, Form, Input, Space } from "antd";
+import {
+  AppButton,
+  AppColorPicker,
+  AppForm,
+  AppInput,
+} from "@/components/ui";
+import { App, Card, Space } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { v4 as uuidv4 } from "uuid";
@@ -37,9 +43,9 @@ const ThemeMyThemeEditorView = () => {
   const [darkBackground, setDarkBackground] = useState("#2f3035");
   const [accentColor, setAccentColor] = useState("#007aff");
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
-  const [form] = Form.useForm<{ name: string; description?: string }>();
-  const watchedName = Form.useWatch("name", form);
-  const watchedDescription = Form.useWatch("description", form);
+  const [form] = AppForm.useForm<{ name: string; description?: string }>();
+  const watchedName = AppForm.useWatch("name", form);
+  const watchedDescription = AppForm.useWatch("description", form);
 
   useEffect(() => {
     try {
@@ -194,43 +200,54 @@ const ThemeMyThemeEditorView = () => {
       headerRight={
         <Space size={8}>
           {isEdit ? (
-            <Button danger onClick={handleDelete}>
+            <AppButton
+              intent="secondary"
+              danger
+              size="default"
+              onClick={handleDelete}
+            >
               {t("ui.delete")}
-            </Button>
+            </AppButton>
           ) : null}
-          <Button onClick={handleSave}>{t("ui.save")}</Button>
-          <Button
-            type="primary"
-            shape="round"
+          <AppButton
+            intent="secondary"
+            size="default"
+            onClick={handleSave}
+          >
+            {t("ui.save")}
+          </AppButton>
+          <AppButton
+            intent="primary"
+            size="default"
             onClick={handleSaveAndApply}
           >
             {t("ui.saveAndApply")}
-          </Button>
+          </AppButton>
         </Space>
       }
       contentClassName="px-4 pb-8 pt-4"
     >
       <div className="grid grid-cols-[minmax(260px,0.8fr)_minmax(0,1.2fr)] gap-6 max-[760px]:grid-cols-1">
         <Card
-          className="rounded-[8px] border-[var(--sn-separator)]! bg-[var(--sn-surface)]! shadow-[var(--sn-shadow)]!"
+          className="rounded-[var(--sn-radius-surface)] border-[var(--sn-separator)]! bg-[var(--sn-surface)]! shadow-[var(--sn-shadow)]!"
           styles={{ body: { padding: 16 } }}
         >
           <section>
             <h2 className="mb-3 text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">
               {t("ui.basicInformation")}
             </h2>
-          <Form form={form} layout="vertical">
-            <Form.Item
+          <AppForm form={form} layout="vertical">
+            <AppForm.Item
               name="name"
               label={t("ui.name")}
               rules={[{ required: true, message: t("ui.enterAName") }]}
             >
-              <Input placeholder={t("ui.exampleMyFocusTheme")} />
-            </Form.Item>
-            <Form.Item name="description" label={t("ui.description")}>
-              <Input placeholder={t("ui.theme.descriptionPlaceholder")} />
-            </Form.Item>
-          </Form>
+              <AppInput placeholder={t("ui.exampleMyFocusTheme")} />
+            </AppForm.Item>
+            <AppForm.Item name="description" label={t("ui.description")}>
+              <AppInput placeholder={t("ui.theme.descriptionPlaceholder")} />
+            </AppForm.Item>
+          </AppForm>
           </section>
 
           <section className="mt-5 border-t border-[var(--sn-separator)] pt-5">
@@ -240,7 +257,7 @@ const ThemeMyThemeEditorView = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.lightBackground")}</div>
-              <ColorPicker
+              <AppColorPicker
                 value={lightBackground}
                 onChange={(color, hex) =>
                   setLightBackground(colorToHex(color, hex))
@@ -253,7 +270,7 @@ const ThemeMyThemeEditorView = () => {
             </div>
             <div>
               <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.darkBackground")}</div>
-              <ColorPicker
+              <AppColorPicker
                 value={darkBackground}
                 onChange={(color, hex) =>
                   setDarkBackground(colorToHex(color, hex))
@@ -268,7 +285,7 @@ const ThemeMyThemeEditorView = () => {
 
           <div className="mt-4">
             <div className="mb-2 text-[13px] font-medium leading-5 text-[var(--sn-text-secondary)]">{t("ui.accentColor")}</div>
-            <ColorPicker
+            <AppColorPicker
               value={accentColor}
               onChange={(color, hex) => setAccentColor(colorToHex(color, hex))}
               showText
@@ -300,10 +317,10 @@ const ThemeMyThemeEditorView = () => {
               ]}
             />
           </div>
-          <div className="aspect-video overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]">
+          <div className="aspect-video overflow-hidden rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]">
             <ThemeDesktopPreview theme={visiblePreviewConfig} />
           </div>
-          <div className="mt-3 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-3 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
+          <div className="mt-3 rounded-[var(--sn-radius-control)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-3 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
             {t("ui.theme.localSaveHint")}
           </div>
         </div>

@@ -1,4 +1,5 @@
 import type { ThemeConfig } from "antd";
+import { appControlHeights, appRadii } from "./tokens";
 
 const primaryColor = "rgb(250, 84, 28)";
 const primaryColorHover = "rgb(255, 104, 50)";
@@ -14,7 +15,11 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
       colorPrimary: primaryColor,
       colorPrimaryHover: primaryColorHover,
       colorPrimaryActive: primaryColorActive,
-      borderRadius: 12,
+      borderRadius: appRadii.control,
+      borderRadiusXS: appRadii.control,
+      borderRadiusSM: appRadii.control,
+      borderRadiusLG: appRadii.surface,
+      borderRadiusOuter: appRadii.panel,
       colorBgContainer: isDark
         ? "rgba(28, 28, 30, 0.78)"
         : "rgba(255, 255, 255, 0.72)",
@@ -27,15 +32,22 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
       colorTextSecondary: isDark
         ? "rgba(235, 235, 245, 0.64)"
         : "rgba(60, 60, 67, 0.62)",
-      controlHeight: 36,
+      controlHeight: appControlHeights.default,
+      controlHeightSM: appControlHeights.small,
+      controlHeightLG: appControlHeights.large,
       controlOutline: "rgba(250, 84, 28, 0.14)",
     },
     components: {
       Button: {
         defaultShadow: "none",
         primaryShadow: "0 8px 18px rgba(250, 84, 28, 0.22)",
-        borderRadius: 999,
+        borderRadius: appRadii.control,
+        borderRadiusSM: appRadii.control,
+        borderRadiusLG: appRadii.control,
         paddingInline: 18,
+        paddingInlineSM: 12,
+        paddingInlineLG: 20,
+        fontWeight: 650,
         defaultBg: isDark
           ? "rgba(255, 255, 255, 0.10)"
           : "rgba(255, 255, 255, 0.58)",
@@ -51,10 +63,12 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
         activeBarBorderWidth: 0,
         itemMarginInline: 0,
         itemHeight: 36,
-        itemBorderRadius: 12,
+        itemBorderRadius: appRadii.control,
       },
       Input: {
-        borderRadius: 12,
+        borderRadius: appRadii.control,
+        borderRadiusSM: appRadii.control,
+        borderRadiusLG: appRadii.control,
         activeBorderColor: primaryColor,
         activeShadow: "0 0 0 3px rgba(250, 84, 28, 0.12)",
         addonBg: isDark
@@ -63,13 +77,17 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
         hoverBorderColor: "rgba(250, 84, 28, 0.42)",
       },
       InputNumber: {
-        borderRadius: 12,
+        borderRadius: appRadii.control,
+        borderRadiusSM: appRadii.control,
+        borderRadiusLG: appRadii.control,
         activeBorderColor: primaryColor,
         activeShadow: "0 0 0 3px rgba(250, 84, 28, 0.12)",
         hoverBorderColor: "rgba(250, 84, 28, 0.42)",
       },
       Select: {
-        borderRadius: 12,
+        borderRadius: appRadii.control,
+        borderRadiusSM: appRadii.control,
+        borderRadiusLG: appRadii.control,
         optionSelectedBg: "rgba(250, 84, 28, 0.1)",
         optionSelectedColor: isDark
           ? "rgb(255, 214, 199)"
@@ -82,8 +100,11 @@ export const createThemeConfig = (colorScheme: AppColorScheme): ThemeConfig => {
         colorPrimary: primaryColor,
         colorPrimaryHover: primaryColorHover,
       },
+      Checkbox: {
+        borderRadiusSM: appRadii.compact,
+      },
       Form: {
-        itemMarginBottom: 0,
+        itemMarginBottom: 16,
         labelColor: isDark
           ? "rgba(235, 235, 245, 0.72)"
           : "rgba(36, 37, 40, 0.78)",

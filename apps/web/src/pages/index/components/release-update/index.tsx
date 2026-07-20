@@ -1,8 +1,9 @@
 import { getLatestReleasePublication } from "@/services/system";
-import { App, Button, Space } from "antd";
+import { App, Space } from "antd";
 import { useCallback, useEffect } from "react";
 import { useI18n } from "@/i18n";
 import { openWebMessageCenter } from "@/utils/message-center";
+import { AppButton } from "@/components/ui";
 
 const POLL_INTERVAL = 5 * 60 * 1000;
 const CURRENT_RELEASE_TAG = import.meta.env.VITE_RELEASE_TAG?.trim() || "dev";
@@ -36,7 +37,7 @@ const WebReleaseUpdatePrompt = () => {
         }),
         btn: (
           <Space>
-            <Button
+            <AppButton
               size="small"
               onClick={() =>
                 openWebMessageCenter({
@@ -46,14 +47,14 @@ const WebReleaseUpdatePrompt = () => {
               }
             >
               {t("ui.releaseUpdate.view")}
-            </Button>
-            <Button
+            </AppButton>
+            <AppButton
               size="small"
-              type="primary"
+              intent="primary"
               onClick={() => reloadForRelease(latest.tagName)}
             >
               {t("ui.releaseUpdate.refresh")}
-            </Button>
+            </AppButton>
           </Space>
         ),
       });

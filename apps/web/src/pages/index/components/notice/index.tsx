@@ -23,10 +23,11 @@ import {
   RiNotification3Fill,
 } from "@remixicon/react";
 import { useBoolean, useRequest } from "ahooks";
-import { Badge, Button, Empty, Tooltip, theme as antdTheme } from "antd";
+import { Badge, Empty, Tooltip, theme as antdTheme } from "antd";
 import { format } from "date-fns";
 import {
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -36,8 +37,15 @@ import {
 import { DesktopNextBaseModal, SimpleEditorViewer } from "zs_library";
 import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
+import {
+  AppButton,
+  AppIconButton,
+  type AppButtonElement,
+} from "@/components/ui";
 
 const NOTICE_POLL_INTERVAL = 2 * 60 * 1000;
+const MESSAGE_CENTER_TABS = ["notifications", "versions"] as const satisfies
+  readonly MessageCenterTab[];
 
 const formatNoticeDate = (value?: string | null) => {
   if (!value) return "";
@@ -70,6 +78,12 @@ const Notice = () => {
     getVersionUpdateReadIds(),
   );
   const autoOpenCheckedRef = useRef(false);
+  const tabButtonRefs = useRef<
+    Record<MessageCenterTab, AppButtonElement | null>
+  >({
+    notifications: null,
+    versions: null,
+  });
 
   const { data: noticeData, run: runNotices } = useRequest(getNotice, {
     pollingInterval: NOTICE_POLL_INTERVAL,
@@ -293,13 +307,47 @@ const Notice = () => {
     else runVersions();
   };
 
+  const handleTabKeyDown = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+    currentTab: MessageCenterTab,
+  ) => {
+    const currentIndex = MESSAGE_CENTER_TABS.indexOf(currentTab);
+    let nextIndex: number;
+
+    switch (event.key) {
+      case "ArrowLeft":
+        nextIndex =
+          (currentIndex - 1 + MESSAGE_CENTER_TABS.length) %
+          MESSAGE_CENTER_TABS.length;
+        break;
+      case "ArrowRight":
+        nextIndex = (currentIndex + 1) % MESSAGE_CENTER_TABS.length;
+        break;
+      case "Home":
+        nextIndex = 0;
+        break;
+      case "End":
+        nextIndex = MESSAGE_CENTER_TABS.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    const nextTab = MESSAGE_CENTER_TABS[nextIndex];
+    selectTab(nextTab);
+    tabButtonRefs.current[nextTab]?.focus();
+  };
+
   return (
     <div>
       <Badge dot={hasUnread}>
         <Tooltip title={t("ui.notifications")}>
-          <Button
+          <AppIconButton
             aria-label={t("ui.notifications")}
-            type="text"
+            intent="quiet"
+            size="small"
             onClick={() => {
               setActiveTab("notifications");
               openModal();
@@ -307,7 +355,7 @@ const Notice = () => {
               runVersions();
             }}
             icon={<RiNotification3Fill color="#fff" size={20} />}
-          ></Button>
+          />
         </Tooltip>
       </Badge>
       <DesktopNextBaseModal
@@ -340,26 +388,40 @@ const Notice = () => {
                 role="tablist"
                 aria-label={t("ui.messageCenter.categories")}
               >
-                <button
-                  type="button"
+                <AppButton
+                  ref={(element) => {
+                    tabButtonRefs.current.notifications = element;
+                  }}
+                  intent="quiet"
+                  size="small"
                   role="tab"
                   aria-selected={activeTab === "notifications"}
                   data-active={activeTab === "notifications"}
+                  tabIndex={activeTab === "notifications" ? 0 : -1}
                   onClick={() => selectTab("notifications")}
+                  onKeyDown={(event) =>
+                    handleTabKeyDown(event, "notifications")
+                  }
                 >
                   {t("ui.notifications")}
                   {hasUnreadNotice ? <span className="tab-unread-dot" /> : null}
-                </button>
-                <button
-                  type="button"
+                </AppButton>
+                <AppButton
+                  ref={(element) => {
+                    tabButtonRefs.current.versions = element;
+                  }}
+                  intent="quiet"
+                  size="small"
                   role="tab"
                   aria-selected={activeTab === "versions"}
                   data-active={activeTab === "versions"}
+                  tabIndex={activeTab === "versions" ? 0 : -1}
                   onClick={() => selectTab("versions")}
+                  onKeyDown={(event) => handleTabKeyDown(event, "versions")}
                 >
                   {t("ui.versionHistory")}
                   {hasUnreadVersion ? <span className="tab-unread-dot" /> : null}
-                </button>
+                </AppButton>
               </div>
             }
             menuItems={currentItems.map((item) => ({
@@ -431,11 +493,9 @@ const Notice = () => {
                         !noticeReadSet.has(visibleNotice._id)) ||
                       (visibleVersion &&
                         !versionReadSet.has(visibleVersion._id)) ? (
-                        <Button
-                          className="notice-read-button"
-                          type="text"
+                        <AppButton
+                          intent="quiet"
                           size="small"
-                          shape="round"
                           icon={<RiCheckLine size={14} />}
                           onClick={() => {
                             if (visibleNotice)
@@ -445,7 +505,7 @@ const Notice = () => {
                           }}
                         >
                           {t("ui.markAsRead")}
-                        </Button>
+                        </AppButton>
                       ) : null}
                     </div>
                   </div>
@@ -455,7 +515,6 @@ const Notice = () => {
                     update={visibleVersion}
                     viewerClassName="notice-richtext"
                     footerClassName="notice-article-footer"
-                    buttonClassName="notice-release-button"
                   />
                 ) : (
                   <SimpleEditorViewer
@@ -536,7 +595,7 @@ const noticeAppWindowClassName = css`
     min-height: 340px;
     margin: 0 auto;
     border: 1px solid var(--sn-separator);
-    border-radius: 14px;
+    border-radius: var(--sn-radius-surface);
     padding: 24px 26px;
     background: var(--sn-surface);
     box-shadow:
@@ -564,7 +623,7 @@ const noticeAppWindowClassName = css`
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    border-radius: 999px;
+    border-radius: var(--sn-radius-round);
     padding: 4px 8px;
     color: var(--sn-accent, #007aff);
     background: color-mix(
@@ -606,25 +665,6 @@ const noticeAppWindowClassName = css`
     font-weight: 550;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-  }
-
-  .notice-read-button.ant-btn {
-    flex: 0 0 auto;
-    color: var(--sn-accent, #007aff);
-    background: color-mix(
-      in srgb,
-      var(--sn-accent, #007aff) 8%,
-      transparent
-    );
-  }
-
-  .notice-read-button.ant-btn:hover {
-    color: var(--sn-accent, #007aff);
-    background: color-mix(
-      in srgb,
-      var(--sn-accent, #007aff) 13%,
-      transparent
-    );
   }
 
   .notice-richtext {
@@ -688,7 +728,7 @@ const noticeAppWindowClassName = css`
 
   .notice-richtext .simple-editor code {
     border: 1px solid var(--sn-separator);
-    border-radius: 6px;
+    border-radius: var(--sn-radius-compact);
     padding: 1px 5px;
     color: var(--sn-text-secondary);
     background: var(--sn-surface-secondary, rgba(118, 118, 128, 0.09));
@@ -717,21 +757,6 @@ const noticeAppWindowClassName = css`
     padding-top: 18px;
     border-top: 1px solid var(--sn-separator);
     border-top-color: var(--sn-separator);
-  }
-
-  .notice-release-button.ant-btn {
-    height: 34px;
-    padding-inline: 14px;
-    border: 0;
-    background: var(--sn-accent, #007aff);
-    box-shadow: 0 5px 14px
-      color-mix(in srgb, var(--sn-accent, #007aff) 18%, transparent);
-    font-weight: 650;
-    transition: transform 100ms ease-out;
-  }
-
-  .notice-release-button.ant-btn:active {
-    transform: scale(0.98);
   }
 
   .notice-empty-state {
@@ -776,12 +801,8 @@ const noticeAppWindowClassName = css`
 
     .notice-article {
       min-height: 0;
-      border-radius: 14px;
+      border-radius: var(--sn-radius-surface);
       padding: 18px;
-    }
-
-    .notice-read-button.ant-btn {
-      padding-inline: 8px;
     }
 
     .notice-article-header {
@@ -808,16 +829,6 @@ const noticeAppWindowClassName = css`
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .notice-release-button.ant-btn {
-      transition: none;
-    }
-
-    .notice-release-button.ant-btn:active {
-      transform: none;
-    }
-  }
-
   @media (prefers-contrast: more) {
     .notice-article {
       border-color: currentColor;
@@ -834,49 +845,21 @@ const noticeSidebarClassName = css`
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 3px;
     border: 1px solid rgba(60, 60, 67, 0.1);
-    border-radius: 10px;
+    border-radius: var(--sn-radius-control);
     padding: 3px;
     background: rgba(118, 118, 128, 0.1);
   }
 
-  .message-center-tabs button {
-    position: relative;
-    display: inline-flex;
+  .message-center-tabs [role="tab"] {
     min-width: 0;
-    height: 28px;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    border: 0;
-    border-radius: 7px;
-    padding: 0 7px;
-    color: rgba(60, 60, 67, 0.68);
-    background: transparent;
-    font: inherit;
-    font-size: 12px;
-    font-weight: 650;
-    white-space: nowrap;
-    cursor: pointer;
-    transition:
-      transform 100ms ease-out,
-      background-color 140ms ease-out;
   }
 
-  .message-center-tabs button[data-active="true"] {
+  .message-center-tabs [role="tab"][data-active="true"] {
     color: #1d1d1f;
     background: rgba(255, 255, 255, 0.9);
     box-shadow:
       0 1px 3px rgba(0, 0, 0, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.76);
-  }
-
-  .message-center-tabs button:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--sn-accent, #007aff) 65%, white);
-    outline-offset: 1px;
-  }
-
-  .message-center-tabs button:active {
-    transform: scale(0.97);
   }
 
   .tab-unread-dot {
@@ -892,11 +875,10 @@ const noticeSidebarClassName = css`
     background: rgba(118, 118, 128, 0.2);
   }
 
-  [data-theme="dark"] & .message-center-tabs button {
-    color: rgba(235, 235, 245, 0.64);
-  }
-
-  [data-theme="dark"] & .message-center-tabs button[data-active="true"] {
+  [data-theme="dark"]
+    &
+    .message-center-tabs
+    [role="tab"][data-active="true"] {
     color: #f5f5f7;
     background: rgba(255, 255, 255, 0.12);
     box-shadow:
@@ -975,13 +957,4 @@ const noticeSidebarClassName = css`
     backdrop-filter: none;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .message-center-tabs button {
-      transition: none;
-    }
-
-    .message-center-tabs button:active {
-      transform: none;
-    }
-  }
 `;

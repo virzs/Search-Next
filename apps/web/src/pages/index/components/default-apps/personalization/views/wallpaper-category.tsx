@@ -1,6 +1,6 @@
 import { DefaultAppView } from "@/components";
 import { useRequest } from "ahooks";
-import { Button, Empty, Pagination, Skeleton } from "antd";
+import { Empty, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
@@ -11,7 +11,9 @@ import {
   type WallpaperApiItem,
   type WallpaperCategoryApiItem,
 } from "@/services/desktop";
-import PreviewCard from "../components/PreviewCard";
+import PreviewCard, {
+  PreviewCardAction,
+} from "../components/PreviewCard";
 import { useI18n } from "@/i18n";
 
 const WallpaperCategoryView: FC = () => {
@@ -93,14 +95,11 @@ const WallpaperCategoryView: FC = () => {
                   description={w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))}
                   action={
                     url && !active ? (
-                      <Button
-                        size="small"
-                        type="primary"
-                        shape="round"
+                      <PreviewCardAction
                         onClick={() => handleSelectImage(w)}
                       >
                         {t("action.apply")}
-                      </Button>
+                      </PreviewCardAction>
                     ) : null
                   }
                   cover={

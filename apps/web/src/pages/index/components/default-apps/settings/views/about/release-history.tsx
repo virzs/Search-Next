@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
 import { RiCalendarLine, RiHistoryLine } from "@remixicon/react";
-import { Alert, Button, Empty, Skeleton } from "antd";
+import { Alert, Empty, Skeleton } from "antd";
 import { useRequest } from "ahooks";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -16,6 +16,7 @@ import {
   MacSettingsView,
 } from "../../components/macos-settings";
 import { getSettingsAboutReleasePath } from "../../route-paths";
+import { AppButton } from "@/components/ui";
 
 const useReleaseHistory = () =>
   useRequest(() => getVersionUpdates("web"));
@@ -36,9 +37,9 @@ export const ReleaseHistoryView = () => {
           showIcon
           message={t("ui.versionHistory.loadFailed")}
           action={
-            <Button size="small" onClick={refresh}>
+            <AppButton size="small" onClick={refresh}>
               {t("ui.legal.retry")}
-            </Button>
+            </AppButton>
           }
         />
       ) : loading ? (
@@ -108,9 +109,9 @@ export const ReleaseHistoryDetailView = () => {
           showIcon
           message={t("ui.versionHistory.loadFailed")}
           action={
-            <Button size="small" onClick={refresh}>
+            <AppButton size="small" onClick={refresh}>
               {t("ui.legal.retry")}
-            </Button>
+            </AppButton>
           }
         />
       ) : loading ? (
@@ -148,7 +149,6 @@ export const ReleaseHistoryDetailView = () => {
             update={update}
             viewerClassName="release-history-richtext"
             footerClassName="release-history-footer"
-            buttonClassName="release-history-button"
           />
         </article>
       ) : (
@@ -168,7 +168,7 @@ const releaseHistoryLoadingClassName = css`
   min-height: 360px;
   place-items: center;
   border: 1px solid var(--sn-separator);
-  border-radius: 16px;
+  border-radius: var(--sn-radius-panel);
   padding: 24px;
   background: var(--sn-surface);
   box-shadow: var(--sn-shadow);
@@ -182,7 +182,7 @@ const releaseHistoryDetailClassName = css`
   min-height: 420px;
   overflow: hidden;
   border: 1px solid var(--sn-separator);
-  border-radius: 16px;
+  border-radius: var(--sn-radius-panel);
   padding: 22px 24px 26px;
   color: var(--sn-text);
   background: var(--sn-surface);
@@ -203,7 +203,7 @@ const releaseHistoryDetailClassName = css`
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    border-radius: 999px;
+    border-radius: var(--sn-radius-round);
     padding: 4px 8px;
     color: var(--sn-accent);
     background: color-mix(in srgb, var(--sn-accent) 9%, transparent);
@@ -267,29 +267,8 @@ const releaseHistoryDetailClassName = css`
     border-top: 1px solid var(--sn-separator);
   }
 
-  .release-history-button.ant-btn {
-    border: 0;
-    background: var(--sn-accent);
-    font-weight: 650;
-    transition: transform 100ms ease-out;
-  }
-
-  .release-history-button.ant-btn:active {
-    transform: scale(0.98);
-  }
-
   @media (max-width: 640px) {
     padding: 18px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .release-history-button.ant-btn {
-      transition: none;
-    }
-
-    .release-history-button.ant-btn:active {
-      transform: none;
-    }
   }
 
   @media (prefers-contrast: more) {

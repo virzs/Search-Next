@@ -1,0 +1,114 @@
+:root {
+  --sn-accent: #fa541c;
+  --sn-surface-strong: #ffffff;
+  --sn-surface-secondary: #f2f2f7;
+  --sn-text: #1d1d1f;
+  --sn-text-secondary: #6e6e73;
+  --sn-separator: rgba(60, 60, 67, 0.16);
+}
+
+[data-theme="dark"] {
+  --sn-surface-strong: #242426;
+  --sn-surface-secondary: rgba(255, 255, 255, 0.1);
+  --sn-text: #f5f5f7;
+  --sn-text-secondary: #aeaeb2;
+  --sn-separator: rgba(235, 235, 245, 0.16);
+}
+
+.sn-button {
+  font-weight: 650;
+  touch-action: manipulation;
+  transform-origin: center;
+  transition:
+    transform 100ms ease-out,
+    color 140ms ease-out,
+    border-color 140ms ease-out,
+    background-color 140ms ease-out,
+    box-shadow 140ms ease-out;
+}
+
+.sn-icon-button {
+  border-radius: var(--sn-radius-round, 999px);
+}
+
+.sn-button [data-slot="button-icon"] {
+  font-size: 16px;
+}
+
+[data-slot="button"]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--sn-accent, #fa541c) 24%, transparent);
+  outline-offset: 2px;
+}
+
+.sn-form.ant-form {
+  --sn-form-field-gap: 16px;
+  display: grid;
+  gap: var(--sn-form-field-gap);
+}
+
+.sn-form--compact.ant-form {
+  --sn-form-field-gap: 12px;
+}
+
+.sn-form--relaxed.ant-form {
+  --sn-form-field-gap: 20px;
+}
+
+.sn-form.ant-form .ant-form-item {
+  margin-bottom: 0;
+}
+
+.sn-form.ant-form .ant-form-item-label {
+  padding-bottom: 6px;
+}
+
+.sn-form.ant-form .ant-form-item-label > label {
+  height: auto;
+  font-weight: 650;
+  line-height: 18px;
+}
+
+.sn-form.ant-form .ant-form-item-extra,
+.sn-form.ant-form .ant-form-item-explain {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.sn-legal-agreement-field {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: start;
+  gap: 0;
+}
+
+.sn-legal-agreement-field .ant-checkbox-wrapper {
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.sn-legal-agreement-copy {
+  min-width: 0;
+  padding-top: 12px;
+  color: var(--sn-text-secondary, #6e6e73);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sn-button {
+    transition:
+      color 100ms linear,
+      border-color 100ms linear,
+      background-color 100ms linear;
+  }
+
+}
+
+@media (prefers-contrast: more) {
+  [data-slot="button"]:focus-visible {
+    outline-color: currentColor;
+  }
+}

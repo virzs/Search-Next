@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
@@ -21,6 +20,7 @@ import {
   MacSettingsView,
 } from "../../components/macos-settings";
 import { useI18n } from "@/i18n";
+import { AppButton } from "@/components/ui";
 
 const resolveWallpaperName = (
   wallpaper: ReturnType<typeof useDesktopTheme>["personalization"]["wallpaper"],
@@ -104,12 +104,12 @@ const PersonalizationView = () => {
           title={t("ui.theme")}
           description={themeName}
           extra={
-            <Button
+            <AppButton
               size="small"
               onClick={() => navigate(personalizationRoute.path.root)}
             >
               {t("ui.manage")}
-            </Button>
+            </AppButton>
           }
         />
 
@@ -120,18 +120,18 @@ const PersonalizationView = () => {
           description={wallpaperName}
           extra={
             <div className="flex items-center gap-2">
-              <Button
+              <AppButton
                 size="small"
                 onClick={() => navigate(personalizationRoute.path.wallpaper)}
               >
                 {t("ui.manage")}
-              </Button>
-              <Button
+              </AppButton>
+              <AppButton
                 size="small"
                 onClick={() => navigate(personalizationRoute.path.my)}
               >
                 {t("ui.mine")}
-              </Button>
+              </AppButton>
             </div>
           }
         />

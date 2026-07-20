@@ -1,4 +1,4 @@
-import { App, Button, Form, Input, Skeleton } from "antd";
+import { App, Skeleton } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +10,7 @@ import {
 } from "../../components/macos-settings";
 import { settingsRoute } from "../../route-paths";
 import { accountSettingsPanelClassName } from "./styles";
+import { AppButton, AppForm, AppInput } from "@/components/ui";
 
 interface ProfileFormValues {
   username: string;
@@ -29,7 +30,7 @@ const ProfileSettingsView = () => {
   const { message } = App.useApp();
   const { user, loading, isAuthenticated, updateUser } = useAuth();
   const navigate = useNavigate();
-  const [form] = Form.useForm<ProfileFormValues>();
+  const [form] = AppForm.useForm<ProfileFormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
 
@@ -69,7 +70,7 @@ const ProfileSettingsView = () => {
       showPageHeader={false}
     >
       {loading || !user ? (
-        <div className="rounded-[14px] bg-[var(--sn-surface)] p-5" aria-busy="true">
+        <div className="rounded-[var(--sn-radius-surface)] bg-[var(--sn-surface)] p-5" aria-busy="true">
           <Skeleton active paragraph={{ rows: 5 }} />
         </div>
       ) : (
@@ -79,7 +80,7 @@ const ProfileSettingsView = () => {
               {t("ui.account.profileDescription")}
             </p>
 
-            <Form
+            <AppForm
               form={form}
               layout="vertical"
               requiredMark={false}
@@ -88,7 +89,7 @@ const ProfileSettingsView = () => {
                 setDirty(values.username?.trim() !== user.username);
               }}
             >
-              <Form.Item
+              <AppForm.Item
                 label={t("ui.username")}
                 name="username"
                 extra={t("ui.account.usernameHelp")}
@@ -105,21 +106,21 @@ const ProfileSettingsView = () => {
                   },
                 ]}
               >
-                <Input autoComplete="username" maxLength={20} />
-              </Form.Item>
+                <AppInput autoComplete="username" maxLength={20} />
+              </AppForm.Item>
 
               <div className="account-settings-actions">
-                <Button
-                  className="account-settings-action account-settings-action-primary"
+                <AppButton
+                  intent="primary"
+                  size="default"
                   htmlType="submit"
-                  shape="round"
                   loading={submitting}
                   disabled={!dirty}
                 >
                   {t("ui.account.saveProfile")}
-                </Button>
+                </AppButton>
               </div>
-            </Form>
+            </AppForm>
           </div>
         </MacSettingsSection>
       )}

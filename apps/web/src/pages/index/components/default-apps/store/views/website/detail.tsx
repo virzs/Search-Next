@@ -1,4 +1,4 @@
-import { Button, Image } from "antd";
+import { Image } from "antd";
 import { FC, useEffect, useRef } from "react";
 import { RiExternalLinkLine } from "@remixicon/react";
 import { DefaultAppView, useAppRouteContext } from "@/components";
@@ -7,6 +7,8 @@ import { storeRoute } from "../../route-paths";
 import { getWebsiteDomain, getWebsiteIconUrl, getWebsiteName, getWebsiteUrl } from "../../utils";
 import type { StoreOutletContext } from "../../index";
 import { useI18n } from "@/i18n";
+import { AppIconButton } from "@/components/ui";
+import StoreGetButton from "../../components/StoreGetButton";
 
 const WebsiteDetailView: FC = () => {
   const { t } = useI18n();
@@ -25,7 +27,7 @@ const WebsiteDetailView: FC = () => {
   if (!item) return null;
 
   const iconUrl = getWebsiteIconUrl(item);
-  const name = getWebsiteName(item);
+  const name = getWebsiteName(item) || t("ui.websites");
   const url = getWebsiteUrl(item);
   const domain = getWebsiteDomain(item);
   const tags = Array.isArray(item?.tags) ? item.tags : [];
@@ -36,16 +38,16 @@ const WebsiteDetailView: FC = () => {
       animate
       contentClassName="px-4 pb-8 pt-4"
     >
-      <div className="min-h-full rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
+      <div className="min-h-full rounded-[var(--sn-radius-panel)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
         <div className="mb-5 flex items-center gap-5 border-b border-[var(--sn-separator)] pb-5 max-[560px]:items-start">
           {iconUrl ? (
             <Image
-              className="h-[88px]! w-[88px]! rounded-[8px] bg-[var(--sn-surface-secondary)] object-cover"
+              className="h-[88px]! w-[88px]! rounded-[var(--sn-radius-surface)] bg-[var(--sn-surface-secondary)] object-cover"
               src={iconUrl}
               preview={false}
             />
           ) : (
-            <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center rounded-[8px] bg-[var(--sn-surface-secondary)] text-[36px] font-bold text-[var(--sn-text-tertiary)]">
+            <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center rounded-[var(--sn-radius-surface)] bg-[var(--sn-surface-secondary)] text-[36px] font-bold text-[var(--sn-text-tertiary)]">
               {name?.[0]?.toUpperCase()}
             </div>
           )}
@@ -68,7 +70,7 @@ const WebsiteDetailView: FC = () => {
                   return (
                     <span
                       key={label}
-                      className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[11px] font-medium text-[var(--sn-text-secondary)]"
+                      className="rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] px-3 py-1 text-[11px] font-medium text-[var(--sn-text-secondary)]"
                     >
                       {label}
                     </span>
@@ -79,17 +81,15 @@ const WebsiteDetailView: FC = () => {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <Button
-              type="primary"
-              shape="round"
-              className="h-8! px-5! font-semibold!"
+            <StoreGetButton
               onClick={() => onAddStoreItem?.({ kind: "website", site: item })}
             >
               {t("ui.get")}
-            </Button>
+            </StoreGetButton>
             {url ? (
-              <Button
-                shape="circle"
+              <AppIconButton
+                aria-label={`${name}: ${domain || url}`}
+                size="small"
                 icon={<RiExternalLinkLine size={18} />}
                 onClick={() => window.open(url, "_blank")}
               />

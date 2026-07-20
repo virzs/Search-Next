@@ -63,7 +63,7 @@ const LoadingOverlay: FC<LoadingOverlayProps> = ({
           transition={{ duration: 0.18, ease: "easeOut" }}
         >
           <MotionDiv
-            className="relative z-[1] flex min-w-[176px] flex-col items-center gap-3 rounded-[22px] border border-white/70 bg-white/80 px-7 py-6 shadow-[0_24px_70px_rgba(0,0,0,0.18)]"
+            className="relative z-[1] flex min-w-[176px] flex-col items-center gap-3 rounded-[var(--sn-radius-panel)] border border-white/70 bg-white/80 px-7 py-6 shadow-[0_24px_70px_rgba(0,0,0,0.18)]"
             style={{
               backdropFilter: "blur(28px) saturate(1.18)",
               boxShadow:

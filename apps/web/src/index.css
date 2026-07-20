@@ -3,9 +3,3 @@
 @import "@radix-ui/themes/styles.css";
 
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
-
-.ant-btn {
-    .ant-btn-icon {
-        font-size: 16px;
-    }
-}

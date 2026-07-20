@@ -1,5 +1,5 @@
 import { useRequest } from "ahooks";
-import { Button, Empty, Skeleton } from "antd";
+import { Empty, Skeleton } from "antd";
 import { FC, useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 import {
@@ -16,6 +16,7 @@ import {
   resolveAppDescription,
   resolveAppDisplayName,
 } from "@/i18n";
+import StoreGetButton from "../../../components/StoreGetButton";
 
 const CollectionArtwork: React.FC<{
   items: AppApiItem[];
@@ -23,7 +24,7 @@ const CollectionArtwork: React.FC<{
   getAppIconUrl: (app: AppApiItem) => string | null;
 }> = ({ items, accent, getAppIconUrl }) => (
   <div
-    className="grid h-28 w-28 shrink-0 grid-cols-3 gap-1.5 rounded-[8px] p-2.5"
+    className="grid h-28 w-28 shrink-0 grid-cols-3 gap-1.5 rounded-[var(--sn-radius-surface)] p-2.5"
     style={{ background: accent || "var(--sn-accent)" }}
   >
     {Array.from({ length: 9 }).map((_, idx) => {
@@ -32,7 +33,7 @@ const CollectionArtwork: React.FC<{
       return (
         <div
           key={idx}
-          className="flex items-center justify-center overflow-hidden rounded-[6px] bg-white/90"
+          className="flex items-center justify-center overflow-hidden rounded-[var(--sn-radius-compact)] bg-white/90"
         >
           {icon ? (
             <img src={icon} alt="" className="h-full w-full object-contain p-1.5" />
@@ -56,7 +57,7 @@ const AppListRow: React.FC<{
   const description = resolveAppDescription(item, language);
   return (
     <div className="flex items-center gap-3 border-b border-[var(--sn-separator)] py-3 last:border-b-0">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[var(--sn-surface-secondary)]">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)]">
         {icon ? (
           <img src={icon} alt={name} className="h-full w-full object-contain p-2.5" />
         ) : (
@@ -73,15 +74,11 @@ const AppListRow: React.FC<{
           </div>
         ) : null}
       </div>
-      <Button
-        type="primary"
-        size="small"
-        shape="round"
-        className="h-7! shrink-0 px-4! text-xs! font-bold!"
+      <StoreGetButton
         onClick={() => onAdd(item)}
       >
         {t("ui.get")}
-      </Button>
+      </StoreGetButton>
     </div>
   );
 };
@@ -152,7 +149,7 @@ const AppCollectionRoute: FC = () => {
       contentClassName="px-4 pb-6 pt-4"
     >
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex items-center justify-between gap-5 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)] max-[560px]:items-start">
+        <div className="mb-6 flex items-center justify-between gap-5 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)] max-[560px]:items-start">
           <div className="min-w-0">
             {activeCollection?.kicker ? (
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sn-accent)]">
@@ -183,12 +180,12 @@ const AppCollectionRoute: FC = () => {
         </div>
 
         {collectionAppsLoading ? (
-          <div className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4">
+          <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4">
             <Skeleton active avatar paragraph={{ rows: 5 }} />
           </div>
         ) : (
           <>
-            <div className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-4 shadow-[var(--sn-shadow)]">
+            <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-4 shadow-[var(--sn-shadow)]">
               {apps.map((item) => (
                 <AppListRow
                   key={item._id}

@@ -1,9 +1,6 @@
 import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import {
   App,
-  Button,
-  Form,
-  Input,
   Skeleton,
   theme as antdTheme,
   type InputRef,
@@ -30,6 +27,7 @@ import {
   dangerZoneClassName,
   deleteAccountModalClassName,
 } from "./styles";
+import { AppButton, AppForm, AppInput } from "@/components/ui";
 
 interface PasswordFormValues {
   currentPassword: string;
@@ -58,14 +56,14 @@ const SecuritySettingsView = () => {
   const { resolvedColorScheme } = useDesktopTheme();
   const { user, loading, isAuthenticated, clearSession } = useAuth();
   const navigate = useNavigate();
-  const [passwordForm] = Form.useForm<PasswordFormValues>();
-  const [deleteForm] = Form.useForm<DeleteFormValues>();
+  const [passwordForm] = AppForm.useForm<PasswordFormValues>();
+  const [deleteForm] = AppForm.useForm<DeleteFormValues>();
   const deletePasswordRef = useRef<InputRef>(null);
   const [changingPassword, setChangingPassword] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const deletePassword = Form.useWatch("currentPassword", deleteForm);
-  const deleteConfirmation = Form.useWatch("confirmation", deleteForm);
+  const deletePassword = AppForm.useWatch("currentPassword", deleteForm);
+  const deleteConfirmation = AppForm.useWatch("confirmation", deleteForm);
   const canDelete = Boolean(
     user && deletePassword && deleteConfirmation === user.username,
   );
@@ -149,7 +147,7 @@ const SecuritySettingsView = () => {
   if (loading || !user) {
     return (
       <MacSettingsView showPageHeader={false}>
-        <div className="rounded-[14px] bg-[var(--sn-surface)] p-5" aria-busy="true">
+        <div className="rounded-[var(--sn-radius-surface)] bg-[var(--sn-surface)] p-5" aria-busy="true">
           <Skeleton active paragraph={{ rows: 8 }} />
         </div>
       </MacSettingsView>
@@ -170,13 +168,13 @@ const SecuritySettingsView = () => {
             </div>
           </div>
 
-          <Form
+          <AppForm
             form={passwordForm}
             layout="vertical"
             requiredMark={false}
             onFinish={handlePasswordSubmit}
           >
-            <Form.Item
+            <AppForm.Item
               label={t("ui.account.currentPassword")}
               name="currentPassword"
               rules={[
@@ -186,14 +184,14 @@ const SecuritySettingsView = () => {
                 },
               ]}
             >
-              <Input.Password
+              <AppInput.Password
                 placeholder={t("ui.account.enterCurrentPassword")}
                 autoComplete="current-password"
                 iconRender={passwordVisibilityIcon}
               />
-            </Form.Item>
+            </AppForm.Item>
 
-            <Form.Item
+            <AppForm.Item
               label={t("ui.account.newPassword")}
               name="newPassword"
               extra={t("ui.account.passwordHelp")}
@@ -220,14 +218,14 @@ const SecuritySettingsView = () => {
                 }),
               ]}
             >
-              <Input.Password
+              <AppInput.Password
                 placeholder={t("ui.account.enterNewPassword")}
                 autoComplete="new-password"
                 iconRender={passwordVisibilityIcon}
               />
-            </Form.Item>
+            </AppForm.Item>
 
-            <Form.Item
+            <AppForm.Item
               className="account-settings-final-field"
               label={t("ui.confirmPassword")}
               name="confirmPassword"
@@ -246,24 +244,24 @@ const SecuritySettingsView = () => {
                 }),
               ]}
             >
-              <Input.Password
+              <AppInput.Password
                 placeholder={t("ui.confirmYourPassword")}
                 autoComplete="new-password"
                 iconRender={passwordVisibilityIcon}
               />
-            </Form.Item>
+            </AppForm.Item>
 
             <div className="account-settings-actions">
-              <Button
-                className="account-settings-action account-settings-action-primary"
+              <AppButton
+                intent="primary"
+                size="default"
                 htmlType="submit"
-                shape="round"
                 loading={changingPassword}
               >
                 {t("ui.account.updatePassword")}
-              </Button>
+              </AppButton>
             </div>
-          </Form>
+          </AppForm>
         </div>
       </MacSettingsSection>
 
@@ -274,14 +272,13 @@ const SecuritySettingsView = () => {
               <h2>{t("ui.account.deleteAccount")}</h2>
               <p>{t("ui.account.deleteAccountDescription")}</p>
             </div>
-            <Button
-              className="account-settings-action"
-              danger
-              shape="round"
+            <AppButton
+              intent="danger"
+              size="default"
               onClick={openDeleteModal}
             >
               {t("ui.account.deleteAccount")}
-            </Button>
+            </AppButton>
           </div>
         </div>
       </MacSettingsSection>
@@ -309,7 +306,7 @@ const SecuritySettingsView = () => {
             {t("ui.account.deleteConfirmDescription")} {" "}
             <strong>{user.username}</strong>
           </p>
-          <Form
+          <AppForm
             className="delete-account-form"
             form={deleteForm}
             layout="vertical"
@@ -317,7 +314,7 @@ const SecuritySettingsView = () => {
             onFinish={handleDeleteSubmit}
             aria-describedby="delete-account-description"
           >
-            <Form.Item
+            <AppForm.Item
               label={t("ui.account.currentPassword")}
               name="currentPassword"
               rules={[
@@ -327,14 +324,14 @@ const SecuritySettingsView = () => {
                 },
               ]}
             >
-              <Input.Password
+              <AppInput.Password
                 ref={deletePasswordRef}
                 placeholder={t("ui.account.enterCurrentPassword")}
                 autoComplete="current-password"
                 iconRender={passwordVisibilityIcon}
               />
-            </Form.Item>
-            <Form.Item
+            </AppForm.Item>
+            <AppForm.Item
               className="delete-account-confirmation-field"
               label={t("ui.account.confirmUsername")}
               name="confirmation"
@@ -355,31 +352,30 @@ const SecuritySettingsView = () => {
                 },
               ]}
             >
-              <Input
+              <AppInput
                 placeholder={t("ui.account.enterUsernameToConfirm")}
                 autoComplete="off"
               />
-            </Form.Item>
+            </AppForm.Item>
             <div className="delete-account-actions">
-              <Button
-                shape="round"
+              <AppButton
+                size="default"
                 disabled={deleting}
                 onClick={() => setDeleteOpen(false)}
               >
                 {t("ui.cancel")}
-              </Button>
-              <Button
-                danger
-                type="primary"
-                shape="round"
+              </AppButton>
+              <AppButton
+                intent="danger"
+                size="default"
                 htmlType="submit"
                 loading={deleting}
                 disabled={!canDelete}
               >
                 {t("ui.account.deletePermanently")}
-              </Button>
+              </AppButton>
             </div>
-          </Form>
+          </AppForm>
         </div>
       </DesktopNextBaseModal>
     </MacSettingsView>

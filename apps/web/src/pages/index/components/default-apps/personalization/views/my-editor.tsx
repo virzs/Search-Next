@@ -1,6 +1,13 @@
 import { AppSegmented, DefaultAppView } from "@/components";
 import { useEffect, useMemo, useState } from "react";
-import { App, Button, Card, ColorPicker, Form, Input, Slider, Space } from "antd";
+import {
+  AppButton,
+  AppColorPicker,
+  AppForm,
+  AppInput,
+  AppSlider,
+} from "@/components/ui";
+import { App, Card, Space } from "antd";
 import { useNavigate, useParams } from "react-router";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
@@ -60,9 +67,9 @@ const ThemeMyEditorView = () => {
   const [items, setItems] = useState<MyWallpaperItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [type, setType] = useState<"gradient" | "image">("gradient");
-  const [form] = Form.useForm<{ name: string; url?: string }>();
-  const watchedName = Form.useWatch("name", form);
-  const watchedUrl = Form.useWatch("url", form);
+  const [form] = AppForm.useForm<{ name: string; url?: string }>();
+  const watchedName = AppForm.useWatch("name", form);
+  const watchedUrl = AppForm.useWatch("url", form);
 
   const [gradientStart, setGradientStart] = useState("#1677ff");
   const [gradientEnd, setGradientEnd] = useState("#fa541c");
@@ -257,7 +264,7 @@ const ThemeMyEditorView = () => {
     if (type === "gradient") {
       return (
         <div
-          className="aspect-video w-full overflow-hidden rounded-[8px] border"
+          className="aspect-video w-full overflow-hidden rounded-[var(--sn-radius-surface)] border"
           style={{
             background: gradientCss,
             borderColor: "rgba(0,0,0,0.08)",
@@ -270,7 +277,7 @@ const ThemeMyEditorView = () => {
     const safeUrl = url.replace(/"/g, '\\"');
     return (
       <div
-        className="aspect-video w-full overflow-hidden rounded-[8px] border"
+        className="aspect-video w-full overflow-hidden rounded-[var(--sn-radius-surface)] border"
         style={{
           borderColor: "rgba(0,0,0,0.08)",
           backgroundColor: "rgba(0,0,0,0.06)",
@@ -290,25 +297,36 @@ const ThemeMyEditorView = () => {
       headerRight={
         <Space size={8}>
           {isEdit ? (
-            <Button danger onClick={handleDelete}>
+            <AppButton
+              intent="secondary"
+              danger
+              size="default"
+              onClick={handleDelete}
+            >
               {t("ui.delete")}
-            </Button>
+            </AppButton>
           ) : null}
-          <Button onClick={handleSave}>{t("ui.save")}</Button>
-          <Button
-            type="primary"
-            shape="round"
+          <AppButton
+            intent="secondary"
+            size="default"
+            onClick={handleSave}
+          >
+            {t("ui.save")}
+          </AppButton>
+          <AppButton
+            intent="primary"
+            size="default"
             disabled={!isEdit || !isReadyToApply || isDirty || applied}
             onClick={handleApply}
           >
             {applied ? t("ui.applied") : t("action.apply")}
-          </Button>
+          </AppButton>
         </Space>
       }
       contentClassName="px-4 pb-8 pt-4"
     >
       <Card
-        className="rounded-[8px] border-[var(--sn-separator)]! bg-[var(--sn-surface)]! shadow-[var(--sn-shadow)]!"
+        className="rounded-[var(--sn-radius-surface)] border-[var(--sn-separator)]! bg-[var(--sn-surface)]! shadow-[var(--sn-shadow)]!"
         styles={{ body: { padding: 16 } }}
       >
         <div className="flex items-center justify-between gap-3">
@@ -325,21 +343,21 @@ const ThemeMyEditorView = () => {
         </div>
 
         <div className="mt-4">
-          <Form form={form} layout="vertical">
-            <Form.Item
+          <AppForm form={form} layout="vertical">
+            <AppForm.Item
               name="name"
               label={t("ui.name")}
               rules={[{ required: true, message: t("ui.enterAName") }]}
             >
-              <Input placeholder={t("ui.exampleMyAurora")} />
-            </Form.Item>
+              <AppInput placeholder={t("ui.exampleMyAurora")} />
+            </AppForm.Item>
 
             {type === "gradient" ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <div className="mb-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">{t("ui.startColor")}</div>
-                    <ColorPicker
+                    <AppColorPicker
                       value={gradientStart}
                       onChange={(color, hex) => setGradientStart(colorToHex(color, hex))}
                       showText
@@ -350,7 +368,7 @@ const ThemeMyEditorView = () => {
                   </div>
                   <div>
                     <div className="mb-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">{t("ui.endColor")}</div>
-                    <ColorPicker
+                    <AppColorPicker
                       value={gradientEnd}
                       onChange={(color, hex) => setGradientEnd(colorToHex(color, hex))}
                       showText
@@ -363,7 +381,7 @@ const ThemeMyEditorView = () => {
 
                 <div className="mt-4">
                   <div className="mb-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">{t("ui.angle")}</div>
-                  <Slider
+                  <AppSlider
                     min={0}
                     max={360}
                     value={gradientAngle}
@@ -372,7 +390,7 @@ const ThemeMyEditorView = () => {
                 </div>
               </>
             ) : (
-              <Form.Item
+              <AppForm.Item
                 name="url"
                 label={t("ui.imageURL")}
                 rules={[
@@ -387,10 +405,10 @@ const ThemeMyEditorView = () => {
                   },
                 ]}
               >
-                <Input placeholder="https://..." />
-              </Form.Item>
+                <AppInput placeholder="https://..." />
+              </AppForm.Item>
             )}
-          </Form>
+          </AppForm>
         </div>
 
         <div className="mt-4">{previewNode}</div>

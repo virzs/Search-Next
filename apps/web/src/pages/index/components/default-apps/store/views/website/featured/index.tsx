@@ -1,4 +1,4 @@
-import { Button, Empty, Skeleton } from "antd";
+import { Empty, Skeleton } from "antd";
 import type React from "react";
 import StoreHeroCard, {
   StoreHeroArtwork,
@@ -6,6 +6,7 @@ import StoreHeroCard, {
 import { getWebsiteIconUrl, getWebsiteId, getWebsiteName } from "../../../utils";
 import WebsiteCard from "../../../components/WebsiteCard";
 import { useI18n } from "@/i18n";
+import { AppButton } from "@/components/ui";
 
 export interface FeaturedViewProps {
   featuredHomeScrollRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -23,7 +24,11 @@ const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
         <div key={idx} className="w-[252px] shrink-0 snap-start max-[640px]:w-[calc(100vw-176px)]">
           <Skeleton.Image
             active
-            style={{ width: 252, height: 76, borderRadius: 8 }}
+            style={{
+              width: 252,
+              height: 76,
+              borderRadius: "var(--sn-radius-surface)",
+            }}
           />
           <div className="mt-2 px-1">
             <Skeleton
@@ -41,13 +46,13 @@ const SkeletonWebsiteCardRow: React.FC<{ count: number }> = ({ count }) => {
 const CollectionArtwork = ({ items }: { items: any[] }) => {
   const icons = items.map(getWebsiteIconUrl).filter(Boolean).slice(0, 6);
   return (
-    <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[8px] bg-white/15 p-2">
+    <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[var(--sn-radius-surface)] bg-white/15 p-2">
       {Array.from({ length: 4 }).map((_, idx) => {
         const icon = icons[idx];
         return (
           <div
             key={idx}
-            className="flex items-center justify-center overflow-hidden rounded-[7px] bg-white/85"
+            className="flex items-center justify-center overflow-hidden rounded-[var(--sn-radius-compact)] bg-white/85"
           >
             {icon ? (
               <img src={icon} alt="" className="h-full w-full object-cover" />
@@ -74,7 +79,7 @@ const FeaturedCollectionCard = ({
     <button
       type="button"
       onClick={() => onOpen(collection._id)}
-      className="group flex min-h-[168px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[8px] border-0 p-5 text-left shadow-[var(--sn-shadow)] transition hover:-translate-y-px active:translate-y-0"
+      className="group flex min-h-[168px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[var(--sn-radius-panel)] border-0 p-5 text-left shadow-[var(--sn-shadow)] transition hover:-translate-y-px active:translate-y-0"
       style={{
         background: `linear-gradient(135deg, ${accent}, #0f172a)`,
       }}
@@ -146,7 +151,7 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                     title={{ width: 160 }}
                     paragraph={{ rows: 1, width: 260 }}
                   />
-                  <Skeleton.Button active size="small" shape="round" />
+                  <Skeleton.Button active size="small" />
                 </div>
                 <SkeletonWebsiteCardRow count={4} />
               </div>
@@ -187,13 +192,13 @@ const FeaturedView: React.FC<FeaturedViewProps> = ({
                             t("ui.storeItemCount", { count: c.total ?? (c.websites || []).length })}
                         </div>
                       </div>
-                      <Button
-                        type="link"
-                        className="px-0! font-semibold! text-[var(--sn-accent)]!"
+                      <AppButton
+                        intent="link"
+                        size="small"
                         onClick={() => onOpenCollection(c._id)}
                       >
                         {t("ui.viewMore")}
-                      </Button>
+                      </AppButton>
                     </div>
                     <div className="-mx-1 flex snap-x snap-mandatory flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
                       {(c.previewWebsites || c.websites || []).map((item: any) => (

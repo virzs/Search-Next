@@ -38,9 +38,9 @@ const AboutView = () => {
 
   return (
     <MacSettingsView>
-      <div className="rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
+      <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)]">
         <div className="flex items-center gap-4 max-[640px]:flex-col max-[640px]:items-start">
-          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[14px] bg-[var(--sn-accent)] text-3xl font-bold text-white">
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[var(--sn-radius-surface)] bg-[var(--sn-accent)] text-3xl font-bold text-white">
             S
           </div>
           <div className="min-w-0 flex-1 text-left max-[640px]:w-full">
@@ -48,13 +48,13 @@ const AboutView = () => {
               {appInfo.name}
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
-              <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
+              <span className="rounded-[var(--sn-radius-round)] bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 {versionLabel}
               </span>
-              <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
+              <span className="rounded-[var(--sn-radius-round)] bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 {t("ui.beta")}
               </span>
-              <span className="rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
+              <span className="rounded-[var(--sn-radius-round)] bg-[var(--sn-surface-secondary)] px-3 py-1 text-[12px] font-medium text-[var(--sn-text-secondary)]">
                 {appInfo.license}
               </span>
             </div>
@@ -158,7 +158,7 @@ const AboutView = () => {
         />
       </MacSettingsSection>
 
-      <div className="rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 text-center shadow-[var(--sn-shadow)]">
+      <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 text-center shadow-[var(--sn-shadow)]">
         <div className="text-[17px] font-semibold leading-[22px] text-[var(--sn-text)]">{t("ui.specialThanks")}</div>
         <div className="mt-2 text-[13px] leading-5 text-[var(--sn-text-secondary)]">
           {t("ui.about.thanksBody")}

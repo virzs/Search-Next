@@ -1,7 +1,8 @@
-import { Button, Empty } from "antd";
+import { Empty } from "antd";
 import { useLocation, useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
 import { useI18n } from "@/i18n";
+import { AppButton } from "@/components/ui";
 
 const StoreNotFoundRoute = () => {
   const { t } = useI18n();
@@ -13,12 +14,13 @@ const StoreNotFoundRoute = () => {
       <div className="w-full max-w-md">
         <Empty description={t("ui.pageNotFound")} />
         <div className="mt-4 flex justify-center">
-          <Button
-            type="primary"
+          <AppButton
+            intent="primary"
+            size="default"
             onClick={() => navigate(storeRoute.path.website.root, { replace: true })}
           >
             {t("ui.backToAppStore")}
-          </Button>
+          </AppButton>
         </div>
         <div className="mt-3 text-center text-xs text-gray-500 break-all">
           {location.pathname}

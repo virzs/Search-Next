@@ -4,7 +4,6 @@ import {
   desktopNextThemeDark,
   desktopNextThemeLight,
 } from "zs_library";
-import "zs_library/style.css";
 import type {
   ContextMenuActionPayload,
   DataTypeMenuConfigMap,
@@ -43,7 +42,8 @@ import {
   type DesktopSortItem,
 } from "@search-next/desktop";
 // import SearchWithAI from "../../components/ai-search";
-import { App, Button, Checkbox } from "antd";
+import { App } from "antd";
+import { AppButton, AppCheckbox } from "@/components/ui";
 import {
   getActiveThemeConfigs,
   getDefaultUserConfig,
@@ -969,7 +969,7 @@ function Index() {
         title={name}
         type="button"
         className={cx(
-          "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[16px] border-0 p-0",
+          "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[var(--sn-radius-panel)] border-0 p-0",
           css`
             position: relative;
             color: ${iconColor ?? "#fff"};
@@ -1094,7 +1094,7 @@ function Index() {
 
       if (availability.status !== "available") {
         return (
-          <div className="h-14 w-14 overflow-visible rounded-[16px]">
+          <div className="h-14 w-14 overflow-visible rounded-[var(--sn-radius-panel)]">
             {renderAppAvailabilityPlaceholder({
               status: availability.status,
               name,
@@ -1109,7 +1109,7 @@ function Index() {
           type="button"
           title={name}
           className={cx(
-            "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[16px] border-0 p-0",
+            "flex h-14 w-14 items-center justify-center overflow-hidden rounded-[var(--sn-radius-panel)] border-0 p-0",
             css`
               position: relative;
               background: rgba(255, 255, 255, 0.16);
@@ -1649,9 +1649,9 @@ function Index() {
           }}
         >
           <div className="flex flex-col items-center text-center text-[#1d1d1f] dark:text-[#f5f5f7]">
-            <div className="relative flex h-[78px] w-[78px] items-center justify-center overflow-visible rounded-[22px] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
+            <div className="relative flex h-[78px] w-[78px] items-center justify-center overflow-visible rounded-[var(--sn-radius-panel)] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_14px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_36px_rgba(0,0,0,0.32)]">
               {availabilityModal.icon ? (
-                <div className="relative h-[62px] w-[62px] overflow-hidden rounded-[18px]">
+                <div className="relative h-[62px] w-[62px] overflow-hidden rounded-[var(--sn-radius-panel)]">
                   <DesktopImageIcon
                     src={availabilityModal.icon}
                     name={availabilityModal.name || t("ui.app")}
@@ -1685,13 +1685,14 @@ function Index() {
                   : "ui.appCheckingMessage",
               )}
             </div>
-            <button
-              type="button"
+            <AppButton
+              intent="primary"
+              size="default"
               onClick={closeAvailabilityModal}
-              className="mt-6 rounded-full border border-white/20 bg-[#007aff] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(0,122,255,0.24)] transition hover:bg-[#0a84ff] active:scale-[0.98]"
+              className="mt-6"
             >
               {t("ui.close")}
-            </button>
+            </AppButton>
           </div>
         </DesktopNextBaseModal>
       )}
@@ -1734,7 +1735,7 @@ function Index() {
         >
           <div className="text-[#1d1d1f] dark:text-[#f5f5f7]">
             <div className="flex items-start gap-4">
-              <div className="relative flex h-[64px] w-[64px] shrink-0 items-center justify-center overflow-hidden rounded-[18px] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_26px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e]">
+              <div className="relative flex h-[64px] w-[64px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-panel)] border border-black/5 bg-[#f2f2f7] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_26px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#2c2c2e]">
                 {removeAppTarget.icon ? (
                   <DesktopImageIcon
                     src={removeAppTarget.icon}
@@ -1757,8 +1758,8 @@ function Index() {
               </div>
             </div>
 
-            <div className="mt-5 rounded-[14px] border border-black/[0.06] bg-black/[0.035] px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.06]">
-              <Checkbox
+            <div className="mt-5 rounded-[var(--sn-radius-surface)] border border-black/[0.06] bg-black/[0.035] px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.06]">
+              <AppCheckbox
                 checked={deleteAppData}
                 disabled={removeAppTarget.storageItemCount === 0}
                 onChange={(event) => setDeleteAppData(event.target.checked)}
@@ -1766,7 +1767,7 @@ function Index() {
                 <span className="font-semibold text-[#1d1d1f] dark:text-[#f5f5f7]">
                   {t("ui.deleteAppDataTogether")}
                 </span>
-              </Checkbox>
+              </AppCheckbox>
               <div className="mt-1 pl-6 text-xs leading-[18px] text-[#6e6e73] dark:text-[#aeaeb2]">
                 {removeAppTarget.storageItemCount > 0
                   ? t("ui.appStorageSummary", {
@@ -1780,7 +1781,7 @@ function Index() {
             </div>
 
             {deleteAppData && removeAppTarget.otherInstanceCount > 0 ? (
-              <div className="mt-3 rounded-[12px] bg-[#ff3b30]/10 px-3.5 py-2.5 text-xs font-medium leading-[18px] text-[#c81e1e] dark:text-[#ff6961]">
+              <div className="mt-3 rounded-[var(--sn-radius-surface)] bg-[#ff3b30]/10 px-3.5 py-2.5 text-xs font-medium leading-[18px] text-[#c81e1e] dark:text-[#ff6961]">
                 {t("ui.sharedAppDataWarning", {
                   count: removeAppTarget.otherInstanceCount,
                 })}
@@ -1788,17 +1789,20 @@ function Index() {
             ) : null}
 
             <div className="mt-6 flex justify-end gap-2">
-              <Button autoFocus shape="round" onClick={cancelRemoveApp}>
+              <AppButton
+                autoFocus
+                size="default"
+                onClick={cancelRemoveApp}
+              >
                 {t("ui.cancel")}
-              </Button>
-              <Button
-                danger
-                type="primary"
-                shape="round"
+              </AppButton>
+              <AppButton
+                intent="danger"
+                size="default"
                 onClick={confirmRemoveApp}
               >
                 {t("ui.removeApp")}
-              </Button>
+              </AppButton>
             </div>
           </div>
         </DesktopNextBaseModal>

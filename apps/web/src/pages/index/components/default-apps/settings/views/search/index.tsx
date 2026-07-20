@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { App as AntdApp, Button, Popconfirm, Switch } from "antd";
+import { App as AntdApp, Popconfirm } from "antd";
 import {
   RiApps2Line,
   RiCommandLine,
@@ -26,9 +26,11 @@ import {
 import {
   MacSettingsRow,
   MacSettingsSection,
+  MacSettingsSwitchRow,
   MacSettingsView,
 } from "../../components/macos-settings";
 import { useI18n } from "@/i18n";
+import { AppButton, AppIconButton } from "@/components/ui";
 
 const SearchSettingsView = () => {
   const { t } = useI18n();
@@ -116,34 +118,26 @@ const SearchSettingsView = () => {
   return (
     <MacSettingsView>
       <MacSettingsSection title={t("ui.search")}>
-        <MacSettingsRow
+        <MacSettingsSwitchRow
           icon={<RiSearchLine size={16} />}
           iconTone="blue"
           title={t("ui.desktopSearchBar")}
           description={t("ui.search.desktopBarDescription")}
-          extra={
-            <Switch
-              checked={preferences.showDesktopSearchBar}
-              onChange={(checked) =>
-                setPreference("showDesktopSearchBar", checked)
-              }
-            />
+          checked={preferences.showDesktopSearchBar}
+          onChange={(checked) =>
+            setPreference("showDesktopSearchBar", checked)
           }
         />
-        <MacSettingsRow
+        <MacSettingsSwitchRow
           icon={<RiKeyboardLine size={16} />}
           iconTone="purple"
           title={t("ui.keyboardShortcut")}
           description={t("ui.openSpotlightSearchWithShortcut", {
             shortcut: formatUnifiedSearchShortcut(preferences.spotlightShortcut),
           })}
-          extra={
-            <Switch
-              checked={preferences.enableSpotlightShortcut}
-              onChange={(checked) =>
-                setPreference("enableSpotlightShortcut", checked)
-              }
-            />
+          checked={preferences.enableSpotlightShortcut}
+          onChange={(checked) =>
+            setPreference("enableSpotlightShortcut", checked)
           }
         />
         <MacSettingsRow
@@ -176,9 +170,9 @@ const SearchSettingsView = () => {
                 okButtonProps={{ danger: true }}
                 onConfirm={clearHistory}
               >
-                <Button size="small" type="text" danger>
+                <AppButton size="small" intent="quiet" danger>
                   {t("ui.clearAll")}
-                </Button>
+                </AppButton>
               </Popconfirm>
             ) : null}
           </span>
@@ -193,11 +187,10 @@ const SearchSettingsView = () => {
               title={item.title}
               description={item.description || getSearchHistoryKindLabel(item, t)}
               extra={
-                <Button
-                  type="text"
+                <AppIconButton
+                  intent="quiet"
                   danger
                   size="small"
-                  shape="circle"
                   aria-label={t("ui.deleteTitle", { title: item.title })}
                   icon={<RiDeleteBinLine size={15} />}
                   onClick={() => removeHistoryItem(item.id)}
@@ -269,8 +262,8 @@ const ShortcutEditorControl = ({
       data-unified-search-shortcut-editor
       className={
         recording
-          ? "inline-flex h-8 min-w-[236px] cursor-text items-center gap-3 rounded-lg border border-[#007aff] bg-[#f5faff] px-2 text-left shadow-[0_0_0_3px_rgba(0,122,255,0.14)] outline-none transition dark:bg-[#0a84ff]/10"
-          : "inline-flex h-8 w-fit cursor-text items-center rounded-lg border border-[rgba(60,60,67,0.18)] bg-white px-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] outline-none transition hover:border-[#007aff]/55 hover:bg-[#f8fbff] focus-visible:border-[#007aff] focus-visible:shadow-[0_0_0_3px_rgba(0,122,255,0.14)] dark:border-white/15 dark:bg-white/[0.07] dark:hover:border-[#64a9ff]/55 dark:hover:bg-white/[0.1]"
+          ? "inline-flex h-8 min-w-[236px] cursor-text items-center gap-3 rounded-[var(--sn-radius-control)] border border-[#007aff] bg-[#f5faff] px-2 text-left shadow-[0_0_0_3px_rgba(0,122,255,0.14)] outline-none transition dark:bg-[#0a84ff]/10"
+          : "inline-flex h-8 w-fit cursor-text items-center rounded-[var(--sn-radius-control)] border border-[rgba(60,60,67,0.18)] bg-white px-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] outline-none transition hover:border-[#007aff]/55 hover:bg-[#f8fbff] focus-visible:border-[#007aff] focus-visible:shadow-[0_0_0_3px_rgba(0,122,255,0.14)] dark:border-white/15 dark:bg-white/[0.07] dark:hover:border-[#64a9ff]/55 dark:hover:bg-white/[0.1]"
       }
       onClick={(event) => {
         event.stopPropagation();
@@ -306,8 +299,8 @@ const ShortcutKeycaps = ({
         key={`${part}-${index}`}
         className={
           active
-            ? "grid h-6 min-w-6 place-items-center rounded-md bg-[#007aff]/10 px-1.5 text-[12px] font-bold not-italic text-[#007aff] dark:bg-[#0a84ff]/20 dark:text-[#64a9ff]"
-            : "grid h-6 min-w-6 place-items-center rounded-md border border-[rgba(60,60,67,0.12)] bg-[#f5f5f7] px-1.5 text-center text-[12px] font-bold not-italic text-[#424245] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-white/10 dark:bg-white/10 dark:text-[#f5f5f7]"
+            ? "grid h-6 min-w-6 place-items-center rounded-[var(--sn-radius-compact)] bg-[#007aff]/10 px-1.5 text-[12px] font-bold not-italic text-[#007aff] dark:bg-[#0a84ff]/20 dark:text-[#64a9ff]"
+            : "grid h-6 min-w-6 place-items-center rounded-[var(--sn-radius-compact)] border border-[rgba(60,60,67,0.12)] bg-[#f5f5f7] px-1.5 text-center text-[12px] font-bold not-italic text-[#424245] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-white/10 dark:bg-white/10 dark:text-[#f5f5f7]"
         }
       >
         {part}

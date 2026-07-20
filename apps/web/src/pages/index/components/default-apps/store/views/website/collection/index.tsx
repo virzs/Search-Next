@@ -1,5 +1,5 @@
 import { useRequest } from "ahooks";
-import { Button, Empty, Skeleton } from "antd";
+import { Empty, Skeleton } from "antd";
 import { FC, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -16,13 +16,21 @@ import {
   getWebsiteId,
   getWebsiteName,
 } from "../../../utils";
+import StoreGetButton from "../../../components/StoreGetButton";
 
 const SkeletonWebsiteGrid: React.FC<{ count: number }> = ({ count }) => {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {Array.from({ length: count }).map((_, idx) => (
-        <div key={idx} className="overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)]">
-          <Skeleton.Image active style={{ width: 52, height: 52, borderRadius: 12 }} />
+        <div key={idx} className="overflow-hidden rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)]">
+          <Skeleton.Image
+            active
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: "var(--sn-radius-surface)",
+            }}
+          />
           <div className="mt-2 px-2">
             <Skeleton
               active
@@ -43,13 +51,13 @@ const CollectionArtwork: React.FC<{ items: any[]; accent?: string }> = ({
   const icons = items.map(getWebsiteIconUrl).filter(Boolean).slice(0, 9);
   return (
     <div
-      className="grid h-28 w-28 shrink-0 grid-cols-3 gap-1.5 rounded-[8px] p-2.5"
+      className="grid h-28 w-28 shrink-0 grid-cols-3 gap-1.5 rounded-[var(--sn-radius-surface)] p-2.5"
       style={{ background: accent || "var(--sn-accent)" }}
     >
       {Array.from({ length: 9 }).map((_, idx) => (
         <div
           key={idx}
-          className="flex items-center justify-center overflow-hidden rounded-[6px] bg-white/90"
+          className="flex items-center justify-center overflow-hidden rounded-[var(--sn-radius-compact)] bg-white/90"
         >
           {icons[idx] ? (
             <img src={icons[idx]} alt="" className="h-full w-full object-cover" />
@@ -69,45 +77,42 @@ const WebsiteListRow: React.FC<{
 }> = ({ item, onAdd, onOpen }) => {
   const { t } = useI18n();
   const icon = getWebsiteIconUrl(item);
-  const name = getWebsiteName(item);
+  const name = getWebsiteName(item) || t("ui.websites");
   const domain = getWebsiteDomain(item);
   const category = item?.classify?.name || item?.category?.name || item?.categoryName;
   return (
-    <div
-      className="group flex cursor-pointer items-center gap-3 border-b border-[var(--sn-separator)] py-3 last:border-b-0"
-      onClick={() => onOpen(item)}
-    >
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[var(--sn-surface-secondary)]">
-        {icon ? (
-          <img src={icon} alt={name} className="h-full w-full object-cover" />
-        ) : (
-          <span className="text-lg font-extrabold text-gray-400">
-            {name?.[0]?.toUpperCase()}
-          </span>
-        )}
-      </div>
-      <div className="min-w-0 flex-1 text-left">
-        <div className="truncate text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
-          {name}
+    <div className="group flex items-center gap-3 border-b border-[var(--sn-separator)] py-3 last:border-b-0">
+      <button
+        type="button"
+        aria-label={name}
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[var(--sn-radius-control)] border-0 bg-transparent p-0 text-left text-inherit focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sn-accent)]"
+        onClick={() => onOpen(item)}
+      >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)]">
+          {icon ? (
+            <img src={icon} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-lg font-extrabold text-gray-400">
+              {name?.[0]?.toUpperCase()}
+            </span>
+          )}
         </div>
-        {category || domain ? (
-          <div className="mt-0.5 truncate text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
-            {category || domain}
+        <div className="min-w-0 flex-1 text-left">
+          <div className="truncate text-[14px] font-semibold leading-5 text-[var(--sn-text)]">
+            {name}
           </div>
-        ) : null}
-      </div>
-      <Button
-        type="primary"
-        size="small"
-        shape="round"
-        className="h-7! shrink-0 px-4! text-xs! font-bold!"
-        onClick={(e) => {
-          e.stopPropagation();
-          onAdd(item);
-        }}
+          {category || domain ? (
+            <div className="mt-0.5 truncate text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
+              {category || domain}
+            </div>
+          ) : null}
+        </div>
+      </button>
+      <StoreGetButton
+        onClick={() => onAdd(item)}
       >
         {t("ui.get")}
-      </Button>
+      </StoreGetButton>
     </div>
   );
 };
@@ -178,7 +183,7 @@ const WebsiteCollectionRoute: FC = () => {
       contentClassName="px-4 pb-6 pt-4"
     >
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex items-center justify-between gap-5 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)] max-[560px]:items-start">
+        <div className="mb-6 flex items-center justify-between gap-5 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5 shadow-[var(--sn-shadow)] max-[560px]:items-start">
           <div className="min-w-0">
             {activeCollection?.kicker ? (
               <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sn-accent)]">
@@ -211,7 +216,7 @@ const WebsiteCollectionRoute: FC = () => {
           <SkeletonWebsiteGrid count={6} />
         ) : (
           <>
-            <div className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-4 shadow-[var(--sn-shadow)]">
+            <div className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] px-4 shadow-[var(--sn-shadow)]">
               {activeCollectionWebsites.map((item: any) => (
                 <WebsiteListRow
                   key={getWebsiteId(item)}

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Button,
   Empty,
   Tag,
   App,
@@ -20,6 +19,7 @@ import DevAppModal, { toSizeConfigs } from "./dev-app-modal";
 import type { DevAppFormValues } from "./dev-app-modal";
 import type { StoreOutletContext } from "../../index";
 import { useI18n } from "@/i18n";
+import { AppButton, AppIconButton } from "@/components/ui";
 
 const DevView: React.FC = () => {
   const { t } = useI18n();
@@ -93,15 +93,14 @@ const DevView: React.FC = () => {
         <div className="text-[28px] font-bold leading-[34px] tracking-normal text-[var(--sn-text)]">
           {t("ui.developer")}
         </div>
-        <Button
-          type="primary"
+        <AppButton
+          intent="primary"
+          size="default"
           icon={<RiAddLine size={16} />}
-          shape="round"
-          className="font-semibold!"
           onClick={openAddModal}
         >
           {t("ui.add")}
-        </Button>
+        </AppButton>
       </div>
 
       <div className="shrink-0">
@@ -122,10 +121,10 @@ const DevView: React.FC = () => {
             return (
               <div
                 key={dw.id}
-                className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]"
+                className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)]"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#30d158,#00c7be)] text-white">
+                  <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[var(--sn-radius-control)] bg-[linear-gradient(135deg,#30d158,#00c7be)] text-white">
                     <RiCodeSSlashLine size={22} />
                   </div>
                   <div className="min-w-0 grow">
@@ -139,34 +138,31 @@ const DevView: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex shrink-0 flex-wrap justify-end gap-2">
-                        <Button
+                        <AppIconButton
                           size="small"
-                          shape="circle"
                           icon={<RiEditLine size={14} />}
                           aria-label={t("ui.edit")}
                           onClick={() => openEditModal(dw)}
                         />
-                        <Button
-                          type="primary"
+                        <AppButton
+                          intent="primary"
                           size="small"
-                          shape="round"
-                          className="font-semibold!"
                           onClick={() =>
                             onAddStoreItem?.({ kind: "app", appId: dw.id })
                           }
                         >
                           {t("ui.addToDesktop")}
-                        </Button>
+                        </AppButton>
                         <Popconfirm
                           title={t("ui.deleteThisApp")}
                           onConfirm={() => handleRemove(dw.id)}
                           okText={t("ui.delete")}
                           cancelText={t("ui.cancel")}
                         >
-                          <Button
+                          <AppIconButton
+                            intent="quiet"
                             danger
                             size="small"
-                            shape="circle"
                             icon={<RiDeleteBinLine size={14} />}
                             aria-label={t("ui.delete")}
                           />
@@ -176,7 +172,10 @@ const DevView: React.FC = () => {
 
                     <div className="mt-3 flex items-center gap-2 text-xs flex-wrap">
                       {dw.sizeConfigs.map((sc) => (
-                        <Tag key={sc.id} className="rounded-full! text-xs! m-0!">
+                        <Tag
+                          key={sc.id}
+                          className="m-0! rounded-[var(--sn-radius-control)]! text-xs!"
+                        >
                           {sc.name || sc.id}
                         </Tag>
                       ))}

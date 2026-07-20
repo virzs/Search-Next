@@ -9,6 +9,8 @@ import enUS from "antd/locale/en_US";
 import { ZsI18nProvider } from "zs_library";
 
 import "./index.css";
+import "zs_library/style.css";
+import "./theme/foundations.css";
 import DesktopNextIndex from "./pages/index";
 import { App, ConfigProvider } from "antd";
 import { createThemeConfig } from "./theme/config";
@@ -20,6 +22,9 @@ import { AppProvider } from "./contexts/AppContext";
 import defaultAppRoutes from "./pages/index/components/default-apps/routes";
 import useDesktopTheme from "./hooks/useDesktopTheme";
 import { i18n, useI18n, type AppLanguage } from "./i18n";
+import { installAppThemeCssVariables } from "./theme/tokens";
+
+installAppThemeCssVariables();
 
 const router = createBrowserRouter([
   {

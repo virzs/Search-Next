@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRequest } from "ahooks";
-import { Button, Empty, Pagination, Skeleton, Spin, Tag } from "antd";
+import { Empty, Pagination, Skeleton, Spin, Tag } from "antd";
 import { RiApps2Line } from "@remixicon/react";
 import { AppCategoryRail, DefaultAppView } from "@/components";
+import { AppButton } from "@/components/ui";
 import { useApp } from "@/hooks/useApp";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import type {
@@ -15,7 +16,6 @@ import { toBackendAssetUrl } from "@/utils/utils";
 import StoreHeroCard, {
   StoreHeroArtwork,
 } from "../../components/StoreHeroCard";
-import { css } from "@emotion/css";
 import {
   getTabsAppClassifyPublicLevel1,
   getTabsAppCollectionPublicList,
@@ -29,21 +29,9 @@ import {
 } from "@/i18n";
 import { useNavigate } from "react-router";
 import { storeRoute } from "../../route-paths";
+import StoreGetButton from "../../components/StoreGetButton";
 
 type PreviewTheme = "light" | "dark";
-
-const appViewClassName = css`
-  .apple-store-get-button.ant-btn {
-    border-color: var(--sn-accent) !important;
-    background: var(--sn-accent) !important;
-    color: #ffffff !important;
-    box-shadow: none;
-  }
-
-  .apple-store-get-link.ant-btn {
-    color: var(--sn-accent) !important;
-  }
-`;
 
 const FALLBACK_SIZE_CONFIG: AppSizeConfig = {
   row: 2,
@@ -184,7 +172,7 @@ const AppArtwork = ({
   apps: AppApiItem[];
   getIconUrl: (app: AppApiItem) => string | null;
 }) => (
-  <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[8px] bg-white/15 p-2">
+  <div className="grid h-24 w-24 shrink-0 grid-cols-2 gap-2 rounded-[var(--sn-radius-surface)] bg-white/15 p-2">
     {Array.from({ length: 4 }).map((_, idx) => {
       const app = apps[idx];
       const icon = app ? getIconUrl(app) : "";
@@ -192,7 +180,7 @@ const AppArtwork = ({
       return (
         <div
           key={idx}
-          className="flex items-center justify-center overflow-hidden rounded-[7px] bg-white/85"
+          className="flex items-center justify-center overflow-hidden rounded-[var(--sn-radius-compact)] bg-white/85"
         >
           {icon ? (
             <img src={icon} alt={name} className="h-full w-full object-contain p-2" />
@@ -220,7 +208,7 @@ const FeaturedCollectionCard = ({
     <button
       type="button"
       onClick={() => onOpen(collection._id)}
-      className="group flex min-h-[168px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[8px] border-0 p-5 text-left shadow-[var(--sn-shadow)] transition hover:-translate-y-px active:translate-y-0"
+      className="group flex min-h-[168px] w-full cursor-pointer items-end justify-between gap-5 overflow-hidden rounded-[var(--sn-radius-panel)] border-0 p-5 text-left shadow-[var(--sn-shadow)] transition hover:-translate-y-px active:translate-y-0"
       style={{ background: `linear-gradient(135deg, ${accent}, #111827)` }}
     >
       <div className="min-w-0 text-white">
@@ -255,8 +243,8 @@ const AppCompactCard = ({
   const description = resolveAppDescription(app, language);
   const iconUrl = getIconUrl(app);
   return (
-    <div className="flex min-h-[76px] w-[252px] shrink-0 snap-start items-center gap-3 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)] max-[640px]:w-[calc(100vw-176px)]">
-      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
+    <div className="flex min-h-[76px] w-[252px] shrink-0 snap-start items-center gap-3 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)] max-[640px]:w-[calc(100vw-176px)]">
+      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
         {iconUrl ? (
           <img
             src={iconUrl}
@@ -277,15 +265,11 @@ const AppCompactCard = ({
           </div>
         ) : null}
       </div>
-      <Button
-        type="primary"
-        size="small"
-        shape="round"
-        className="apple-store-get-button h-7! shrink-0 px-3! text-xs! font-bold!"
+      <StoreGetButton
         onClick={() => onAdd(app, app.defaultSizeId)}
       >
         {t("ui.get")}
-      </Button>
+      </StoreGetButton>
     </div>
   );
 };
@@ -306,8 +290,8 @@ const AppListCard = ({
   const iconUrl = getIconUrl(app);
 
   return (
-    <article className="flex min-h-[96px] items-center gap-4 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px">
-      <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
+    <article className="flex min-h-[96px] items-center gap-4 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px">
+      <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
         {iconUrl ? (
           <img
             src={iconUrl}
@@ -332,7 +316,7 @@ const AppListCard = ({
           {(tags.length ? tags.slice(0, 4) : [t("ui.app")]).map((tag) => (
             <Tag
               key={tag}
-              className="m-0! rounded-full! border-0! bg-[var(--sn-surface-secondary)]! text-xs! font-medium! text-[var(--sn-text-secondary)]!"
+              className="m-0! rounded-[var(--sn-radius-control)]! border-0! bg-[var(--sn-surface-secondary)]! text-xs! font-medium! text-[var(--sn-text-secondary)]!"
             >
               {tag}
             </Tag>
@@ -340,15 +324,11 @@ const AppListCard = ({
           {app.version ? <span>v{app.version}</span> : null}
         </div>
       </div>
-      <Button
-        type="primary"
-        size="small"
-        shape="round"
-        className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
+      <StoreGetButton
         onClick={() => onAdd(app)}
       >
         {t("ui.get")}
-      </Button>
+      </StoreGetButton>
     </article>
   );
 };
@@ -373,9 +353,9 @@ const AppCard = ({
   const hasScreenshots = previewItems.some((item) => item.screenshot);
 
   return (
-    <article className="overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]">
+    <article className="overflow-hidden rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]">
       <div className="flex items-start gap-3.5 px-5 pt-5">
-        <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
+        <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)]">
           {iconUrl ? (
             <img
               src={iconUrl}
@@ -400,22 +380,18 @@ const AppCard = ({
                 </div>
               ) : null}
             </div>
-            <Button
-              type="primary"
-              size="small"
-              shape="round"
-              className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold! max-[640px]:self-start"
+            <StoreGetButton
               onClick={() => onAdd(app, app.defaultSizeId)}
             >
               {t("ui.getApp")}
-            </Button>
+            </StoreGetButton>
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#8e8e93]">
             {(tags.length ? tags.slice(0, 4) : [t("ui.app")]).map((tag) => (
               <Tag
                 key={tag}
-                className="m-0! rounded-full! border-0! bg-[var(--sn-surface-secondary)]! text-xs! font-medium! text-[var(--sn-text-secondary)]!"
+                className="m-0! rounded-[var(--sn-radius-control)]! border-0! bg-[var(--sn-surface-secondary)]! text-xs! font-medium! text-[var(--sn-text-secondary)]!"
               >
                 {tag}
               </Tag>
@@ -431,11 +407,11 @@ const AppCard = ({
             {previewItems.map((item) => (
               <div
                 key={item.sizeId}
-                className="group shrink-0 snap-start rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-2 text-left transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]"
+                className="group shrink-0 snap-start rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] p-2 text-left transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]"
                 style={{ width: getPreviewTileWidth(item) }}
               >
                 <div
-                  className="flex min-h-[92px] w-full items-center justify-center overflow-hidden rounded-[7px] border border-[var(--sn-separator)] bg-[var(--sn-surface-strong)] p-2"
+                  className="flex min-h-[92px] w-full items-center justify-center overflow-hidden rounded-[var(--sn-radius-compact)] border border-[var(--sn-separator)] bg-[var(--sn-surface-strong)] p-2"
                   style={{
                     aspectRatio: getPreviewAspectRatio(
                       item.screenshot,
@@ -458,10 +434,9 @@ const AppCard = ({
                   <span className="truncate text-[12px] font-semibold text-[var(--sn-text)]">
                     {item.label}
                   </span>
-                  <Button
-                    type="link"
+                  <AppButton
+                    intent="link"
                     size="small"
-                    className="apple-store-get-link h-5! px-0! text-[11px]! font-bold!"
                     aria-label={t("ui.addNameLabel", {
                       name: displayName,
                       label: item.label,
@@ -469,7 +444,7 @@ const AppCard = ({
                     onClick={() => onAdd(app, item.sizeId)}
                   >
                     {t("ui.addWidgetSize", { size: item.label })}
-                  </Button>
+                  </AppButton>
                 </div>
               </div>
             ))}
@@ -477,15 +452,16 @@ const AppCard = ({
         </div>
       ) : (
         <div className="px-5 pb-5 pt-4">
-          <div className="flex h-24 w-full items-center justify-center rounded-[8px] border border-dashed border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] text-[13px] font-medium text-[var(--sn-text-secondary)]">
+          <div className="flex h-24 w-full items-center justify-center rounded-[var(--sn-radius-surface)] border border-dashed border-[var(--sn-separator)] bg-[var(--sn-surface-secondary)] text-[13px] font-medium text-[var(--sn-text-secondary)]">
             <span>{app.defaultSizeId || "2x2"}</span>
-            <Button
-              type="link"
-              className="apple-store-get-link ml-2 px-0! font-bold!"
+            <AppButton
+              intent="link"
+              size="small"
+              className="ml-2"
               onClick={() => onAdd(app, app.defaultSizeId)}
             >
               {t("ui.get")}
-            </Button>
+            </AppButton>
           </div>
         </div>
       )}
@@ -498,7 +474,7 @@ const AppGridSkeleton: React.FC<{ count: number }> = ({ count }) => (
     {Array.from({ length: count }).map((_, idx) => (
       <div
         key={idx}
-        className="rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5"
+        className="rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-5"
       >
         <Skeleton active avatar paragraph={{ rows: 3 }} />
       </div>
@@ -594,13 +570,13 @@ const AppFeaturedView = ({
                       })}
                   </div>
                 </div>
-                <Button
-                  type="link"
-                  className="px-0! font-semibold! text-[var(--sn-accent)]!"
+                <AppButton
+                  intent="link"
+                  size="small"
                   onClick={() => onOpenCollection(collection._id)}
                 >
                   {t("ui.viewMore")}
-                </Button>
+                </AppButton>
               </div>
               <div className="-mx-1 flex snap-x snap-mandatory flex-nowrap gap-3 overflow-x-auto overflow-y-hidden px-1 pb-2">
                 {apps.map((app) => (
@@ -793,7 +769,6 @@ const AppView: React.FC<AppViewProps> = ({
 
   return (
     <DefaultAppView
-      className={appViewClassName}
       contentClassName="flex h-full flex-col overflow-hidden px-0 pt-0 pb-0"
     >
       <div className="shrink-0 px-4 pb-2 pt-3">

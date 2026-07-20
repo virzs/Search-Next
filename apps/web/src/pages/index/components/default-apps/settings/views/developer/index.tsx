@@ -1,9 +1,9 @@
-import { Switch } from "antd";
 import { RiCodeSSlashLine, RiStore2Line } from "@remixicon/react";
 import { useApp } from "@/hooks/useApp";
 import {
   MacSettingsRow,
   MacSettingsSection,
+  MacSettingsSwitchRow,
   MacSettingsValue,
   MacSettingsView,
 } from "../../components/macos-settings";
@@ -16,12 +16,13 @@ const DeveloperView = () => {
   return (
     <MacSettingsView>
       <MacSettingsSection title={t("ui.appDevelopment")}>
-        <MacSettingsRow
+        <MacSettingsSwitchRow
           icon={<RiCodeSSlashLine size={16} />}
           iconTone="green"
           title={t("ui.developerMode")}
           description={t("ui.dev.modeDescription")}
-          extra={<Switch checked={devModeEnabled} onChange={toggleDevMode} />}
+          checked={devModeEnabled}
+          onChange={() => toggleDevMode()}
         />
         <MacSettingsRow
           icon={<RiStore2Line size={16} />}

@@ -1,6 +1,7 @@
 import { AppCategoryRail, DefaultAppView } from "@/components";
+import { AppButton } from "@/components/ui";
 import { useRequest } from "ahooks";
-import { Button, Empty, Pagination, Skeleton } from "antd";
+import { Empty, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
@@ -16,7 +17,9 @@ import {
   GradientWallpaperPreset,
   gradientWallpaperPresets,
 } from "./wallpaper-gradients";
-import PreviewCard from "../components/PreviewCard";
+import PreviewCard, {
+  PreviewCardAction,
+} from "../components/PreviewCard";
 import { useI18n } from "@/i18n";
 import { RiCheckLine, RiLandscapeLine } from "@remixicon/react";
 
@@ -181,14 +184,11 @@ const WallpaperView: FC = () => {
         description={w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))}
         action={
           url && !active ? (
-            <Button
-              size="small"
-              type="primary"
-              shape="round"
+            <PreviewCardAction
               onClick={() => handleSelectImage(w)}
             >
               {t("action.apply")}
-            </Button>
+            </PreviewCardAction>
           ) : null
         }
         cover={
@@ -216,7 +216,7 @@ const WallpaperView: FC = () => {
             {t("ui.wallpaper.chooseDescription")}
           </div>
           </div>
-          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] px-3 py-1.5 text-[12px] font-medium leading-4 text-[var(--sn-text-secondary)]">
             <RiCheckLine size={13} className="text-[var(--sn-accent)]" />
             <span>{t("ui.currentWallpaper")} · {currentWallpaperName}</span>
           </div>
@@ -250,15 +250,11 @@ const WallpaperView: FC = () => {
                 description={w.id === "none" ? t("ui.useDefaultBackground") : t("ui.gradientBackground")}
                 action={
                   active ? null : (
-                  <Button
-                    size="small"
-                    type="primary"
-                    shape="round"
-                    className="px-3! font-semibold!"
+                  <PreviewCardAction
                     onClick={() => handleSelectGradient(w)}
                   >
                     {t("action.apply")}
-                  </Button>
+                  </PreviewCardAction>
                   )
                 }
                 cover={
@@ -267,7 +263,7 @@ const WallpaperView: FC = () => {
                     style={{ background: coverBackground }}
                   >
                     {w.id === "none" ? (
-                      <span className="grid h-12 w-12 place-items-center rounded-[14px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] text-[var(--sn-text-tertiary)] shadow-[var(--sn-shadow)]">
+                      <span className="grid h-12 w-12 place-items-center rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] text-[var(--sn-text-tertiary)] shadow-[var(--sn-shadow)]">
                         <RiLandscapeLine size={22} />
                       </span>
                     ) : null}
@@ -288,14 +284,18 @@ const WallpaperView: FC = () => {
                   title={{ width: 160 }}
                   paragraph={{ rows: 1, width: 260 }}
                 />
-                <Skeleton.Button active size="small" shape="round" />
+                <Skeleton.Button active size="small" />
               </div>
               <div className="flex flex-nowrap gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1">
                 {Array.from({ length: 5 }).map((__, cardIdx) => (
                   <div key={cardIdx} className="w-56 shrink-0">
                     <Skeleton.Image
                       active
-                      style={{ width: 224, height: 120, borderRadius: 8 }}
+                      style={{
+                        width: 224,
+                        height: 120,
+                        borderRadius: "var(--sn-radius-compact)",
+                      }}
                     />
                     <div className="mt-2 px-1">
                       <Skeleton
@@ -323,13 +323,14 @@ const WallpaperView: FC = () => {
                         {c.name}
                       </div>
                     </div>
-                    <Button
-                      type="link"
-                      className="px-0! font-semibold! text-[var(--sn-accent)]!"
+                    <AppButton
+                      intent="link"
+                      size="small"
+                      className="text-[var(--sn-accent)]!"
                       onClick={() => openCategory(c._id)}
                     >
                       {t("ui.viewMore")}
-                    </Button>
+                    </AppButton>
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {items.map((item) => renderWallpaperCard(item))}

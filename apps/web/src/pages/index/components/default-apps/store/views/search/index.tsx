@@ -1,10 +1,11 @@
 import { AppSegmented, DefaultAppView, useAppRouteContext } from "@/components";
+import { AppButton } from "@/components/ui";
 import {
   RiApps2Line,
   RiArrowRightUpLine,
   RiLinksLine,
 } from "@remixicon/react";
-import { Button, Empty, Spin, Tag } from "antd";
+import { Empty, Spin, Tag } from "antd";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import WebsiteCard from "../../components/WebsiteCard";
@@ -15,13 +16,13 @@ import { useRequest } from "ahooks";
 import { getTabsWebsitePublic } from "@/services/website";
 import { useApp } from "@/hooks/useApp";
 import type { AppApiItem } from "@/types";
-import { css } from "@emotion/css";
 import {
   resolveAppDescription,
   resolveAppDisplayName,
   resolveAppTags,
   useI18n,
 } from "@/i18n";
+import StoreGetButton from "../../components/StoreGetButton";
 
 type SearchKind = "all" | "website" | "app" | "widget";
 
@@ -33,18 +34,6 @@ const SEARCH_KIND_OPTIONS = [
 ];
 
 const SEARCH_PAGE_SIZE = 12;
-
-const storeSearchClassName = css`
-  .apple-store-get-button.ant-btn {
-    border-color: var(--sn-accent) !important;
-    background: var(--sn-accent) !important;
-    color: #ffffff !important;
-  }
-
-  .apple-link.ant-btn-text {
-    color: var(--sn-accent) !important;
-  }
-`;
 
 const toTagLabel = (tag: unknown) => {
   if (typeof tag === "string") return tag;
@@ -145,35 +134,33 @@ const AppResultCard = ({
   const description = resolveAppDescription(item, language);
   const tags = getAppTags(item, language);
   return (
-  <article className="flex min-h-[112px] items-start gap-3.5 rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]">
-    <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
-      {iconUrl ? (
-        <img
-          src={iconUrl}
-          alt={displayName}
-          className="h-full w-full object-contain p-2.5"
-          loading="lazy"
-        />
-      ) : (
-        <RiApps2Line size={22} />
-      )}
-    </div>
-    <div className="min-w-0 flex-1">
-      <div className="truncate text-[14px] font-semibold leading-5 tracking-normal text-[var(--sn-text)]">
-        {displayName}
+    <article className="flex min-h-[112px] items-start gap-3.5 rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-4 shadow-[var(--sn-shadow)] transition hover:-translate-y-px hover:bg-[var(--sn-surface-strong)]">
+      <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center overflow-hidden rounded-[var(--sn-radius-control)] bg-[var(--sn-surface-secondary)] text-[var(--sn-accent)]">
+        {iconUrl ? (
+          <img
+            src={iconUrl}
+            alt={displayName}
+            className="h-full w-full object-contain p-2.5"
+            loading="lazy"
+          />
+        ) : (
+          <RiApps2Line size={22} />
+        )}
       </div>
-      <div className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
-        {description || t("ui.app")}
-      </div>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        {showSize ? (
-          <Tag className="m-0! border-0! bg-[var(--sn-surface-secondary)]! text-[11px]! font-medium! text-[var(--sn-text-secondary)]!">
-            {getAppDefaultSizeId(item)}
-          </Tag>
-        ) : null}
-        {tags
-          .slice(0, 3)
-          .map((tag) => (
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[14px] font-semibold leading-5 tracking-normal text-[var(--sn-text)]">
+          {displayName}
+        </div>
+        <div className="mt-1 line-clamp-2 text-[12px] leading-[18px] text-[var(--sn-text-secondary)]">
+          {description || t("ui.app")}
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {showSize ? (
+            <Tag className="m-0! border-0! bg-[var(--sn-surface-secondary)]! text-[11px]! font-medium! text-[var(--sn-text-secondary)]!">
+              {getAppDefaultSizeId(item)}
+            </Tag>
+          ) : null}
+          {tags.slice(0, 3).map((tag) => (
             <Tag
               key={tag}
               className="m-0! border-0! bg-[var(--sn-surface-secondary)]! text-[11px]! font-medium! text-[var(--sn-text-secondary)]!"
@@ -181,18 +168,19 @@ const AppResultCard = ({
               {tag}
             </Tag>
           ))}
+        </div>
       </div>
-    </div>
-    <Button
-      type="primary"
-      size="small"
-      shape="round"
-      className="apple-store-get-button h-7! shrink-0 px-4! text-xs! font-bold!"
-      onClick={() => onAdd?.(item, showSize ? getAppDefaultSizeId(item) : undefined)}
-    >
-      {t("ui.get")}
-    </Button>
-  </article>
+      <StoreGetButton
+        onClick={() =>
+          onAdd?.(
+            item,
+            showSize ? getAppDefaultSizeId(item) : undefined,
+          )
+        }
+      >
+        {t("ui.get")}
+      </StoreGetButton>
+    </article>
   );
 };
 
@@ -320,7 +308,6 @@ const StoreSearchView = () => {
 
   return (
     <DefaultAppView
-      className={storeSearchClassName}
       title={
         normalizedQuery
           ? t("ui.searchQuery", { query: normalizedQuery })
@@ -362,15 +349,15 @@ const StoreSearchView = () => {
               title={t("ui.websites")}
               count={websiteTotal}
               action={
-                <Button
-                  type="text"
+                <AppButton
+                  intent="quiet"
                   size="small"
                   icon={<RiLinksLine size={15} />}
-                  className="apple-link"
+                  className="text-[var(--sn-accent)]!"
                   onClick={() => navigateFromSearch(storeRoute.path.website.root)}
                 >
                   {t("ui.viewWebsites")}
-                </Button>
+                </AppButton>
               }
             >
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -401,15 +388,15 @@ const StoreSearchView = () => {
               title={t("ui.app")}
               count={appResults.length}
               action={
-                <Button
-                  type="text"
+                <AppButton
+                  intent="quiet"
                   size="small"
                   icon={<RiArrowRightUpLine size={15} />}
-                  className="apple-link"
+                  className="text-[var(--sn-accent)]!"
                   onClick={() => navigateFromSearch(storeRoute.path.app)}
                 >
                   {t("ui.viewApps")}
-                </Button>
+                </AppButton>
               }
             >
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
@@ -430,15 +417,15 @@ const StoreSearchView = () => {
               title={t("ui.widgets")}
               count={widgetResults.length}
               action={
-                <Button
-                  type="text"
+                <AppButton
+                  intent="quiet"
                   size="small"
                   icon={<RiArrowRightUpLine size={15} />}
-                  className="apple-link"
+                  className="text-[var(--sn-accent)]!"
                   onClick={() => navigateFromSearch(storeRoute.path.widget)}
                 >
                   {t("ui.viewWidgets")}
-                </Button>
+                </AppButton>
               }
             >
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">

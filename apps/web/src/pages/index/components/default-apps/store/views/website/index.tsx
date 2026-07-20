@@ -1,6 +1,6 @@
 import { useRequest } from "ahooks";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Empty, Pagination, Skeleton } from "antd";
+import { Empty, Pagination, Skeleton } from "antd";
 import {
   getTabsWebsiteClassifyPublicLevel1,
   getTabsWebsiteCollectionPublicList,
@@ -20,13 +20,14 @@ import type { StoreOutletContext } from "../../index";
 import AddWebsiteModal from "./add-website-modal";
 import { storeRoute } from "../../route-paths";
 import { useI18n } from "@/i18n";
+import { AppButton } from "@/components/ui";
 
 const WebsiteGridSkeleton: React.FC<{ count: number }> = ({ count }) => (
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
     {Array.from({ length: count }).map((_, index) => (
       <div
         key={index}
-        className="min-h-[164px] rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)]"
+        className="min-h-[164px] rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] p-3 shadow-[var(--sn-shadow)]"
       >
         <Skeleton.Avatar active size={52} shape="square" />
         <Skeleton
@@ -158,15 +159,14 @@ const WebsiteView: React.FC = () => {
       contentClassName="flex flex-col overflow-hidden px-0 pt-0 pb-0"
       headerClassName="items-center px-3 pt-3 pb-2"
       headerRight={
-        <Button
-          type="primary"
+        <AppButton
+          intent="primary"
           onClick={() => setAddVisible(true)}
           icon={<RiAddLine size={16} />}
-          shape="round"
-          size="small"
+          size="default"
         >
           {t("ui.custom")}
-        </Button>
+        </AppButton>
       }
     >
       <div className="shrink-0 px-4 pb-2 pt-3">

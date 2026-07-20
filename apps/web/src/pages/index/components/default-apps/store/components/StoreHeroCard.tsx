@@ -94,7 +94,7 @@ const heroBaseClassName = css`
   gap: 28px;
   overflow: hidden;
   border: 1px solid var(--sn-separator);
-  border-radius: 14px;
+  border-radius: var(--sn-radius-panel);
   padding: 22px 24px;
   background: var(--sn-surface);
   box-shadow:
@@ -172,7 +172,7 @@ const artworkTileClassName = css`
   place-items: center;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--sn-separator) 82%, white);
-  border-radius: 15px;
+  border-radius: var(--sn-radius-surface);
   background: color-mix(in srgb, var(--sn-surface-strong) 92%, transparent);
   padding: 10px;
   color: var(--sn-text-tertiary);

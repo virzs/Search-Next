@@ -1,11 +1,17 @@
 import { DesktopNextBaseModal } from "zs_library";
-import { Button, Form, Input, InputNumber } from "antd";
 import { RiAddLine, RiCloseLine } from "@remixicon/react";
 import type { FC } from "react";
 import type { DevApp } from "@/contexts/AppContext";
 import type { AppSizeConfig } from "@/types";
 import { css } from "@emotion/css";
 import { useI18n } from "@/i18n";
+import {
+  AppButton,
+  AppForm,
+  AppIconButton,
+  AppInput,
+  AppInputNumber,
+} from "@/components/ui";
 
 // ====== 表单数据类型 ======
 
@@ -55,7 +61,7 @@ const SizeConfigList: FC<{
     <div className="flex flex-col gap-2">
       {value.map((item, index) => (
         <div key={index} className="flex items-center gap-2">
-          <InputNumber
+          <AppInputNumber
             min={1}
             max={8}
             value={item.col}
@@ -63,7 +69,7 @@ const SizeConfigList: FC<{
             className="w-18!"
             placeholder={t("ui.columns")}
           />
-          <InputNumber
+          <AppInputNumber
             min={1}
             max={8}
             value={item.row}
@@ -71,30 +77,33 @@ const SizeConfigList: FC<{
             className="w-18!"
             placeholder={t("ui.rows")}
           />
-          <Input
+          <AppInput
             value={item.name}
             onChange={(e) => update(index, "name", e.target.value)}
             className="w-20! shrink-0"
             placeholder={t("ui.name")}
           />
           {value.length > 1 && (
-            <Button
-              type="text"
+            <AppIconButton
+              aria-label={t("ui.delete")}
+              intent="quiet"
               danger
+              size="small"
               icon={<RiCloseLine size={16} />}
               onClick={() => remove(index)}
             />
           )}
         </div>
       ))}
-      <Button
-        type="dashed"
+      <AppButton
+        intent="secondary"
+        size="small"
         icon={<RiAddLine size={16} />}
         onClick={add}
-        className="w-full"
+        className="self-start"
       >
         {t("ui.addSize")}
-      </Button>
+      </AppButton>
     </div>
   );
 };
@@ -134,7 +143,7 @@ const DevAppModal: FC<DevAppModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useI18n();
-  const [form] = Form.useForm<DevAppFormValues>();
+  const [form] = AppForm.useForm<DevAppFormValues>();
 
   /** 弹窗打开时，若为编辑模式则回填表单 */
   const handleAfterOpen = () => {
@@ -183,7 +192,7 @@ const DevAppModal: FC<DevAppModalProps> = ({
           {editingApp ? t("ui.editApp") : t("ui.addApp")}
         </div>
 
-        <Form
+        <AppForm
           form={form}
           layout="vertical"
           initialValues={{ sizes: [{ ...defaultSize }] }}
@@ -193,15 +202,15 @@ const DevAppModal: FC<DevAppModalProps> = ({
             handleClose();
           }}
         >
-          <Form.Item
+          <AppForm.Item
             name="name"
             label={t("ui.name")}
             rules={[{ required: true, message: t("ui.enterAAppName") }]}
           >
-            <Input placeholder={t("ui.exampleMyClock")} />
-          </Form.Item>
+            <AppInput placeholder={t("ui.exampleMyClock")} />
+          </AppForm.Item>
 
-          <Form.Item
+          <AppForm.Item
             name="entry"
             label={t("ui.eSMEntryURL")}
             rules={[
@@ -209,10 +218,10 @@ const DevAppModal: FC<DevAppModalProps> = ({
               { type: "url", message: t("ui.enterAValidURL") },
             ]}
           >
-            <Input placeholder="http://localhost:5173/src/index.tsx" />
-          </Form.Item>
+            <AppInput placeholder="http://localhost:5173/src/index.tsx" />
+          </AppForm.Item>
 
-          <Form.Item
+          <AppForm.Item
             name="sizes"
             label={t("ui.sizeConfig")}
             rules={[
@@ -225,22 +234,21 @@ const DevAppModal: FC<DevAppModalProps> = ({
             ]}
           >
             <SizeConfigList />
-          </Form.Item>
+          </AppForm.Item>
 
           <div className="flex items-center justify-center gap-2 pt-2">
-            <Button shape="round" onClick={handleClose}>
+            <AppButton intent="secondary" size="default" onClick={handleClose}>
               {t("ui.cancel")}
-            </Button>
-            <Button
-              shape="round"
-              type="primary"
-              className="apple-primary"
+            </AppButton>
+            <AppButton
+              intent="primary"
+              size="default"
               onClick={() => (form as any).submit()}
             >
               {editingApp ? t("ui.save") : t("ui.addToDesktop")}
-            </Button>
+            </AppButton>
           </div>
-        </Form>
+        </AppForm>
       </div>
     </DesktopNextBaseModal>
   );
@@ -254,41 +262,4 @@ const appleDevAppModalClassName = css`
     rgba(245, 245, 247, 0.72);
   padding: 22px;
   backdrop-filter: blur(28px) saturate(1.18);
-
-  .ant-form-item-label > label {
-    color: #1d1d1f;
-    font-weight: 600;
-  }
-
-  .ant-input,
-  .ant-input-number,
-  .ant-input-number-input {
-    border-radius: 10px;
-  }
-
-  .ant-input,
-  .ant-input-number {
-    border-color: rgba(60, 60, 67, 0.16);
-    background: rgba(255, 255, 255, 0.74);
-  }
-
-  .ant-input:hover,
-  .ant-input:focus,
-  .ant-input-number:hover,
-  .ant-input-number-focused {
-    border-color: rgba(0, 122, 255, 0.42);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
-  }
-
-  .ant-btn-dashed {
-    border-color: rgba(0, 122, 255, 0.24);
-    background: rgba(0, 122, 255, 0.06);
-    color: #007aff;
-  }
-
-  .apple-primary {
-    border-color: #007aff !important;
-    background: #007aff !important;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.2);
-  }
 `;

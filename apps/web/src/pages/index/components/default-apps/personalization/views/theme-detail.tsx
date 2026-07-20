@@ -1,6 +1,7 @@
 import { DefaultAppView } from "@/components";
+import { AppButton } from "@/components/ui";
 import { useRequest } from "ahooks";
-import { Button, Image } from "antd";
+import { Image } from "antd";
 import { FC, useEffect, useMemo, useRef } from "react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import {
@@ -55,14 +56,14 @@ const ThemeDetailView: FC = () => {
       animate
       title={theme.name}
       headerRight={
-        <Button
-          type="primary"
-          shape="round"
+        <AppButton
+          intent="primary"
+          size="default"
           disabled={active}
           onClick={() => setActiveThemeId(theme._id)}
         >
           {active ? t("ui.applied") : t("ui.applyToDesktop")}
-        </Button>
+        </AppButton>
       }
     >
       {theme.description ? (
@@ -71,7 +72,7 @@ const ThemeDetailView: FC = () => {
         </div>
       ) : null}
       <div
-        className="aspect-video w-full overflow-hidden rounded-[8px] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]"
+        className="aspect-video w-full overflow-hidden rounded-[var(--sn-radius-surface)] border border-[var(--sn-separator)] bg-[var(--sn-surface)] shadow-[var(--sn-shadow)]"
         style={{
           background: "var(--sn-surface)",
         }}
@@ -88,7 +89,7 @@ const ThemeDetailView: FC = () => {
           {previewUrls.slice(1, 9).map((url) => (
             <Image
               key={url}
-              className="h-20! w-full! rounded-[8px] border border-[var(--sn-separator)] object-cover"
+              className="h-20! w-full! rounded-[var(--sn-radius-compact)] border border-[var(--sn-separator)] object-cover"
               src={url}
               preview={false}
             />
