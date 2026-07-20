@@ -7,9 +7,11 @@ import { Response } from "src/utils/response";
 import { ProjectName } from "./schemas/ref-names";
 import { ProjectDto } from "./dto/project.dto";
 
+export const DEFAULT_PROJECT_THEME_COLOR = "rgb(250, 84, 28)";
+
 // 当不存在项目记录时的默认公开数据
 const DEFAULT_PUBLIC_PROJECT: Partial<Project> = {
-  name: "默认项目",
+  name: "Search Next",
   description: "",
   login: {
     title: "",
@@ -32,6 +34,9 @@ const DEFAULT_PUBLIC_PROJECT: Partial<Project> = {
   },
   release: {
     repositoryUrl: "https://github.com/virzs/Search-Next",
+  },
+  site: {
+    themeColor: DEFAULT_PROJECT_THEME_COLOR,
   },
 };
 
@@ -79,21 +84,31 @@ export class ProjectService {
   async detail() {
     // 当前始终只有一条，多项目配置以后看情况修改
     const project = await this.projectModel.findOne().exec();
-    return project ?? (DEFAULT_PUBLIC_PROJECT as Project);
+    if (!project) {
+      return DEFAULT_PUBLIC_PROJECT as Project;
+    }
+
+    if (!project.site) {
+      project.set("site", { themeColor: DEFAULT_PROJECT_THEME_COLOR });
+    } else if (!project.site.themeColor) {
+      project.set("site.themeColor", DEFAULT_PROJECT_THEME_COLOR);
+    }
+    return project;
   }
 
   async publicDetail(): Promise<Partial<Project>> {
     const doc = await this.projectModel.findOne().exec();
-    if (!doc) {
-      return DEFAULT_PUBLIC_PROJECT;
-    }
-    const json = doc.toJSON();
-    const { name, description, login, register, turnstile } = json;
+    const json = doc ? doc.toJSON() : DEFAULT_PUBLIC_PROJECT;
+    const { name, description, login, register, turnstile, site } = json;
     return {
       name,
       description,
       login,
       register,
+      site: {
+        ...(site?.icon ? { icon: site.icon } : {}),
+        themeColor: site?.themeColor ?? DEFAULT_PROJECT_THEME_COLOR,
+      },
       turnstile: {
         enabled: turnstile?.enabled ?? false,
         siteKey: turnstile?.siteKey ?? "",
@@ -114,9 +129,25 @@ export class ProjectService {
     return {
       ...body,
       release: repositoryUrl ? { repositoryUrl } : body.release,
+      site: body.site
+        ? {
+            ...body.site,
+            themeColor: body.site.themeColor
+              ? normalizeRgbColor(body.site.themeColor)
+              : DEFAULT_PROJECT_THEME_COLOR,
+          }
+        : body.site,
     };
   }
 }
+
+export const normalizeRgbColor = (value: string) => {
+  const match = String(value || "")
+    .replace(/\s+/g, "")
+    .match(/^rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)$/i);
+  if (!match) return DEFAULT_PROJECT_THEME_COLOR;
+  return `rgb(${Number(match[1])}, ${Number(match[2])}, ${Number(match[3])})`;
+};
 
 export const normalizeGithubRepositoryUrl = (value: string) => {
   let url: URL;

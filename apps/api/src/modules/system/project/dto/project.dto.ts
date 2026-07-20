@@ -3,11 +3,14 @@ import { Expose, Transform, Type } from "class-transformer";
 import {
   IsBoolean,
   IsArray,
+  IsObject,
   IsOptional,
+  IsRgbColor,
   IsString,
   ValidateNested,
 } from "class-validator";
 import { ResourceDto } from "src/public/dto/resource.dto";
+import { Resource } from "src/modules/resource/schemas/resource";
 
 class SubObjectDto {
   @ApiProperty({ description: "标题" })
@@ -91,6 +94,23 @@ class ReleaseConfigDto {
   repositoryUrl: string;
 }
 
+class SiteConfigDto {
+  @ApiProperty({ description: "Web/Admin 站点图标", type: Resource })
+  @IsObject()
+  @IsOptional()
+  @Expose()
+  icon?: Resource;
+
+  @ApiProperty({ description: "Web/Admin 组件强调色" })
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.replace(/\s+/g, "") : value,
+  )
+  @IsRgbColor()
+  @IsOptional()
+  @Expose()
+  themeColor?: string;
+}
+
 export class ProjectDto {
   @ApiProperty({ description: "项目名称" })
   @IsString()
@@ -145,4 +165,12 @@ export class ProjectDto {
   @Type(() => ReleaseConfigDto)
   @Transform(({ value }) => (value == null ? undefined : value))
   release?: ReleaseConfigDto;
+
+  @ApiProperty({ description: "Web/Admin 站点品牌设置", type: SiteConfigDto })
+  @ValidateNested()
+  @IsOptional()
+  @Expose()
+  @Type(() => SiteConfigDto)
+  @Transform(({ value }) => (value == null ? undefined : value))
+  site?: SiteConfigDto;
 }

@@ -61,6 +61,16 @@ class ReleaseConfig {
   repositoryUrl: string;
 }
 
+class SiteConfig {
+  // Web/Admin 站点图标，沿用通用资源对象格式。
+  @Prop({ type: Resource })
+  icon?: Resource;
+
+  // Web/Admin 组件强调色。
+  @Prop({ type: String, default: "rgb(250, 84, 28)" })
+  themeColor: string;
+}
+
 @Schema({ timestamps: true })
 export class Project extends BaseSchema {
   @Prop({ type: String, required: true })
@@ -101,6 +111,13 @@ export class Project extends BaseSchema {
     }),
   })
   release: ReleaseConfig;
+
+  // Web/Admin 共用的站点品牌配置。
+  @Prop({
+    type: SiteConfig,
+    default: () => ({ themeColor: "rgb(250, 84, 28)" }),
+  })
+  site: SiteConfig;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
