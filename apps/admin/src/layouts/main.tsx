@@ -20,11 +20,14 @@ import { useAccess } from "@/contexts/AccessContext";
 import { useEffect } from "react";
 import AdminNoticeCenter from "./components/notice";
 import AdminReleaseUpdatePrompt from "./components/release-update";
+import { useSiteConfig } from "@/contexts/SiteConfigContext";
 
 const MainLayout = (props: any) => {
   const menus = useMenu();
   const navigate = useNavigate();
   const { userInfo, refresh, setAccessUser } = useAccess();
+  const { projectInfo } = useSiteConfig();
+  const adminTitle = `${projectInfo.name || "Search Next"} - 管理后台`;
 
   useEffect(() => {
     refresh();
@@ -95,7 +98,7 @@ const MainLayout = (props: any) => {
         `,
       )}
       logo={false}
-      title="Search Next 管理"
+      title={adminTitle}
       route={{
         routes: menus,
       }}

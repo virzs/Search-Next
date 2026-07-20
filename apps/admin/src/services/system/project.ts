@@ -1,4 +1,12 @@
 import { baseGetRequest, basePostRequest, basePutRequest } from "@/utils/axios";
+import type { Resource } from "@/services/resource";
+
+export const DEFAULT_PROJECT_THEME_COLOR = "rgb(250, 84, 28)";
+
+export interface ProjectSiteConfig {
+  icon?: Resource;
+  themeColor: string;
+}
 
 export interface ProjectData {
   _id?: string;
@@ -30,7 +38,13 @@ export interface ProjectData {
   release?: {
     repositoryUrl?: string;
   };
+  site?: ProjectSiteConfig;
 }
+
+export type ProjectPublicData = Pick<
+  ProjectData,
+  "name" | "description" | "login" | "register" | "turnstile" | "site"
+>;
 
 // detail
 // /system/project
@@ -53,5 +67,5 @@ export async function updateProject(id: string, data: ProjectData) {
 // get
 // /system/project/public
 export async function getPublicProject(params: Record<string, unknown> = {}) {
-  return baseGetRequest<ProjectData>("/system/project/public")(params);
+  return baseGetRequest<ProjectPublicData>("/system/project/public")(params);
 }

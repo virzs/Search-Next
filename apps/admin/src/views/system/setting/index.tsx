@@ -9,6 +9,7 @@ import {
   ProForm,
   ProFormInstance,
   ProFormDependency,
+  ProFormColorPicker,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
@@ -22,6 +23,8 @@ import {
   RoleRequest,
   SYSTEM_ADMIN_ROLE_CODE,
 } from "@/services/system/role";
+import { ProFormUpload } from "@/components/pro-form";
+import { useSiteConfig } from "@/contexts/SiteConfigContext";
 
 const TURNSTILE_URL = "https://dash.cloudflare.com/?to=/:account/turnstile";
 
@@ -72,9 +75,10 @@ const SettingSwitchRow = (props: SettingSwitchRowProps) => {
 };
 
 const Setting = () => {
-  const { data, loading, run } = useRequest(getProject);
+  const { data, loading, runAsync } = useRequest(getProject);
   const { data: roles = [], loading: rolesLoading } = useRequest(getRoleList);
   const [submitting, setSubmitting] = useState(false);
+  const { refreshSiteConfig } = useSiteConfig();
 
   const ref = useRef<ProFormInstance<ProjectData>>(null);
 
@@ -127,9 +131,9 @@ const Setting = () => {
             return (
               data?._id ? updateProject(data?._id, values) : addProject(values)
             )
-              .then(() => {
+              .then(async () => {
                 message.success("保存成功");
-                run({});
+                await Promise.all([runAsync({}), refreshSiteConfig()]);
                 return true;
               })
               .catch(() => false)
@@ -144,9 +148,39 @@ const Setting = () => {
               <div className="grid gap-4">
                 <ProFormText
                   name="name"
-                  label="系统名称"
+                  label="系统名称（网页标题）"
+                  extra="Web 使用该名称作为网页标题，Admin 显示为“系统名称 - 管理后台”。"
                   rules={[{ required: true, message: "请输入名称" }]}
                 />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <ProFormUpload
+                    name={["site", "icon"]}
+                    label="站点图标"
+                    extra="用于 Web 和 Admin 的浏览器标签图标。"
+                    fieldProps={{
+                      maxCount: 1,
+                      listType: "picture-card",
+                      dir: "system-site",
+                      accept:
+                        "image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon",
+                    }}
+                  />
+                  <ProFormColorPicker
+                    name={["site", "themeColor"]}
+                    label="主题色"
+                    extra="用于 Web 和 Admin 的按钮、选中态、焦点环等组件强调状态。"
+                    formItemProps={{
+                      rules: [{ required: true, message: "请选择主题色" }],
+                      getValueFromEvent: (color: any) =>
+                        color?.toRgbString?.(),
+                    }}
+                    fieldProps={{
+                      format: "rgb",
+                      showText: true,
+                      disabledAlpha: true,
+                    } as any}
+                  />
+                </div>
                 <ProFormTextArea
                   name="description"
                   label="描述"

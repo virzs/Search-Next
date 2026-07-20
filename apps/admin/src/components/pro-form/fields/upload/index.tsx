@@ -8,7 +8,7 @@ import { resourceUpload } from "@/services/resource";
 const { Dragger } = Upload;
 
 export interface UploadProps extends ProFormItemProps {
-  name?: string;
+  name?: ProFormItemProps["name"];
   value?: any;
   onChange?: (fileList: UploadFile[]) => void;
   /**

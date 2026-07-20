@@ -11,9 +11,12 @@ import { Tree, ProFormUpload, ProFormUserSearchSelect } from "./components/pro-f
 import { GlobalNotificationProvider } from "./utils/globalNotification";
 import MEditor from "./components/pro-form/fields/editor/editor";
 import { AccessProvider } from "./contexts/AccessContext";
+import { SiteConfigProvider, useSiteConfig } from "./contexts/SiteConfigContext";
+import { DEFAULT_PROJECT_THEME_COLOR } from "./services/system/project";
 
 const Root = () => {
   const { theme, appId } = useLayout();
+  const { projectInfo } = useSiteConfig();
 
   const darkMode = useMemo(() => {
     return theme === Theme.Dark;
@@ -26,7 +29,8 @@ const Root = () => {
           cssVar: { key: appId },
           algorithm: darkMode ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
           token: {
-            colorPrimary: "rgb(250, 84, 28)",
+            colorPrimary:
+              projectInfo.site?.themeColor || DEFAULT_PROJECT_THEME_COLOR,
           },
         }}
       >
@@ -89,9 +93,11 @@ const Root = () => {
 
 function App() {
   return (
-    <RootLayoutProvider>
-      <Root />
-    </RootLayoutProvider>
+    <SiteConfigProvider>
+      <RootLayoutProvider>
+        <Root />
+      </RootLayoutProvider>
+    </SiteConfigProvider>
   );
 }
 
