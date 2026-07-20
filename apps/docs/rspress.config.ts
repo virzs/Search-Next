@@ -4,10 +4,10 @@ import { defineConfig } from 'rspress/config';
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
   title: 'My Site',
-  icon: '/rspress-icon.png',
+  icon: '/search-next-icon.png',
   logo: {
-    light: '/rspress-light-logo.png',
-    dark: '/rspress-dark-logo.png',
+    light: '/search-next-icon.png',
+    dark: '/search-next-icon.png',
   },
   themeConfig: {
     socialLinks: [
