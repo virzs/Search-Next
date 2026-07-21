@@ -1,20 +1,25 @@
 const enUS = {
   "language.name.zh-CN": "简体中文",
   "language.name.en-US": "English",
-  "language.description.zh-CN": "Use Simplified Chinese for menus, settings, and system UI",
-  "language.description.en-US": "Use English for menus, settings, and system UI",
+  "language.description.zh-CN":
+    "Use Simplified Chinese for menus, settings, and system UI",
+  "language.description.en-US":
+    "Use English for menus, settings, and system UI",
   "routes.account.root.title": "Account",
-  "routes.account.root.description": "Use a local account, or sign in, register, and view account details",
+  "routes.account.root.description":
+    "Use a local account, or sign in, register, and view account details",
   "routes.account.login.title": "Sign In",
   "routes.account.login.description": "Sign in to your Search Next account",
   "routes.account.register.title": "Register",
   "routes.account.register.description": "Create a Search Next account",
   "routes.account.profile.title": "Account Details",
-  "routes.account.profile.description": "View the local or signed-in account details",
+  "routes.account.profile.description":
+    "View the local or signed-in account details",
   "routes.store.root.title": "App Store",
   "routes.store.root.description": "Discover websites, apps, and widgets",
   "routes.store.website.title": "Websites",
-  "routes.store.website.description": "Discover and add frequently used websites",
+  "routes.store.website.description":
+    "Discover and add frequently used websites",
   "routes.store.website-collection.title": "Website Collection",
   "routes.store.website-collection.description": "View website collection",
   "routes.store.app-collection.title": "App Collection",
@@ -30,17 +35,21 @@ const enUS = {
   "routes.store.dev.title": "Developer",
   "routes.store.dev.description": "Test custom apps and local ESM entries",
   "routes.personalization.root.title": "Personalization",
-  "routes.personalization.root.description": "Manage desktop themes, wallpapers, and custom appearance",
+  "routes.personalization.root.description":
+    "Manage desktop themes, wallpapers, and custom appearance",
   "routes.personalization.theme.title": "Themes",
   "routes.personalization.theme.description": "Browse and apply desktop themes",
   "routes.personalization.detail.title": "Theme Details",
   "routes.personalization.detail.description": "View theme details",
   "routes.personalization.wallpaper-category.title": "Wallpaper Category",
-  "routes.personalization.wallpaper-category.description": "View wallpaper category",
+  "routes.personalization.wallpaper-category.description":
+    "View wallpaper category",
   "routes.personalization.wallpaper.title": "Wallpaper",
-  "routes.personalization.wallpaper.description": "Browse and apply desktop backgrounds",
+  "routes.personalization.wallpaper.description":
+    "Browse and apply desktop backgrounds",
   "routes.personalization.my.title": "Mine",
-  "routes.personalization.my.description": "Manage custom themes and wallpapers",
+  "routes.personalization.my.description":
+    "Manage custom themes and wallpapers",
   "routes.personalization.my-create.title": "Create Wallpaper",
   "routes.personalization.my-create.description": "Create a custom wallpaper",
   "routes.personalization.my-edit.title": "Edit Wallpaper",
@@ -50,33 +59,44 @@ const enUS = {
   "routes.personalization.my-theme-edit.title": "Edit Theme",
   "routes.personalization.my-theme-edit.description": "Edit custom theme",
   "routes.settings.root.title": "Settings",
-  "routes.settings.root.description": "Manage account, appearance, search, language, and backup",
+  "routes.settings.root.description":
+    "Manage account, appearance, search, language, and backup",
   "routes.settings.account.title": "Account",
   "routes.settings.account.description": "Profile, sign-in, and security",
   "routes.settings.personalization.title": "Personalization",
-  "routes.settings.personalization.description": "Appearance, themes, and desktop background",
+  "routes.settings.personalization.description":
+    "Appearance, themes, and desktop background",
   "routes.settings.search.title": "Search",
-  "routes.settings.search.description": "Desktop search bar and keyboard shortcut",
+  "routes.settings.search.description":
+    "Desktop search bar and keyboard shortcut",
   "routes.settings.language.title": "Language",
   "routes.settings.language.description": "Interface language",
   "routes.settings.backup.title": "Backup & Restore",
-  "routes.settings.backup.description": "Local backup, cloud backup, and data restore",
+  "routes.settings.backup.description":
+    "Local backup, cloud backup, and data restore",
   "routes.settings.backup-storage.title": "Cloud Backup Storage",
-  "routes.settings.backup-storage.description": "View cloud backup storage and versions",
+  "routes.settings.backup-storage.description":
+    "View cloud backup storage and versions",
   "routes.settings.backup-storage-detail.title": "Cloud Backup Details",
-  "routes.settings.backup-storage-detail.description": "View backup version details",
+  "routes.settings.backup-storage-detail.description":
+    "View backup version details",
   "routes.settings.backup-storage-apps.title": "App Storage",
-  "routes.settings.backup-storage-apps.description": "View local data usage by app",
+  "routes.settings.backup-storage-apps.description":
+    "View local data usage by app",
   "routes.settings.about.title": "About",
   "routes.settings.about.description": "Version and project information",
   "routes.settings.about-releases.title": "Version History",
-  "routes.settings.about-releases.description": "Review previous version updates",
+  "routes.settings.about-releases.description":
+    "Review previous version updates",
   "routes.settings.about-release-detail.title": "Version Details",
-  "routes.settings.about-release-detail.description": "Review version update details",
+  "routes.settings.about-release-detail.description":
+    "Review version update details",
   "routes.settings.about-terms.title": "Terms of Service",
-  "routes.settings.about-terms.description": "Review the current Terms of Service",
+  "routes.settings.about-terms.description":
+    "Review the current Terms of Service",
   "routes.settings.about-privacy.title": "Privacy Policy",
-  "routes.settings.about-privacy.description": "Review the current Privacy Policy",
+  "routes.settings.about-privacy.description":
+    "Review the current Privacy Policy",
   "routes.settings.developer.title": "Developer",
   "routes.settings.developer.description": "App development entry",
   "app.languageChanged": "Language changed to {{language}}",
@@ -98,8 +118,10 @@ const enUS = {
   "ui.notifications": "Notifications",
   "ui.noNotifications": "No notifications",
   "ui.markAsRead": "Mark as read",
-  "ui.notice.missingDescription": "The notification does not exist or is offline",
-  "ui.notice.selectPlaceholder": "Select a notification on the left to view details",
+  "ui.notice.missingDescription":
+    "The notification does not exist or is offline",
+  "ui.notice.selectPlaceholder":
+    "Select a notification on the left to view details",
   "ui.notice.center": "Message Center",
   "ui.notice.release": "Version Update",
   "ui.notice.system": "System Notice",
@@ -110,7 +132,8 @@ const enUS = {
   "ui.versionHistory.description": "Review Search Next version updates",
   "ui.versionHistory.empty": "No version history",
   "ui.versionHistory.missingDescription": "This version record does not exist",
-  "ui.versionHistory.selectPlaceholder": "Select a version on the left to view details",
+  "ui.versionHistory.selectPlaceholder":
+    "Select a version on the left to view details",
   "ui.versionHistory.loadFailed": "Unable to load version history",
   "ui.versionHistory.publishedAt": "Published {{date}}",
   "ui.releaseUpdate.title": "A new version is available",
@@ -119,7 +142,8 @@ const enUS = {
   "ui.releaseUpdate.refresh": "Refresh",
   "ui.language": "Language",
   "ui.interfaceLanguage": "Interface Language",
-  "ui.language.description": "Use this language for menus, settings, and system UI",
+  "ui.language.description":
+    "Use this language for menus, settings, and system UI",
   "ui.english": "English",
   "ui.simplifiedChinese": "Simplified Chinese",
   "ui.appearance": "Appearance",
@@ -137,14 +161,16 @@ const enUS = {
   "ui.gradient": "Gradient",
   "ui.default": "Default",
   "ui.welcome": "Welcome",
-  "ui.signInToSyncYourDataAndSettings": "Sign in to sync your data and settings",
+  "ui.signInToSyncYourDataAndSettings":
+    "Sign in to sync your data and settings",
   "ui.unknown": "Unknown",
   "ui.accountAvatar": "Account avatar",
   "ui.account.localName": "Guest Account",
   "ui.account.localAvatar": "Guest account avatar",
   "ui.account.localSubtitle": "Local account in this browser",
   "ui.account.localStatus": "Using locally",
-  "ui.account.localDescription": "Data is saved only in this browser and is not synced to the cloud.",
+  "ui.account.localDescription":
+    "Data is saved only in this browser and is not synced to the cloud.",
   "ui.signedIn": "Signed in",
   "ui.signOut": "Sign Out",
   "ui.accountInfo": "Account Info",
@@ -155,7 +181,8 @@ const enUS = {
   "ui.account.editProfile": "Edit Profile",
   "ui.account.profileDescription": "Update your public username.",
   "ui.account.joinedOn": "Joined {{date}}",
-  "ui.account.usernameHelp": "2-20 characters using letters, numbers, underscores, or Chinese characters",
+  "ui.account.usernameHelp":
+    "2-20 characters using letters, numbers, underscores, or Chinese characters",
   "ui.account.saveProfile": "Save Profile",
   "ui.account.profileUpdated": "Profile updated",
   "ui.account.profileUpdateFailed": "Failed to update profile",
@@ -164,10 +191,13 @@ const enUS = {
   "ui.account.enterCurrentPassword": "Enter your current password",
   "ui.account.newPassword": "New Password",
   "ui.account.enterNewPassword": "Enter a new password",
-  "ui.account.passwordDescription": "All devices will be signed out after this change to protect your account.",
-  "ui.account.passwordHelp": "6-20 characters with at least one letter and one number",
+  "ui.account.passwordDescription":
+    "All devices will be signed out after this change to protect your account.",
+  "ui.account.passwordHelp":
+    "6-20 characters with at least one letter and one number",
   "ui.account.passwordLength": "Password must be 6-20 characters",
-  "ui.account.passwordMustDiffer": "The new password must differ from the current password",
+  "ui.account.passwordMustDiffer":
+    "The new password must differ from the current password",
   "ui.account.showPassword": "Show password",
   "ui.account.hidePassword": "Hide password",
   "ui.account.updatePassword": "Update Password",
@@ -175,10 +205,12 @@ const enUS = {
   "ui.account.passwordChangeFailed": "Failed to change password",
   "ui.account.dangerZone": "Danger Zone",
   "ui.account.deleteAccount": "Delete Account",
-  "ui.account.deleteAccountDescription": "Account deletion cannot be undone, and linked cloud data will no longer be accessible.",
+  "ui.account.deleteAccountDescription":
+    "Account deletion cannot be undone, and linked cloud data will no longer be accessible.",
   "ui.account.deleteConfirmTitle": "Delete this account?",
   "ui.account.deletePermanently": "Delete Permanently",
-  "ui.account.deleteConfirmDescription": "This action cannot be undone. Enter your current password and type your username to confirm:",
+  "ui.account.deleteConfirmDescription":
+    "This action cannot be undone. Enter your current password and type your username to confirm:",
   "ui.account.confirmUsername": "Confirm Username",
   "ui.account.enterUsernameToConfirm": "Enter your current username",
   "ui.account.usernameConfirmationMismatch": "The username does not match",
@@ -189,18 +221,21 @@ const enUS = {
   "ui.email": "Email",
   "ui.signIn": "Sign In",
   "ui.register": "Register",
-  "ui.auth.registrationDisabled": "Registration is not currently available for this project",
+  "ui.auth.registrationDisabled":
+    "Registration is not currently available for this project",
   "ui.signedInSuccessfully": "Signed in successfully.",
   "ui.signedInSuccessfully2": "Signed in successfully",
   "ui.welcomeBackUsername": "Welcome back, {{username}}!",
   "ui.registeredSuccessfully": "Registered successfully.",
   "ui.registeredSuccessfully2": "Registered successfully",
-  "ui.registeredSuccessfullyWelcomeUsername": "Registered successfully. Welcome, {{username}}!",
+  "ui.registeredSuccessfullyWelcomeUsername":
+    "Registered successfully. Welcome, {{username}}!",
   "ui.signInFailed": "Sign-in failed",
   "ui.registrationFailed": "Registration failed",
   "ui.welcomeBack": "Welcome back",
   "ui.createAccount": "Create Account",
-  "ui.auth.createAccountSubtitle": "Create an account to enjoy the full experience",
+  "ui.auth.createAccountSubtitle":
+    "Create an account to enjoy the full experience",
   "ui.noAccountYet": "No account yet?",
   "ui.alreadyHaveAnAccount": "Already have an account?",
   "ui.registerNow": "Register now",
@@ -209,30 +244,36 @@ const enUS = {
   "ui.enterAValidEmailAddress": "Enter a valid email address",
   "ui.password": "Password",
   "ui.enterYourPassword": "Enter your password",
-  "ui.passwordMustBeAtLeast6Characters": "Password must be at least 6 characters",
+  "ui.passwordMustBeAtLeast6Characters":
+    "Password must be at least 6 characters",
   "ui.rememberMe": "Remember me",
   "ui.forgotPassword": "Forgot password?",
   "ui.signingIn": "Signing in...",
-  "ui.auth.turnstileConfigMissing": "Human verification is incomplete. Contact the administrator.",
+  "ui.auth.turnstileConfigMissing":
+    "Human verification is incomplete. Contact the administrator.",
   "ui.completeHumanVerification": "Complete human verification",
   "ui.anErrorOccurredWhileSigningIn": "An error occurred while signing in",
   "ui.username": "Username",
   "ui.enterAUsername": "Enter a username",
   "ui.usernameMustBe220Characters": "Username must be 2-20 characters",
-  "ui.auth.usernamePattern": "Username can only contain letters, numbers, underscores, and Chinese characters",
+  "ui.auth.usernamePattern":
+    "Username can only contain letters, numbers, underscores, and Chinese characters",
   "ui.invitationCode": "Invitation Code",
   "ui.enterInvitationCode": "Enter invitation code",
   "ui.emailVerificationCode": "Email Verification Code",
   "ui.enterTheVerificationCode": "Enter the verification code",
-  "ui.theVerificationCodeMustBe6Digits": "The verification code must be 6 digits",
+  "ui.theVerificationCodeMustBe6Digits":
+    "The verification code must be 6 digits",
   "ui.enterThe6DigitCode": "Enter the 6-digit code",
   "ui.getCode": "Get Code",
   "ui.verificationCodeSentToYourEmail": "Verification code sent to your email",
   "ui.failedToSendVerificationCode": "Failed to send verification code",
   "ui.enterYourEmailAddressFirst": "Enter your email address first",
   "ui.failedToGetVerificationCode": "Failed to get verification code",
-  "ui.passwordMustIncludeLettersAndNumbers": "Password must include letters and numbers",
-  "ui.auth.passwordPlaceholder": "Enter a password (at least 6 characters, with letters and numbers)",
+  "ui.passwordMustIncludeLettersAndNumbers":
+    "Password must include letters and numbers",
+  "ui.auth.passwordPlaceholder":
+    "Enter a password (at least 6 characters, with letters and numbers)",
   "ui.confirmPassword": "Confirm Password",
   "ui.confirmYourPassword": "Confirm your password",
   "ui.theTwoPasswordsDoNotMatch": "The two passwords do not match",
@@ -246,27 +287,35 @@ const enUS = {
   "ui.privacyPolicy": "Privacy Policy",
   "ui.appDevelopment": "App Development",
   "ui.developerMode": "Developer Mode",
-  "ui.dev.modeDescription": "Use custom apps and local ESM entries for testing.",
+  "ui.dev.modeDescription":
+    "Use custom apps and local ESM entries for testing.",
   "ui.appStoreEntry": "App Store Entry",
-  "ui.dev.storeEntryDescription": "Show the Developer navigation item when developer mode is enabled",
+  "ui.dev.storeEntryDescription":
+    "Show the Developer navigation item when developer mode is enabled",
   "ui.enabled": "Enabled",
   "ui.disabled": "Disabled",
   "ui.desktopSearchBar": "Desktop Search Bar",
-  "ui.search.desktopBarDescription": "Show a full-width search entry at the top of the desktop",
+  "ui.search.desktopBarDescription":
+    "Show a full-width search entry at the top of the desktop",
   "ui.keyboardShortcut": "Keyboard Shortcut",
-  "ui.openSpotlightSearchWithShortcut": "Open Spotlight Search with {{shortcut}}",
+  "ui.openSpotlightSearchWithShortcut":
+    "Open Spotlight Search with {{shortcut}}",
   "ui.shortcut": "Shortcut",
   "ui.enterNewShortcut": "Enter New Shortcut",
-  "ui.search.shortcutRecordHint": "Press a new combination. Esc cancels, Delete/Backspace restores default.",
-  "ui.search.shortcutEditHint": "Click the field on the right to edit. The system default modifier is {{modifier}}.",
-  "ui.shortcutMustIncludeCommandCtrlAlt": "Shortcut must include Command/Ctrl/Alt",
+  "ui.search.shortcutRecordHint":
+    "Press a new combination. Esc cancels, Delete/Backspace restores default.",
+  "ui.search.shortcutEditHint":
+    "Click the field on the right to edit. The system default modifier is {{modifier}}.",
+  "ui.shortcutMustIncludeCommandCtrlAlt":
+    "Shortcut must include Command/Ctrl/Alt",
   "ui.recent": "Recent",
   "ui.clearRecentItems": "Clear recent items?",
   "ui.clearAll": "Clear",
   "ui.cancel": "Cancel",
   "ui.deleteTitle": "Delete {{title}}",
   "ui.noRecentItems": "No recent items",
-  "ui.search.recentDescription": "Searches, websites, apps, pages, and settings opened from Spotlight Search will appear here",
+  "ui.search.recentDescription":
+    "Searches, websites, apps, pages, and settings opened from Spotlight Search will appear here",
   "ui.pages": "Pages",
   "ui.shortcuts": "Shortcuts",
   "ui.webSearch": "Web Search",
@@ -285,15 +334,19 @@ const enUS = {
   "ui.reportIssue": "Report Issue",
   "ui.createAGitHubIssue": "Create a GitHub Issue",
   "ui.specialThanks": "Special Thanks",
-  "ui.about.thanksBody": "Thanks to all open-source contributors, and to every user for support and feedback.",
-  "ui.search.placeholder": "Search web, websites, apps, and settings. Type @ for commands",
+  "ui.about.thanksBody":
+    "Thanks to all open-source contributors, and to every user for support and feedback.",
+  "ui.search.placeholder":
+    "Search web, websites, apps, and settings. Type @ for commands",
   "ui.atCommands": "@ Commands",
   "ui.quickSearchCommands": "Quick search commands",
   "ui.loading2": "Loading",
   "ui.use": "Use",
   "ui.all": "All",
-  "ui.searchWebWebsitesAppsAndSettings": "Search web, websites, apps, and settings",
-  "ui.onlyOpenSearchEnginesAndSuggestions": "Only open search engines and suggestions",
+  "ui.searchWebWebsitesAppsAndSettings":
+    "Search web, websites, apps, and settings",
+  "ui.onlyOpenSearchEnginesAndSuggestions":
+    "Only open search engines and suggestions",
   "ui.onlySearchSavedWebsites": "Only search saved websites",
   "ui.onlySearchApps": "Only search apps",
   "ui.onlySearchSettings": "Only search settings",
@@ -319,8 +372,10 @@ const enUS = {
   "ui.openSettings": "Open settings",
   "ui.signInToSearchNext": "Sign in to Search Next",
   "ui.createASearchNextAccount": "Create a Search Next account",
-  "ui.auth.signInSyncSubtitle": "Sign in to sync desktop layout, websites, apps, and preferences.",
-  "ui.auth.registerSyncSubtitle": "Register to sync your Search Next data across devices.",
+  "ui.auth.signInSyncSubtitle":
+    "Sign in to sync desktop layout, websites, apps, and preferences.",
+  "ui.auth.registerSyncSubtitle":
+    "Register to sync your Search Next data across devices.",
   "ui.auth.settingsSignedOutTitle": "Sign in to sync your space",
   "ui.auth.settingsSignedOutDescription":
     "Sign in or create a Search Next account to sync your desktop layout, websites, apps, and preferences across devices.",
@@ -342,34 +397,44 @@ const enUS = {
   "ui.countItems": "{{count}} items",
   "ui.namespace": "Namespace",
   "ui.clearAppData": "Clear app data?",
-  "ui.app.clearDataWarning": "The local data for this app cannot be restored after clearing.",
+  "ui.app.clearDataWarning":
+    "The local data for this app cannot be restored after clearing.",
   "ui.clear": "Clear",
   "ui.clearAppData2": "Clear App Data",
   "ui.removeAppTitle": "Remove “{{name}}”?",
-  "ui.removeAppDescription": "This app instance will be removed from the desktop.",
+  "ui.removeAppDescription":
+    "This app instance will be removed from the desktop.",
   "ui.deleteAppDataTogether": "Also delete app data",
-  "ui.appStorageSummary": "Uses {{size}} across {{count}} data items. This data is kept by default.",
+  "ui.appStorageSummary":
+    "Uses {{size}} across {{count}} data items. This data is kept by default.",
   "ui.noAppDataToDelete": "This app has no saved local data.",
-  "ui.sharedAppDataWarning": "This app has {{count}} other desktop instances. Their shared data will also be cleared.",
+  "ui.sharedAppDataWarning":
+    "This app has {{count}} other desktop instances. Their shared data will also be cleared.",
   "ui.removeApp": "Remove App",
   "ui.removedWithData": "App and data removed",
   "ui.desktopAndLayout": "Desktop & Layout",
-  "ui.backup.desktopDescription": "Desktop pages, icon layout, and modified marker",
-  "ui.themesWallpapersAndAppearanceSettings": "Themes, wallpapers, and appearance settings",
+  "ui.backup.desktopDescription":
+    "Desktop pages, icon layout, and modified marker",
+  "ui.themesWallpapersAndAppearanceSettings":
+    "Themes, wallpapers, and appearance settings",
   "ui.backup.appDescription": "Installed apps and private app storage",
-  "ui.backup.searchDescription": "Search preferences, search engines, and recent items",
+  "ui.backup.searchDescription":
+    "Search preferences, search engines, and recent items",
   "ui.interfaceLanguageSetting": "Interface language setting",
   "ui.developerModeAndLocalAppEntries": "Developer mode and local app entries",
   "ui.readNotificationRecords": "Read notification records",
   "ui.backupMetadata": "Backup Metadata",
-  "ui.backup.metadataDescription": "Backup version, time, origin, and structure overhead",
+  "ui.backup.metadataDescription":
+    "Backup version, time, origin, and structure overhead",
   "ui.other": "Other",
   "ui.uncategorizedDataItems": "Uncategorized data items",
-  "ui.categoryCountCategoriesItemCountItems": "{{categoryCount}} categories, {{itemCount}} items",
+  "ui.categoryCountCategoriesItemCountItems":
+    "{{categoryCount}} categories, {{itemCount}} items",
   "ui.sizeUsed": "{{size}} used",
   "ui.usageDetails": "Usage Details",
   "ui.appStorageUsage": "App Storage",
-  "ui.appStorageUsageDescription": "Private data saved by each app in this browser",
+  "ui.appStorageUsageDescription":
+    "Private data saved by each app in this browser",
   "ui.appStorageDetails": "App Details",
   "ui.appStorageCount": "{{count}} apps have saved local data",
   "ui.appStorageItemCount": "{{count}} data items",
@@ -377,7 +442,8 @@ const enUS = {
   "ui.appInstallMetadata": "App Installation Data",
   "ui.appInstallMetadataDescription": "App list and installation state data",
   "ui.noAppStorageData": "No App Data",
-  "ui.noAppStorageDataDescription": "No apps currently store private data in this browser.",
+  "ui.noAppStorageDataDescription":
+    "No apps currently store private data in this browser.",
   "ui.noLocalData": "No Local Data",
   "ui.thereIsNoBackupDataToSummarize": "There is no backup data to summarize.",
   "ui.syncedToCloud": "Synced to cloud",
@@ -386,48 +452,60 @@ const enUS = {
   "ui.importThisBackup": "Import this backup?",
   "ui.fileNameSizeKB": "File: {{name}} ({{size}} KB)",
   "ui.backupTimeTime": "Backup time: {{time}}",
-  "ui.backup.importWarning": "Importing will overwrite all current local settings. Export current data first as a backup.",
+  "ui.backup.importWarning":
+    "Importing will overwrite all current local settings. Export current data first as a backup.",
   "ui.confirmImport": "Import",
   "ui.forceImport": "Force Import",
   "ui.importedSuccessfullyRefreshing": "Imported successfully. Refreshing...",
   "ui.backupOriginMismatch": "Backup Origin Mismatch",
   "ui.backupFieldsMismatch": "Backup Fields Mismatch",
-  "ui.backupOriginOriginCurrentPageCurrent": "Backup origin: {{origin}}. Current page: {{current}}",
-  "ui.missingFieldsMissingExtraFieldsExtra": "Missing fields: {{missing}}. Extra fields: {{extra}}",
-  "ui.backup.originMismatchContinue": "Continuing will allow importing this origin and overwrite current local settings.",
-  "ui.backup.fieldsMismatchContinue": "Continuing will attempt a forced import. Missing fields will keep current local values.",
+  "ui.backupOriginOriginCurrentPageCurrent":
+    "Backup origin: {{origin}}. Current page: {{current}}",
+  "ui.missingFieldsMissingExtraFieldsExtra":
+    "Missing fields: {{missing}}. Extra fields: {{extra}}",
+  "ui.backup.originMismatchContinue":
+    "Continuing will allow importing this origin and overwrite current local settings.",
+  "ui.backup.fieldsMismatchContinue":
+    "Continuing will attempt a forced import. Missing fields will keep current local values.",
   "ui.continue": "Continue",
   "ui.importFailedError": "Import failed: {{error}}",
   "ui.chooseCloudBackupToOverwrite": "Choose Cloud Backup to Overwrite",
-  "ui.backup.chooseOverwriteDescription": "The cloud backup limit has been reached. Choose an existing backup to overwrite with current local data.",
+  "ui.backup.chooseOverwriteDescription":
+    "The cloud backup limit has been reached. Choose an existing backup to overwrite with current local data.",
   "ui.chooseACloudBackupToOverwrite": "Choose a cloud backup to overwrite",
   "ui.untitledBackup": "Untitled Backup",
   "ui.selectedCloudBackupNotFound": "Selected cloud backup not found",
   "ui.cloudBackupTime": "Cloud Backup {{time}}",
   "ui.uploadToCloud": "Upload to Cloud",
-  "ui.backup.uploadCloudDescription": "Save current local data as a new cloud backup version. Current: {{current}}/{{max}}.",
+  "ui.backup.uploadCloudDescription":
+    "Save current local data as a new cloud backup version. Current: {{current}}/{{max}}.",
   "ui.enterABackupName": "Enter a backup name",
   "ui.upload": "Upload",
   "ui.restoreFromCloud": "Restore from cloud?",
   "ui.versionName": "Version: {{name}}",
   "ui.syncTimeTimeSizeSize": "Sync time: {{time}}, size: {{size}}",
-  "ui.backup.restoreWarning": "Restoring will overwrite current local settings with cloud data. Export current data first as a backup.",
+  "ui.backup.restoreWarning":
+    "Restoring will overwrite current local settings with cloud data. Export current data first as a backup.",
   "ui.confirmRestore": "Restore",
-  "ui.selectedCloudBackupVersionNotFound": "Selected cloud backup version not found",
+  "ui.selectedCloudBackupVersionNotFound":
+    "Selected cloud backup version not found",
   "ui.restoredSuccessfullyRefreshing": "Restored successfully. Refreshing...",
   "ui.overwriteCloudBackup": "Overwrite cloud backup?",
   "ui.targetVersionName": "Target version: {{name}}",
   "ui.originalSyncTimeTime": "Original sync time: {{time}}",
-  "ui.backup.overwriteCloudWarning": "After overwriting, this cloud backup will be replaced with current local data and the previous cloud data cannot be viewed or restored.",
+  "ui.backup.overwriteCloudWarning":
+    "After overwriting, this cloud backup will be replaced with current local data and the previous cloud data cannot be viewed or restored.",
   "ui.confirmOverwrite": "Overwrite",
   "ui.setBackupName": "Set Backup Name",
   "ui.save": "Save",
   "ui.storage": "Storage",
   "ui.currentDataUsage": "Current Data Usage",
-  "ui.backup.storageUsageDescription": "View storage usage for desktop, settings, apps, and more",
+  "ui.backup.storageUsageDescription":
+    "View storage usage for desktop, settings, apps, and more",
   "ui.cloudBackupList": "Cloud Backup List",
   "ui.readingCloudBackups": "Reading cloud backups",
-  "ui.backup.emptyCloudBackups": "No cloud backups yet. Upload to create the first backup version.",
+  "ui.backup.emptyCloudBackups":
+    "No cloud backups yet. Upload to create the first backup version.",
   "ui.rename": "Rename",
   "ui.restore": "Restore",
   "ui.overwrite": "Overwrite",
@@ -436,34 +514,45 @@ const enUS = {
   "ui.saveAsASnbakBackupFile": "Save as a .snbak backup file",
   "ui.export": "Export",
   "ui.importData": "Import Data",
-  "ui.backup.importDescription": "Importing will overwrite current local settings",
+  "ui.backup.importDescription":
+    "Importing will overwrite current local settings",
   "ui.import": "Import",
   "ui.exportCurrentDataBeforeImporting": "Export current data before importing",
-  "ui.backup.importOverwriteNotice": "Imported data will overwrite all current settings.",
+  "ui.backup.importOverwriteNotice":
+    "Imported data will overwrite all current settings.",
   "ui.cloudSync": "Cloud Sync",
   "ui.syncStatus": "Sync Status",
-  "ui.lastSyncedTimeVersionCurrentMax": "Last synced: {{time}}, version {{current}}/{{max}}",
-  "ui.thisAccountHasNoCloudSyncDataYet": "This account has no cloud sync data yet",
+  "ui.lastSyncedTimeVersionCurrentMax":
+    "Last synced: {{time}}, version {{current}}/{{max}}",
+  "ui.thisAccountHasNoCloudSyncDataYet":
+    "This account has no cloud sync data yet",
   "ui.backup.limitExceeded": "Cloud backup versions exceed the current limit",
-  "ui.backup.limitExceededDescription": "There are {{current}} versions; the current limit is {{max}}. The next upload must overwrite an existing version.",
+  "ui.backup.limitExceededDescription":
+    "There are {{current}} versions; the current limit is {{max}}. The next upload must overwrite an existing version.",
   "ui.uploadCloudBackup": "Upload Cloud Backup",
-  "ui.backup.cloudUploadHint": "Create a new version below the limit; overwrite an existing version after reaching the limit",
+  "ui.backup.cloudUploadHint":
+    "Create a new version below the limit; overwrite an existing version after reaching the limit",
   "ui.currentStorageUsage": "Current Storage Usage",
   "ui.cloudBackup": "Cloud Backup",
   "ui.reading": "Reading",
-  "ui.backup.storageLoadingDescription": "Fetching storage usage for this cloud backup version.",
+  "ui.backup.storageLoadingDescription":
+    "Fetching storage usage for this cloud backup version.",
   "ui.cloudBackupNotFound": "Cloud Backup Not Found",
-  "ui.backup.notFoundDescription": "This cloud backup version may have been overwritten or deleted.",
+  "ui.backup.notFoundDescription":
+    "This cloud backup version may have been overwritten or deleted.",
   "ui.openToolsAsApps": "Open tools as apps",
-  "ui.apps.openAsAppsHint": "Add apps to the desktop as fixed icons, then open their full experience in a separate window.",
+  "ui.apps.openAsAppsHint":
+    "Add apps to the desktop as fixed icons, then open their full experience in a separate window.",
   "ui.appCollections": "App Collections",
   "ui.allApps": "All Apps",
   "ui.get": "Get",
   "ui.getApp": "Get App",
   "ui.addWidgetSize": "Add {{size}}",
   "ui.desktopInfoAtAGlance": "Desktop info at a glance",
-  "ui.store.appHeroDescription": "Browse curated collections and full apps, then get them as standalone desktop windows.",
-  "ui.store.widgetHeroDescription": "Previews automatically follow your current appearance. Compare sizes, then add the best fit to your desktop.",
+  "ui.store.appHeroDescription":
+    "Browse curated collections and full apps, then get them as standalone desktop windows.",
+  "ui.store.widgetHeroDescription":
+    "Previews automatically follow your current appearance. Compare sizes, then add the best fit to your desktop.",
   "ui.noMatchingApps": "No matching apps",
   "ui.noAppsAvailable": "No apps available",
   "ui.allWidgets": "All Widgets",
@@ -473,24 +562,30 @@ const enUS = {
   "ui.noWidgetsAvailable": "No widgets available",
   "ui.appCheckingShort": "Checking",
   "ui.appUnavailableShort": "Unavailable",
-  "ui.appCheckingMessage": "Checking app availability. Please try again shortly.",
-  "ui.appUnavailableMessage": "This app has been removed or disabled. Remove it from the desktop or wait for an administrator to restore it.",
+  "ui.appCheckingMessage":
+    "Checking app availability. Please try again shortly.",
+  "ui.appUnavailableMessage":
+    "This app has been removed or disabled. Remove it from the desktop or wait for an administrator to restore it.",
   "ui.addNameLabel": "Add {{name}} {{label}}",
   "ui.countResults": "{{count}} results",
-  "ui.searchQuery": "Search \"{{query}}\"",
-  "ui.enterKeywordsToShowRealStoreResults": "Enter keywords to show real store results",
+  "ui.searchQuery": 'Search "{{query}}"',
+  "ui.enterKeywordsToShowRealStoreResults":
+    "Enter keywords to show real store results",
   "ui.noMatchingContentFound": "No matching content found",
   "ui.viewWebsites": "View Websites",
   "ui.viewApps": "View Apps",
   "ui.viewWidgets": "View Widgets",
-  "ui.ai.simulationNotice": "Simulation mode is active. Configure a DeepSeek API key to enable real AI search.",
-  "ui.ai.searchFailedMessage": "Search failed. Please try again later. If the issue persists, check your network connection or API configuration.",
+  "ui.ai.simulationNotice":
+    "Simulation mode is active. Configure a DeepSeek API key to enable real AI search.",
+  "ui.ai.searchFailedMessage":
+    "Search failed. Please try again later. If the issue persists, check your network connection or API configuration.",
   "ui.searchRequestFailed": "Search request failed",
   "ui.websites": "Websites",
   "ui.featured": "Featured",
   "ui.featuredToday": "Featured Today",
   "ui.curatedProductivityWebsites": "Curated Productivity Websites",
-  "ui.store.websiteHeroDescription": "Browse common tools, docs, and design resources in one place, then add them to the desktop from details.",
+  "ui.store.websiteHeroDescription":
+    "Browse common tools, docs, and design resources in one place, then add them to the desktop from details.",
   "ui.allWebsites": "All Websites",
   "ui.storeItemCount": "{{count}} items",
   "ui.categories": "Categories",
@@ -498,7 +593,8 @@ const enUS = {
   "ui.nextCategories": "View next categories",
   "ui.custom": "Custom",
   "ui.addWebsite": "Add Website",
-  "ui.addWebsiteDescription": "Add a favorite website for quick access from your desktop.",
+  "ui.addWebsiteDescription":
+    "Add a favorite website for quick access from your desktop.",
   "ui.uRL": "URL",
   "ui.iconURL": "Icon URL",
   "ui.optional": "Optional",
@@ -521,24 +617,32 @@ const enUS = {
   "ui.noConversationHistory": "No conversation history",
   "ui.newConversation": "New conversation",
   "ui.searchWithEngine": "Search with {{engine}}...",
-  "ui.ai.welcomeMessage": "Hi! I am your AI search assistant and can help you search for anything.",
+  "ui.ai.welcomeMessage":
+    "Hi! I am your AI search assistant and can help you search for anything.",
   "ui.whatIsTheWeatherLikeToday": "What is the weather like today?",
-  "ui.ai.weatherHelpMessage": "I can help search for weather information. Choose Bing, Baidu, or Google to get the latest weather data.",
+  "ui.ai.weatherHelpMessage":
+    "I can help search for weather information. Choose Bing, Baidu, or Google to get the latest weather data.",
   "ui.baidu": "Baidu",
   "ui.searchIcons": "Search icons",
   "ui.noMatchingIconsFound": "No matching icons found",
-  "ui.theme.chooseDescription": "Choose the visual style for desktop windows, Dock, menus, and icons.",
+  "ui.theme.chooseDescription":
+    "Choose the visual style for desktop windows, Dock, menus, and icons.",
   "ui.loadingThemes": "Loading themes...",
-  "ui.clickTheCardToViewPreviewDetails": "Click the card to view preview details",
+  "ui.clickTheCardToViewPreviewDetails":
+    "Click the card to view preview details",
   "ui.inUse": "In Use",
   "ui.current": "Current",
   "ui.applied": "Applied",
   "ui.noThemesAvailable": "No themes available",
   "ui.applyToDesktop": "Apply to Desktop",
   "ui.wallpaper": "Wallpaper",
-  "ui.wallpaper.chooseDescription": "Choose a gradient or image background for the current desktop.",
+  "ui.wallpaper.chooseDescription":
+    "Choose a gradient, image, or web wallpaper for the current desktop.",
   "ui.loadingWallpapers": "Loading wallpapers...",
   "ui.imageWallpaper": "Image Wallpaper",
+  "ui.applicationWallpaper": "Web Wallpaper",
+  "ui.applicationWallpaperUnavailable":
+    "The web wallpaper is unavailable. The default background was restored.",
   "ui.gradientWallpaper": "Gradient Wallpaper",
   "ui.resourceUnavailable": "Resource unavailable",
   "ui.useDefaultBackground": "Use Default Background",
@@ -547,7 +651,8 @@ const enUS = {
   "ui.noCategories": "No categories",
   "ui.noData": "No data",
   "ui.viewMore": "View More",
-  "ui.personalization.mineDescription": "Manage themes and wallpapers you created, and quickly apply them to the desktop.",
+  "ui.personalization.mineDescription":
+    "Manage themes and wallpapers you created, and quickly apply them to the desktop.",
   "ui.currentTheme": "Current Theme",
   "ui.currentWallpaper": "Current Wallpaper",
   "ui.appliedToDesktop": "Applied to Desktop",
@@ -557,15 +662,18 @@ const enUS = {
   "ui.myCreations": "My Creations",
   "ui.createTheme": "Create Theme",
   "ui.addWallpaper": "Add Wallpaper",
-  "ui.theme.editorDescription": "Configure light and dark backgrounds, then save and apply directly to the desktop.",
-  "ui.wallpaper.editorDescription": "Create a gradient background or add an image as the desktop wallpaper.",
+  "ui.theme.editorDescription":
+    "Configure light and dark backgrounds, then save and apply directly to the desktop.",
+  "ui.wallpaper.editorDescription":
+    "Create a gradient background or add an image as the desktop wallpaper.",
   "ui.customThemeInUse": "Custom theme · In use",
   "ui.customWallpaperInUse": "Custom wallpaper · In use",
   "ui.clickTheCardToEditTheme": "Click the card to edit theme",
   "ui.clickTheCardToEditGradient": "Click the card to edit gradient",
   "ui.clickTheCardToEditImage": "Click the card to edit image",
   "ui.edit": "Edit",
-  "ui.personalization.emptyMine": "No custom content yet. Create a theme or add a wallpaper above to get started.",
+  "ui.personalization.emptyMine":
+    "No custom content yet. Create a theme or add a wallpaper above to get started.",
   "ui.editWallpaper": "Edit Wallpaper",
   "ui.type": "Type",
   "ui.name": "Name",
@@ -576,7 +684,8 @@ const enUS = {
   "ui.angle": "Angle",
   "ui.imageURL": "Image URL",
   "ui.enterAnImageURL": "Enter an image URL",
-  "ui.enterAValidImageURLHttpHttpData": "Enter a valid image URL (http/https/data)",
+  "ui.enterAValidImageURLHttpHttpData":
+    "Enter a valid image URL (http/https/data)",
   "ui.deleteThisItem": "Delete this item?",
   "ui.thisCannotBeUndone": "This cannot be undone.",
   "ui.delete": "Delete",
@@ -584,20 +693,24 @@ const enUS = {
   "ui.editTheme": "Edit Theme",
   "ui.customTheme": "Custom Theme",
   "ui.deleteThisTheme": "Delete this theme?",
-  "ui.theme.deleteWarning": "This cannot be undone. If currently in use, the default theme will be restored.",
+  "ui.theme.deleteWarning":
+    "This cannot be undone. If currently in use, the default theme will be restored.",
   "ui.saveAndApply": "Save and Apply",
   "ui.description": "Description",
   "ui.exampleMyFocusTheme": "Example: My Focus Theme",
-  "ui.theme.descriptionPlaceholder": "Example: low contrast, comfortable for long sessions",
+  "ui.theme.descriptionPlaceholder":
+    "Example: low contrast, comfortable for long sessions",
   "ui.lightBackground": "Light Background",
   "ui.darkBackground": "Dark Background",
   "ui.accentColor": "Accent Color",
-  "ui.accentColorManaged": "The accent color is managed by the system administrator.",
+  "ui.accentColorManaged":
+    "The accent color is managed by the system administrator.",
   "ui.livePreview": "Live Preview",
   "ui.basicInformation": "Basic Information",
   "ui.colors": "Colors",
   "ui.previewAppearance": "Preview Appearance",
-  "ui.theme.localSaveHint": "Custom themes are saved locally under Mine and take effect in desktop rendering immediately after saving and applying.",
+  "ui.theme.localSaveHint":
+    "Custom themes are saved locally under Mine and take effect in desktop rendering immediately after saving and applying.",
   "ui.noDescription": "No description",
   "ui.aurora": "Aurora",
   "ui.skylight": "Skylight",
@@ -606,7 +719,8 @@ const enUS = {
   "ui.mist": "Mist",
   "ui.midnight": "Midnight",
   "ui.debugCustomApps": "Debug Custom Apps",
-  "ui.dev.customAppsDescription": "Manage ESM entry URLs and size configs for debugging local apps or backend-unpacked app entries.",
+  "ui.dev.customAppsDescription":
+    "Manage ESM entry URLs and size configs for debugging local apps or backend-unpacked app entries.",
   "ui.noCustomApps": "No custom apps",
   "ui.add": "Add",
   "ui.addToDesktop": "Add to Desktop",
@@ -614,7 +728,8 @@ const enUS = {
   "ui.updated": "Updated",
   "ui.addedToDesktop": "Added to desktop",
   "ui.removed": "Removed",
-  "ui.dev.duplicateEntry": "This entry URL already exists. Do not add it again.",
+  "ui.dev.duplicateEntry":
+    "This entry URL already exists. Do not add it again.",
   "ui.editApp": "Edit App",
   "ui.addApp": "Add App",
   "ui.eSMEntryURL": "ESM Entry URL",
@@ -632,10 +747,13 @@ const enUS = {
   "ui.legal.confirmPrefix": "I have read and agree to the",
   "ui.legal.readerTitle": "Legal & Privacy",
   "ui.legal.updateRequiredTitle": "Legal Documents Updated",
-  "ui.legal.updateRequiredDescription": "Please review and accept the latest documents to continue using Search Next.",
-  "ui.legal.readBeforeContinue": "Please review the documents below. Your original action will continue after confirmation.",
+  "ui.legal.updateRequiredDescription":
+    "Please review and accept the latest documents to continue using Search Next.",
+  "ui.legal.readBeforeContinue":
+    "Please review the documents below. Your original action will continue after confirmation.",
   "ui.legal.loadFailed": "Unable to load documents",
-  "ui.legal.retryDescription": "Check your connection, then close and reopen this window.",
+  "ui.legal.retryDescription":
+    "Check your connection, then close and reopen this window.",
   "ui.legal.pageRetryDescription": "Check your connection and try again.",
   "ui.legal.retry": "Reload",
   "ui.legal.notPublished": "No published document",
@@ -648,7 +766,8 @@ const enUS = {
   "ui.legal.privacy": "Privacy Policy",
   "ui.legal.confirmationVersion": "Consent version {{version}}",
   "ui.legal.documents": "Legal & Privacy",
-  "ui.legal.documentsDescription": "Review the current Terms of Service and Privacy Policy",
+  "ui.legal.documentsDescription":
+    "Review the current Terms of Service and Privacy Policy",
 } as const;
 
 export default enUS;

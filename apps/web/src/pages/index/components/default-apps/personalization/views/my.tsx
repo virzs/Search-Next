@@ -43,6 +43,7 @@ const resolveWallpaperName = (
   if (wallpaper.name) return wallpaper.name;
   if (wallpaper.type === "none") return "ui.none";
   if (wallpaper.type === "image") return "ui.image";
+  if (wallpaper.type === "application") return "ui.applicationWallpaper";
   return "ui.gradient";
 };
 
@@ -61,6 +62,15 @@ const wallpaperPreviewStyle = (
     const safeUrl = (item.url || "").replace(/"/g, '\\"');
     return {
       backgroundImage: `url("${safeUrl}")`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    };
+  }
+  if (item.type === "application") {
+    return {
+      backgroundImage: item.previewUrl
+        ? `url("${item.previewUrl.replace(/"/g, '\\"')}")`
+        : undefined,
       backgroundSize: "cover",
       backgroundPosition: "center",
     };
@@ -283,7 +293,9 @@ const ThemeMyView = () => {
                   ? t("ui.useDefaultBackground")
                   : personalization.wallpaper.type === "image"
                     ? t("ui.imageWallpaper")
-                    : t("ui.gradientWallpaper")
+                    : personalization.wallpaper.type === "application"
+                      ? t("ui.applicationWallpaper")
+                      : t("ui.gradientWallpaper")
               }
               tone="purple"
             />

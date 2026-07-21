@@ -10,7 +10,10 @@ import {
 } from "@remixicon/react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import type { AppearanceMode } from "@/contexts/DesktopThemeContext";
-import { getActiveThemeConfigs } from "@/services/desktop";
+import {
+  getActiveThemeConfigs,
+  getActiveWallpaperDetail,
+} from "@/services/desktop";
 import { AppSegmented } from "@/components";
 import { getMyThemeConfigs } from "../../../personalization/my-assets";
 import { personalizationRoute } from "../../../personalization/route-paths";
@@ -30,6 +33,7 @@ const resolveWallpaperName = (
   if (wallpaper.name) return wallpaper.name;
   if (wallpaper.type === "none") return "ui.none";
   if (wallpaper.type === "image") return "ui.image";
+  if (wallpaper.type === "application") return "ui.applicationWallpaper";
   return "ui.gradient";
 };
 
@@ -53,26 +57,73 @@ const PersonalizationView = () => {
     setAppearanceMode,
   } = useDesktopTheme();
   const { data: themes } = useRequest(getActiveThemeConfigs);
+  const activeApplicationWallpaperId =
+    personalization.wallpaper.type === "application"
+      ? personalization.wallpaper.id
+      : "";
+  const { data: activeApplicationWallpaper } = useRequest(
+    () => getActiveWallpaperDetail(activeApplicationWallpaperId),
+    {
+      ready: Boolean(activeApplicationWallpaperId),
+      refreshDeps: [activeApplicationWallpaperId],
+    },
+  );
   const { projectInfo } = useConfig();
-  const systemThemeColor =
-    projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
+  const systemThemeColor = projectInfo?.site?.themeColor || DEFAULT_THEME_COLOR;
 
   const activeTheme = useMemo(() => {
     const id = personalization.themeId;
     return (
-      [
-        ...(themes ?? []),
-        ...getMyThemeConfigs(systemThemeColor),
-      ].find((t) => t._id === id) ??
-      null
+      [...(themes ?? []), ...getMyThemeConfigs(systemThemeColor)].find(
+        (t) => t._id === id,
+      ) ?? null
     );
   }, [personalization.themeId, systemThemeColor, themes]);
 
   const wallpaperName = t(resolveWallpaperName(personalization.wallpaper));
-  const themeName = t(resolveThemeName(
-    activeTheme?.name,
-    personalization.themeId,
-  ));
+  const wallpaperDescription =
+    personalization.wallpaper.type === "application" &&
+    activeApplicationWallpaper?.application ? (
+      <span className="grid gap-0.5">
+        <span>{wallpaperName}</span>
+        {activeApplicationWallpaper.description ||
+        activeApplicationWallpaper.application.description ? (
+          <span>
+            {activeApplicationWallpaper.description ||
+              activeApplicationWallpaper.application.description}
+          </span>
+        ) : null}
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[var(--sn-text-tertiary)]">
+          {activeApplicationWallpaper.author ||
+          activeApplicationWallpaper.application.author ? (
+            <span>
+              {t("ui.author")} ·{" "}
+              {activeApplicationWallpaper.author ||
+                activeApplicationWallpaper.application.author}
+            </span>
+          ) : null}
+          {activeApplicationWallpaper.url ||
+          activeApplicationWallpaper.application.projectUrl ? (
+            <a
+              href={
+                activeApplicationWallpaper.url ||
+                activeApplicationWallpaper.application.projectUrl
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[var(--sn-accent-text)] hover:underline"
+            >
+              {t("ui.source")}
+            </a>
+          ) : null}
+        </span>
+      </span>
+    ) : (
+      wallpaperName
+    );
+  const themeName = t(
+    resolveThemeName(activeTheme?.name, personalization.themeId),
+  );
 
   return (
     <MacSettingsView>
@@ -125,7 +176,7 @@ const PersonalizationView = () => {
           icon={<RiLandscapeLine size={16} />}
           iconTone="purple"
           title={t("ui.background")}
-          description={wallpaperName}
+          description={wallpaperDescription}
           extra={
             <div className="flex items-center gap-2">
               <AppButton
@@ -144,7 +195,6 @@ const PersonalizationView = () => {
           }
         />
       </MacSettingsSection>
-
     </MacSettingsView>
   );
 };

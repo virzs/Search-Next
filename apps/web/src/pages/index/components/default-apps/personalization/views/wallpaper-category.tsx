@@ -2,39 +2,52 @@ import { DefaultAppView } from "@/components";
 import { useRequest } from "ahooks";
 import { Empty, Pagination, Skeleton } from "antd";
 import { FC, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
 import {
   getWallpaperImageUrl,
+  getWallpaperPreviewUrl,
   getUserWallpaperCategories,
   getUserWallpapers,
   type WallpaperApiItem,
   type WallpaperCategoryApiItem,
 } from "@/services/desktop";
-import PreviewCard, {
-  PreviewCardAction,
-} from "../components/PreviewCard";
+import PreviewCard, { PreviewCardAction } from "../components/PreviewCard";
+import ApplicationWallpaperMetadata from "../components/ApplicationWallpaperMetadata";
 import { useI18n } from "@/i18n";
 
 const WallpaperCategoryView: FC = () => {
   const { t } = useI18n();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const categoryId = id ? decodeURIComponent(String(id)) : "";
+  const wallpaperType =
+    searchParams.get("type") === "application" ? "application" : "image";
   const { personalization, setWallpaper } = useDesktopTheme();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
 
   const { data: categories, loading: categoryLoading } = useRequest(
-    getUserWallpaperCategories,
+    () => getUserWallpaperCategories({ type: wallpaperType }),
+    { refreshDeps: [wallpaperType] },
   );
 
   useEffect(() => {
     setPage(1);
-  }, [categoryId]);
+  }, [categoryId, wallpaperType]);
 
   const { data: wallpapersPage, loading: wallpaperLoading } = useRequest(
-    () => getUserWallpapers({ page, pageSize, categoryId: categoryId || undefined }),
-    { ready: Boolean(categoryId), refreshDeps: [categoryId, page, pageSize] },
+    () =>
+      getUserWallpapers({
+        page,
+        pageSize,
+        categoryId: categoryId || undefined,
+        type: wallpaperType,
+      }),
+    {
+      ready: Boolean(categoryId),
+      refreshDeps: [categoryId, page, pageSize, wallpaperType],
+    },
   );
 
   const activeCategory = useMemo(() => {
@@ -63,6 +76,19 @@ const WallpaperCategoryView: FC = () => {
     setWallpaper({ type: "image", url, name: wallpaper.name });
   };
 
+  const handleSelectApplication = (wallpaper: WallpaperApiItem) => {
+    const previewUrl = getWallpaperPreviewUrl(wallpaper);
+    const revision = wallpaper.application?.revision;
+    if (!previewUrl || !revision) return;
+    setWallpaper({
+      type: "application",
+      id: wallpaper._id,
+      revision,
+      previewUrl,
+      name: wallpaper.name,
+    });
+  };
+
   return (
     <DefaultAppView
       className="h-full"
@@ -78,25 +104,46 @@ const WallpaperCategoryView: FC = () => {
     >
       {categoryLoading || wallpaperLoading ? (
         <div className="h-[220px] w-full flex items-center justify-center">
-          <div className="text-[13px] text-[var(--sn-text-secondary)]">{t("ui.loadingWallpapers")}</div>
+          <div className="text-[13px] text-[var(--sn-text-secondary)]">
+            {t("ui.loadingWallpapers")}
+          </div>
         </div>
       ) : visibleWallpapers.length ? (
         <div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {visibleWallpapers.map((w) => {
-              const url = getWallpaperImageUrl(w);
-              const active = url ? isImageActive(url) : false;
+              const url = getWallpaperPreviewUrl(w);
+              const active =
+                wallpaperType === "application"
+                  ? personalization.wallpaper.type === "application" &&
+                    personalization.wallpaper.id === w._id
+                  : url
+                    ? isImageActive(url)
+                    : false;
               return (
                 <PreviewCard
                   key={w._id}
                   active={active}
                   disabled={!url}
                   title={w.name}
-                  description={w.description || (url ? t("ui.imageWallpaper") : t("ui.resourceUnavailable"))}
+                  description={
+                    wallpaperType === "application" || w.author || w.url ? (
+                      <ApplicationWallpaperMetadata wallpaper={w} />
+                    ) : (
+                      w.description ||
+                      (url
+                        ? t("ui.imageWallpaper")
+                        : t("ui.resourceUnavailable"))
+                    )
+                  }
                   action={
                     url && !active ? (
                       <PreviewCardAction
-                        onClick={() => handleSelectImage(w)}
+                        onClick={() =>
+                          wallpaperType === "application"
+                            ? handleSelectApplication(w)
+                            : handleSelectImage(w)
+                        }
                       >
                         {t("action.apply")}
                       </PreviewCardAction>
@@ -118,19 +165,21 @@ const WallpaperCategoryView: FC = () => {
             })}
           </div>
 
-          {total > pageSize ? <div className="mt-5 flex justify-end">
-            <Pagination
-              current={page}
-              pageSize={pageSize}
-              total={total}
-              showSizeChanger
-              showQuickJumper
-              onChange={(nextPage, nextPageSize) => {
-                setPage(nextPage);
-                if (nextPageSize !== pageSize) setPageSize(nextPageSize);
-              }}
-            />
-          </div> : null}
+          {total > pageSize ? (
+            <div className="mt-5 flex justify-end">
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={total}
+                showSizeChanger
+                showQuickJumper
+                onChange={(nextPage, nextPageSize) => {
+                  setPage(nextPage);
+                  if (nextPageSize !== pageSize) setPageSize(nextPageSize);
+                }}
+              />
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="h-[220px] w-full flex items-center justify-center">

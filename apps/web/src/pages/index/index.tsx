@@ -64,6 +64,7 @@ import LoadingOverlay from "./components/loading-overlay";
 import AppInfoModal from "@/components/app-info-modal";
 import { v4 as uuidv4 } from "uuid";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
+import type { PersonalizationWallpaper } from "@/contexts/DesktopThemeContext";
 import { Outlet, useNavigate } from "react-router";
 import { storeRoute } from "./components/default-apps/store/route-paths";
 import type { StoreAddPayload } from "./components/default-apps/store";
@@ -104,6 +105,10 @@ import {
   formatAppStorageSize,
   getAppStorageStats,
 } from "@/utils/app-storage";
+import ApplicationWallpaperBackground, {
+  type WallpaperBridgeKeyEvent,
+} from "./components/application-wallpaper-background";
+import WallpaperPageEdge from "./components/wallpaper-page-edge";
 
 type DesktopItem = DesktopSortItem<DesktopItemData>;
 type DesktopNextHandleRef = {
@@ -129,6 +134,38 @@ interface RemoveAppTarget {
   storageBytes: number;
   storageItemCount: number;
 }
+
+const applicationWallpaperShellClassName = css`
+  pointer-events: none;
+
+  [data-wallpaper-interactive],
+  [data-wallpaper-interactive] *,
+  [data-base-modal-panel],
+  [data-base-modal-panel] *,
+  .desktop-next-context-menu,
+  .desktop-next-context-menu *,
+  .desktop-next-context-submenu,
+  .desktop-next-context-submenu * {
+    pointer-events: auto;
+  }
+`;
+
+const applicationWallpaperDesktopClassName = css`
+  pointer-events: none;
+
+  * {
+    pointer-events: none !important;
+  }
+
+  [data-grid-item-id],
+  [data-grid-item-id] *,
+  .application-wallpaper-dock,
+  .application-wallpaper-dock *,
+  .application-wallpaper-pagination,
+  .application-wallpaper-pagination * {
+    pointer-events: auto !important;
+  }
+`;
 
 interface PendingRemovalDecision {
   appId: string;
@@ -244,6 +281,7 @@ function Index() {
     appearanceMode,
     personalization,
     resolvedColorScheme,
+    setWallpaper,
   } = useDesktopTheme();
   const navigate = useNavigate();
   const {
@@ -476,8 +514,51 @@ function Index() {
       return `background-color: #000; background-image: url("${safeUrl}"); background-size: cover; background-position: center; background-repeat: no-repeat;`;
     }
 
+    if (wallpaper.type === "application") {
+      return "background: #000;";
+    }
+
     return "background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);";
   }, [personalization.wallpaper]);
+
+  const applicationWallpaper =
+    personalization.wallpaper.type === "application"
+      ? personalization.wallpaper
+      : null;
+
+  const handleApplicationWallpaperResolved = useCallback(
+    (
+      wallpaper: Extract<
+        PersonalizationWallpaper,
+        { type: "application" }
+      >,
+    ) => setWallpaper(wallpaper),
+    [setWallpaper],
+  );
+
+  const handleApplicationWallpaperUnavailable = useCallback(() => {
+    message.warning(t("ui.applicationWallpaperUnavailable"));
+    setWallpaper({ type: "none", name: "None" });
+  }, [message, setWallpaper, t]);
+
+  const handleApplicationWallpaperKeyDown = useCallback(
+    (payload: WallpaperBridgeKeyEvent) => {
+      if (!searchPreferences.enableSpotlightShortcut) return;
+      const event = new KeyboardEvent("keydown", payload);
+      if (
+        matchesUnifiedSearchShortcut(
+          event,
+          searchPreferences.spotlightShortcut,
+        )
+      ) {
+        setSpotlightOpen(true);
+      }
+    },
+    [
+      searchPreferences.enableSpotlightShortcut,
+      searchPreferences.spotlightShortcut,
+    ],
+  );
 
   const [init, { setFalse: finishInit }] = useBoolean(true);
   const [fullApp, setFullApp] = useState<{
@@ -1526,25 +1607,48 @@ function Index() {
   return (
     <div
       className={cx(
-        "w-screen h-screen flex flex-col",
+        "relative w-screen h-screen overflow-hidden",
         css`
           ${desktopBackgroundCss}
         `,
       )}
     >
-      <WebReleaseUpdatePrompt />
-      <LegalDocumentGate />
-      <div className="flex items-center justify-end py-2 px-6 max-w-7xl mx-auto w-full gap-2">
-        <Notice />
-        <Feedback />
-      </div>
-      {searchPreferences.showDesktopSearchBar ? (
-        <DesktopSearchBar
-          onOpenApp={handleOpenSearchApp}
-          showShortcutHint={searchPreferences.enableSpotlightShortcut}
-          shortcut={searchPreferences.spotlightShortcut}
+      {applicationWallpaper ? (
+        <ApplicationWallpaperBackground
+          wallpaper={applicationWallpaper}
+          theme={resolvedColorScheme}
+          language={language as "zh-CN" | "en-US"}
+          onResolved={handleApplicationWallpaperResolved}
+          onUnavailable={handleApplicationWallpaperUnavailable}
+          onBridgeKeyDown={handleApplicationWallpaperKeyDown}
         />
       ) : null}
+      <div
+        className={cx(
+          "relative z-10 flex h-full w-full flex-col",
+          applicationWallpaper ? applicationWallpaperShellClassName : null,
+        )}
+      >
+        <div className="contents" data-wallpaper-interactive>
+          <WebReleaseUpdatePrompt />
+          <LegalDocumentGate />
+        </div>
+        <div
+          data-wallpaper-interactive
+          className="flex items-center justify-end py-2 px-6 max-w-7xl mx-auto w-full gap-2"
+        >
+          <Notice />
+          <Feedback />
+        </div>
+        {searchPreferences.showDesktopSearchBar ? (
+          <div data-wallpaper-interactive>
+            <DesktopSearchBar
+              onOpenApp={handleOpenSearchApp}
+              showShortcutHint={searchPreferences.enableSpotlightShortcut}
+              shortcut={searchPreferences.spotlightShortcut}
+            />
+          </div>
+        ) : null}
       {/* <div className="pt-30 pb-10">
         <SearchWithAI />
       </div> */}
@@ -1555,6 +1659,20 @@ function Index() {
           pages={desktopPages}
           onChange={handleDesktopPagesChange}
           maxPages={userLimit?.maxPages || 5}
+          className={
+            applicationWallpaper
+              ? applicationWallpaperDesktopClassName
+              : undefined
+          }
+          pagingDotsBuilder={
+            applicationWallpaper
+              ? (dots) => (
+                  <div className="application-wallpaper-pagination flex items-center justify-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 backdrop-blur-xl">
+                    {dots}
+                  </div>
+                )
+              : undefined
+          }
           theme={desktopTheme}
           typeConfigMap={typeConfigMap}
           contextMenuProps={{ showRemoveButton: true }}
@@ -1563,6 +1681,9 @@ function Index() {
           onContextMenuItemClick={handleContextMenuItemClick}
           itemIconBuilder={desktopItemIconBuilder}
           dockProps={{
+            className: applicationWallpaper
+              ? "application-wallpaper-dock"
+              : undefined,
             items: dockItems,
             itemBuilder: createDockHistoryItem,
             fixedItems: [
@@ -1652,6 +1773,7 @@ function Index() {
           }}
         />
       </div>
+      <div className="contents" data-wallpaper-interactive>
       <Outlet context={{ onAddStoreItem: handleAddStoreItem }} />
       {availabilityModal && (
         <DesktopNextBaseModal
@@ -1864,6 +1986,28 @@ function Index() {
         shortcut={searchPreferences.spotlightShortcut}
       />
       {init && <LoadingOverlay open text={t("ui.loadingConfiguration")} />}
+      </div>
+      </div>
+      {applicationWallpaper && desktopPages.length > 1 ? (
+        <>
+          <WallpaperPageEdge
+            side="left"
+            onCommit={() => {
+              const current = desktopRef.current?.currentPage ?? 0;
+              desktopRef.current?.setCurrentPage(Math.max(0, current - 1));
+            }}
+          />
+          <WallpaperPageEdge
+            side="right"
+            onCommit={() => {
+              const current = desktopRef.current?.currentPage ?? 0;
+              desktopRef.current?.setCurrentPage(
+                Math.min(desktopPages.length - 1, current + 1),
+              );
+            }}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

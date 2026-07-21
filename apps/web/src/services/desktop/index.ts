@@ -1,6 +1,7 @@
 import { Resource } from "@/types";
 import { baseGetRequest } from "@/utils/axios";
 import type { DesktopListItem, DesktopTheme } from "zs_library";
+import { getApiPrefix } from "@/utils/utils";
 
 export interface DefaultUserConfig {
   config: {
@@ -119,21 +120,36 @@ export interface WallpaperCategoryApiItem {
 /**
  * 获取用户可用壁纸分类
  */
-export const getUserWallpaperCategories = () => {
+export const getUserWallpaperCategories = (params?: {
+  type?: "image" | "application";
+}) => {
   return baseGetRequest<WallpaperCategoryApiItem[]>(
     "/tabs/desktop/wallpaper/category/user",
-  )();
+  )(params ?? {});
 };
 
 export interface WallpaperApiItem {
   _id: string;
+  type?: "image" | "application";
   name: string;
   description?: string;
+  author?: string;
+  url?: string;
   thumbnail?: Resource;
   image?: Resource;
   categoryId?: string;
   sortOrder?: number;
   isActive?: boolean;
+  application?: {
+    packageName: string;
+    version: string;
+    entry: string;
+    preview: string;
+    author?: string;
+    projectUrl?: string;
+    description?: string;
+    revision: string;
+  };
 }
 
 export const getWallpaperImageUrl = (
@@ -143,6 +159,31 @@ export const getWallpaperImageUrl = (
   if (!url || typeof url !== "string") return null;
   return toAbsUrl(url);
 };
+
+export const getWallpaperApplicationPreviewUrl = (
+  wallpaper: WallpaperApiItem | null | undefined,
+) => {
+  if (!wallpaper?._id || !wallpaper.application?.revision) return null;
+  return getApiPrefix(
+    `/tabs/desktop/wallpaper/runtime/${wallpaper._id}/${wallpaper.application.revision}/preview`,
+  );
+};
+
+export const getWallpaperApplicationEntryUrl = (
+  wallpaper: WallpaperApiItem | null | undefined,
+) => {
+  if (!wallpaper?._id || !wallpaper.application?.revision) return null;
+  return getApiPrefix(
+    `/tabs/desktop/wallpaper/runtime/${wallpaper._id}/${wallpaper.application.revision}/entry`,
+  ).replace(/\/$/, "");
+};
+
+export const getWallpaperPreviewUrl = (
+  wallpaper: WallpaperApiItem | null | undefined,
+) =>
+  wallpaper?.type === "application"
+    ? getWallpaperApplicationPreviewUrl(wallpaper)
+    : getWallpaperImageUrl(wallpaper);
 
 export interface WallpaperPageResult {
   data: WallpaperApiItem[];
@@ -156,8 +197,15 @@ export const getUserWallpapers = (params?: {
   page?: number;
   pageSize?: number;
   categoryId?: string;
+  type?: "image" | "application";
 }) => {
   return baseGetRequest<WallpaperPageResult>(
     "/tabs/desktop/wallpaper/upload/active",
   )(params ?? {});
+};
+
+export const getActiveWallpaperDetail = (id: string) => {
+  return baseGetRequest<WallpaperApiItem>(
+    `/tabs/desktop/wallpaper/upload/active/${encodeURIComponent(id)}`,
+  )();
 };

@@ -28,7 +28,14 @@ const DesktopThemeContext = createContext<DesktopThemeContextValue | undefined>(
 export type PersonalizationWallpaper =
   | { type: "none"; name?: string }
   | { type: "image"; url: string; name?: string }
-  | { type: "gradient"; css: string; name?: string };
+  | { type: "gradient"; css: string; name?: string }
+  | {
+      type: "application";
+      id: string;
+      revision: string;
+      previewUrl: string;
+      name?: string;
+    };
 
 export interface PersonalizationConfig {
   themeId: DesktopThemeId;
@@ -47,6 +54,34 @@ const isThemeId = (value: unknown): value is DesktopThemeId => {
 
 const isAppearanceMode = (value: unknown): value is AppearanceMode => {
   return value === "system" || value === "dark" || value === "light";
+};
+
+const parseWallpaper = (value: unknown): PersonalizationWallpaper => {
+  if (!value || typeof value !== "object") return defaultWallpaper;
+  const record = value as Record<string, unknown>;
+  const name = typeof record.name === "string" ? record.name : undefined;
+  if (record.type === "none") return { type: "none", name };
+  if (record.type === "image" && typeof record.url === "string") {
+    return { type: "image", url: record.url, name };
+  }
+  if (record.type === "gradient" && typeof record.css === "string") {
+    return { type: "gradient", css: record.css, name };
+  }
+  if (
+    record.type === "application" &&
+    typeof record.id === "string" &&
+    typeof record.revision === "string"
+  ) {
+    return {
+      type: "application",
+      id: record.id,
+      revision: record.revision,
+      previewUrl:
+        typeof record.previewUrl === "string" ? record.previewUrl : "",
+      name,
+    };
+  }
+  return defaultWallpaper;
 };
 
 const getSystemColorScheme = (): ResolvedColorScheme => {
@@ -98,9 +133,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         const appearanceMode = isAppearanceMode(parsed?.appearanceMode)
           ? parsed.appearanceMode
           : defaultAppearanceMode;
-        const wallpaper = (parsed?.wallpaper as
-          | PersonalizationWallpaper
-          | undefined) ?? defaultWallpaper;
+        const wallpaper = parseWallpaper(parsed?.wallpaper);
         setPersonalization({
           themeId: resolvedThemeId,
           appearanceMode,
