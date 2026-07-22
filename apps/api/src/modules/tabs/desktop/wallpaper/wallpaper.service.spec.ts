@@ -290,6 +290,12 @@ describe("WallpaperService web wallpaper packages", () => {
     );
     expect(html).toContain('<base href="./assets/">');
     expect(html).toContain("search-next-wallpaper-v1");
+    expect(html).toContain("emit('activity'");
+    expect(html).toContain("pointermove");
+    expect(html).toContain("touchstart");
+    expect(html).toContain("wheel");
+    expect(html).toContain("activity('keyboard')");
+    expect(html).toContain("now-lastActivity<500");
     expect((service as any).getRuntimeContentSecurityPolicy()).toContain(
       "connect-src 'none'",
     );
