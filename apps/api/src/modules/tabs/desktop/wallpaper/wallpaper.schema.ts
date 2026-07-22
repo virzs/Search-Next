@@ -10,7 +10,7 @@ import { Resource } from "src/modules/resource/schemas/resource";
 export type WallpaperDocument = Wallpaper & Document;
 export const WallpaperName = "Wallpaper";
 
-export type WallpaperType = "image" | "application";
+export type WallpaperType = "image" | "gradient" | "application";
 
 export type WallpaperApplicationPackage = {
   packageName: string;
@@ -26,7 +26,11 @@ export type WallpaperApplicationPackage = {
 
 @Schema({ timestamps: true })
 export class Wallpaper extends BaseSchema {
-  @Prop({ type: String, enum: ["image", "application"], default: "image" })
+  @Prop({
+    type: String,
+    enum: ["image", "gradient", "application"],
+    default: "image",
+  })
   type: WallpaperType;
 
   @Prop()
@@ -40,6 +44,12 @@ export class Wallpaper extends BaseSchema {
 
   @Prop()
   url?: string;
+
+  @Prop()
+  css?: string;
+
+  @Prop({ type: String, unique: true, sparse: true })
+  sourceKey?: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

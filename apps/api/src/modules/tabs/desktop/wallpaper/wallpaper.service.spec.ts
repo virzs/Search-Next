@@ -57,6 +57,94 @@ describe("WallpaperService web wallpaper packages", () => {
     await fs.rm(storageRoot, { recursive: true, force: true });
   });
 
+  it("seeds the former built-in gradients without overwriting admin changes", async () => {
+    const bulkWrite = jest.fn(async (_operations: any[]) => ({}));
+    service = new WallpaperService({ bulkWrite } as any, {} as any, {} as any);
+
+    await service.onModuleInit();
+
+    const operations = bulkWrite.mock.calls[0][0];
+    expect(operations).toHaveLength(6);
+    expect(operations[0]).toEqual({
+      updateOne: {
+        filter: { sourceKey: "system-gradient-aurora" },
+        update: {
+          $setOnInsert: expect.objectContaining({
+            type: "gradient",
+            name: "极光",
+            isActive: true,
+          }),
+        },
+        upsert: true,
+      },
+    });
+    expect(operations[0].updateOne.update.$set).toBeUndefined();
+    expect(bulkWrite).toHaveBeenCalledWith(operations, { timestamps: false });
+  });
+
+  it("accepts layered gradients and rejects executable or injectable CSS", () => {
+    const layered =
+      "radial-gradient(circle at 20% 20%, rgba(0, 0, 0, .2), transparent 60%), linear-gradient(135deg, #34c759, #0a84ff)";
+
+    expect((service as any).normalizeGradientCss(layered)).toBe(layered);
+    for (const unsafe of [
+      "linear-gradient(red, blue); background: url(https://example.com/a)",
+      "linear-gradient(red, u/**/rl(https://example.com/a))",
+      "linear-gradient(red, var(--external))",
+      "linear-gradient(red, j\\61vascript:alert(1))",
+    ]) {
+      expect(() => (service as any).normalizeGradientCss(unsafe)).toThrow(
+        BadRequestException,
+      );
+    }
+  });
+
+  it("creates and updates admin-managed gradient wallpapers", async () => {
+    const create = jest.fn(async () => ({ _id: "507f1f77bcf86cd799439011" }));
+    const findById = jest.fn(() => ({
+      exec: async () => ({ type: "gradient" }),
+    }));
+    const findByIdAndUpdate = jest.fn(async () => ({ type: "gradient" }));
+    service = new WallpaperService(
+      { create, findById, findByIdAndUpdate } as any,
+      {} as any,
+      {} as any,
+    );
+    jest
+      .spyOn(service, "getWallpaperDetail")
+      .mockResolvedValue({ type: "gradient" } as any);
+
+    await service.createGradientWallpaper(
+      {
+        name: "Ocean",
+        css: "linear-gradient(135deg, #34c759, #0a84ff)",
+      },
+      "user-id",
+    );
+    await service.updateGradientWallpaper(
+      "507f1f77bcf86cd799439011",
+      { css: "radial-gradient(circle, #fff, #000)" },
+      "user-id",
+    );
+
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "gradient",
+        name: "Ocean",
+        creator: "user-id",
+      }),
+    );
+    expect(findByIdAndUpdate).toHaveBeenCalledWith(
+      "507f1f77bcf86cd799439011",
+      expect.objectContaining({
+        type: "gradient",
+        css: "radial-gradient(circle, #fff, #000)",
+        updater: "user-id",
+      }),
+      { new: true },
+    );
+  });
+
   it("validates and stages a valid package", async () => {
     const prepared = await (service as any).prepareApplicationPackage(
       makePackage({}, { "assets/main.js": 'document.body.dataset.ready="1"' }),

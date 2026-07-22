@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  OnModuleInit,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import AdmZip from "adm-zip";
@@ -14,7 +15,9 @@ import { Response } from "src/utils/response";
 import {
   ApplicationWallpaperDto,
   CreateWallpaperDto,
+  GradientWallpaperDto,
   WallpaperGroupQueryDto,
+  UpdateGradientWallpaperDto,
   UpdateWallpaperDto,
   WallpaperQueryDto,
 } from "./wallpaper.dto";
@@ -85,8 +88,47 @@ const ALLOWED_PACKAGE_EXTENSIONS = new Set([
 ]);
 const PREVIEW_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
+const DEFAULT_GRADIENT_WALLPAPERS = [
+  {
+    sourceKey: "system-gradient-aurora",
+    name: "极光",
+    description: "深色极光渐变背景",
+    css: "radial-gradient(80% 70% at 15% 20%, rgba(0, 199, 190, 0.70) 0%, rgba(0, 0, 0, 0) 65%), radial-gradient(80% 70% at 85% 15%, rgba(10, 132, 255, 0.62) 0%, rgba(0, 0, 0, 0) 60%), radial-gradient(90% 80% at 55% 92%, rgba(255, 45, 85, 0.55) 0%, rgba(0, 0, 0, 0) 62%), linear-gradient(135deg, #0b0b10 0%, #111325 40%, #0b1220 100%)",
+  },
+  {
+    sourceKey: "system-gradient-skylight",
+    name: "天光",
+    description: "轻盈的蓝紫色天光渐变",
+    css: "radial-gradient(120% 90% at 20% 10%, rgba(90, 200, 250, 0.85) 0%, rgba(10, 132, 255, 0.0) 55%), radial-gradient(100% 80% at 90% 30%, rgba(88, 86, 214, 0.55) 0%, rgba(88, 86, 214, 0) 60%), linear-gradient(135deg, rgba(242, 242, 247, 1) 0%, rgba(224, 235, 255, 1) 55%, rgba(236, 232, 255, 1) 100%)",
+  },
+  {
+    sourceKey: "system-gradient-sunset",
+    name: "落日",
+    description: "温暖的橙粉色落日渐变",
+    css: "radial-gradient(110% 90% at 15% 25%, rgba(255, 159, 10, 0.80) 0%, rgba(255, 159, 10, 0) 55%), radial-gradient(120% 100% at 85% 20%, rgba(255, 45, 85, 0.70) 0%, rgba(255, 45, 85, 0) 60%), linear-gradient(135deg, rgba(255, 250, 245, 1) 0%, rgba(255, 231, 220, 1) 60%, rgba(255, 220, 236, 1) 100%)",
+  },
+  {
+    sourceKey: "system-gradient-lime",
+    name: "青柠",
+    description: "清新的青绿色渐变背景",
+    css: "radial-gradient(110% 90% at 20% 20%, rgba(48, 209, 88, 0.70) 0%, rgba(48, 209, 88, 0) 55%), radial-gradient(120% 90% at 80% 30%, rgba(0, 199, 190, 0.55) 0%, rgba(0, 199, 190, 0) 60%), linear-gradient(135deg, rgba(245, 255, 252, 1) 0%, rgba(226, 255, 243, 1) 55%, rgba(224, 248, 255, 1) 100%)",
+  },
+  {
+    sourceKey: "system-gradient-mist",
+    name: "雾白",
+    description: "柔和克制的灰白渐变",
+    css: "radial-gradient(120% 90% at 25% 20%, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0) 55%), radial-gradient(120% 90% at 85% 35%, rgba(199, 199, 204, 0.55) 0%, rgba(199, 199, 204, 0) 60%), linear-gradient(135deg, rgba(242, 242, 247, 1) 0%, rgba(232, 232, 236, 1) 100%)",
+  },
+  {
+    sourceKey: "system-gradient-midnight",
+    name: "深夜",
+    description: "深色蓝紫午夜渐变",
+    css: "radial-gradient(100% 80% at 20% 25%, rgba(88, 86, 214, 0.55) 0%, rgba(88, 86, 214, 0) 60%), radial-gradient(120% 90% at 82% 18%, rgba(10, 132, 255, 0.55) 0%, rgba(10, 132, 255, 0) 60%), radial-gradient(110% 90% at 60% 92%, rgba(255, 45, 85, 0.40) 0%, rgba(255, 45, 85, 0) 62%), linear-gradient(135deg, #050509 0%, #0b0b14 55%, #070710 100%)",
+  },
+] as const;
+
 @Injectable()
-export class WallpaperService {
+export class WallpaperService implements OnModuleInit {
   constructor(
     @InjectModel(WallpaperName)
     private readonly wallpaperModel: Model<Wallpaper>,
@@ -94,6 +136,29 @@ export class WallpaperService {
     private readonly wallpaperCategoryModel: Model<WallpaperCategory>,
     private readonly resourceService: ResourceService,
   ) {}
+
+  async onModuleInit() {
+    await this.wallpaperModel.bulkWrite(
+      DEFAULT_GRADIENT_WALLPAPERS.map((wallpaper, index) => ({
+        updateOne: {
+          filter: { sourceKey: wallpaper.sourceKey },
+          update: {
+            $setOnInsert: {
+              ...wallpaper,
+              type: "gradient",
+              isActive: true,
+              isDelete: false,
+              sortOrder: index,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          },
+          upsert: true,
+        },
+      })),
+      { timestamps: false },
+    );
+  }
 
   private ensureObjectId(id: string, message: string) {
     if (!Types.ObjectId.isValid(id)) {
@@ -103,11 +168,15 @@ export class WallpaperService {
 
   private applyTypeFilter(
     finder: Record<string, any>,
-    type?: "image" | "application",
+    type?: "image" | "gradient" | "application",
   ) {
     if (!type) return;
     if (type === "application") {
       finder.type = "application";
+      return;
+    }
+    if (type === "gradient") {
+      finder.type = "gradient";
       return;
     }
     finder.$and = [
@@ -123,13 +192,34 @@ export class WallpaperService {
     return value;
   }
 
-  private serializeWallpaper(value: unknown) {
-    const plain = this.toPlain(value) as Record<string, any>;
-    const type = plain?.type === "application" ? "application" : "image";
+  private serializeWallpaper(value: unknown, includeAdmin = false) {
+    const plain = { ...(this.toPlain(value) as Record<string, any>) };
+    delete plain.sourceKey;
+    delete plain.isDelete;
+    delete plain.__v;
+    if (!includeAdmin) {
+      delete plain.creator;
+      delete plain.updater;
+    }
+    const type =
+      plain?.type === "application"
+        ? "application"
+        : plain?.type === "gradient"
+          ? "gradient"
+          : "image";
     if (type === "application" && plain.application) {
       const application = { ...plain.application };
       delete application.storageDir;
       return { ...plain, type, application };
+    }
+    if (type === "gradient") {
+      return {
+        ...plain,
+        type,
+        image: undefined,
+        thumbnail: undefined,
+        application: undefined,
+      };
     }
     return { ...plain, type, application: undefined };
   }
@@ -178,7 +268,7 @@ export class WallpaperService {
     ).exec();
     const total = await this.wallpaperModel.countDocuments(finder);
     return Response.page(
-      data.map((item) => this.serializeWallpaper(item)),
+      data.map((item) => this.serializeWallpaper(item, true)),
       {
         page,
         pageSize,
@@ -302,6 +392,56 @@ export class WallpaperService {
     return this.getWallpaperDetail(String(created._id));
   }
 
+  async createGradientWallpaper(dto: GradientWallpaperDto, user?: string) {
+    if (dto.categoryId) {
+      this.ensureObjectId(dto.categoryId, "壁纸分类不存在");
+    }
+    const css = this.normalizeGradientCss(dto.css);
+    const created = await this.wallpaperModel.create({
+      ...dto,
+      css,
+      type: "gradient",
+      categoryId: dto.categoryId || undefined,
+      isActive: dto.isActive ?? true,
+      sortOrder: dto.sortOrder ?? 0,
+      creator: user,
+    });
+    return this.getWallpaperDetail(String(created._id));
+  }
+
+  async updateGradientWallpaper(
+    id: string,
+    dto: UpdateGradientWallpaperDto,
+    user?: string,
+  ) {
+    this.ensureObjectId(id, "壁纸不存在");
+    if (dto.categoryId) {
+      this.ensureObjectId(dto.categoryId, "壁纸分类不存在");
+    }
+    const current = await this.wallpaperModel.findById(id).exec();
+    if (!current) throw new BadRequestException("壁纸不存在");
+    if (current.type !== "gradient") {
+      throw new BadRequestException("壁纸类型不可修改");
+    }
+    const updated = await this.wallpaperModel.findByIdAndUpdate(
+      id,
+      {
+        ...dto,
+        ...(dto.css !== undefined
+          ? { css: this.normalizeGradientCss(dto.css) }
+          : {}),
+        ...(dto.categoryId !== undefined
+          ? { categoryId: dto.categoryId || null }
+          : {}),
+        type: "gradient",
+        updater: user,
+      },
+      { new: true },
+    );
+    if (!updated) throw new BadRequestException("壁纸不存在");
+    return this.getWallpaperDetail(id);
+  }
+
   async updateWallpaper(id: string, dto: UpdateWallpaperDto, user?: string) {
     this.ensureObjectId(id, "壁纸不存在");
     if (dto.categoryId) {
@@ -313,6 +453,9 @@ export class WallpaperService {
     if (!current) throw new BadRequestException("壁纸不存在");
     if (current.type === "application") {
       throw new BadRequestException("网页壁纸请使用网页壁纸包更新接口");
+    }
+    if (current.type === "gradient") {
+      throw new BadRequestException("渐变壁纸请使用渐变壁纸更新接口");
     }
 
     const updateDoc: any = { ...dto, type: "image", updater: user };
@@ -474,7 +617,7 @@ export class WallpaperService {
       isActive: false,
     });
     if (!result) throw new BadRequestException("壁纸不存在");
-    return this.serializeWallpaper(result);
+    return this.serializeWallpaper(result, true);
   }
 
   async getWallpaperDetail(id: string) {
@@ -484,7 +627,7 @@ export class WallpaperService {
       true,
     ).exec();
     if (!wallpaper) throw new BadRequestException("壁纸不存在");
-    return this.serializeWallpaper(wallpaper);
+    return this.serializeWallpaper(wallpaper, true);
   }
 
   async getApplicationRuntimeFile(
@@ -821,6 +964,33 @@ export class WallpaperService {
   ) {
     const target = this.resolveApplicationStoragePath(application.storageDir);
     await fs.rm(target, { recursive: true, force: true });
+  }
+
+  private normalizeGradientCss(value: string) {
+    const css = String(value || "").trim();
+    if (!css || css.length > 4000) {
+      throw new BadRequestException("渐变 CSS 长度不正确");
+    }
+    if (!/^(?:repeating-)?(?:linear|radial|conic)-gradient\(/i.test(css)) {
+      throw new BadRequestException("仅支持 CSS 渐变背景");
+    }
+    if (
+      /[;{}\\]/.test(css) ||
+      /\/\*|\*\//.test(css) ||
+      /(?:url\s*\(|@import|expression\s*\(|javascript\s*:|data\s*:|var\s*\()/i.test(
+        css,
+      )
+    ) {
+      throw new BadRequestException("渐变 CSS 包含不支持的内容");
+    }
+    let depth = 0;
+    for (const char of css) {
+      if (char === "(") depth += 1;
+      if (char === ")") depth -= 1;
+      if (depth < 0) throw new BadRequestException("渐变 CSS 格式不正确");
+    }
+    if (depth !== 0) throw new BadRequestException("渐变 CSS 格式不正确");
+    return css;
   }
 
   private normalizePackagePath(value: string) {

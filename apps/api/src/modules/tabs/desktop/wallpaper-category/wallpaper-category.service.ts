@@ -1,17 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Response } from 'src/utils/response';
-import { Wallpaper, WallpaperName } from '../wallpaper/wallpaper.schema';
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { Response } from "src/utils/response";
+import { Wallpaper, WallpaperName } from "../wallpaper/wallpaper.schema";
 import {
   WallpaperCategory,
   WallpaperCategoryName,
-} from './wallpaper-category.schema';
+} from "./wallpaper-category.schema";
 import {
   CreateWallpaperCategoryDto,
   UpdateWallpaperCategoryDto,
   WallpaperCategoryQueryDto,
-} from './wallpaper-category.dto';
+} from "./wallpaper-category.dto";
 
 @Injectable()
 export class WallpaperCategoryService {
@@ -36,19 +36,19 @@ export class WallpaperCategoryService {
 
     if (q) {
       finder.$or = [
-        { name: { $regex: q, $options: 'i' } },
-        { description: { $regex: q, $options: 'i' } },
+        { name: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
       ];
     }
 
-    if (typeof isActive === 'boolean') {
+    if (typeof isActive === "boolean") {
       finder.isActive = isActive;
     }
 
     const data = await this.wallpaperCategoryModel
       .find(finder)
-      .populate('creator', 'username')
-      .populate('updater', 'username')
+      .populate("creator", "username")
+      .populate("updater", "username")
       .sort({ sortOrder: 1, createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
@@ -58,17 +58,20 @@ export class WallpaperCategoryService {
     return Response.page(data, { page, pageSize, total });
   }
 
-  async getUserWallpaperCategories(type?: 'image' | 'application') {
-    if (type && type !== 'image' && type !== 'application') {
-      throw new BadRequestException('壁纸类型不正确');
+  async getUserWallpaperCategories(
+    type?: "image" | "gradient" | "application",
+  ) {
+    if (type && !["image", "gradient", "application"].includes(type)) {
+      throw new BadRequestException("壁纸类型不正确");
     }
     const finder: any = { isActive: true };
-    if (type === 'application') finder.type = 'application';
-    if (type === 'image') {
-      finder.$or = [{ type: 'image' }, { type: { $exists: false } }];
+    if (type === "application") finder.type = "application";
+    if (type === "gradient") finder.type = "gradient";
+    if (type === "image") {
+      finder.$or = [{ type: "image" }, { type: { $exists: false } }];
     }
     const usedCategoryIds = await this.wallpaperModel
-      .distinct('categoryId', finder)
+      .distinct("categoryId", finder)
       .exec();
 
     return this.wallpaperCategoryModel
@@ -95,7 +98,7 @@ export class WallpaperCategoryService {
 
     return this.wallpaperCategoryModel
       .findById(created._id)
-      .populate('creator', 'username')
+      .populate("creator", "username")
       .exec();
   }
 
@@ -104,24 +107,24 @@ export class WallpaperCategoryService {
     dto: UpdateWallpaperCategoryDto,
     user?: string,
   ) {
-    this.ensureObjectId(id, '壁纸分类不存在');
+    this.ensureObjectId(id, "壁纸分类不存在");
     const updated = await this.wallpaperCategoryModel
       .findByIdAndUpdate(id, { ...dto, updater: user }, { new: true })
-      .populate('creator', 'username')
-      .populate('updater', 'username');
+      .populate("creator", "username")
+      .populate("updater", "username");
 
     if (!updated) {
-      throw new BadRequestException('壁纸分类不存在');
+      throw new BadRequestException("壁纸分类不存在");
     }
 
     return updated;
   }
 
   async toggleWallpaperCategory(id: string, user?: string) {
-    this.ensureObjectId(id, '壁纸分类不存在');
+    this.ensureObjectId(id, "壁纸分类不存在");
     const current = await this.wallpaperCategoryModel.findById(id).exec();
     if (!current) {
-      throw new BadRequestException('壁纸分类不存在');
+      throw new BadRequestException("壁纸分类不存在");
     }
 
     const updated = await this.wallpaperCategoryModel
@@ -130,39 +133,39 @@ export class WallpaperCategoryService {
         { isActive: !current.isActive, updater: user },
         { new: true },
       )
-      .populate('creator', 'username')
-      .populate('updater', 'username');
+      .populate("creator", "username")
+      .populate("updater", "username");
 
     if (!updated) {
-      throw new BadRequestException('壁纸分类不存在');
+      throw new BadRequestException("壁纸分类不存在");
     }
 
     return updated;
   }
 
   async deleteWallpaperCategory(id: string) {
-    this.ensureObjectId(id, '壁纸分类不存在');
+    this.ensureObjectId(id, "壁纸分类不存在");
     const result = await this.wallpaperCategoryModel.findByIdAndUpdate(id, {
       isDelete: true,
     });
 
     if (!result) {
-      throw new BadRequestException('壁纸分类不存在');
+      throw new BadRequestException("壁纸分类不存在");
     }
 
     return result;
   }
 
   async getWallpaperCategoryDetail(id: string) {
-    this.ensureObjectId(id, '壁纸分类不存在');
+    this.ensureObjectId(id, "壁纸分类不存在");
     const category = await this.wallpaperCategoryModel
       .findById(id)
-      .populate('creator', 'username')
-      .populate('updater', 'username')
+      .populate("creator", "username")
+      .populate("updater", "username")
       .exec();
 
     if (!category) {
-      throw new BadRequestException('壁纸分类不存在');
+      throw new BadRequestException("壁纸分类不存在");
     }
 
     return category;

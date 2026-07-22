@@ -19,9 +19,11 @@ import { PublicRoute } from "src/public/decorator/public_route.decorator";
 import { User } from "src/public/decorator/route-user.decoratpr";
 import {
   CreateWallpaperDto,
+  GradientWallpaperDto,
   ApplicationWallpaperDto,
   WallpaperGroupQueryDto,
   UpdateWallpaperDto,
+  UpdateGradientWallpaperDto,
   WallpaperQueryDto,
 } from "./wallpaper.dto";
 import { WallpaperService } from "./wallpaper.service";
@@ -66,6 +68,15 @@ export class WallpaperController {
     return this.wallpaperService.createWallpaper(body, user);
   }
 
+  @Post("/upload/gradient")
+  @ApiOperation({ summary: "创建渐变壁纸" })
+  createGradientWallpaper(
+    @Body() body: GradientWallpaperDto,
+    @User("_id") user: string,
+  ) {
+    return this.wallpaperService.createGradientWallpaper(body, user);
+  }
+
   @Post("/upload/application")
   @UseInterceptors(
     FileInterceptor("file", { limits: { fileSize: 30 * 1024 * 1024 } }),
@@ -96,6 +107,16 @@ export class WallpaperController {
       body,
       user,
     );
+  }
+
+  @Put("/upload/:id/gradient")
+  @ApiOperation({ summary: "更新渐变壁纸" })
+  updateGradientWallpaper(
+    @Param("id") id: string,
+    @Body() body: UpdateGradientWallpaperDto,
+    @User("_id") user: string,
+  ) {
+    return this.wallpaperService.updateGradientWallpaper(id, body, user);
   }
 
   @Put("/upload/:id")

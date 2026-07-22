@@ -71,6 +71,68 @@ export class CreateWallpaperDto {
 
 export class UpdateWallpaperDto extends PartialType(CreateWallpaperDto) {}
 
+export class GradientWallpaperDto {
+  @ApiProperty({ description: "壁纸名称" })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  @Expose()
+  name: string;
+
+  @ApiProperty({ description: "CSS 渐变背景" })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(4000)
+  @Expose()
+  css: string;
+
+  @ApiPropertyOptional({ description: "描述" })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  @Expose()
+  description?: string;
+
+  @ApiPropertyOptional({ description: "作者" })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  @Expose()
+  author?: string;
+
+  @ApiPropertyOptional({ description: "项目 URL" })
+  @IsOptional()
+  @Transform(({ value }) => (value === "" ? undefined : value))
+  @IsUrl({ protocols: ["https"], require_protocol: true })
+  @MaxLength(500)
+  @Expose()
+  url?: string;
+
+  @ApiPropertyOptional({ description: "分类ID" })
+  @IsOptional()
+  @Transform(({ value }) => (value === "" ? null : value))
+  @IsMongoId()
+  @Expose()
+  categoryId?: string | null;
+
+  @ApiPropertyOptional({ description: "是否启用", example: true })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  isActive?: boolean;
+
+  @ApiPropertyOptional({ description: "排序", example: 0 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Expose()
+  sortOrder?: number;
+}
+
+export class UpdateGradientWallpaperDto extends PartialType(
+  GradientWallpaperDto,
+) {}
+
 export class ApplicationWallpaperDto {
   @ApiPropertyOptional({ description: "壁纸名称" })
   @IsOptional()
@@ -151,13 +213,13 @@ export class WallpaperQueryDto {
 
   @ApiPropertyOptional({
     description: "壁纸类型",
-    enum: ["image", "application"],
+    enum: ["image", "gradient", "application"],
   })
   @IsOptional()
   @IsString()
-  @IsIn(["image", "application"])
+  @IsIn(["image", "gradient", "application"])
   @Expose()
-  type?: "image" | "application";
+  type?: "image" | "gradient" | "application";
 }
 
 export class WallpaperGroupQueryDto extends PageDto {
@@ -176,11 +238,11 @@ export class WallpaperGroupQueryDto extends PageDto {
 
   @ApiPropertyOptional({
     description: "壁纸类型",
-    enum: ["image", "application"],
+    enum: ["image", "gradient", "application"],
   })
   @IsOptional()
   @IsString()
-  @IsIn(["image", "application"])
+  @IsIn(["image", "gradient", "application"])
   @Expose()
-  type?: "image" | "application";
+  type?: "image" | "gradient" | "application";
 }
