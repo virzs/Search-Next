@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -101,6 +102,8 @@ interface UnifiedSearchProps {
   open?: boolean;
   onClose?: () => void;
   onOpenApp?: (app: AppApiItem) => void;
+  onDesktopActiveChange?: (active: boolean) => void;
+  desktopPresentation?: "standard" | "zen";
   autoFocus?: boolean;
   showShortcutHint?: boolean;
   shortcut?: UnifiedSearchShortcut;
@@ -465,6 +468,8 @@ const UnifiedSearch = ({
   open = true,
   onClose,
   onOpenApp,
+  onDesktopActiveChange,
+  desktopPresentation = "standard",
   autoFocus,
   showShortcutHint = true,
   shortcut,
@@ -1671,6 +1676,11 @@ const UnifiedSearch = ({
         variant === "desktop"
           ? unifiedSearchDesktopInputClassName
           : unifiedSearchSpotlightInputClassName,
+        variant === "desktop" &&
+          desktopPresentation === "zen" &&
+          !desktopSearchActive
+          ? unifiedSearchZenRestingInputClassName
+          : null,
         desktopSearchActive ? unifiedSearchDesktopInputActiveClassName : null,
       )}
     >
@@ -2179,6 +2189,11 @@ const UnifiedSearch = ({
       ? desktopPanelShouldOpen || desktopPanelMounted || desktopClosing
       : desktopPanelShouldOpen;
 
+  useLayoutEffect(() => {
+    if (variant !== "desktop") return;
+    onDesktopActiveChange?.(desktopSearchActive);
+  }, [desktopSearchActive, onDesktopActiveChange, variant]);
+
   const renderPanel = () => {
     const enginePicker = renderEnginePicker();
     const showPanelHeader = Boolean(enginePicker) || variant === "spotlight";
@@ -2657,6 +2672,32 @@ const unifiedSearchDesktopInputClassName = css`
       0 0 0 3px rgba(137, 185, 238, 0.12),
       0 12px 32px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+`;
+
+const unifiedSearchZenRestingInputClassName = css`
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.54),
+    0 6px 20px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(18px) saturate(1.08);
+
+  [data-theme="dark"] & {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(28, 28, 30, 0.46);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 7px 22px rgba(0, 0, 0, 0.14);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background: rgba(245, 245, 247, 0.88);
+    backdrop-filter: none;
+
+    [data-theme="dark"] & {
+      background: rgba(28, 28, 30, 0.9);
+    }
   }
 `;
 

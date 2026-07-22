@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
 import {
   RiComputerLine,
+  RiFocus2Line,
   RiHourglassLine,
   RiLandscapeLine,
   RiMoonLine,
@@ -63,6 +64,7 @@ const PersonalizationView = () => {
     resolvedColorScheme,
     setAppearanceMode,
     setScreenSaver,
+    setZenMode,
   } = useDesktopTheme();
   const { data: themes } = useRequest(getActiveThemeConfigs);
   const activeApplicationWallpaperId =
@@ -135,6 +137,17 @@ const PersonalizationView = () => {
 
   return (
     <MacSettingsView>
+      <MacSettingsSection title={t("ui.desktop")}>
+        <MacSettingsSwitchRow
+          icon={<RiFocus2Line size={16} />}
+          iconTone="green"
+          title={t("ui.zenMode")}
+          description={t("ui.zenMode.description")}
+          checked={personalization.zenMode}
+          onChange={setZenMode}
+        />
+      </MacSettingsSection>
+
       <MacSettingsSection title={t("ui.appearance")}>
         <MacSettingsRow
           icon={

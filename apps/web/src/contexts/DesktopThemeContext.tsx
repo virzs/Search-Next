@@ -28,6 +28,7 @@ export interface DesktopThemeContextValue {
   setAppearanceMode: (mode: AppearanceMode) => void;
   setWallpaper: (wallpaper: PersonalizationWallpaper | null) => void;
   setScreenSaver: (screenSaver: ScreenSaverConfig) => void;
+  setZenMode: (enabled: boolean) => void;
 }
 
 const DesktopThemeContext = createContext<DesktopThemeContextValue | undefined>(
@@ -51,6 +52,7 @@ export interface PersonalizationConfig {
   appearanceMode?: AppearanceMode;
   wallpaper: PersonalizationWallpaper;
   screenSaver: ScreenSaverConfig;
+  zenMode: boolean;
   fontFamily?: string;
 }
 
@@ -152,6 +154,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
       appearanceMode: defaultAppearanceMode,
       wallpaper: defaultWallpaper,
       screenSaver: DEFAULT_SCREEN_SAVER_CONFIG,
+      zenMode: false,
     },
   );
   const [systemColorScheme, setSystemColorScheme] =
@@ -175,6 +178,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
           appearanceMode,
           wallpaper,
           screenSaver,
+          zenMode: parsed?.zenMode === true,
           fontFamily: parsed?.fontFamily,
         });
         return;
@@ -185,6 +189,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         appearanceMode: defaultAppearanceMode,
         wallpaper: defaultWallpaper,
         screenSaver: DEFAULT_SCREEN_SAVER_CONFIG,
+        zenMode: false,
       });
     }
   }, []);
@@ -246,6 +251,14 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         const next: PersonalizationConfig = {
           ...personalization,
           screenSaver: parseScreenSaver(screenSaver),
+        };
+        setPersonalization(next);
+        persistPersonalization(next);
+      },
+      setZenMode: (enabled) => {
+        const next: PersonalizationConfig = {
+          ...personalization,
+          zenMode: enabled === true,
         };
         setPersonalization(next);
         persistPersonalization(next);

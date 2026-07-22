@@ -147,6 +147,7 @@ const enUS = {
   "ui.english": "English",
   "ui.simplifiedChinese": "Simplified Chinese",
   "ui.appearance": "Appearance",
+  "ui.desktop": "Desktop",
   "ui.mode": "Mode",
   "ui.currentlyScheme": "Currently {{scheme}}",
   "ui.dark": "Dark",
@@ -154,6 +155,9 @@ const enUS = {
   "ui.followSystem": "Follow System",
   "ui.theme": "Theme",
   "ui.background": "Background",
+  "ui.zenMode": "Zen Mode",
+  "ui.zenMode.description":
+    "Hide desktop content and the Dock, leaving only search and system tools",
   "ui.screenSaver": "Screen Saver",
   "ui.screenSaver.enabled": "Enable Screen Saver",
   "ui.screenSaver.description":

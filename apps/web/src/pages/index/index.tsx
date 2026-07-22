@@ -41,8 +41,8 @@ import {
   type DesktopSortItem,
 } from "@search-next/desktop";
 // import SearchWithAI from "../../components/ai-search";
-import { App } from "antd";
-import { AppButton, AppCheckbox } from "@/components/ui";
+import { App, Tooltip } from "antd";
+import { AppButton, AppCheckbox, AppIconButton } from "@/components/ui";
 import {
   getActiveThemeConfigs,
   getDefaultUserConfig,
@@ -88,7 +88,6 @@ import { LOCAL_ACCOUNT_AVATAR_SEED } from "@/components/auth/local-account";
 import { getPublicAppDetail } from "@/services/app";
 import type { AppApiItem } from "@/types";
 import {
-  DesktopSearchBar,
   matchesUnifiedSearchShortcut,
   SearchSpotlight,
   useUnifiedSearchPreferences,
@@ -111,6 +110,10 @@ import ApplicationWallpaperBackground, {
 import WallpaperPageEdge from "./components/wallpaper-page-edge";
 import ScreenSaverOverlay from "./components/screen-saver";
 import { useScreenSaverController } from "./components/screen-saver-controller";
+import {
+  StandardDesktopLayout,
+  ZenDesktopLayout,
+} from "./components/desktop-layouts";
 
 type DesktopItem = DesktopSortItem<DesktopItemData>;
 type DesktopNextHandleRef = {
@@ -1650,27 +1653,47 @@ function Index() {
           <WebReleaseUpdatePrompt />
           <LegalDocumentGate />
         </div>
-        <div
-          data-wallpaper-interactive
-          className="flex items-center justify-end py-2 px-6 max-w-7xl mx-auto w-full gap-2"
-        >
-          <Notice />
-          <Feedback />
-        </div>
-        {searchPreferences.showDesktopSearchBar ? (
-          <div data-wallpaper-interactive>
-            <DesktopSearchBar
-              onOpenApp={handleOpenSearchApp}
-              showShortcutHint={searchPreferences.enableSpotlightShortcut}
-              shortcut={searchPreferences.spotlightShortcut}
-            />
-          </div>
-        ) : null}
-      {/* <div className="pt-30 pb-10">
-        <SearchWithAI />
-      </div> */}
-      <div className="flex-1 min-h-0 pb-8 w-full max-w-7xl mx-auto">
-        <DesktopNext<DesktopItemData>
+        {personalization.zenMode ? (
+          <ZenDesktopLayout
+            toolbar={
+              <>
+                <Notice />
+                <Feedback />
+                <Tooltip title={t("ui.settings")}>
+                  <AppIconButton
+                    aria-label={t("ui.settings")}
+                    intent="quiet"
+                    size="small"
+                    onClick={() =>
+                      navigate(settingsRoute.path.personalization)
+                    }
+                    icon={<RiSettingsLine color="#fff" size={20} />}
+                  />
+                </Tooltip>
+              </>
+            }
+            searchProps={{
+              onOpenApp: handleOpenSearchApp,
+              showShortcutHint: searchPreferences.enableSpotlightShortcut,
+              shortcut: searchPreferences.spotlightShortcut,
+            }}
+          />
+        ) : (
+          <StandardDesktopLayout
+            toolbar={
+              <>
+                <Notice />
+                <Feedback />
+              </>
+            }
+            showSearch={searchPreferences.showDesktopSearchBar}
+            searchProps={{
+              onOpenApp: handleOpenSearchApp,
+              showShortcutHint: searchPreferences.enableSpotlightShortcut,
+              shortcut: searchPreferences.spotlightShortcut,
+            }}
+          >
+            <DesktopNext<DesktopItemData>
           key={desktopMountKey}
           ref={desktopRef}
           pages={desktopPages}
@@ -1788,8 +1811,9 @@ function Index() {
               window.open(url, "_blank", "noopener,noreferrer");
             }
           }}
-        />
-      </div>
+            />
+          </StandardDesktopLayout>
+        )}
       <div className="contents" data-wallpaper-interactive>
       <Outlet context={{ onAddStoreItem: handleAddStoreItem }} />
       {availabilityModal && (
@@ -2005,7 +2029,9 @@ function Index() {
       {init && <LoadingOverlay open text={t("ui.loadingConfiguration")} />}
       </div>
       </div>
-      {applicationWallpaper && desktopPages.length > 1 ? (
+      {!personalization.zenMode &&
+      applicationWallpaper &&
+      desktopPages.length > 1 ? (
         <>
           <WallpaperPageEdge
             side="left"
