@@ -154,6 +154,16 @@ const enUS = {
   "ui.followSystem": "Follow System",
   "ui.theme": "Theme",
   "ui.background": "Background",
+  "ui.screenSaver": "Screen Saver",
+  "ui.screenSaver.enabled": "Enable Screen Saver",
+  "ui.screenSaver.description":
+    "Show only the current time and wallpaper after a period of inactivity",
+  "ui.screenSaver.waitTime": "Start After",
+  "ui.screenSaver.waitTimeDescription":
+    "How long to wait before starting the screen saver",
+  "ui.screenSaver.minutes_one": "{{count}} minute",
+  "ui.screenSaver.minutes_other": "{{count}} minutes",
+  "ui.screenSaver.wake": "Click, touch, or press a key to return to the desktop",
   "ui.manage": "Manage",
   "ui.mine": "Mine",
   "ui.none": "None",

@@ -109,6 +109,8 @@ import ApplicationWallpaperBackground, {
   type WallpaperBridgeKeyEvent,
 } from "./components/application-wallpaper-background";
 import WallpaperPageEdge from "./components/wallpaper-page-edge";
+import ScreenSaverOverlay from "./components/screen-saver";
+import { useScreenSaverController } from "./components/screen-saver-controller";
 
 type DesktopItem = DesktopSortItem<DesktopItemData>;
 type DesktopNextHandleRef = {
@@ -283,6 +285,12 @@ function Index() {
     resolvedColorScheme,
     setWallpaper,
   } = useDesktopTheme();
+  const {
+    active: screenSaverActive,
+    covering: screenSaverCovering,
+    recordActivity: recordScreenSaverActivity,
+    finishExit: finishScreenSaverExit,
+  } = useScreenSaverController(personalization.screenSaver);
   const navigate = useNavigate();
   const {
     apps,
@@ -1605,25 +1613,34 @@ function Index() {
   );
 
   return (
-    <div
-      className={cx(
-        "relative w-screen h-screen overflow-hidden",
-        css`
-          ${desktopBackgroundCss}
-        `,
-      )}
-    >
-      {applicationWallpaper ? (
-        <ApplicationWallpaperBackground
-          wallpaper={applicationWallpaper}
-          theme={resolvedColorScheme}
-          language={language as "zh-CN" | "en-US"}
-          onResolved={handleApplicationWallpaperResolved}
-          onUnavailable={handleApplicationWallpaperUnavailable}
-          onBridgeKeyDown={handleApplicationWallpaperKeyDown}
-        />
-      ) : null}
+    <div className="relative h-screen w-screen overflow-hidden bg-black">
       <div
+        data-desktop-wallpaper-layer
+        className={cx(
+          "absolute inset-0 overflow-hidden bg-black",
+          !applicationWallpaper
+            ? css`
+                ${desktopBackgroundCss}
+              `
+            : null,
+        )}
+        style={{ zIndex: 0 }}
+      >
+        {applicationWallpaper ? (
+          <ApplicationWallpaperBackground
+            wallpaper={applicationWallpaper}
+            theme={resolvedColorScheme}
+            language={language as "zh-CN" | "en-US"}
+            onResolved={handleApplicationWallpaperResolved}
+            onUnavailable={handleApplicationWallpaperUnavailable}
+            onBridgeKeyDown={handleApplicationWallpaperKeyDown}
+            onBridgeActivity={recordScreenSaverActivity}
+          />
+        ) : null}
+      </div>
+      <div
+        inert={screenSaverCovering ? true : undefined}
+        aria-hidden={screenSaverCovering ? true : undefined}
         className={cx(
           "relative z-10 flex h-full w-full flex-col",
           applicationWallpaper ? applicationWallpaperShellClassName : null,
@@ -2008,6 +2025,35 @@ function Index() {
           />
         </>
       ) : null}
+      <ScreenSaverOverlay
+        active={screenSaverActive}
+        covering={screenSaverCovering}
+        background={
+          applicationWallpaper ? (
+            <ApplicationWallpaperBackground
+              wallpaper={applicationWallpaper}
+              theme={resolvedColorScheme}
+              language={language as "zh-CN" | "en-US"}
+              onResolved={handleApplicationWallpaperResolved}
+              onUnavailable={handleApplicationWallpaperUnavailable}
+              onBridgeKeyDown={handleApplicationWallpaperKeyDown}
+              onBridgeActivity={recordScreenSaverActivity}
+            />
+          ) : (
+            <div
+              className={cx(
+                "absolute inset-0 bg-black",
+                css`
+                  ${desktopBackgroundCss}
+                `,
+              )}
+            />
+          )
+        }
+        language={language}
+        wakeLabel={t("ui.screenSaver.wake")}
+        onExitComplete={finishScreenSaverExit}
+      />
     </div>
   );
 }

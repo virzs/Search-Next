@@ -3,13 +3,19 @@ import { useNavigate } from "react-router";
 import { useRequest } from "ahooks";
 import {
   RiComputerLine,
+  RiHourglassLine,
   RiLandscapeLine,
   RiMoonLine,
   RiSunLine,
+  RiTimerLine,
   RiTShirtLine,
 } from "@remixicon/react";
 import useDesktopTheme from "@/hooks/useDesktopTheme";
-import type { AppearanceMode } from "@/contexts/DesktopThemeContext";
+import {
+  SCREEN_SAVER_TIMEOUT_MINUTES,
+  type AppearanceMode,
+  type ScreenSaverTimeoutMinutes,
+} from "@/contexts/DesktopThemeContext";
 import {
   getActiveThemeConfigs,
   getActiveWallpaperDetail,
@@ -20,10 +26,11 @@ import { personalizationRoute } from "../../../personalization/route-paths";
 import {
   MacSettingsRow,
   MacSettingsSection,
+  MacSettingsSwitchRow,
   MacSettingsView,
 } from "../../components/macos-settings";
 import { useI18n } from "@/i18n";
-import { AppButton } from "@/components/ui";
+import { AppButton, AppSelect } from "@/components/ui";
 import { useConfig } from "@/hooks/useConfig";
 import { DEFAULT_THEME_COLOR } from "@/theme/color";
 
@@ -55,6 +62,7 @@ const PersonalizationView = () => {
     personalization,
     resolvedColorScheme,
     setAppearanceMode,
+    setScreenSaver,
   } = useDesktopTheme();
   const { data: themes } = useRequest(getActiveThemeConfigs);
   const activeApplicationWallpaperId =
@@ -192,6 +200,48 @@ const PersonalizationView = () => {
                 {t("ui.mine")}
               </AppButton>
             </div>
+          }
+        />
+      </MacSettingsSection>
+
+      <MacSettingsSection title={t("ui.screenSaver")}>
+        <MacSettingsSwitchRow
+          icon={<RiTimerLine size={16} />}
+          iconTone="blue"
+          title={t("ui.screenSaver.enabled")}
+          description={t("ui.screenSaver.description")}
+          checked={personalization.screenSaver.enabled}
+          onChange={(enabled) =>
+            setScreenSaver({ ...personalization.screenSaver, enabled })
+          }
+        />
+        <MacSettingsRow
+          icon={<RiHourglassLine size={16} />}
+          iconTone="purple"
+          title={t("ui.screenSaver.waitTime")}
+          description={t("ui.screenSaver.waitTimeDescription")}
+          extra={
+            <AppSelect
+              size="small"
+              aria-label={t("ui.screenSaver.waitTime")}
+              value={personalization.screenSaver.timeoutMinutes}
+              disabled={!personalization.screenSaver.enabled}
+              onChange={(timeoutMinutes: ScreenSaverTimeoutMinutes) =>
+                setScreenSaver({
+                  ...personalization.screenSaver,
+                  timeoutMinutes,
+                })
+              }
+              options={SCREEN_SAVER_TIMEOUT_MINUTES.map((minutes) => ({
+                label: t("ui.screenSaver.minutes", { count: minutes }),
+                value: minutes,
+              }))}
+              popupMatchSelectWidth={false}
+              getPopupContainer={(triggerNode) =>
+                triggerNode.closest(".base-modal-panel") ?? document.body
+              }
+              className="w-[112px]"
+            />
           }
         />
       </MacSettingsSection>

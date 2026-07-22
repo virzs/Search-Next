@@ -10,6 +10,14 @@ import { PERSONALIZATION_STORAGE_KEY } from "@/utils/storage";
 export type DesktopThemeId = string;
 export type AppearanceMode = "system" | "dark" | "light";
 export type ResolvedColorScheme = "dark" | "light";
+export const SCREEN_SAVER_TIMEOUT_MINUTES = [1, 5, 10, 30] as const;
+export type ScreenSaverTimeoutMinutes =
+  (typeof SCREEN_SAVER_TIMEOUT_MINUTES)[number];
+
+export interface ScreenSaverConfig {
+  enabled: boolean;
+  timeoutMinutes: ScreenSaverTimeoutMinutes;
+}
 
 export interface DesktopThemeContextValue {
   personalization: PersonalizationConfig;
@@ -19,6 +27,7 @@ export interface DesktopThemeContextValue {
   setActiveThemeId: (id: DesktopThemeId) => void;
   setAppearanceMode: (mode: AppearanceMode) => void;
   setWallpaper: (wallpaper: PersonalizationWallpaper | null) => void;
+  setScreenSaver: (screenSaver: ScreenSaverConfig) => void;
 }
 
 const DesktopThemeContext = createContext<DesktopThemeContextValue | undefined>(
@@ -41,12 +50,17 @@ export interface PersonalizationConfig {
   themeId: DesktopThemeId;
   appearanceMode?: AppearanceMode;
   wallpaper: PersonalizationWallpaper;
+  screenSaver: ScreenSaverConfig;
   fontFamily?: string;
 }
 
 const defaultThemeId: DesktopThemeId = "light";
 const defaultAppearanceMode: AppearanceMode = "system";
 const defaultWallpaper: PersonalizationWallpaper = { type: "none", name: "无" };
+const DEFAULT_SCREEN_SAVER_CONFIG: ScreenSaverConfig = {
+  enabled: false,
+  timeoutMinutes: 5,
+};
 
 const isThemeId = (value: unknown): value is DesktopThemeId => {
   return typeof value === "string" && value.length > 0;
@@ -54,6 +68,26 @@ const isThemeId = (value: unknown): value is DesktopThemeId => {
 
 const isAppearanceMode = (value: unknown): value is AppearanceMode => {
   return value === "system" || value === "dark" || value === "light";
+};
+
+const isScreenSaverTimeout = (
+  value: unknown,
+): value is ScreenSaverTimeoutMinutes =>
+  SCREEN_SAVER_TIMEOUT_MINUTES.includes(
+    value as ScreenSaverTimeoutMinutes,
+  );
+
+const parseScreenSaver = (value: unknown): ScreenSaverConfig => {
+  if (!value || typeof value !== "object") {
+    return DEFAULT_SCREEN_SAVER_CONFIG;
+  }
+  const record = value as Record<string, unknown>;
+  return {
+    enabled: record.enabled === true,
+    timeoutMinutes: isScreenSaverTimeout(record.timeoutMinutes)
+      ? record.timeoutMinutes
+      : DEFAULT_SCREEN_SAVER_CONFIG.timeoutMinutes,
+  };
 };
 
 const parseWallpaper = (value: unknown): PersonalizationWallpaper => {
@@ -117,6 +151,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
       themeId: defaultThemeId,
       appearanceMode: defaultAppearanceMode,
       wallpaper: defaultWallpaper,
+      screenSaver: DEFAULT_SCREEN_SAVER_CONFIG,
     },
   );
   const [systemColorScheme, setSystemColorScheme] =
@@ -134,10 +169,12 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
           ? parsed.appearanceMode
           : defaultAppearanceMode;
         const wallpaper = parseWallpaper(parsed?.wallpaper);
+        const screenSaver = parseScreenSaver(parsed?.screenSaver);
         setPersonalization({
           themeId: resolvedThemeId,
           appearanceMode,
           wallpaper,
+          screenSaver,
           fontFamily: parsed?.fontFamily,
         });
         return;
@@ -147,6 +184,7 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         themeId: defaultThemeId,
         appearanceMode: defaultAppearanceMode,
         wallpaper: defaultWallpaper,
+        screenSaver: DEFAULT_SCREEN_SAVER_CONFIG,
       });
     }
   }, []);
@@ -200,6 +238,14 @@ export const DesktopThemeProvider: React.FC<{ children: ReactNode }> = ({
         const next: PersonalizationConfig = {
           ...personalization,
           wallpaper: nextWallpaper,
+        };
+        setPersonalization(next);
+        persistPersonalization(next);
+      },
+      setScreenSaver: (screenSaver) => {
+        const next: PersonalizationConfig = {
+          ...personalization,
+          screenSaver: parseScreenSaver(screenSaver),
         };
         setPersonalization(next);
         persistPersonalization(next);

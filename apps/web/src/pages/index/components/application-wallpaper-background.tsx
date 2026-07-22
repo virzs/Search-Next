@@ -19,6 +19,10 @@ export type WallpaperBridgeKeyEvent = {
   repeat: boolean;
 };
 
+export type WallpaperBridgeActivityEvent = {
+  source: "keyboard" | "pointer" | "touch" | "wheel";
+};
+
 export interface ApplicationWallpaperBackgroundProps {
   wallpaper: Extract<PersonalizationWallpaper, { type: "application" }>;
   theme: "light" | "dark";
@@ -28,6 +32,7 @@ export interface ApplicationWallpaperBackgroundProps {
   ) => void;
   onUnavailable: () => void;
   onBridgeKeyDown?: (event: WallpaperBridgeKeyEvent) => void;
+  onBridgeActivity?: (event: WallpaperBridgeActivityEvent) => void;
 }
 
 const useReducedMotion = () => {
@@ -53,6 +58,7 @@ const ApplicationWallpaperBackground = ({
   onResolved,
   onUnavailable,
   onBridgeKeyDown,
+  onBridgeActivity,
 }: ApplicationWallpaperBackgroundProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [runtimeWallpaper, setRuntimeWallpaper] =
@@ -105,18 +111,21 @@ const ApplicationWallpaperBackground = ({
       const data = event.data as {
         channel?: string;
         type?: string;
-        payload?: WallpaperBridgeKeyEvent;
+        payload?: unknown;
       };
       if (data?.channel !== WALLPAPER_CHANNEL) return;
       if (data.type === "ready") setReady(true);
       if (data.type === "navigating") setReady(false);
       if (data.type === "keydown" && data.payload) {
-        onBridgeKeyDown?.(data.payload);
+        onBridgeKeyDown?.(data.payload as WallpaperBridgeKeyEvent);
+      }
+      if (data.type === "activity" && data.payload) {
+        onBridgeActivity?.(data.payload as WallpaperBridgeActivityEvent);
       }
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [onBridgeKeyDown]);
+  }, [onBridgeActivity, onBridgeKeyDown]);
 
   useEffect(() => {
     if (!ready || !iframeRef.current?.contentWindow) return;
