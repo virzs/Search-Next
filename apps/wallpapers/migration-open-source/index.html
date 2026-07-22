@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="zh">
+<!--
+  Migration / 候鸟 — automatic wallpaper adaptation for Search Next.
+  Source: https://github.com/sdhhhyu-glitch/Migration-OpenSource
+
+  MIT License
+
+  Copyright (c) 2026 Tukine (sdhhhyu@gmail.com)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>候鸟 · MIGRATION — v6</title>
+<style>
+:root{--paper:#f6f2e9;--ink:#3a362c}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:"Avenir Next","Futura","PingFang SC","Noto Sans SC",sans-serif}
+#sky{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:default}
+.mark{position:fixed;top:26px;left:4vw;z-index:6;font-size:12px;letter-spacing:.34em;font-weight:700}
+#idx{position:fixed;top:26px;right:4vw;z-index:6;font-size:11px;letter-spacing:.3em;opacity:.65}
+.ft{position:fixed;bottom:26px;z-index:6;font-size:10px;letter-spacing:.3em;opacity:.5;text-transform:uppercase}
+#f1{display:none}#f2{right:4vw}
+#poem{position:fixed;right:4vw;top:54px;z-index:6;text-align:right;pointer-events:none;font-size:12px;letter-spacing:.16em;line-height:2.15;transition:opacity 1.3s;color:rgba(44,42,36,.85)}
+#poemBar{height:1px;width:0;background:currentColor;opacity:.5;margin:0 0 10px auto}
+#poemTxt span{opacity:0;transition:opacity .9s}
+html,body{overscroll-behavior:none}canvas{touch-action:none}
+/* 大屏适配：仅在宽窗口放大 UI 文字（约1.5倍 / 2倍两档），小屏与手机样式不受影响 */
+@media (min-width:2200px){
+.mark{font-size:17px}#idx{font-size:15px}.ft{font-size:14px}
+#poem{font-size:17px;top:64px}
+}
+@media (min-width:3200px){
+.mark{font-size:22px;top:34px}#idx{font-size:20px;top:34px}.ft{font-size:18px;bottom:34px}
+#poem{font-size:22px;top:84px}
+}
+@media (max-width:640px){
+.mark{font-size:11px}#idx{font-size:9px}.ft{display:none}
+#poem{font-size:11px;top:46px;letter-spacing:.12em}
+}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div class="mark">候鸟 / MIGRATION</div>
+<div id="idx">01 · TOP-DOWN</div>
+<div id="poem"><div id="poemBar"></div><div id="poemTxt"></div></div>
+<div class="ft" id="f1">a geometric flight</div>
+<div class="ft" id="f2">canvas · no library</div>
+<script>
+/* ================= 基础 ================= */
+const cv=document.getElementById('sky'),ctx=cv.getContext('2d');
+let W,H,FLv,DPR=1;
+function rs(){
+  W=innerWidth; H=innerHeight;
+  /* 以设备像素比绘制；此前画布只有 CSS 像素，手机高分屏会显得发糊。 */
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  cv.style.width='100%';cv.style.height='100%';
+  ctx.setTransform(DPR,0,0,DPR,0,0); FLv=H*1.05;
+}
+addEventListener('resize',rs);rs();
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const lerp=(a,b,k)=>a+(b-a)*k;
+const ss=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+function hash(i,j){let h=(i*374761393+j*668265263)|0;h=((h^(h>>>13))*1274126177)|0;return((h^(h>>>16))>>>0)/4294967295}
+/* ================= 世界参数 ================= */
+const COARSE=matchMedia('(pointer:coarse)').matches;/* 触屏设备：降配 + 触摸交�� */
+const CELL=84,RCELL=26,FAR=COARSE?1900:2400,NEAR=13,RIVW=48;
+/* ===== 场景风格：风格是地理属性——世界沿飞行方向分段换风格，锋面参差不齐，一块一块过渡 ===== */
+const STYLES=[
+{name:'WARM',field:['#f2ecdf','#eee7d8','#f5efe4','#eae2d1','#f0e9db'],rivA:'#d9e8eb',rivB:'#c3dbe1',
+ walls:['#f8f5ec','#e9e2d3','#f1ebdd','#f4eee1'],roofs:['#bccdd2','#d9bfa8','#e5d2a2','#e6dcc8'],gable:'#f3eee1',chim:'#d8ccb6',
+ spire:['#b9c7cc','#c8d4d8'],bstroke:'rgba(70,66,56,0.22)',trunk:'rgba(110,120,110,0.85)',leaf:['#a3b1a6','#b2bfb4'],cone:false,snow:false,win:false,
+ sky:['#faf7ee','#f4efe3','#efe9da','#ebe5d6'],flat:['#f4efe3','#f0ebde'],fog:'248,244,236',fogA:0.4,glow:'255,255,255',glowA:0.24,
+ corn:'70,66,56',cornA:0.05,cloud:'255,255,255',shadG:'96,108,112',ui:'#3a362c',glintB:1,ptype:0},
+{name:'MIST',field:['#e6ebe7','#e0e6e2','#ebefec','#dae1dd','#e3e9e5'],rivA:'#ccdde2',rivB:'#b8d0d8',
+ walls:['#f1f3ef','#e1e6e2','#eaeeea','#edf0ec'],roofs:['#96afb9','#a5b9c1','#b0c1c7','#8ba3ae'],gable:'#ecefe9',chim:'#c3ccc4',
+ spire:['#93a8b0','#a8b9c0'],bstroke:'rgba(78,90,92,0.32)',trunk:'rgba(105,118,113,0.85)',leaf:['#95a6a0','#a4b3ac'],cone:false,snow:false,win:false,
+ sky:['#f0f4f3','#e9efee','#e2e9e9','#dce4e4'],flat:['#e9efee','#e4eae9'],fog:'232,238,238',fogA:0.62,glow:'255,255,255',glowA:0.15,
+ corn:'70,80,82',cornA:0.05,cloud:'255,255,255',shadG:'92,104,106',ui:'#43514f',glintB:0.8,ptype:0},
+{name:'DUSK',field:['#f1dfd8','#eddad3','#f4e5de','#e8d4cd','#efdcd5'],rivA:'#dbd0e0',rivB:'#c9bcd4',
+ walls:['#f7eae3','#eadad2','#f2e3db','#f5e7df'],roofs:['#7f7b95','#977e86','#a48a91','#8b8090'],gable:'#f2e4dc',chim:'#cbb4ac',
+ spire:['#7d7a92','#918ca5'],bstroke:'rgba(96,76,78,0.32)',trunk:'rgba(122,104,104,0.85)',leaf:['#a29399','#ad9fa3'],cone:false,snow:false,win:false,
+ sky:['#f8ece7','#f3e0dc','#eed6d3','#e8cdca'],flat:['#f3e0dc','#eed8d4'],fog:'246,228,222',fogA:0.42,glow:'255,240,230',glowA:0.2,
+ corn:'88,64,70',cornA:0.07,cloud:'255,244,240',shadG:'112,96,100',ui:'#5a4448',glintB:1.5,ptype:2},
+{name:'SNOW',field:['#f3f6f6','#eef2f3','#f7f9f9','#e9eff0','#f1f4f4'],rivA:'#d6e6ec',rivB:'#c3dae4',
+ walls:['#f8faf9','#edf1f0','#f4f7f6','#f6f9f8'],roofs:['#b9cad4','#b3c4d0','#adbfca','#c4d2da'],gable:'#f5f8f7',chim:'#c8d2d4',
+ spire:['#b8cad4','#c7d5dc'],bstroke:'rgba(104,116,124,0.48)',trunk:'rgba(126,138,136,0.38)',leaf:['#c0ceca','#ccd8d4'],cone:true,snow:true,win:false,
+ sky:['#f8fbfc','#f3f7f9','#eef3f6','#e9eff3'],flat:['#f3f7f9','#eff4f6'],fog:'243,248,250',fogA:0.55,glow:'255,255,255',glowA:0.28,
+ corn:'96,108,116',cornA:0.04,cloud:'255,255,255',shadG:'110,122,130',ui:'#5a6870',glintB:1.25,ptype:1},
+{name:'NIGHT',field:['#252f3f','#212a39','#293344','#1e2735','#232d3d'],rivA:'#33475f',rivB:'#3e5673',
+ walls:['#333e4e','#2a3442','#303b4a','#36414f'],roofs:['#41556b','#4a4a5e','#514b62','#455263'],gable:'#3a4656',chim:'#556274',
+ spire:['#465a6e','#54687c'],bstroke:'rgba(158,176,196,0.28)',trunk:'rgba(150,162,158,0.5)',leaf:['#31403c','#394943'],cone:false,snow:false,win:true,
+ sky:['#27334a','#212c41','#1b2536','#161e2c'],flat:['#212c41','#1c2536'],fog:'52,66,92',fogA:0.5,glow:'186,204,232',glowA:0.12,
+ corn:'8,12,20',cornA:0.22,cloud:'132,150,180',shadG:'10,14,22',ui:'#c4d0dc',glintB:1.9,ptype:3}];
+const SEG=8600,BANDW=520,segSty=[0];
+function segStyle(n){n=Math.max(0,n);while(segSty.length<=n){const m=segSty.length;segSty.push((segSty[m-1]+1+Math.floor(hash(m,881)*4))%5)}return segSty[n]}
+/* 锋面参差不齐：每��排田块的�����������，风格一块一块换 */
+function styleAt(x,y){const off=(hash(Math.floor(y/CELL),997)-0.5)*2*BANDW;return segStyle(Math.floor((x+off)/SEG))}
+/* 返回 [风格A,风格B,混合权重]：锋面两侧颜��渐变，不再非0即1 */
+function styleMix(x,y){
+  const off=(hash(Math.floor(y/CELL),997)-0.5)*2*BANDW;
+  const lx=x+off,n=Math.floor(lx/SEG),lo=lx-n*SEG,bz=BANDW*3;/* 过渡带拉长���� 3000 世界单位 */
+  let s0=segStyle(n),s1=s0,m=0;
+  if(lo<bz){s0=segStyle(n-1);s1=segStyle(n);m=ss(-bz,bz,lo)}
+  else if(lo>SEG-bz){s0=segStyle(n);s1=segStyle(n+1);m=ss(SEG-bz,SEG+bz,lo)}
+  return[s0,s1,m];
+}
+function styC(k,i,s0,s1,m){
+  const A=STYLES[s0],B=STYLES[s1];
+  const va=i<0?A[k]:A[k][i],vb=i<0?B[k]:B[k][i];
+  return m<=0.001?va:(m>=0.999?vb:mixC(va,vb,m));
+}
+/* 地面有独立的、更长过渡带：夜色仍是夜色，只是不会硬切到亮场 */
+function groundStyleMix(x,y){
+  const off=(hash(Math.floor(y/CELL),997)-0.5)*2*BANDW;
+  const lx=x+off,n=Math.floor(lx/SEG),lo=lx-n*SEG,bz=BANDW*6;
+  let s0=segStyle(n),s1=s0,m=0;
+  if(lo<bz){s0=segStyle(n-1);s1=segStyle(n);m=ss(-bz,bz,lo)}
+  else if(lo>SEG-bz){s0=segStyle(n);s1=segStyle(n+1);m=ss(SEG-bz,SEG+bz,lo)}
+  return[s0,s1,m];
+}
+const hxc=c=>{const n=parseInt(c.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255]};
+const mixC=(a,b,k)=>{const A=hxc(a),B=hxc(b);return'rgb('+((A[0]+(B[0]-A[0])*k)|0)+','+((A[1]+(B[1]-A[1])*k)|0)+','+((A[2]+(B[2]-A[2])*k)|0)+')'};
+/* rgba 线条色渐变：连 alpha 一起插值，鸟的描边跨场景不再硬切 */
+const rgbaP=c=>{const m=c.match(/rgba?\(([^)]+)\)/)[1].split(',').map(Number);return[m[0],m[1],m[2],m[3]===undefined?1:m[3]]};
+const mixO=(a,b,k)=>{const A=rgbaP(a),B=rgbaP(b);return'rgba('+((A[0]+(B[0]-A[0])*k)|0)+','+((A[1]+(B[1]-A[1])*k)|0)+','+((A[2]+(B[2]-A[2])*k)|0)+','+(A[3]+(B[3]-A[3])*k).toFixed(3)+')'};
+const mixT=(a,b,k)=>{const A=a.split(','),B=b.split(',');return((+A[0]+(+B[0]-+A[0])*k)|0)+','+((+A[1]+(+B[1]-+A[1])*k)|0)+','+((+A[2]+(+B[2]-+A[2])*k)|0)};
+const rgbaC=(c,a)=>{const v=c[0]==='#'?hxc(c):c.match(/[\d.]+/g).map(Number);return'rgba('+v[0]+','+v[1]+','+v[2]+','+a.toFixed(3)+')'};
+const lumC=c=>{const v=c[0]==='#'?hxc(c):c.match(/[\d.]+/g).map(Number);return v[0]*0.2126+v[1]*0.7152+v[2]*0.0722;};
+let amb=null,ambW=[1,0,0,0,0];
+/* 环境色（天空/雾/光/粒子）随飞行位置在风格段落间平滑渐变 */
+function calcAmb(x){
+  /* 与地面 groundStyleMix 用同一条过渡带宽：天空换场的节奏 = 地面换场的节奏 */
+  const bz=BANDW*6,n=Math.floor(x/SEG),lo=x-n*SEG;
+  let s0,s1,m;
+  if(lo<bz){s0=segStyle(n-1);s1=segStyle(n);m=ss(-bz,bz,lo)}
+  else if(lo>SEG-bz){s0=segStyle(n);s1=segStyle(n+1);m=ss(SEG-bz,SEG+bz,lo)}
+  else{s0=s1=segStyle(n);m=0}
+  const A=STYLES[s0],B=STYLES[s1];
+  ambW=[0,0,0,0,0];ambW[s0]+=1-m;ambW[s1]+=m;
+  amb={sky:[0,1,2,3].map(i2=>mixC(A.sky[i2],B.sky[i2],m)),
+    flat:[0,1].map(i2=>mixC(A.flat[i2],B.flat[i2],m)),
+    fog:mixT(A.fog,B.fog,m),fogA:lerp(A.fogA,B.fogA,m),
+    glow:mixT(A.glow,B.glow,m),glowA:lerp(A.glowA,B.glowA,m),
+    corn:mixT(A.corn,B.corn,m),cornA:lerp(A.cornA,B.cornA,m),
+    cloud:mixT(A.cloud,B.cloud,m),shadG:mixT(A.shadG,B.shadG,m),
+    ui:mixC(A.ui,B.ui,m),glintB:lerp(A.glintB,B.glintB,m)};
+}
+const riverC=x=>150*Math.sin(x*0.0021)+95*Math.sin(x*0.00093+2.1);
+/* ================= 旅程（时间驱动�������无����循环 + 每圈变奏） ================= */
+const CYCLE=96;/* 每镜约 16–19 秒，换镜与滑移都更从容 */
+const TEST_NEW_SHOTS=false;/* 测试模式：只排 ORBIT/REVEAL 两个新镜头；已转正并入正常轮换 */
+let started=true,pT=0,p=0,forceP=null,curSp=0.9;
+window.__setP=v=>{forceP=v;started=true};
+/* 镜头库：固定弧线上的可变奏镜位 */
+const SHOTS={
+  /* 正俯视只作为开场建立空间；后续循环改由微侧俯视接手。 */
+  TOP:   {A:1.5551,B:0,      dist:660,tz:64, ty:0, pan:-0.055,pay:0,    sp:0.9, capF:0.60,label:'TOP-DOWN'},
+  AERIAL:{A:1.34,  B:0.28,   dist:525,tz:55, ty:4, pan:-0.04, pay:0,    sp:0.82,capF:0.72,label:'AERIAL GLIDE'},
+  DESC:  {A:0.90,  B:0,      dist:430,tz:56, ty:0, pan:-0.085,pay:0,    sp:1.6, capF:0.62,label:'DESCENT'},
+  DIAG:  {A:0.72,  B:0.16,   dist:440,tz:54, ty:12,pan:-0.09, pay:0,    sp:1.05,capF:0.66,label:'DIAGONAL RAIL'},
+  HIGH:  {A:1.28,  B:-0.12,  dist:520,tz:60, ty:0, pan:0.10,  pay:0.04, sp:0.85,capF:0.93,label:'HIGH DRIFT'},
+  SIDE:  {A:0.55,  B:0.82,   dist:330,tz:44, ty:4, pan:-0.07, pay:-0.01,sp:0.72,capF:0.66,label:'FORWARD RAIL'},
+  RIGHT: {A:0.105, B:0,      dist:310,tz:44, ty:0, pan:0.13,  pay:0.02, sp:0.7, capF:0.95,label:'EAST WINDOW'},
+  SKY:   {A:0.09,  B:0,      dist:310,tz:118,ty:0, pan:-0.02, pay:0.10, sp:0.8, capF:0.80,label:'SKY BAND'},
+  DRIFT: {A:0.95,  B:-0.22,  dist:620,tz:60, ty:0, pan:0,     pay:-0.03,sp:0.75,capF:0.82,label:'OPEN DRIFT'},
+  SKIM:  {A:0.15,  B:0,      dist:170,tz:24, ty:0, pan:-0.11, pay:0,    sp:1.5, capF:0.70,label:'RIVER SKIM'},
+  /* 沿河前推：低俯、近正向，河流只作前景引导；已转正入中景池常驻轮换。 */
+  RIVERFOLLOW:{A:0.34,B:0.14,dist:540,tz:34, ty:4, pan:-0.045,pay:-0.01,sp:0.72,capF:0.78,label:'RIVER FOLLOW'},
+  /* 新增：低空宽景——参考图里雾化远景、河流对角的低俯全景，之前完全没有的类型 */
+  VISTA: {A:0.44,  B:0.18,   dist:560,tz:46, ty:6, pan:-0.06, pay:-0.01,sp:0.9, capF:0.74,label:'LOW VISTA'},
+  /* 导演层专用：暮粉/夜航低机位逆光宽景 */
+  LOWSUN:{A:0.30,  B:0.66,   dist:560,tz:24, ty:0, pan:0,     pay:-0.02,sp:0.7, capF:0.80,label:'LOW LIGHT'},
+  /* 调研新增：环绕——偏航在段内从 -45° 画弧到 +45°，背景持续旋转 */
+  ORBIT: {A:0.66,  B:0,      dist:540,tz:56, ty:6, pan:0,     pay:0,    sp:0.7, capF:0.82,label:'ORBIT'},
+  /* 调研新增：拉远揭示——从鸟群近景缓慢后拉抬升，逐渐露出大地 */
+  REVEAL:{A:0.42,  B:0.35,   dist:270,tz:36, ty:6, pan:-0.06, pay:0,    sp:0.8, capF:0.70,label:'PULL REVEAL'},
+  BEHIND:{A:0.105, B:1.309,  dist:560,tz:50, ty:0, pan:0,     pay:0,    sp:0.6, capF:0.80,label:'BEHIND'},/* 正背面偏过去15°：四分之三角度，不再死对轴线 */
+  HEADON:{A:0.13,  B:-1.309, dist:330,tz:42, ty:0, pan:0,     pay:0,    sp:0.62,capF:0.80,label:'HEAD-ON'},/* 同上，镜像侧 */
+  RET:   {A:1.30,  B:0,      dist:600,tz:62, ty:0, pan:-0.06, pay:0,    sp:1.8, capF:0.70,label:'RETURN'}
+};
+/* 每圈重排：骨架不动（俯视→下降→中景→压轴→回升）���圈内随机变奏；首圈全镜头 */
+function buildSchedCore(n){
+  if(TEST_NEW_SHOTS){/* 测试：环绕与拉远揭示交替，每镜约 16 秒 */
+    const seq=[['ORBIT',1],['REVEAL',1],['ORBIT',1],['REVEAL',1]];
+    let acc=0;const out=[];
+    for(const e of seq){out.push({s:e[0],a:acc/4,b:(acc+e[1])/4});acc+=e[1]}
+    return out;
+  }
+  const R=k=>hash((n*97+13)|0,k*31+7);
+  /* 首圈存档：旧版那套原样用一次——TOP 大俯冲直接扎到贴河，再侧拍���拉高漂移、压轴、揭示；
+     之后的圈交回生成方案 */
+  if(n===0){
+    const s0=[['TOP',1.25],['SKIM',1.0],['SIDE',1.1],['DRIFT',1.05],['BEHIND',1.35,560,'FAR'],['REVEAL',1.15,undefined,undefined,undefined,1]];
+    const t0=s0.reduce((s,e)=>s+e[1],0);let a0=0;const o0=[];
+    for(const e of s0){o0.push({s:e[0],a:a0/t0,b:(a0+e[1])/t0,dist:e[2],distTier:e[3],Bov:e[4],dynS:e[5]});a0+=e[1]}
+    return o0;
+  }
+  /* 用�������筛选：TOP/DIAG/SIDE/DRIFT/BEHIND/HEADON。
+     轮转规则（调研结论）：
+     1) 中景池按圈号旋转起点——下一圈的第一个永远≠上一圈的最后一个，不回头；
+     2) 压轴 BEHIND/HEADON 隔圈交替，两者永不相邻，偏航跨度最大 90°，无 180° 翻转；
+     3) 正俯视只留给开场；之后以更近的微侧俯视作为每圈锚点 */
+  /* 调研结论落地：高圈/低圈交替，锥齿变呼吸——高圈从 TOP/AERIAL 锚点全弧下降，
+     低圈不回高空、直接从中层接续；爬���只经由 REVEAL（有动机的拉远抬升） */
+  const hiL=n%2===1;/* 首圈走存档；偶数圈为低圈 */
+  const seq=[];
+  if(hiL)seq.push(['AERIAL',0.68+R(1)*0.18]);/* 锚点俯瞰只占约12%——俯视只负责建立空间 */
+  /* 半侧视为主（参考 DIAGONAL/FORWARD RAIL）：54°俯的 DRIFT 移出巡航池，鸟和景同框 */
+  const loP=['SIDE','VISTA','RIVERFOLLOW'],miP=['DIAG','ORBIT'];
+  const pick=(arr,k)=>arr[(((n+k)%arr.length)+arr.length)%arr.length];
+  const hOf=e=>SHOTS[e[0]].tz+e[2]*Math.sin(SHOTS[e[0]].A);
+  const dClamp=(nm,d)=>clamp(d,SHOTS[nm].dist*0.7,SHOTS[nm].dist*1.42);
+  const tierOf=(nm,d)=>d<SHOTS[nm].dist*0.92?'NEAR':d>SHOTS[nm].dist*1.12?'FAR':'MID';
+  /* 先定远近再算高度（远55% 中30% 近15%）：远景不再被高度反推挤成近景 */
+  const mkFar=(nm,k)=>{const u=R(40+k*3),f=u<0.3?0.82+R(41+k*3)*0.08:u<0.75?1.0:1.18+R(42+k*3)*0.14;/* 中近景为主：近30% 中45% 远25% */
+    const d=dClamp(nm,SHOTS[nm].dist*f);return[nm,0.95+R(3+k)*0.3,d,tierOf(nm,d)]};
+  const mkAtH=(nm,hT,k)=>{const d=dClamp(nm,(hT-SHOTS[nm].tz)/Math.sin(SHOTS[nm].A));
+    return[nm,0.95+R(3+k)*0.3,d,tierOf(nm,d)]};
+  const midE=[];
+  if(hiL){midE.push(mkFar(pick(loP,0),0));/* 一次俯冲直接扎进半侧视带：低俯角+远景着陆，鸟在村庄河流之上 */
+    let ph=hOf(midE[0]);
+    const cand=[R(7)<0.5?'DIAG':'ORBIT',pick(loP,1),pick(loP,2)],cnt=R(2)<0.4?1:2;
+    for(let i=0;i<cand.length&&midE.length<cnt+1;i++){const nm=cand[i];
+      const fl=SHOTS[nm].tz+SHOTS[nm].dist*0.7*Math.sin(SHOTS[nm].A);
+      if(fl>ph-35)continue;/* 该镜位最低高度塞不进缓降就跳过 */
+      const e=mkAtH(nm,ph-(35+R(51+i)*45),i+1);midE.push(e);ph=hOf(e)}
+  }else{midE.push(mkFar(R(6)<0.5?(R(7)<0.5?'DIAG':'ORBIT'):pick(loP,0),0));/* 低圈从中层半侧视接续，不回高空 */
+    let ph=hOf(midE[0]);
+    const cand=[pick(loP,1),pick(loP,2),R(7)<0.5?'ORBIT':'DIAG'].filter(nm=>nm!==midE[0][0]),cnt=R(2)<0.35?1:2;
+    for(let i=0;i<cand.length&&midE.length<cnt+1;i++){const nm=cand[i];
+      const fl=SHOTS[nm].tz+SHOTS[nm].dist*0.7*Math.sin(SHOTS[nm].A);
+      if(fl>ph-30)continue;
+      const e=mkAtH(nm,ph-(35+R(51+i)*40),i+1);midE.push(e);ph=hOf(e)}}
+  /* 前段偏航大摆（60°~100°）：高圈首个中景相对锚点大幅甲侧 */
+  if(hiL&&midE.length){const aB=SHOTS[n===0?'TOP':'AERIAL'].B||0;
+    midE[0][4]=clamp(aB+(R(56)<0.5?-1:1)*(1.05+R(57)*0.5),-1.35,1.35)}
+  /* 30度规则保留（防跳剪）；尾段另加上限，摆幅收回 40° 内 */
+  for(let i=1;i<midE.length;i++){const pb=midE[i-1][4]!==undefined?midE[i-1][4]:SHOTS[midE[i-1][0]].B,cb=midE[i][4]!==undefined?midE[i][4]:SHOTS[midE[i][0]].B;
+    if(Math.abs(cb-pb)<0.28)midE[i][4]=pb+(cb>=pb?0.3:-0.3);
+    else if(i>=2&&Math.abs(cb-pb)>0.85)midE[i][4]=pb+(cb>=pb?0.7:-0.7)}
+  for(const e of midE)seq.push(e);
+  seq.push([n%2===0?'BEHIND':'HEADON',1.2+R(9)*0.3]);
+  /* 回升只经由拉远揭示：BEHIND 后全幅爬回高空锚点；HEADON 后半幅，衔接低圈的中层起点 */
+  if(n%2===0)seq.push(['REVEAL',1.0+R(12)*0.3,undefined,undefined,undefined,1]);
+  else seq.push(['REVEAL',0.8+R(12)*0.25,undefined,undefined,-0.3,0.55]);
+  /* 正对镜头的距离变奏：出现时抽一次卡，整段锁定、转场仍平滑；前、后镜头各自从近/中/远三档随机抽一 */
+  const bi=seq.findIndex(e=>e[0]==='BEHIND');
+  if(bi>=0){const ds=[
+    {d:545+R(20)*30,t:'FAR'},/* 原有远景 */
+    {d:470+R(21)*35,t:'MID'},
+    {d:395+R(22)*35,t:'NEAR'}
+  ];const u=R(25),v=ds[u<0.25?0:u<0.65?1:2];seq[bi][2]=v.d;seq[bi][3]=v.t}/* 中近为主：远25% 中40% 近35% */
+  const hi=seq.findIndex(e=>e[0]==='HEADON');
+  if(hi>=0){const ds=[
+    {d:380+R(26)*35,t:'FAR'},/* 新增的远一点版本 */
+    {d:320+R(27)*25,t:'MID'},/* 原有常规距离附近 */
+    {d:285+R(28)*25,t:'NEAR'}
+  ];const u=R(29),v=ds[u<0.25?0:u<0.65?1:2];seq[hi][2]=v.d;seq[hi][3]=v.t}/* 中近为主：远25% 中40% 近35% */
+  const tot=seq.reduce((s,e)=>s+e[1],0);
+  let acc=0;const out=[];
+  for(const e of seq){out.push({s:e[0],a:acc/tot,b:(acc+e[1])/tot,dist:e[2],distTier:e[3],Bov:e[4],dynS:e[5]});acc+=e[1]}
+  return out;
+}
+/* 跨圈无缝：每圈末尾的滑动目标 = 下一圈真实的第一镜（含距离/偏航参数），不再弹回初始位置 */
+function buildSched(n){const s=buildSchedCore(n);const f=buildSchedCore(n+1)[0];
+  s[s.length-1].wrapIt={s:f.s,dist:f.dist,Bov:f.Bov};return s}
+let SCHED=[],loopN=-1;
+window.__sched=()=>SCHED;
+window.__goto=nm=>{const it=SCHED.find(e=>e.s===nm);if(it)window.__setP(it.a+(it.b-it.a)*0.25)};
+window.__birdPos=()=>birdS.map(s=>[s.px,s.py,s.pz]);
+window.__jump=x=>{flockX=x};
+window.__shot=nm=>{window.__setP(0.5);loopN=0;SCHED=[{s:nm,a:0,b:1}]};
+/* 段内前半保持镜位，后半平滑滑向下一镜——全程连续无切换；开场正俯视后滑入微侧俯视循环 */
+function schedState(q){
+  q=clamp(q,0,0.99999);
+  let k=SCHED.length-1;
+  for(let i=0;i<SCHED.length;i++)if(q<SCHED[i].b){k=i;break}
+  const it=SCHED[k],cur=SHOTS[it.s],nxIt=k+1<SCHED.length?SCHED[k+1]:(it.wrapIt||SCHED[0]),nxN=nxIt.s,nx=SHOTS[nxN];
+  const hb=it.a+(it.b-it.a)*0.5,st={k,mix:0};
+  const m=q<=hb?0:ss(hb,it.b,q);st.mix=m;
+  for(const ky of['A','B','dist','tz','ty','pan','pay','sp','capF']){
+    const cv=ky==='dist'&&it.dist!==undefined?it.dist:(ky==='B'&&it.Bov!==undefined?it.Bov:cur[ky]);
+    const nv=ky==='dist'&&nxIt.dist!==undefined?nxIt.dist:(ky==='B'&&nxIt.Bov!==undefined?nxIt.Bov:nx[ky]);
+    st[ky]=lerp(cv,nv,m)
+  }
+  /* 段内动态镜位：环绕=偏航持续画弧；拉远揭示=由近及远抬升后拉。
+     当前镜的动态量随混合淡出，下一镜从其起点动态量淡入，全程连续 */
+  const lp=clamp((q-it.a)/(it.b-it.a),0,1);
+  const dyn=(nm,l,sc)=>{const e=l*l*(3-2*l);
+    if(nm==='ORBIT')return{B:lerp(-0.78,0.78,e)};
+    if(nm==='REVEAL')return{A:e*0.62*sc,dist:e*480*sc,tz:e*52*sc};
+    return null};
+  const dc=dyn(it.s,lp,it.dynS!==undefined?it.dynS:1),dn=dyn(nxN,0,1);
+  for(const ky of['A','B','dist','tz'])st[ky]+=((dc&&dc[ky])||0)*(1-m)+((dn&&dn[ky])||0)*m;
+  return st;
+}
+/* ================= 相机 ================= */
+let tilt=0,yawN=0,dist=660,cam={x:0,y:0,z:700},f={x:0,y:0,z:-1},u={x:0,y:1,z:0},r={x:1,y:0,z:0},panX=0,panY=0;
+/* 平滑相机轴：跟随力沿它施加，转镜头时鸟群被"带着转"而不是弹回 */
+let rS={x:1,y:0,z:0},uS={x:0,y:1,z:0},glide=0,pA=1.5551,pB=0;
+let flockX=0;
+function proj(px,py,pz){
+  const dx=px-cam.x,dy=py-cam.y,dz=pz-cam.z;
+  const zc=dx*f.x+dy*f.y+dz*f.z;if(zc<NEAR)return null;
+  const xr=dx*r.x+dy*r.y+dz*r.z,yu=dx*u.x+dy*u.y+dz*u.z;
+  return{x:W/2+panX+xr*FLv/zc,y:H/2+panY-yu*FLv/zc,z:zc}
+}
+/* ================= 鼠标跟随 ================= */
+let mx=-1,my=-1,lastMove=-9999,pdown=false,camMode='auto',freeA=0.72,freeB=0.16,freeDist=390,lastCamA=0.72,lastCamB=0.16;
+const ptrs=new Map();let pinchD=0;/* 多指追踪：双指捧合 = 自主镜头缩放 */
+function pointOf(e){return[e.clientX,e.clientY]}
+addEventListener('pointermove',e=>{const q=pointOf(e),dx=e.movementX,dy=e.movementY;if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,q);
+  if(ptrs.size===2&&camMode==='free'){const a=[...ptrs.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pinchD>0)freeDist=clamp(freeDist*pinchD/Math.max(1,d),160,680);pinchD=d}
+  else if(camMode==='free'&&pdown){freeB=clamp(freeB-dx*0.004,-1.48,1.48);freeA=clamp(freeA+dy*0.003,0.18,1.46)}
+  /* 微抖死区：光标静止时系统级 1–2px 抖动不再重新点燃「风」；真正的缓慢移动会在短时间内累积超过阈值 */
+  const nowP=performance.now();
+  if(nowP-lastPtrT>400)jAcc=0;lastPtrT=nowP;
+  if(mx>=0)jAcc+=Math.hypot(q[0]-mx,q[1]-my);
+  if(mx<0||jAcc>3){lastMove=nowP;jAcc=0}
+  mx=q[0];my=q[1]});
+addEventListener('pointerdown',e=>{const q=pointOf(e);ptrs.set(e.pointerId,q);if(ptrs.size===2){const a=[...ptrs.values()];pinchD=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])}pdown=true;mx=q[0];my=q[1];lastMove=performance.now()});
+addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinchD=0;if(ptrs.size===0)pdown=false});
+addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinchD=0;if(ptrs.size===0)pdown=false});
+let wheelD=0,wheelH=0,wheelT=-9999,wD=0,wH=0;
+let g1=0,g2=0,pmx=0,pmy=0,csS=0,capR=200,capL=400,steerY=0,steerVy=0,camSteerY=0,cpx=0,cpy=0,actE=0,jAcc=0,lastPtrT=-9999;
+/* ================= 鸟群（��只独立弹簧，有大有小） ================= */
+const NB=COARSE?22:30,birdD=[],birdS=[];
+for(let i=0;i<NB;i++){
+  /* 金角螺旋均匀铺满椭圆盘 + 分层高度：三轴比例接近，不再拉成一条线或成团 */
+  const gA=i*2.399963,rad=Math.sqrt((i+0.5)/NB);
+  const oz=34+(((i*7)%NB)/NB)*126+hash(i,9)*14;
+  birdD.push({
+    ox:Math.cos(gA)*rad*235+(hash(i,3)-0.5)*44-38,oy:Math.sin(gA)*rad*175+(hash(i,7)-0.5)*40,oz,
+    ph:hash(i,11)*6.283,glint:hash(i,13),
+    sz:0.7+Math.pow(hash(i,17),1.6)*1.25,
+    k:1.4+hash(i,19)*2.2,
+    fg:0.5+hash(i,23)*0.6
+  });
+  birdS.push({px:birdD[i].ox,py:birdD[i].oy,pz:oz,vx:0,vy:0,vz:0,hd:0,init:false});
+}
+function slotOf(i,t){
+  const bd=birdD[i];
+  const ox=bd.ox*(1-tilt*0.24)*(1-yawN*0.35)+yawN*40;
+  /* 随镜头变��侧视时沿深度非对称展开——����离镜头侧拉开层次，靠镜头侧压缩防巨��� */
+  const sv=tilt*(1-yawN);
+  const dp=bd.oy<0?lerp(1,0.55,sv):lerp(1,1.32,sv);
+  const oy=bd.oy*dp*(1-yawN*0.45);
+  const oz=lerp(bd.oz,26+(bd.oz-40)*0.72,tilt*(1-yawN*0.35));
+  const mo=Math.sin(t*0.23+bd.ph*2.7);
+  return{x:flockX+ox+Math.sin(t*0.85+bd.ph)*7,
+    y:oy+Math.sin(t*0.6+bd.ph*1.3)*4+mo*22*(0.35+tilt*0.65),
+    z:oz+Math.sin(t*1.6+bd.ph*2.1)*2.6+Math.cos(t*0.19+bd.ph*1.9)*8}
+}
+function stepBirds(t,dt){
+  /* 左 60% 软引力：越往右阻力越大（tanh 渐进），每只鸟边界不同，不会卡成一堆 */
+  const cRe=lerp(capR,W*0.24,yawN),cLe=lerp(capL,W*0.26,yawN);
+  for(let i=0;i<NB;i++){
+    const bd=birdD[i],st=birdS[i],sl=slotOf(i,t);
+    const sox=sl.x-flockX,soy=sl.y,soz=sl.z;
+    const sdr=sox*rS.x+soy*rS.y;
+    let rl=sdr+g1*bd.fg;
+    /* 按每��鸟自己的景深换算像素边界：近处���鸟也不会冲出左 60% */
+    const bzc=Math.max(80,zcOf(st.init?st.px:sl.x,st.init?st.py:sl.y,st.init?st.pz:sl.z));
+    /* 边���呼吸：每只鸟幅度相位都不同 */
+    const brz=0.82+(0.12+0.4*hash(i,41))*Math.sin(t*0.45+bd.ph*3.1);
+    /* 胆量幂律分布：��数头鸟能超出很远，大多数早早被拉住 */
+    const cR=cRe*bzc/FLv*(0.5+Math.pow(hash(i,29),3)*2.3)*brz,cL=cLe*bzc/FLv*(0.35+Math.pow(hash(i,31),2.5)*1.9)*brz;
+    const rlRaw=rl;
+    /* 去掉硬边界：tanh 饱和会把全群钉在同一条线上。
+       改为只衰减“推动量”：越靠边，同样的推动产生的位移越小（平方衰减），
+       队形偏移 sdr 原样保留；往回走不衰减，每只鸟胆量不同衰减曲线不同 → 排不成线 */
+    const push=rlRaw-sdr;
+    const pn=push>=0?cR:cL;
+    const rn=Math.max(0,(push>=0?sdr:-sdr)+Math.abs(push)*0.35)/pn;
+    const damp=1/(1+rn*rn*1.3);
+    rl=sdr+push*damp;
+    const ovf=push*(1-damp);
+    /* 只在中间安全区做小幅��开；越接近边界��这个散开越消�� */
+    const mid=clamp(damp*damp,0,1);
+    const midFan=(hash(i,47)-0.5)*32*mid+Math.sin(t*(0.42+hash(i,49)*0.22)+bd.ph*4.7)*12*mid;
+    const fan=(hash(i,43)-0.5)*2;
+    const gu=g2*bd.fg+midFan+ovf*(hash(i,37)-0.5)*0.6+(Math.abs(g1)*0.25+Math.abs(g2)*0.35)*fan,dl=rl-sdr;
+    const tx=flockX+sox+dl*rS.x+gu*uS.x;
+    const ty=soy+dl*rS.y+gu*uS.y+steerY;/* 漂移加在目标上，边界判定仍相对镜头 */
+    const tz=clamp(soz+gu*uS.z,16,195);
+    if(!st.init){st.px=tx;st.py=ty;st.pz=tz;st.init=true}
+    /* 离目标越远跟得越慢——落在后面的鸟慢慢赶上来 */
+    const ddF=Math.hypot(tx-st.px,ty-st.py,tz-st.pz);
+    const g=bd.k*3.2*dt*(0.18+0.55/(1+ddF/85)),dm=Math.exp(-3.4*dt);
+    st.vx=(st.vx+(tx-st.px)*g)*dm;st.vy=(st.vy+(ty-st.py)*g)*dm;st.vz=(st.vz+(tz-st.pz)*g)*dm;
+    st.px+=st.vx*dt*3.4;st.py+=st.vy*dt*3.4;st.pz=clamp(st.pz+st.vz*dt*3.4,14,200);
+    /* 机头朝指引方向轻轻偏 */
+    /* 只轻轻朝引航���������向点头，不让鸟群整片倾斜追鼠标 */
+    const hv=clamp((st.vy*2.1+steerVy*0.38)/170,-0.20,0.20);
+    st.hd+=(hv-st.hd)*Math.min(1,dt*1.65);
+  }
+  /* Boids ��离：平方��衰减 + 力上限 + 沿分离轴速度阻尼���—滑开绕开，���是弹开 */
+  for(let a=0;a<NB;a++)for(let b2=a+1;b2<NB;b2++){
+    const A=birdS[a],B=birdS[b2];
+    const dx=B.px-A.px,dy=B.py-A.py,dz=B.pz-A.pz;
+    const dr=dx*rS.x+dy*rS.y,du2=dx*uS.x+dy*uS.y+dz*uS.z;
+    /* 背面/迎面镜头（偏航大）时收缩分离：屏幕重叠是正常透视，
+       否则分离力和队形弹簧持续拉锯→连续抽搐 */
+    const sepK=1-yawN*0.72;
+    const d2=dr*dr+du2*du2,R=30*(0.55+0.45*sepK);
+    if(d2<R*R&&d2>0.01){
+      const d=Math.sqrt(d2),q1=(R-d)/R;
+      const fm=Math.min(q1*q1*36*dt,2.0)*sepK;
+      const nx=(dr*rS.x+du2*uS.x)/d,ny=(dr*rS.y+du2*uS.y)/d,nz=du2*uS.z/d;
+      A.px-=nx*fm;A.py-=ny*fm;A.pz=clamp(A.pz-nz*fm,14,200);
+      B.px+=nx*fm;B.py+=ny*fm;B.pz=clamp(B.pz+nz*fm,14,200);
+      const rv=(B.vx-A.vx)*nx+(B.vy-A.vy)*ny+(B.vz-A.vz)*nz;
+      if(rv<0){const j=rv*q1*Math.min(1,dt*9);
+        A.vx+=nx*j*0.5;A.vy+=ny*j*0.5;A.vz+=nz*j*0.5;
+        B.vx-=nx*j*0.5;B.vy-=ny*j*0.5;B.vz-=nz*j*0.5;
+      }
+    }
+  }
+}
+/* ================= 地面 ================= */
+let sparks=[],Lx=0,Ly=0,sunLight=null,horizonY=0;
+function quad(a,b,c,d,fill,stroke){
+  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.closePath();
+  ctx.fillStyle=fill;ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=0.8;ctx.stroke()}
+}
+function star4(x,y,s,a){
+  ctx.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')';
+  ctx.beginPath();ctx.moveTo(x,y-s);ctx.quadraticCurveTo(x,y,x+s,y);ctx.quadraticCurveTo(x,y,x,y+s);ctx.quadraticCurveTo(x,y,x-s,y);ctx.quadraticCurveTo(x,y,x,y-s);ctx.fill();
+}
+/* 以真正会画出��远处田块为准：天空只向地平线最后一层地面靠齐。 */
+function fieldColorAt(x,y){
+  const sm=groundStyleMix(x,y),fi=(hash(Math.floor(x/CELL/3)*7+1,Math.floor(y/CELL/2)*5+2)*5)|0;
+  return styC('field',fi,sm[0],sm[1],sm[2]);
+}
+function horizonGroundColor(){
+  /* 沿视线取真正画在画面里的远处地面带（全部 <FAR，不采画面外的地块），
+     越远权重越高����天空底边接的是地平线最后一层田块，而不是脚下的近景。 */
+  const spread=CELL*1.15,ds=[FAR*0.45,FAR*0.65,FAR*0.85],ws=[0.28,0.34,0.38];
+  /* fieldColorAt 在混合带内返回 rgb() 字符串，hxc 只认 #hex 会把它���解成纯黑；
+     这里��两种格式都能解的取色。 */
+  const pC=c=>c[0]==='#'?hxc(c):c.match(/[\d.]+/g).map(Number);
+  const v=[0,0,0];
+  for(let k=0;k<ds.length;k++){
+    const hx=cam.x+f.x*ds[k],hy=cam.y+f.y*ds[k];
+    const a=pC(fieldColorAt(hx+r.x*spread,hy+r.y*spread)),b=pC(fieldColorAt(hx,hy)),c=pC(fieldColorAt(hx-r.x*spread,hy-r.y*spread));
+    for(let i=0;i<3;i++)v[i]+=ws[k]*(a[i]+b[i]+c[i])/3;
+  }
+  /* 远景蒙着雾，底色向��������靠，让接缝落进地平线雾带里。 */
+  const fog=amb.fog.split(',').map(Number),fw=0.2;
+  return 'rgb('+[0,1,2].map(i=>Math.round(v[i]*(1-fw)+fog[i]*fw)).join(',')+')';
+}
+function drawSunGroundLight(){
+  if(!sunLight||sunLight.p<0.02)return;
+  const yy=clamp(sunLight.y+H*0.065,horizonY+4,H*0.84),rx=W*(0.18+0.12*sunLight.p),ry=H*(0.055+0.035*sunLight.p);
+  ctx.save();ctx.beginPath();ctx.rect(0,Math.max(0,horizonY-2),W,H-Math.max(0,horizonY-2));ctx.clip();
+  const lg=ctx.createRadialGradient(sunLight.x,yy,0,sunLight.x,yy,rx);
+  lg.addColorStop(0,rgbaC(sunLight.c,0.035*sunLight.p));lg.addColorStop(0.38,rgbaC(sunLight.c,0.012*sunLight.p));lg.addColorStop(1,rgbaC(sunLight.c,0));
+  ctx.save();ctx.scale(1,ry/rx);ctx.fillStyle=lg;ctx.fillRect(0,yy/(ry/rx)-rx,W,H/(ry/rx));ctx.restore();ctx.restore();
+}
+function drawNightStars(t){
+  /* 夜航才轻轻浮现的小星点：稳定、不抢鸟的戏 */
+  const nw=ambW[4]||0;if(nw<0.04)return;
+  for(let k=0;k<105;k++){
+    const x=hash(k,701)*W,y=H*(0.025+hash(k,709)*0.62);
+    const tw=0.58+0.42*Math.sin(t*(0.65+hash(k,719)*0.7)+hash(k,727)*6.283);
+    const a=nw*(0.38+hash(k,733)*0.42)*tw;
+    const s=hash(k,739)>0.86?2.4:1.38;
+    star4(x,y,s,a);
+  }
+}
+function drawGround(t){
+  const ci=Math.round(Lx/CELL),cj=Math.round(Ly/CELL);
+  const cells=[];
+  for(let i=ci-RCELL;i<=ci+RCELL;i++)for(let j=cj-RCELL;j<=cj+RCELL;j++){
+    const zc=(i*CELL+CELL/2-cam.x)*f.x+(j*CELL+CELL/2-cam.y)*f.y+(0-cam.z)*f.z;
+    if(zc>-CELL&&zc<FAR+CELL)cells.push([i,j,zc]);
+  }
+  cells.sort((a,b)=>b[2]-a[2]);
+  sparks=[];
+  for(const c of cells){
+    const i=c[0],j=c[1],x0=i*CELL,y0=j*CELL;
+    const p0=proj(x0,y0,0),p1=proj(x0+CELL,y0,0),p2=proj(x0+CELL,y0+CELL,0),p3=proj(x0,y0+CELL,0);
+    if(!p0||!p1||!p2||!p3)continue;
+    const cxm=x0+CELL/2,dRiv=Math.abs(y0+CELL/2-riverC(cxm));
+    const smG=groundStyleMix(cxm,y0+CELL/2),fi=(hash(Math.floor(i/3)*7+1,Math.floor(j/2)*5+2)*5)|0;
+    /* 用��色描边盖住相邻田块之间的抗锯齿接缝，避免背景色从缝里透出成网格线 */
+    const fldC=styC('field',fi,smG[0],smG[1],smG[2]);
+    quad(p0,p1,p2,p3,fldC,fldC);
+    if(dRiv<RIVW){
+      for(let k=0;k<3;k++){
+        const sx=x0+hash(i*7+k,j*5)*CELL,sy=y0+hash(i,j*9+k)*CELL;
+        const sp=proj(sx,sy,0.5);if(!sp)continue;
+        const tw=Math.sin(t*3.2+hash(i+k,j)*40)*0.5+0.5;
+        if(tw<0.45)continue;
+        sparks.push({x:sp.x,y:sp.y,s:clamp(FLv/sp.z*3.0,1,6),a:(tw-0.45)*1.7*(1-sp.z/FAR),river:true});
+      }
+    }else if(hash(i*11,j*13)>0.955){
+      const gx=x0+hash(i,j+70)*CELL,gy=y0+hash(i+70,j)*CELL;
+      const gp=proj(gx,gy,0.5);
+      if(gp){const tw2=Math.sin(t*2.6+hash(i,j+90)*40)*0.5+0.5;
+        if(tw2>0.55)sparks.push({x:gp.x,y:gp.y,s:clamp(FLv/gp.z*2.2,0.8,4),a:(tw2-0.55)*1.3*(1-gp.z/FAR)});}
+    }
+  }
+  const drawRiver=(wd,inner)=>{
+    let seg=[],curCol=null,curK='';
+    const flush=()=>{if(seg.length>1&&curCol){ctx.beginPath();ctx.moveTo(seg[0][0].x,seg[0][0].y);
+      for(let k=1;k<seg.length;k++)ctx.lineTo(seg[k][0].x,seg[k][0].y);
+      for(let k=seg.length-1;k>=0;k--)ctx.lineTo(seg[k][1].x,seg[k][1].y);
+      ctx.closePath();ctx.fillStyle=curCol;ctx.fill()}seg=[]};
+    /* 采样点吸附世界固定网格：过渡色带边界不随镜头移动抖动；量化细到 0.04 更顺滑 */
+    const xg0=Math.floor((Lx-2300)/40)*40;
+    for(let x=xg0;x<=Lx+2300;x+=40){
+      const yc=riverC(x);
+      const sm=styleMix(x,yc),qm=Math.round(sm[2]*25)/25;
+      const key=sm[0]+'_'+sm[1]+'_'+qm;
+      if(key!==curK){const last=seg.length?seg[seg.length-1]:null;flush();if(last)seg.push(last);curK=key;curCol=styC(inner?'rivB':'rivA',-1,sm[0],sm[1],qm)}
+      const pl=proj(x,yc-wd,0),pr=proj(x,yc+wd,0);
+      if(pl&&pr&&pl.z<FAR&&pr.z<FAR)seg.push([pl,pr]);else flush();
+    }
+    flush();
+  };
+  drawRiver(46,false);drawRiver(27,true);
+  for(const s of sparks){
+    /* 夜航河面不闪：在风格过渡中平滑淡出；陆地微光保留 */
+    const riverFade=s.river?1-(ambW[4]||0):1;
+    star4(s.x,s.y,s.s,clamp(s.a*(amb?amb.glintB:1)*riverFade,0,0.95));
+  }
+}
+/* ================= 鸟影 ================= */
+function drawShadows(){
+  ctx.fillStyle='rgba('+(amb?amb.shadG:'96,108,112')+','+(0.09*(1-tilt*0.55)).toFixed(3)+')';
+  for(let i=0;i<NB;i++){
+    const st=birdS[i],sp=proj(st.px,st.py,0);if(!sp)continue;
+    const rr=clamp(FLv/sp.z*6*birdD[i].sz,1,18);
+    ctx.beginPath();ctx.ellipse(sp.x,sp.y,rr,rr*(0.9-0.62*tilt),0,0,6.283);ctx.fill();
+  }
+}
+/* ================= 小镇（坡顶小房 + 塔楼） ================= */
+function clusterBoxes(m){
+  const out=[],h0=hash(m,101);
+  if(h0<0.22)return out;
+  const bx0=m*190+h0*70;
+  /* 欧洲老城：临河联排屋，共用山墙，高低错落 */
+  /* 街道沿��岸蜒蜒：两岸交替 + 逐栋错位，不����成直�� */
+  const side=hash(m,119)>0.45?-1:1;
+  const off=78+hash(m,105)*85;
+  const yF=riverC(bx0)+side*off;
+  let x=bx0;const n=3+Math.floor(hash(m,103)*3);
+  for(let k=0;k<n;k++){
+    const w=7+hash(m,k+11)*5;
+    const hh=(15+hash(m,k+29)*17)*(hash(m,k+83)>0.82?1.5:1);/* 偶发高窄排屋 */
+    const hy=riverC(x+w)+side*(off+(hash(m,k+91)-0.5)*30);
+    /* 每栋房子在自己的位置采样混合权重，和脚下地面同步渐变 */
+    const smH=styleMix(x+w,hy),siH=smH[2]>0.5?smH[1]:smH[0];
+    out.push({x:x+w,y:hy,w,d:9+hash(m,k+19)*3,h:hh,sd:hash(m,k+61),ch:hash(m,k+71)>0.45,ty:hash(m,k+87)>0.85?2:0,si:siH,s0:smH[0],s1:smH[1],sm:smH[2]});
+    x+=w*2;
+  }
+  /* 教堂塔（地标兼前景遮挡） */
+  if(hash(m,109)>0.78){
+    const spx=bx0+40+hash(m,111)*100,spy=yF+side*(30+hash(m,113)*20);
+    const smP=styleMix(spx,spy),siP=smP[2]>0.5?smP[1]:smP[0];
+    out.push({x:spx,y:spy,w:6.5,d:6.5,h:54+hash(m,115)*22,sd:0.9,spire:true,si:siP,s0:smP[0],s1:smP[1],sm:smP[2]});
+  }
+  /* 后排散屋 */
+  const nB=1+Math.floor(hash(m,107)*3);
+  for(let k=0;k<nB;k++){
+    const tv=hash(m,k+81);
+    const bxk=bx0+k*55+hash(m,k+31)*34;
+    const by=riverC(bxk)-side*(85+hash(m,k+37)*115);
+    const smK=styleMix(bxk,by),siK=smK[2]>0.5?smK[1]:smK[0];
+    out.push({x:bxk,y:by,w:8+hash(m,k+41)*6,d:8+hash(m,k+43)*5,h:13+hash(m,k+47)*16,sd:hash(m,k+67),ch:hash(m,k+73)>0.55,ty:tv>0.62?2:(tv>0.3?1:0),si:siK,s0:smK[0],s1:smK[1],sm:smK[2]});
+  }
+  return out;
+}
+function bStyC(b,k,i){const s0=b.s0!==undefined?b.s0:(b.si||0),s1=b.s1!==undefined?b.s1:s0;return styC(k,i,s0,s1,b.sm||0)}
+function roofColB(sd,b){return bStyC(b,'roofs',sd>0.82?0:(sd>0.62?1:(sd<0.12?2:3)))}
+function shadeCol(c){
+  let R,G,B;
+  if(c[0]==='#'){const n=parseInt(c.slice(1),16);R=(n>>16)&255;G=(n>>8)&255;B=n&255}
+  else{const p=c.match(/\d+/g);R=+p[0];G=+p[1];B=+p[2]}
+  return'rgb('+(R*0.88|0)+','+(G*0.88|0)+','+(B*0.86|0)+')';
+}
+function drawWalls(b,hTop){
+  const cs=[[b.x-b.w,b.y-b.d],[b.x+b.w,b.y-b.d],[b.x+b.w,b.y+b.d],[b.x-b.w,b.y+b.d]];
+  const lo=[],hi=[];
+  for(let k=0;k<4;k++){const a=proj(cs[k][0],cs[k][1],0),c=proj(cs[k][0],cs[k][1],hTop);if(!a||!c)return null;lo.push(a);hi.push(c)}
+  const walls=[[0,1,0,-1],[1,2,1,0],[2,3,0,1],[3,0,-1,0]],sty=STYLES[b.si||0];
+  for(let wI=0;wI<4;wI++){
+    const wl=walls[wI];
+    const mxx=(cs[wl[0]][0]+cs[wl[1]][0])/2,myy=(cs[wl[0]][1]+cs[wl[1]][1])/2;
+    if((mxx-cam.x)*wl[2]+(myy-cam.y)*wl[3]<0){
+      quad(lo[wl[0]],lo[wl[1]],hi[wl[1]],hi[wl[0]],bStyC(b,'walls',wI),sty.bstroke);
+      /* 夜航：窗户亮灯 */
+      if(sty.win&&hTop>9&&hash((b.x*3|0)+wI,771)>0.35){
+        const nw=1+((hash((b.x|0),wI+13)*2)|0);
+        for(let q=0;q<nw;q++){
+          const fq=0.28+q*0.34;
+          const wp=proj(lerp(cs[wl[0]][0],cs[wl[1]][0],fq),lerp(cs[wl[0]][1],cs[wl[1]][1],fq),hTop*(0.32+hash((b.x|0)+q,wI+31)*0.3));
+          if(wp){const s2=clamp(FLv/wp.z*1.1,0.6,3.4);ctx.fillStyle='rgba(246,216,140,0.85)';ctx.fillRect(wp.x-s2/2,wp.y-s2,s2,s2*1.55)}
+        }
+      }
+    }
+  }
+  return hi;
+}
+function drawBox(b,fade){
+  ctx.globalAlpha=fade;
+  const hi=drawWalls(b,b.h);
+  if(hi&&cam.z>b.h)quad(hi[0],hi[1],hi[2],hi[3],roofColB(b.sd,b),STYLES[b.si||0].bstroke);
+  ctx.globalAlpha=1;
+}
+function drawHouse(b,fade){
+  ctx.globalAlpha=fade;
+  const hi=drawWalls(b,b.h);
+  if(!hi){ctx.globalAlpha=1;return}
+  const rh=b.h+Math.min(b.w,b.d)*1.1;
+  const sty=STYLES[b.si||0],rc=roofColB(b.sd,b),rd=shadeCol(rc),ST=sty.bstroke;
+  const gt=(a,c,d,col)=>{ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.strokeStyle=ST;ctx.lineWidth=0.8;ctx.stroke()};
+  let cpt=null;
+  if(b.ty===1){/* 山墙朝南北��屋脊沿 y */
+    const rA=proj(b.x,b.y-b.d,rh),rB=proj(b.x,b.y+b.d,rh);
+    if(rA&&rB){
+      if(cam.x<b.x){quad(hi[1],hi[2],rB,rA,rd,ST);quad(hi[0],hi[3],rB,rA,rc,ST)}
+      else{quad(hi[0],hi[3],rB,rA,rd,ST);quad(hi[1],hi[2],rB,rA,rc,ST)}
+      if(cam.y<b.y-b.d)gt(hi[0],hi[1],rA,bStyC(b,'gable',-1));
+      if(cam.y>b.y+b.d)gt(hi[3],hi[2],rB,bStyC(b,'gable',-1));
+      if(sty.snow){ctx.strokeStyle='rgba(250,252,254,0.95)';ctx.lineWidth=clamp(FLv/rA.z*2.2,1,6);ctx.beginPath();ctx.moveTo(rA.x,rA.y);ctx.lineTo(rB.x,rB.y);ctx.stroke()}
+      cpt=[b.x,b.y+(b.sd-0.5)*b.d*1.1];
+    }
+  }else if(b.ty===2){/* 四坡顶 */
+    const r1=proj(b.x-b.w*0.45,b.y,rh),r2=proj(b.x+b.w*0.45,b.y,rh);
+    if(r1&&r2){
+      const N=()=>quad(hi[0],hi[1],r2,r1,cam.y<b.y?rc:rd,ST);
+      const S=()=>quad(hi[3],hi[2],r2,r1,cam.y<b.y?rd:rc,ST);
+      const Wf=()=>gt(hi[0],hi[3],r1,cam.x<b.x?rc:rd);
+      const Ef=()=>gt(hi[1],hi[2],r2,cam.x<b.x?rd:rc);
+      if(cam.y<b.y){S()}else{N()}
+      if(cam.x<b.x){Ef()}else{Wf()}
+      if(cam.y<b.y){N()}else{S()}
+      if(cam.x<b.x){Wf()}else{Ef()}
+      if(sty.snow){ctx.strokeStyle='rgba(250,252,254,0.95)';ctx.lineWidth=clamp(FLv/r1.z*2.2,1,6);ctx.beginPath();ctx.moveTo(r1.x,r1.y);ctx.lineTo(r2.x,r2.y);ctx.stroke()}
+      cpt=[b.x,b.y];
+    }
+  }else{/* 山墙朝东西（默认） */
+    const rA=proj(b.x-b.w,b.y,rh),rB=proj(b.x+b.w,b.y,rh);
+    if(rA&&rB){
+      if(cam.y<b.y){quad(hi[3],hi[2],rB,rA,rd,ST);quad(hi[0],hi[1],rB,rA,rc,ST)}
+      else{quad(hi[0],hi[1],rB,rA,rd,ST);quad(hi[3],hi[2],rB,rA,rc,ST)}
+      if(cam.x<b.x-b.w)gt(hi[0],hi[3],rA,bStyC(b,'gable',-1));
+      if(cam.x>b.x+b.w)gt(hi[1],hi[2],rB,bStyC(b,'gable',-1));
+      if(sty.snow){ctx.strokeStyle='rgba(250,252,254,0.95)';ctx.lineWidth=clamp(FLv/rA.z*2.2,1,6);ctx.beginPath();ctx.moveTo(rA.x,rA.y);ctx.lineTo(rB.x,rB.y);ctx.stroke()}
+      cpt=[b.x+(b.sd-0.5)*b.w*1.1,b.y];
+    }
+  }
+  if(b.ch&&cpt){/* 烟囱：屋顶是第五立面 */
+    const c1=proj(cpt[0],cpt[1],rh-1.5),c2=proj(cpt[0],cpt[1],rh+3.5);
+    if(c1&&c2){ctx.strokeStyle=bStyC(b,'chim',-1);ctx.lineWidth=clamp(FLv/c1.z*1.6,1,4.5);ctx.beginPath();ctx.moveTo(c1.x,c1.y);ctx.lineTo(c2.x,c2.y);ctx.stroke()}
+  }
+  ctx.globalAlpha=1;
+}
+function drawSpire(b,fade){
+  ctx.globalAlpha=fade;
+  const hi=drawWalls(b,b.h);
+  if(hi){
+    const ap=proj(b.x,b.y,b.h+15);
+    if(ap){
+      const cs=[[b.x-b.w,b.y-b.d],[b.x+b.w,b.y-b.d],[b.x+b.w,b.y+b.d],[b.x-b.w,b.y+b.d]];
+      const fc=[[0,1,0,-1],[1,2,1,0],[2,3,0,1],[3,0,-1,0]];
+      for(const wl of fc){
+        const mxx=(cs[wl[0]][0]+cs[wl[1]][0])/2,myy=(cs[wl[0]][1]+cs[wl[1]][1])/2;
+        const face=(mxx-cam.x)*wl[2]+(myy-cam.y)*wl[3]<0;
+        if(face||cam.z>b.h+15){
+          ctx.beginPath();ctx.moveTo(hi[wl[0]].x,hi[wl[0]].y);ctx.lineTo(hi[wl[1]].x,hi[wl[1]].y);ctx.lineTo(ap.x,ap.y);ctx.closePath();
+          const sp2=STYLES[b.si||0];ctx.fillStyle=bStyC(b,'spire',face?0:1);ctx.fill();ctx.strokeStyle=sp2.bstroke;ctx.lineWidth=0.8;ctx.stroke();
+        }
+      }
+    }
+  }
+  ctx.globalAlpha=1;
+}
+/* ================= �� / 云 / 粒子 ================= */
+function drawTree(o,fade){
+  ctx.globalAlpha=fade;
+  const a=proj(o.x,o.y,0),b=proj(o.x,o.y,o.h);
+  if(!a||!b){ctx.globalAlpha=1;return}
+  const sty=STYLES[o.si||0];
+  ctx.strokeStyle=bStyC(o,'trunk',-1);ctx.lineWidth=clamp(FLv/a.z*1.4,0.8,3.2);
+  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  const rr=clamp(FLv/b.z*(4+o.h*0.42),1.2,30);
+  ctx.fillStyle=bStyC(o,'leaf',o.v>0.5?0:1);
+  if(sty.cone){
+    ctx.beginPath();ctx.moveTo(b.x,b.y-rr*1.5);ctx.lineTo(b.x-rr*0.85,b.y+rr*0.55);ctx.lineTo(b.x+rr*0.85,b.y+rr*0.55);ctx.closePath();ctx.fill();
+    if(sty.snow){ctx.fillStyle='#f5f9fa';ctx.beginPath();ctx.moveTo(b.x,b.y-rr*1.5);ctx.lineTo(b.x-rr*0.34,b.y-rr*0.62);ctx.lineTo(b.x+rr*0.34,b.y-rr*0.62);ctx.closePath();ctx.fill()}
+  }else{ctx.beginPath();ctx.arc(b.x,b.y,rr,0,6.283);ctx.fill()}
+  ctx.globalAlpha=1;
+}
+let cloudT=0;
+function cloudDef(m){
+  /* 中层云雾沿航线向后流：从前景穿过鸟群，退向远方 */
+  const md=hash(m,353)>0.20,flow=cloudT*82;
+  /* y 围绕当前镜头展开，云不会只从画面边界排队进入 */
+  return{cx:m*185+hash(m,301)*200-flow,cy:Ly+(hash(m,307)-0.5)*620,cz:md?(36+hash(m,311)*104):(140+hash(m,311)*145),md}
+}
+function drawCloud(m,fade){
+  const cd=cloudDef(m);
+  /* 云团立体���：泡沫在三个轴上都展开，中央隆起成穹顶，几乎不做屏幕拉伸 */
+  const n=7+((hash(m,313)*4)|0),el=1.1+hash(m,317)*0.8;
+  for(let k=0;k<n;k++){
+    const u=hash(m,k+331)-0.5,dome=1-Math.abs(u)*2;
+    const px=cd.cx+u*150*el,py=cd.cy+(hash(m,k+337)-0.5)*130,pz=cd.cz+(hash(m,k+341)-0.5)*34+dome*30;
+    const q=proj(px,py,pz);if(!q)continue;
+    const rr=clamp(FLv/q.z*(21+hash(m,k+347)*34),5,190),ax=1.12+hash(m,k+351)*0.55;
+    const g=ctx.createRadialGradient(q.x,q.y,0,q.x,q.y,rr);
+    const al=(cd.md?0.14:0.16)*fade*(1-q.z/FAR);/* 云只留一层极淡的空气感 */if(al<=0.01)continue;
+    const CL=amb?amb.cloud:'255,255,255';
+    g.addColorStop(0,'rgba('+CL+','+al.toFixed(3)+')');g.addColorStop(1,'rgba('+CL+',0)');
+    ctx.fillStyle=g;
+    ctx.save();ctx.translate(q.x,q.y);ctx.scale(ax,1);ctx.beginPath();ctx.arc(0,0,rr,0,6.283);ctx.fill();ctx.restore();
+  }
+}
+function drawFlowAtmosphere(t){
+  /* 屏幕中部的前后雾丝：从较近的中下方收束到远处中线，不从左上角冒出 */
+  /* 雾丝改为世界空间雾团：绕航线三维分布、沿航线向后流，
+     流向由镜头角度决定，不再永远从左往右 */
+  const CL=amb?amb.cloud:'255,255,255';
+  const spanF=1500,pmodF=(v,M)=>((v%M)+M)%M;
+  for(let k=0;k<14;k++){
+    /* 减去 Lx：雾团固定在世界里，以飞行速度+风速从身边流过，不跟着镜头悬停 */
+    const px=Lx-spanF*0.4+pmodF(hash(k,811)*spanF-Lx-t*(46+hash(k,813)*30),spanF);
+    const py=Ly+(hash(k,819)-0.5)*760;
+    const pz=26+hash(k,821)*168+Math.sin(t*0.4+k*1.7)*10;
+    const q=proj(px,py,pz);if(!q||q.z<NEAR||q.z>FAR)continue;
+    const rr=clamp(FLv/q.z*(30+hash(k,823)*46),8,150);
+    const a=(0.035+hash(k,827)*0.030)*(1-q.z/FAR);/* 雾丝同样极淡，不盖住鸟和地图 */if(a<=0.01)continue;
+    const g=ctx.createRadialGradient(q.x,q.y,0,q.x,q.y,rr);
+    g.addColorStop(0,'rgba('+CL+','+a.toFixed(3)+')');g.addColorStop(1,'rgba('+CL+',0)');
+    ctx.fillStyle=g;ctx.save();ctx.translate(q.x,q.y);ctx.scale(1.55,0.82);ctx.beginPath();ctx.arc(0,0,rr,0,6.283);ctx.fill();ctx.restore();
+  }
+  /* 暖纸首幕专属：小而清楚的青灰尘粒，持续向后流过 */
+  const warm=ambW[0]||0;if(warm<0.04)return;
+  /* 暖纸尘粒同样入世界空间：近大远小，随镜头角度变向 */
+  for(let k=0;k<54;k++){
+    const px=Lx-spanF*0.5+pmodF(hash(k,841)*spanF-Lx-t*(70+hash(k,843)*40),spanF);
+    const py=Ly+(hash(k,847)-0.5)*820;
+    const pz=24+hash(k,853)*150;
+    const q=proj(px,py,pz);if(!q||q.z<NEAR||q.z>FAR)continue;
+    const rr=clamp(FLv/q.z*(0.9+hash(k,857)*1.2),0.4,3.6);
+    const a=warm*(0.26+hash(k,859)*0.2)*(1-q.z/FAR);if(a<=0.01)continue;
+    ctx.fillStyle='rgba(137,160,158,'+a.toFixed(3)+')';ctx.beginPath();ctx.arc(q.x,q.y,rr,0,6.283);ctx.fill();
+  }
+}
+function moteObjs(t,objs){
+  /* 主��粒子：飘壮/雪花/花瓣/萤火随风格换型，密度不变（64 颗） */
+  const span=1300,pmod=(v,M)=>((v%M)+M)%M;
+  const pw=[0,0,0,0];
+  for(let s=0;s<5;s++){if(ambW[s]>0.001)pw[STYLES[s].ptype]+=ambW[s]}
+  const cum=[pw[0],pw[0]+pw[1],pw[0]+pw[1]+pw[2],1];
+  const moteN=110+Math.round(pw[1]*130);/* 雪境最多 240 颗，形成明显但轻的降雪 */
+  for(let k=0;k<moteN;k++){
+    const rk=hash(k,601);
+    let ty=0;for(let s2=0;s2<4;s2++){if(rk<=cum[s2]+1e-6){ty=s2;break}}
+    const wgt=Math.min(1,pw[ty]*2.5);if(wgt<=0.02)continue;
+    let px,py,pz,a,sz,col='255,255,255';
+    if(ty===1){/* 雪：缓降 */
+      px=Lx-span+pmod(hash(k,501)*span*2-Lx-t*(48+hash(k,503)*32),span*2);
+      py=(hash(k,507)-0.5)*1000+Math.sin(t*0.5+k)*40;
+      pz=185-((t*(9+hash(k,509)*9)+hash(k,513)*185)%185);
+      a=0.2+0.28*(Math.sin(t*1.4+k*2.1)*0.5+0.5);sz=1.05;
+    }else if(ty===2){/* 花���：慢��+横摆 */
+      col='235,176,186';
+      px=Lx-span+pmod(hash(k,501)*span*2-Lx-t*(64+hash(k,503)*36),span*2)+Math.sin(t*1.1+k*1.3)*22;
+      py=(hash(k,507)-0.5)*1000+Math.sin(t*0.7+k)*46;
+      pz=180-((t*(5+hash(k,509)*5)+hash(k,513)*180)%180);
+      a=0.2+0.26*(Math.sin(t*1.7+k*2.4)*0.5+0.5);sz=1.0;
+    }else if(ty===3){/* 萤火���低空慢漂+呼吸脉冲 */
+      col='222,236,150';
+      px=Lx-span+pmod(hash(k,501)*span*2-Lx-t*(30+hash(k,503)*18),span*2);
+      py=(hash(k,507)-0.5)*900+Math.sin(t*0.4+k)*30;
+      pz=20+hash(k,509)*70+Math.sin(t*0.6+k*1.7)*8;
+      const pu=Math.sin(t*(1.1+hash(k,517)*1.2)+k*2.6)*0.5+0.5;
+      a=pu*pu*pu*0.85;sz=0.9;
+    }else{/* 开场暖纸：小颗青灰尘粒，确保第一幕也能读到空气流动 */
+      col='194,210,209';
+      px=Lx-span+pmod(hash(k,501)*span*2-Lx-t*(88+hash(k,503)*56),span*2);
+      py=(hash(k,507)-0.5)*1000+Math.sin(t*0.3+k)*34;
+      pz=26+hash(k,509)*160+Math.sin(t*0.5+k*1.7)*9;
+      a=0.22+0.28*(Math.sin(t*1.9+k*2.1)*0.5+0.5);sz=0.95;
+    }
+    const q=proj(px,py,pz);if(!q)continue;
+    const al=a*wgt*(1-q.z/FAR);if(al<=0.01)continue;
+    /* 近大远小：每颗带尺寸变化，��近镜头可飘过大颗粒子 */
+    const rr=clamp(FLv/q.z*sz*(0.55+hash(k,521)*0.8),0.35,4.2);
+    objs.push({k:'mote',mo:{x:q.x,y:q.y,rr,col,al,ty},z:q.z});
+  }
+}
+/* 粒子进统一深度排序：鸟前鸟��都有，近大远小 */
+function drawMote(mo,fade){
+  const al=mo.al*fade;if(al<=0.01)return;
+  if(mo.ty===3){ctx.fillStyle='rgba('+mo.col+','+(al*0.35).toFixed(3)+')';ctx.beginPath();ctx.arc(mo.x,mo.y,mo.rr*2.4,0,6.283);ctx.fill()}
+  ctx.fillStyle='rgba('+mo.col+','+al.toFixed(3)+')';
+  ctx.beginPath();ctx.arc(mo.x,mo.y,mo.rr,0,6.283);ctx.fill();
+}
+/* ================= 鸟 ================= */
+const BS=1.15;
+/* 鸟随环境轻微冷暖偏移（约10–20%），保持纸白主��� */
+const BIRDC=[
+ {f:['#eff1ef','#fafbfa','#e9edec','#ffffff'],o:'rgba(84,96,99,0.6)'},
+ {f:['#dbe8eb','#edf5f5','#d4e2e5','#f4fbfb'],o:'rgba(74,90,92,0.62)'},
+ {f:['#f1d8db','#fbebec','#ecd0d5','#fff3f2'],o:'rgba(106,86,92,0.40)'},/* 暮粉：鸟线条更轻、���透 */
+ {f:['#dce8ee','#eef6f9','#d5e2e9','#f5fbfd'],o:'rgba(132,150,156,0.38)'},/* 雪境高亮：鸟线条退成浅灰，不压过白色场景 */
+ {f:['#c2cfe2','#d4deee','#b8c8dd','#e2eaf6'],o:'rgba(40,56,80,0.72)'}];/* 夜航：月光蓝灰明显一些 */
+let birdFill=BIRDC[0].f.slice(),birdIN=BIRDC[0].o;
+function calcBirdCol(){
+  let dom=0;for(let s=1;s<5;s++)if(ambW[s]>ambW[dom])dom=s;
+  birdIN=BIRDC[dom].o;
+  for(let q=0;q<4;q++){
+    let R=0,G=0,B=0,W=0;
+    for(let s=0;s<5;s++){const w=ambW[s];if(w<=0.001)continue;const c=hxc(BIRDC[s].f[q]);R+=c[0]*w;G+=c[1]*w;B+=c[2]*w;W+=w}
+    if(W<=0){birdFill[q]=BIRDC[0].f[q];continue}
+    birdFill[q]='rgb('+(R/W|0)+','+(G/W|0)+','+(B/W|0)+')';
+  }
+}
+function birdColAt(x,y){
+  /* 每只鸟按所在世界位置采样：过渡带中群体会同时带有两端的冷暖色 */
+  const sm=styleMix(x,y),f=[];
+  for(let q=0;q<4;q++)f.push(mixC(BIRDC[sm[0]].f[q],BIRDC[sm[1]].f[q],sm[2]));
+  return{f,o:mixO(BIRDC[sm[0]].o,BIRDC[sm[1]].o,sm[2])};/* 线条和填充一样随过渡带渐变，不在 0.5 处突变 */
+}
+function drawBird(i,t,fade){
+  const st=birdS[i],bd=birdD[i],bc=birdColAt(st.px,st.py);
+  const b={x:st.px,y:st.py,z:st.pz};
+  const s=BS*bd.sz;
+  const th=(Math.sin(t*6.4+bd.ph)*0.62+0.14)*(0.28+0.72*tilt);
+  const wy=8.4*Math.cos(th)*s,wz=8.4*Math.sin(th)*s;
+  const hd=st.hd||0,chd=Math.cos(hd),shd=Math.sin(hd);
+  const P=(dx,dy,dz)=>proj(b.x+dx*chd-dy*shd,b.y+dx*shd+dy*chd,b.z+dz);
+  const pF=P(3.8*s,0,0),pB=P(-3.2*s,0,0),pL=P(-2.0*s,wy,wz),pR=P(-2.0*s,-wy,wz);
+  if(!pF||!pB||!pL||!pR)return;
+  const zc=(b.x-cam.x)*f.x+(b.y-cam.y)*f.y+(b.z-cam.z)*f.z;
+  const lwRaw=FLv/zc*0.4*Math.sqrt(bd.sz),lw=clamp(lwRaw,0.7,2.2);
+  /* ��处弱化描边：鸟小到描边盖过填充时按比例淡出；
+     ��前/背面（鸟头对准视��，��充面最��）���得��早，侧面稍��� */
+  /* 线条随屏幕尺寸连续淡变：拉宽距离区间并用 smoothstep 消掉阈值感。
+     不再按朝向加速衰减，避免鸟一��向或越过某个距离就像突然少了描边。 */
+  const sfT=clamp((lwRaw-0.10)/(1.10-0.10),0,1);
+  const sfI=0.40+0.60*(sfT*sfT*(3-2*sfT));
+  /* 时间维度再平滑一道：镜头距离突变时描边亮度用 ~0.5s 慢慢追，不再突然变亮 */
+  const dtb=st.sfLt===undefined?0.016:Math.min(0.1,Math.max(0.001,t-st.sfLt));st.sfLt=t;
+  if(st.sfS===undefined)st.sfS=sfI;st.sfS+=(sfI-st.sfS)*Math.min(1,dtb*2.2);
+  const sf=st.sfS;
+  ctx.lineJoin='round';ctx.globalAlpha=fade;
+  const tri=(a,c,d,fl,stk)=>{ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.closePath();
+    ctx.fillStyle=fl;ctx.fill();if(stk&&sf>0.02){ctx.globalAlpha=fade*sf;ctx.strokeStyle=stk;ctx.lineWidth=lw;ctx.stroke();ctx.globalAlpha=fade}};
+  const zL=(b.y+wy-cam.y)*f.y,zR=(b.y-wy-cam.y)*f.y;
+  const nose=P(9.6*s,0,0.45*s),tail=P(-5.6*s,0,0.9*s),keL=P(-3.6*s,2.3*s,-0.7*s),keR=P(-3.6*s,-2.3*s,-0.7*s);
+  if(!nose||!tail||!keL||!keR){ctx.globalAlpha=1;return}
+  const so=clamp(FLv/zc*1.4*bd.sz,1,5.5),SH='rgba(110,122,126,0.16)';
+  const off=q=>({x:q.x+so,y:q.y+so*1.25});
+  tri(off(pF),off(pB),off(zL>zR?pL:pR),SH);
+  tri(off(nose),off(keL),off(tail),SH);tri(off(nose),off(keR),off(tail),SH);
+  tri(off(pF),off(pB),off(zL>zR?pR:pL),SH);
+  const IN=bc.o;
+  tri(pF,pB,zL>zR?pL:pR,bc.f[0],IN);
+  tri(nose,keL,tail,bc.f[1],IN);tri(nose,keR,tail,bc.f[2],IN);
+  if(sf>0.02){ctx.globalAlpha=fade*sf;ctx.beginPath();ctx.moveTo(nose.x,nose.y);ctx.lineTo(tail.x,tail.y);ctx.strokeStyle=IN;ctx.lineWidth=lw*0.7;ctx.stroke();ctx.globalAlpha=fade}
+  tri(pF,pB,zL>zR?pR:pL,bc.f[3],IN);
+  ctx.globalAlpha=1;
+}
+/* ================= 统一深度排序 ================= */
+function zcOf(x,y,z){return(x-cam.x)*f.x+(y-cam.y)*f.y+(z-cam.z)*f.z}
+function drawObjects(t){
+  calcBirdCol();
+  const objs=[];
+  const ci=Math.round(Lx/CELL),cj=Math.round(Ly/CELL);
+  for(let i=ci-RCELL;i<=ci+RCELL;i++)for(let j=cj-RCELL;j<=cj+RCELL;j++){
+    const hh=hash(i*3+1,j*5+2);
+    if(hh<=0.9)continue;
+    const x0=i*CELL,y0=j*CELL;
+    const tx=x0+hash(i,j+11)*CELL,ty=y0+hash(i+11,j)*CELL;
+    if(Math.abs(ty-riverC(tx))<RIVW+30)continue;
+    const zc=zcOf(tx,ty,10);if(zc<NEAR-8||zc>FAR)continue;
+    const smS=styleMix(tx,ty),siS=smS[2]>0.5?smS[1]:smS[0];
+    if(hh>0.975)objs.push({k:'box',b:{x:tx,y:ty,w:5+hash(i,j+21)*3,d:4+hash(i,j+23)*3,h:7+hash(i,j+25)*5,sd:hash(i,j+27),si:siS,s0:smS[0],s1:smS[1],sm:smS[2]},z:zc});
+    else objs.push({k:'tree',o:{x:tx,y:ty,h:14+hash(i,j+13)*14,v:hash(i,j+15),si:siS,s0:smS[0],s1:smS[1],sm:smS[2]},z:zc});
+  }
+  const m0=Math.floor((Lx-1700)/190),m1=Math.floor((Lx+FAR)/190);
+  for(let m=m0;m<=m1;m++)for(const b of clusterBoxes(m)){
+    const zc=zcOf(b.x,b.y,b.h*0.5);if(zc<NEAR-10||zc>FAR)continue;
+    const bf=ss(Lx-1700,Lx-1250,b.x);if(bf<=0)continue;/* 身后渐隐，不再整排硬切 */
+    objs.push({k:b.spire?'spire':'house',b,z:zc,bf});
+  }
+  cloudT=t;
+  const c0=Math.floor((Lx+cloudT*82-1400)/185),c1=Math.floor((Lx+cloudT*82+FAR)/185);
+  for(let m=c0;m<=c1;m++){
+    const cd=cloudDef(m),q=proj(cd.cx,cd.cy,cd.cz);
+    const zc=zcOf(cd.cx,cd.cy,cd.cz);
+    /* 旧体积云仅保留画面中央，杜绝左上角/边缘反复冒云 */
+    if(!q||zc<NEAR||zc>FAR||q.x<W*0.14||q.x>W*0.86||q.y<H*0.16||q.y>H*0.82)continue;
+    objs.push({k:'cloud',m,z:zc});
+  }
+  for(let i=0;i<NB;i++){
+    const st=birdS[i];
+    const zc=zcOf(st.px,st.py,st.pz);if(zc<NEAR)continue;
+    /* 排序深度用队形槽位基准（去掉时间摆动项）：鸟与鸟的前后关系固定，
+       重叠的鸟不再随摆动互���遮挡（背面/迎面镜头的连续抽搐）；渐隐仍用真实深度 */
+    const bd=birdD[i],svq=tilt*(1-yawN);
+    const box=bd.ox*(1-tilt*0.24)*(1-yawN*0.35)+yawN*40;
+    const boy=bd.oy*(bd.oy<0?lerp(1,0.55,svq):lerp(1,1.32,svq))*(1-yawN*0.45);
+    const boz=lerp(bd.oz,26+(bd.oz-40)*0.72,tilt*(1-yawN*0.35));
+    st.zS=clamp(zcOf(flockX+box,boy+steerY,boz),zc-45,zc+45);
+    objs.push({k:'bird',i,z:zc,zs:st.zS});
+  }
+  moteObjs(t,objs);
+  objs.sort((a,b)=>(b.zs!==undefined?b.zs:b.z)-(a.zs!==undefined?a.zs:a.z));
+  for(const o of objs){
+    let fade=(1-ss(FAR*0.62,FAR*0.98,o.z))*(o.bf===undefined?1:o.bf);
+    if(o.k==='house'||o.k==='spire'||o.k==='tree'||o.k==='box')fade*=ss(NEAR-10,NEAR+70,o.z);/* 掠过镜头时渐隐而非突然消失 */
+    if(fade<=0)continue;
+    if(o.k==='tree')drawTree(o.o,fade);
+    else if(o.k==='house')drawHouse(o.b,fade);
+    else if(o.k==='spire')drawSpire(o.b,fade);
+    else if(o.k==='box')drawBox(o.b,fade);
+    else if(o.k==='cloud')drawCloud(o.m,fade*0.9);
+    else if(o.k==='mote')drawMote(o.mo,fade);
+    else drawBird(o.i,t,fade);
+  }
+}
+/* ================= 主循环 ================= */
+const idxEl=document.getElementById('idx');
+/* ================= 诗句层：短���随旅程一行行浮现，白天墨色、夜航白色 ================= */
+const POEMS=[
+["北方的光渐渐短了。","它们掠过结霜的草地，","将饥饿、方向与明日","一同收进翅下。"],
+["迁徙不是离开，","是对另一场春天的回答。"],
+["风一转向，","天空就有了路。"],
+["太阳落下以后，","星星、山脊与地磁","仍在暗处排成一张地图。"],
+["没有谁教它们读懂天空。","风掠过羽毛，","路就在身体里醒来。"],
+["河口的泥滩留着潮水，","稻田留着一夜的湿气。"],
+["它们短暂停下，","像一句诗在逗号处呼吸，","再把远方放回翼尖。"],
+["每一片湿地，","都是漫长旅程里的一口气。"],
+["夜色并不安静；","有些翅膀，","只在看不见时启程。"],
+["留一点黑给天空吧，","让它们知道，","黎明还在前方。"],
+["候鸟跨过国界；","风没有。"],
+["从冻原到海岸，","它们借风穿过","我们划下的边界。"],
+["这不是一群鸟的远行，","这是地球仍在呼吸的证据。"]
+];
+const poemEl=document.getElementById('poem'),poemBarEl=document.getElementById('poemBar'),poemTxtEl=document.getElementById('poemTxt');
+let poemOn=true,poemIdx=0;
+function poemColor(){const sm=styleMix(Lx,Ly);
+  /* 昔夜权重连续变化，颜色随世界换装渐变，不再跨过阈值突变；
+     夜里降亮度（240→208，α .92→.74），白天提一点亮度（44→58，α .85→.88） */
+  const w=(sm[0]===4?1-sm[2]:0)+(sm[1]===4?sm[2]:0);
+  const L=(a,b)=>Math.round(a+(b-a)*w);
+  poemEl.style.color='rgba('+L(58,208)+','+L(55,212)+','+L(47,224)+','+(0.88-0.14*w).toFixed(2)+')'}
+function showPoem(){
+  if(!poemOn||!started)return;
+  const v=POEMS[poemIdx%POEMS.length];poemIdx++;
+  poemEl.style.opacity=1;
+  poemBarEl.style.transition='none';poemBarEl.style.width='0px';
+  poemTxtEl.innerHTML='';
+  requestAnimationFrame(()=>{poemBarEl.style.transition='width 1.6s cubic-bezier(.25,.6,.3,1)';poemBarEl.style.width='150px'});
+  /* 逐字浮现（不是逐行），存留时间拉长 */
+  let ci=0;
+  v.forEach(ln=>{const d=document.createElement('div');
+    for(const ch of ln){const s=document.createElement('span');s.textContent=ch;d.appendChild(s);
+      setTimeout(()=>{s.style.opacity=1},900+ci*130);ci++}
+    poemTxtEl.appendChild(d)});
+  setTimeout(()=>{
+    poemEl.style.opacity=0;
+    setTimeout(()=>{if(poemOn&&started)showPoem()},1300+2800);
+  },900+ci*130+10500);
+}
+function resetFlockAtStart(){const tt=performance.now()/1000;for(let i=0;i<NB;i++){const sl=slotOf(i,tt),st=birdS[i];st.px=sl.x;st.py=sl.y;st.pz=sl.z;st.vx=st.vy=st.vz=0;st.hd=0;st.init=true}}
+let wallpaperVisible=!document.hidden,reducedMotion=false;
+document.addEventListener('visibilitychange',()=>{wallpaperVisible=!document.hidden});
+addEventListener('search-next-wallpaper-environment',event=>{
+  const detail=event.detail||{};
+  wallpaperVisible=detail.visible!==false;
+  reducedMotion=detail.reducedMotion===true;
+});
+resetFlockAtStart();
+setTimeout(showPoem,2600);
+let last=performance.now();
+function frame(now){
+  const dt=wallpaperVisible&&!reducedMotion?Math.min(0.05,(now-last)/1000):0;last=now;
+  const t=now/1000;
+  if(started&&forceP===null)pT+=dt*curSp;
+  const ln=Math.max(0,Math.floor(pT/CYCLE));
+  if(ln!==loopN){loopN=ln;SCHED=buildSched(ln)}
+  p=forceP!==null?forceP:(pT/CYCLE)%1;
+  /* 固定弧线 + 每圈变奏：段��保持，段间连续滑移 */
+  const stC=schedState(p);curSp=stC.sp;
+  /* 滚轮观察偏移：停手 2s 后缓慢回归 */
+  if(performance.now()-wheelT>2000){wheelD*=Math.exp(-dt*0.55);wheelH*=Math.exp(-dt*0.55)}
+  wD+=(wheelD-wD)*Math.min(1,dt*4);wH+=(wheelH-wH)*Math.min(1,dt*4);
+  let A=stC.A,B=stC.B;
+  if(camMode==='free'){A=freeA;B=freeB}
+  lastCamA=A;lastCamB=B;
+  tilt=clamp((1.5551-A)/1.4501,0,1);
+  yawN=clamp(Math.abs(B)/1.5708,0,1);
+  dist=(camMode==='free'?freeDist:stC.dist)*(1+wD)*(H>W?1.26:1);/* 竖屏适当拉远保构图 */
+  const sinA=Math.sin(A),cosA=Math.cos(A),sinB=Math.sin(B),cosB=Math.cos(B);
+  f={x:sinB*cosA,y:cosB*cosA,z:-sinA};
+  u={x:sinB*sinA,y:cosB*sinA,z:cosA};
+  r={x:f.y*u.z-f.z*u.y,y:f.z*u.x-f.x*u.z,z:f.x*u.y-f.y*u.x};
+  /* 转����速率→跟随重定位���速：镜头转多快，鸟就多不慌（防弹回） */
+  glide+=((Math.abs(A-pA)+Math.abs(B-pB))/Math.max(dt,0.001)-glide)*Math.min(1,dt*3);pA=A;pB=B;
+  const damp=1/(1+glide*9);
+  const ke=Math.min(1,dt*2.0);
+  rS.x+=(r.x-rS.x)*ke;rS.y+=(r.y-rS.y)*ke;rS.z+=(r.z-rS.z)*ke;
+  uS.x+=(u.x-uS.x)*ke;uS.y+=(u.y-uS.y)*ke;uS.z+=(u.z-uS.z)*ke;
+  const rn=Math.hypot(rS.x,rS.y,rS.z)||1,un=Math.hypot(uS.x,uS.y,uS.z)||1;
+  rS.x/=rn;rS.y/=rn;rS.z/=rn;uS.x/=un;uS.y/=un;uS.z/=un;
+  flockX+=dt*(52+(started?60*stC.sp:48*stC.sp)+60*tilt*(1-yawN));/* 开场只比正式巡航慢一点，不像静止展示 */
+  /* 鼠标驾驶：把鼠标偏移投影到世界横向（y 轴）在屏��上��方向——俯视时上下引航，斜视/追尾时左右引航；
+     越靠屏幕边缘漂越快，但封��不快，可��河引航 */
+  const actS=(performance.now()-lastMove<1600)||pdown;
+  const nsx=actS&&mx>=0?clamp((mx-W/2)/(W*0.5),-1,1):0;
+  const nsy=actS&&my>=0?clamp((H/2-my)/(H*0.5),-1,1):0;
+  const nsw=clamp(nsx*rS.y+nsy*uS.y,-1,1);
+  steerVy=58*Math.pow(Math.abs(nsw),1.7)*Math.sign(nsw);
+  steerY=clamp(steerY+steerVy*dt,-300,300);
+  if(!actS)steerY+=(0-steerY)*Math.min(1,dt*0.05);/* 松手后极慢回中 */
+  /* 镜头��更快、但仍带一点惯性的节奏追上鸟群偏航 */
+  camSteerY+=(steerY-camSteerY)*Math.min(1,dt*4.8);
+  window.__steer=()=>[steerY,camSteerY,cpx,cpy];
+  const T={x:flockX,y:stC.ty+camSteerY,z:stC.tz+wH};
+  cam={x:T.x-f.x*dist,y:T.y-f.y*dist,z:Math.max(15,T.z-f.z*dist)};
+  /* 镜头随鼠标���慢偏一点 */
+  const panFollow=camMode==='auto'&&actS;
+  cpx+=((panFollow&&mx>=0?(mx-W/2)*0.30:0)-cpx)*Math.min(1,dt*0.95);
+  cpy+=((panFollow&&my>=0?(my-H/2)*0.14:0)-cpy)*Math.min(1,dt*0.72);
+  panX=stC.pan*W+cpx;panY=stC.pay*H+cpy;
+  Lx=cam.x+f.x*dist;Ly=cam.y+f.y*dist;
+  if(started&&poemOn)poemColor();
+  /* 鼠标跟随向量���沿平滑相机轴，转场无感���交�� */
+  const act=(performance.now()-lastMove<1600)||pdown;
+  /* 风的强度包络：重新动起来约 0.8s 渐入，停下后缓缓渐出——不再从静止瞬间满力聚拢 */
+  actE+=((act?1:0)-actE)*Math.min(1,dt*(act?2.1:0.8));
+  const tg1=(mx>=0?clamp((mx-W/2-panX)*dist/FLv*1.0625,-425,425):0)*actE;
+  const tg2=(mx>=0?clamp((H/2+panY-my)*dist/FLv*1.0625,-375,375):0)*actE;
+  /* 反用 1€ Filter：光标速度越快，响应越缓，手���不忽���忽慢 */
+  const inst=Math.hypot(mx-pmx,my-pmy)/Math.max(dt,0.001);pmx=mx;pmy=my;
+  csS+=(inst-csS)*Math.min(1,dt*3);
+  const rate=3.25/(1+csS/660)*damp;
+  /* 非对称：追赶灵敏，松���后只用很小的力慢慢漂回——风停了纸飞机自己滑���航线 */
+  const rEff=rate*(0.16+0.84*actE);
+  g1+=(tg1-g1)*Math.min(1,dt*rEff);g2+=(tg2-g2)*Math.min(1,dt*rEff);
+  window.__g=()=>[g1,g2,actE];
+  /* 边界随镜头平滑推移，不突跳 */
+  const cR0=Math.max(40,W*stC.capF-(W/2+panX)),cL0=Math.max(60,(W/2+panX)-W*0.05);
+  capR+=(cR0-capR)*Math.min(1,dt*1.5);capL+=(cL0-capL)*Math.min(1,dt*1.5);
+  stepBirds(t,dt);
+  /* ���空锚在镜头实际看见的那片地面中心，而不是鸟群坐标：
+     看到���地面还是雪，天空就还是雪境；镜头回望时天空也跟着回望方向。 */
+  calcAmb(cam.x+f.x*FAR*0.45);
+  document.documentElement.style.setProperty('--ink',amb.ui);
+  const yhz=H/2+panY-FLv*Math.tan(A);
+  horizonY=yhz;
+  const horizonC=horizonGroundColor();
+  const g=ctx.createLinearGradient(0,0,0,H);
+  if(tilt>0.02&&yhz>-H){
+    const hn=clamp(yhz/H,0.01,0.97);
+    /* 最低天空 stop 直接接远方最终田块色；不改写任何近/中景地面。 */
+    g.addColorStop(0,amb.sky[0]);g.addColorStop(Math.max(0.01,hn-0.11),amb.sky[1]);g.addColorStop(hn,horizonC);g.addColorStop(1,horizonC);
+  }else{g.addColorStop(0,amb.flat[0]);g.addColorStop(1,amb.flat[1])}
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* 前方�����：沿迁徙方向分别采样前/后天空；天亮会从前方地平线推过来 */
+  const sf=styleMix(flockX+2100,Ly),sb=styleMix(flockX-2100,Ly);
+  const fSky=styC('sky',0,sf[0],sf[1],sf[2]),bSky=styC('sky',0,sb[0],sb[1],sb[2]);
+  const dawn=clamp((lumC(fSky)-lumC(bSky))/150,0,1);
+  if(dawn>0.025){
+    /* 世界前方 +x 投影到屏幕上：不同镜���下亮源仍在飞行前方 */
+    const sx=W*0.5+r.x*W*0.62,sy=H*0.48-u.x*H*0.32;
+    const fg=ctx.createRadialGradient(sx,sy,0,sx,sy,Math.max(W,H)*0.78);
+    fg.addColorStop(0,rgbaC(fSky,0.68*dawn));fg.addColorStop(0.42,rgbaC(fSky,0.25*dawn));fg.addColorStop(1,rgbaC(fSky,0));
+    ctx.fillStyle=fg;ctx.fillRect(0,0,W,H);
+  }
+  /* 后方不是��亮：它跟随当前场景底色慢慢追上，和地面暗色消失同节奏 */
+  const rearSky=amb.sky[0],rearLift=clamp((lumC(rearSky)-lumC(bSky))/150,0,1);
+  if(rearLift>0.02){
+    const rx=W*0.5-r.x*W*0.54,ry=H*0.52+u.x*H*0.24;
+    const rg=ctx.createRadialGradient(rx,ry,0,rx,ry,Math.max(W,H)*0.92);
+    rg.addColorStop(0,rgbaC(rearSky,0.48*rearLift));rg.addColorStop(0.58,rgbaC(rearSky,0.16*rearLift));rg.addColorStop(1,rgbaC(rearSky,0));
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  }
+  /* 太阳只在跨入/离开夜航的晨昏弧段出现；它是可见光源，不是整片地面的���镜。 */
+  sunLight=null;
+  const solarArc=[sf[0],sf[1],sb[0],sb[1]].includes(4);
+  const solarDelta=(lumC(fSky)-lumC(bSky))/150,solarP=solarArc?clamp(Math.abs(solarDelta)*1.35,0,1):0;
+  if(solarP>0.055){
+    /* 锚在迁徙世界的晨昏锋面，而不是以屏幕中心/镜头轴计算。 */
+    const dir=solarDelta>=0?1:-1,boundary=Math.round(flockX/SEG)*SEG,wx=boundary+dir*SEG*0.28,wy=riverC(wx),wp=proj(wx,wy,180);
+    if(wp&&wp.x>-W*0.28&&wp.x<W*1.28&&wp.y>-H*0.2&&wp.y<H*0.95){
+      const sx=wp.x,sy=wp.y,sc=dir>0?'#ffe0ae':'#efb0ab',halo=ctx.createRadialGradient(sx,sy,0,sx,sy,H*(0.12+solarP*0.045));
+      /* 这是贴在地平线的稀薄光云，不画太阳圆盘。 */
+      halo.addColorStop(0,rgbaC(sc,0.075*solarP));halo.addColorStop(0.28,rgbaC(sc,0.035*solarP));halo.addColorStop(0.72,rgbaC(sc,0.008*solarP));halo.addColorStop(1,rgbaC(sc,0));ctx.fillStyle=halo;ctx.fillRect(0,0,W,H);
+      sunLight={x:sx,y:sy,p:solarP,c:sc};
+    }
+  }
+  drawNightStars(t);
+  drawGround(t);
+  drawSunGroundLight();
+  drawFlowAtmosphere(t);
+  drawShadows();
+  drawObjects(t);
+  /* 地��线雾带 */
+  if(tilt>0.05&&yhz>-200&&yhz<H+200){
+    const hz=ctx.createLinearGradient(0,yhz-80,0,yhz+110);
+    hz.addColorStop(0,'rgba('+amb.fog+',0)');hz.addColorStop(0.5,'rgba('+amb.fog+','+amb.fogA.toFixed(3)+')');hz.addColorStop(1,'rgba('+amb.fog+',0)');
+    ctx.fillStyle=hz;ctx.fillRect(0,yhz-80,W,190);
+  }
+  /* 左上过渡光 */
+  const lg=ctx.createRadialGradient(W*0.06,H*0.04,0,W*0.06,H*0.04,Math.max(W,H)*0.85);
+  lg.addColorStop(0,'rgba('+amb.glow+','+amb.glowA.toFixed(3)+')');lg.addColorStop(0.5,'rgba('+amb.glow+','+(amb.glowA*0.3).toFixed(3)+')');lg.addColorStop(1,'rgba('+amb.glow+',0)');
+  ctx.fillStyle=lg;ctx.fillRect(0,0,W,H);
+  const dg=ctx.createRadialGradient(W*0.94,H*0.96,0,W*0.94,H*0.96,Math.max(W,H)*0.9);
+  dg.addColorStop(0,'rgba('+amb.corn+','+amb.cornA.toFixed(3)+')');dg.addColorStop(1,'rgba('+amb.corn+',0)');
+  ctx.fillStyle=dg;ctx.fillRect(0,0,W,H);
+  /* UI */
+  let li=stC.k+1,lb=SHOTS[SCHED[stC.k].s].label;
+  if(stC.mix>0.5){if(stC.k+1<SCHED.length){li=stC.k+2;lb=SHOTS[SCHED[stC.k+1].s].label}else{li=1;lb=SHOTS[SCHED[0].s].label}}
+  const nn=v=>(v<10?'0':'')+v;
+  idxEl.textContent=!started&&p<0.005?'00 · PRELUDE':nn(li)+' · '+lb+(loopN>0?' — VAR '+nn(loopN+1):'');
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

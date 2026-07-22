@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "migration-open-source",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "preview": "preview.webp",
+  "packageFiles": ["index.html", "preview.webp"],
+  "author": "Tukine (sdhhhyu-glitch)",
+  "projectUrl": "https://github.com/sdhhhyu-glitch/Migration-OpenSource",
+  "description": "基于 HTML5 Canvas 和原生 JavaScript 的 3D 生成艺术作品，通过 Boids 鸟群算法、低多边形环境与自动电影镜头呈现候鸟迁徙。此壁纸适配版会在加载后自动运行，并移除了开始、场景、镜头、音乐和诗句开关等手动控制。"
+}

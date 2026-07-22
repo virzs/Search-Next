@@ -72,6 +72,8 @@ redis_password=
 redis_db=0
 storage_service=local
 local_storage_path=./assets/uploads
+# 可选；默认使用 local_storage_path 同级的 wallpaper-applications 目录
+wallpaper_application_storage_path=./assets/wallpaper-applications
 ```
 
 不要把真实密码、API Key、云存储密钥提交到仓库。
@@ -331,6 +333,28 @@ pnpm app:pack my-tool
 ```
 
 应用入口是远程 ESM 代码，会在宿主页面权限下运行并访问注入的 SDK。仅加载自己开发或可信来源的应用。
+
+### 网页壁纸包
+
+管理员可在“壁纸”中上传 `.snwall` 网页壁纸包。它是 ZIP 文件，根目录必须包含：
+
+```json
+{
+  "schemaVersion": 1,
+  "name": "aurora-particles",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "preview": "preview.webp",
+  "packageFiles": ["index.html", "preview.webp"],
+  "author": "Example Author",
+  "projectUrl": "https://github.com/example/wallpaper",
+  "description": "An offline web wallpaper."
+}
+```
+
+配置文件名固定为 `wallpaper.config.json`。`packageFiles` 用于声明需要复制到构建目录的文件或目录；入口和预览图会自动包含。包内只能有一个 HTML 文件，CSS、JavaScript、图片、字体、音视频和 WASM 必须一起打包，运行时不允许访问外部网络。网页壁纸在无同源权限的沙箱 iframe 中执行，通过 `search-next-wallpaper-v1` 消息接收主题、语言、减少动态效果和页面可见性变化。
+
+使用 `pnpm wallpaper:pack <name>` 或 `pnpm wallpaper:pack:all` 构建。阶段文件输出到 `dist/wallpaper-build/<name>`，最终 `.snwall` 输出到 `dist/wallpapers`。后台上传 `.snwall` 后会立即读取名称、简介、作者、项目 URL、版本、入口和预览图并回填壁纸表单。
 
 ## 免责声明
 
