@@ -53,6 +53,18 @@ export const personalizationRouteDefinitions: DefaultAppRouteDefinition[] = [
     search: false,
   },
   {
+    key: "personalization.wallpaper-collection",
+    segment: personalizationRoute.segment.wallpaperCollection,
+    path: "/personalization/wallpaper/collection/:id",
+    meta: {
+      title: "壁纸合集",
+      description: "查看壁纸合集",
+      keywords: ["wallpaper", "collection", "壁纸", "合集"],
+    },
+    sidebar: false,
+    search: false,
+  },
+  {
     key: "personalization.wallpaper-category",
     segment: personalizationRoute.segment.wallpaperCategory,
     path: "/personalization/wallpaper/category/:id",

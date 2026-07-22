@@ -17,7 +17,9 @@ const ApplicationWallpaperMetadata = ({
     t(
       wallpaper.type === "application"
         ? "ui.applicationWallpaper"
-        : "ui.imageWallpaper",
+        : wallpaper.type === "gradient"
+          ? "ui.gradientBackground"
+          : "ui.imageWallpaper",
     );
   const author = wallpaper.author || application?.author;
   const projectUrl = wallpaper.url || application?.projectUrl;

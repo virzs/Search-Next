@@ -121,7 +121,7 @@ export interface WallpaperCategoryApiItem {
  * 获取用户可用壁纸分类
  */
 export const getUserWallpaperCategories = (params?: {
-  type?: "image" | "application";
+  type?: "image" | "gradient" | "application";
 }) => {
   return baseGetRequest<WallpaperCategoryApiItem[]>(
     "/tabs/desktop/wallpaper/category/user",
@@ -130,11 +130,12 @@ export const getUserWallpaperCategories = (params?: {
 
 export interface WallpaperApiItem {
   _id: string;
-  type?: "image" | "application";
+  type?: "image" | "gradient" | "application";
   name: string;
   description?: string;
   author?: string;
   url?: string;
+  css?: string;
   thumbnail?: Resource;
   image?: Resource;
   categoryId?: string;
@@ -190,6 +191,21 @@ export interface WallpaperPageResult {
   total: number;
 }
 
+export interface WallpaperCollectionPublicItem {
+  _id: string;
+  title: string;
+  description?: string;
+  kicker?: string;
+  cover?: Resource | string | Array<Resource | string>;
+  accentColor?: string;
+  layout?: "story" | "compact";
+  featured?: boolean;
+  itemLimit?: number;
+  total?: number;
+  wallpapers?: WallpaperApiItem[];
+  previewWallpapers?: WallpaperApiItem[];
+}
+
 /**
  * 获取用户可用壁纸
  */
@@ -197,7 +213,7 @@ export const getUserWallpapers = (params?: {
   page?: number;
   pageSize?: number;
   categoryId?: string;
-  type?: "image" | "application";
+  type?: "image" | "gradient" | "application";
 }) => {
   return baseGetRequest<WallpaperPageResult>(
     "/tabs/desktop/wallpaper/upload/active",
@@ -209,3 +225,24 @@ export const getActiveWallpaperDetail = (id: string) => {
     `/tabs/desktop/wallpaper/upload/active/${encodeURIComponent(id)}`,
   )();
 };
+
+export const getUserWallpaperCollections = (params?: {
+  wallpaperType?: "image" | "gradient" | "application";
+}) =>
+  baseGetRequest<WallpaperCollectionPublicItem[]>(
+    "/tabs/desktop/wallpaper/collection/public/list",
+  )(params ?? {});
+
+export const getUserWallpaperCollectionWallpapers = (
+  id: string,
+  params?: {
+    page?: number;
+    pageSize?: number;
+    wallpaperType?: "image" | "gradient" | "application";
+  },
+) =>
+  baseGetRequest<
+    WallpaperPageResult & { collection: WallpaperCollectionPublicItem | null }
+  >(
+    `/tabs/desktop/wallpaper/collection/public/${encodeURIComponent(id)}/wallpapers`,
+  )(params ?? {});

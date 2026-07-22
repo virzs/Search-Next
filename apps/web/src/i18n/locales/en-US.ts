@@ -636,6 +636,10 @@ const enUS = {
   "ui.noThemesAvailable": "No themes available",
   "ui.applyToDesktop": "Apply to Desktop",
   "ui.wallpaper": "Wallpaper",
+  "ui.wallpaperHome": "Home",
+  "ui.wallpaperCollection": "Wallpaper Collection",
+  "ui.wallpaperCollections": "Featured Collections",
+  "ui.noWallpaperCollections": "No wallpaper collections",
   "ui.wallpaper.chooseDescription":
     "Choose a gradient, image, or web wallpaper for the current desktop.",
   "ui.loadingWallpapers": "Loading wallpapers...",

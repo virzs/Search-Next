@@ -21,8 +21,11 @@ const WallpaperCategoryView: FC = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const categoryId = id ? decodeURIComponent(String(id)) : "";
+  const typeParam = searchParams.get("type");
   const wallpaperType =
-    searchParams.get("type") === "application" ? "application" : "image";
+    typeParam === "application" || typeParam === "gradient"
+      ? typeParam
+      : "image";
   const { personalization, setWallpaper } = useDesktopTheme();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
@@ -89,6 +92,15 @@ const WallpaperCategoryView: FC = () => {
     });
   };
 
+  const handleSelectGradient = (wallpaper: WallpaperApiItem) => {
+    if (!wallpaper.css) return;
+    setWallpaper({
+      type: "gradient",
+      css: wallpaper.css,
+      name: wallpaper.name,
+    });
+  };
+
   return (
     <DefaultAppView
       className="h-full"
@@ -113,21 +125,32 @@ const WallpaperCategoryView: FC = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {visibleWallpapers.map((w) => {
               const url = getWallpaperPreviewUrl(w);
+              const gradientCss =
+                wallpaperType === "gradient" ? w.css : undefined;
               const active =
                 wallpaperType === "application"
                   ? personalization.wallpaper.type === "application" &&
                     personalization.wallpaper.id === w._id
-                  : url
-                    ? isImageActive(url)
-                    : false;
+                  : wallpaperType === "gradient"
+                    ? Boolean(
+                        gradientCss &&
+                        personalization.wallpaper.type === "gradient" &&
+                        personalization.wallpaper.css === gradientCss,
+                      )
+                    : url
+                      ? isImageActive(url)
+                      : false;
               return (
                 <PreviewCard
                   key={w._id}
                   active={active}
-                  disabled={!url}
+                  disabled={wallpaperType === "gradient" ? !gradientCss : !url}
                   title={w.name}
                   description={
-                    wallpaperType === "application" || w.author || w.url ? (
+                    wallpaperType === "application" ||
+                    wallpaperType === "gradient" ||
+                    w.author ||
+                    w.url ? (
                       <ApplicationWallpaperMetadata wallpaper={w} />
                     ) : (
                       w.description ||
@@ -137,12 +160,14 @@ const WallpaperCategoryView: FC = () => {
                     )
                   }
                   action={
-                    url && !active ? (
+                    (url || gradientCss) && !active ? (
                       <PreviewCardAction
                         onClick={() =>
                           wallpaperType === "application"
                             ? handleSelectApplication(w)
-                            : handleSelectImage(w)
+                            : wallpaperType === "gradient"
+                              ? handleSelectGradient(w)
+                              : handleSelectImage(w)
                         }
                       >
                         {t("action.apply")}
@@ -150,7 +175,12 @@ const WallpaperCategoryView: FC = () => {
                     ) : null
                   }
                   cover={
-                    url ? (
+                    gradientCss ? (
+                      <div
+                        className="h-full w-full"
+                        style={{ background: gradientCss }}
+                      />
+                    ) : url ? (
                       <img
                         className="h-full w-full object-cover"
                         src={url}

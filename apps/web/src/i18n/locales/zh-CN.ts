@@ -567,6 +567,10 @@ const zhCN = {
   "ui.noThemesAvailable": "暂无可切换主题",
   "ui.applyToDesktop": "应用到桌面",
   "ui.wallpaper": "壁纸",
+  "ui.wallpaperHome": "首页",
+  "ui.wallpaperCollection": "壁纸合集",
+  "ui.wallpaperCollections": "精选合集",
+  "ui.noWallpaperCollections": "暂无壁纸合集",
   "ui.wallpaper.chooseDescription":
     "选择渐变、图片或网页壁纸，应用到当前桌面。",
   "ui.loadingWallpapers": "正在加载壁纸…",

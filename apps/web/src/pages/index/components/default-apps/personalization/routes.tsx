@@ -6,6 +6,7 @@ import ThemeView from "./views/theme";
 import WallpaperView from "./views/wallpaper";
 import ThemeDetailView from "./views/theme-detail";
 import WallpaperCategoryView from "./views/wallpaper-category";
+import WallpaperCollectionView from "./views/wallpaper-collection";
 import ThemeMyView from "./views/my";
 import ThemeMyEditorView from "./views/my-editor";
 import ThemeMyThemeEditorView from "./views/my-theme-editor";
@@ -15,6 +16,7 @@ const personalizationRouteElements = {
   "personalization.theme": <ThemeView />,
   "personalization.detail": <ThemeDetailView />,
   "personalization.wallpaper-category": <WallpaperCategoryView />,
+  "personalization.wallpaper-collection": <WallpaperCollectionView />,
   "personalization.wallpaper": <WallpaperView />,
   "personalization.my": <ThemeMyView />,
   "personalization.my-create": <ThemeMyEditorView />,
