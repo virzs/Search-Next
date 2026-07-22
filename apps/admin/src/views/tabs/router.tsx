@@ -18,6 +18,10 @@ import DesktopConfigPreview from "./desktop/desktop-config/preview";
 import WallpaperIndex from "./wallpaper";
 import WallpaperCategoryIndex from "./wallpaper/category";
 import WallpaperHandle from "./wallpaper/handle";
+import WallpaperDetail from "./wallpaper/detail";
+import WallpaperCollectionIndex from "./wallpaper/collection";
+import WallpaperCollectionHandle from "./wallpaper/collection/handle";
+import WallpaperCollectionDetail from "./wallpaper/collection/detail";
 import AppIndex from "./app";
 import AppHandle from "./app/handle";
 import AppClassify from "./app/classify";
@@ -53,7 +57,11 @@ export const TabsPaths = {
   // 壁纸相关路径
   wallpaper: "/tabs/wallpaper",
   wallpaperHandle: "/tabs/wallpaper/handle",
+  wallpaperDetail: "/tabs/wallpaper/detail",
   wallpaperCategory: "/tabs/wallpaper/category",
+  wallpaperCollection: "/tabs/wallpaper/collection",
+  wallpaperCollectionHandle: "/tabs/wallpaper/collection/handle",
+  wallpaperCollectionDetail: "/tabs/wallpaper/collection/detail",
   wallpaperUpload: "/tabs/wallpaper/upload",
   // 应用相关路径
   app: "/tabs/app",
@@ -175,6 +183,26 @@ const TabsRouter: RouteObject = {
     {
       path: TabsPaths.wallpaperHandle + "/:id",
       element: <WallpaperHandle />,
+    },
+    {
+      path: TabsPaths.wallpaperDetail + "/:id",
+      element: <WallpaperDetail />,
+    },
+    {
+      path: TabsPaths.wallpaperCollection,
+      element: <WallpaperCollectionIndex />,
+    },
+    {
+      path: TabsPaths.wallpaperCollectionHandle,
+      element: <WallpaperCollectionHandle />,
+    },
+    {
+      path: TabsPaths.wallpaperCollectionHandle + "/:id",
+      element: <WallpaperCollectionHandle />,
+    },
+    {
+      path: TabsPaths.wallpaperCollectionDetail + "/:id",
+      element: <WallpaperCollectionDetail />,
     },
     // 应用路由
     {
@@ -322,6 +350,29 @@ export const TabsMenu: Menu = {
           auth: routeAuth("GET", "/tabs/desktop/wallpaper/category"),
         },
         {
+          name: "合集",
+          path: TabsPaths.wallpaperCollection,
+          auth: routeAuth("GET", "/tabs/desktop/wallpaper/collection"),
+          hideChildrenInMenu: true,
+          children: [
+            {
+              name: "新增",
+              path: TabsPaths.wallpaperCollectionHandle,
+              hideInTab: true,
+            },
+            {
+              name: "编辑",
+              path: TabsPaths.wallpaperCollectionHandle + "/:id",
+              hideInTab: true,
+            },
+            {
+              name: "详情",
+              path: TabsPaths.wallpaperCollectionDetail + "/:id",
+              hideInTab: true,
+            },
+          ],
+        },
+        {
           name: "壁纸",
           path: TabsPaths.wallpaperUpload,
           auth: routeAuth("GET", "/tabs/desktop/wallpaper/upload"),
@@ -335,6 +386,11 @@ export const TabsMenu: Menu = {
             {
               name: "编辑",
               path: TabsPaths.wallpaperHandle + "/:id",
+              hideInTab: true,
+            },
+            {
+              name: "详情",
+              path: TabsPaths.wallpaperDetail + "/:id",
               hideInTab: true,
             },
           ],

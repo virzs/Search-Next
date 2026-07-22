@@ -3,17 +3,66 @@ import Operation from "@/components/TablePage2/Operation";
 import { useTablePage } from "@/hooks/useTablePage2";
 import {
   deleteDesktopWallpaper,
-  getApplicationWallpaperPreviewUrl,
+  getDesktopWallpaperPreviewUrl,
   getDesktopWallpapers,
   toggleDesktopWallpaper,
+  type DesktopWallpaper,
 } from "@/services/tabs/desktop/wallpaper";
-import { Button, Image, message } from "antd";
+import { Button, message, Tooltip } from "antd";
 import { useRequest } from "ahooks";
 import { useNavigate } from "react-router";
 import { RiAddLine } from "@remixicon/react";
 import { TabsPaths } from "../router";
 import { WindowTableColumnType } from "@/components/WindowTable";
 import TablePageContainer from "@/components/containter/table";
+
+const WallpaperNameCell = ({
+  record,
+  onOpen,
+}: {
+  record: DesktopWallpaper;
+  onOpen: () => void;
+}) => {
+  const previewUrl = getDesktopWallpaperPreviewUrl(record);
+  const name = record.name || record.application?.packageName || "未命名壁纸";
+  const content = (
+    <span
+      role="link"
+      tabIndex={0}
+      className="block max-w-full cursor-pointer truncate font-medium text-[var(--ant-color-text)] outline-none focus-visible:text-[var(--ant-color-primary)]"
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        onOpen();
+      }}
+    >
+      {name}
+    </span>
+  );
+
+  if (!previewUrl && record.type !== "gradient") return content;
+  return (
+    <Tooltip
+      placement="right"
+      mouseEnterDelay={0.25}
+      title={
+        <div className="h-[126px] w-[224px] overflow-hidden rounded-md bg-black/5">
+          {record.type === "gradient" ? (
+            <div className="h-full w-full" style={{ background: record.css }} />
+          ) : (
+            <img
+              src={previewUrl || ""}
+              alt={`${name}预览`}
+              className="h-full w-full object-cover"
+            />
+          )}
+        </div>
+      }
+    >
+      {content}
+    </Tooltip>
+  );
+};
 
 const WallpaperIndex = () => {
   const navigate = useNavigate();
@@ -42,63 +91,30 @@ const WallpaperIndex = () => {
     },
   );
 
-  const columns: WindowTableColumnType<any>[] = [
+  const openDetail = (record: DesktopWallpaper) => {
+    if (!record._id) return;
+    navigate(`${TabsPaths.wallpaperDetail}/${record._id}`);
+  };
+
+  const columns: WindowTableColumnType<DesktopWallpaper>[] = [
     {
-      title: "图片",
-      dataIndex: "preview",
-      width: 92,
-      render: (_, record: any) => {
-        const img =
-          record.type === "application"
-            ? getApplicationWallpaperPreviewUrl(record)
-            : record.thumbnail;
-        const src = typeof img === "string" ? img : img?.url;
-        if (!src) return "-";
-        return (
-          <Image
-            src={src}
-            alt=""
-            width={72}
-            height={48}
-            preview={false}
-            style={{ objectFit: "cover", borderRadius: 6 }}
-          />
-        );
-      },
+      title: "名称",
+      dataIndex: "name",
+      width: 180,
+      render: (_, record) => (
+        <WallpaperNameCell record={record} onOpen={() => openDetail(record)} />
+      ),
     },
     {
       title: "类型",
       dataIndex: "type",
       width: 100,
-      render: (type) => (type === "application" ? "网页壁纸" : "图片壁纸"),
-    },
-    { title: "名称", dataIndex: "name" },
-    {
-      title: "版本",
-      dataIndex: ["application", "version"],
-      width: 100,
-      render: (version) => version || "-",
-    },
-    {
-      title: "作者",
-      dataIndex: "author",
-      width: 140,
-      render: (author, record) => author || record.application?.author || "-",
-    },
-    {
-      title: "项目",
-      dataIndex: "url",
-      width: 90,
-      render: (url, record) => {
-        const href = url || record.application?.projectUrl;
-        return href ? (
-          <a href={href} target="_blank" rel="noopener noreferrer">
-            查看
-          </a>
-        ) : (
-          "-"
-        );
-      },
+      render: (type) =>
+        type === "application"
+          ? "网页壁纸"
+          : type === "gradient"
+            ? "渐变壁纸"
+            : "图片壁纸",
     },
     { title: "描述", dataIndex: "description" },
     {
@@ -131,6 +147,38 @@ const WallpaperIndex = () => {
         typeof u === "string" ? u : (u?.username ?? u?.name ?? "-"),
     },
     { title: "更新时间", dataIndex: "updatedAt" },
+    {
+      title: "版本",
+      dataIndex: ["application", "version"],
+      width: 100,
+      render: (version) => version || "-",
+    },
+    {
+      title: "作者",
+      dataIndex: "author",
+      width: 140,
+      render: (author, record) => author || record.application?.author || "-",
+    },
+    {
+      title: "项目",
+      dataIndex: "url",
+      width: 90,
+      render: (url, record) => {
+        const href = url || record.application?.projectUrl;
+        return href ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(event) => event.stopPropagation()}
+          >
+            查看
+          </a>
+        ) : (
+          "-"
+        );
+      },
+    },
     {
       title: "操作",
       dataIndex: "action",
@@ -175,6 +223,7 @@ const WallpaperIndex = () => {
         table={table}
         columns={columns}
         rowKey="_id"
+        onRow={(record) => ({ onClick: () => openDetail(record) })}
         showSearch
         searchPlaceholder="搜索壁纸名称/描述/作者/URL"
         button={

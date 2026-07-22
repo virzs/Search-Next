@@ -1,0 +1,23 @@
+.gradient-picker-responsive,
+.gradient-picker-responsive *,
+.gradient-picker-responsive *::before,
+.gradient-picker-responsive *::after {
+  box-sizing: border-box;
+}
+
+.gradient-picker-responsive [id^="rbgcp-inputs-wrap"] {
+  display: grid !important;
+  grid-template-columns: minmax(76px, 88px) repeat(4, minmax(0, 1fr));
+  column-gap: 4px !important;
+}
+
+.gradient-picker-responsive [id^="rbgcp-inputs-wrap"] > div {
+  width: auto !important;
+  min-width: 0;
+}
+
+.gradient-picker-responsive [id^="rbgcp-inputs-wrap"] input {
+  min-width: 0;
+  padding-inline: 2px !important;
+  font-size: 13px !important;
+}

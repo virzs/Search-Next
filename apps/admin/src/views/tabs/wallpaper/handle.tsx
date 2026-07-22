@@ -29,14 +29,18 @@ import { baseFormItemLayout } from "@/utils/utils";
 import {
   createApplicationWallpaper,
   createDesktopWallpaper,
+  createGradientWallpaper,
   getApplicationWallpaperEntryUrl,
   getApplicationWallpaperPreviewUrl,
   getDesktopWallpaperDetail,
   getEnabledDesktopWallpaperCategories,
   updateApplicationWallpaper,
   updateDesktopWallpaper,
+  updateGradientWallpaper,
   type DesktopWallpaper,
 } from "@/services/tabs/desktop/wallpaper";
+import GradientEditor from "./components/gradient-editor";
+import { isSafeGradientCss } from "./components/gradient-utils";
 
 const buildWallpaperFormValues = (data: DesktopWallpaper) => {
   const image = data?.image;
@@ -52,7 +56,12 @@ const buildWallpaperFormValues = (data: DesktopWallpaper) => {
       : undefined;
   return {
     ...data,
-    type: data?.type === "application" ? "application" : "image",
+    type:
+      data?.type === "application"
+        ? "application"
+        : data?.type === "gradient"
+          ? "gradient"
+          : "image",
     name: data.name || data.application?.packageName,
     description: data.description || data.application?.description,
     author: data.author || data.application?.author,
@@ -74,7 +83,8 @@ const WallpaperHandle = () => {
   const [packageWallpaperId, setPackageWallpaperId] = useState<string>();
   const [packageFileName, setPackageFileName] = useState("");
   const wallpaperType =
-    Form.useWatch<"image" | "application">("type", form) ?? "image";
+    Form.useWatch<"image" | "gradient" | "application">("type", form) ??
+    "image";
   const formAuthor = Form.useWatch<string>("author", form);
   const formUrl = Form.useWatch<string>("url", form);
   const formDescription = Form.useWatch<string>("description", form);
@@ -190,6 +200,19 @@ const WallpaperHandle = () => {
                     targetApplicationId,
                     payload,
                   );
+                } else if (values.type === "gradient") {
+                  const payload = {
+                    name: values?.name,
+                    css: values?.css,
+                    description: values?.description,
+                    author: values?.author || undefined,
+                    url: values?.url || undefined,
+                    categoryId: values?.categoryId || null,
+                    isActive: !!values?.isActive,
+                    sortOrder: Number(values?.sortOrder ?? 0),
+                  };
+                  if (id) await updateGradientWallpaper(id, payload);
+                  else await createGradientWallpaper(payload);
                 } else {
                   const rawImage = values?.image;
                   const imageId =
@@ -232,6 +255,7 @@ const WallpaperHandle = () => {
               disabled={Boolean(id || packageWallpaperId)}
               options={[
                 { label: "图片壁纸", value: "image" },
+                { label: "渐变壁纸", value: "gradient" },
                 { label: "网页壁纸", value: "application" },
               ]}
               rules={[{ required: true, message: "请选择壁纸类型" }]}
@@ -354,6 +378,33 @@ const WallpaperHandle = () => {
                     dir: "wallpaper",
                   }}
                 />
+              </ProCard>
+            ) : null}
+
+            {wallpaperType === "gradient" ? (
+              <ProCard title="渐变配置" className="mb-5" bordered>
+                <Form.Item
+                  name="css"
+                  className="mb-0"
+                  labelCol={{ span: 0 }}
+                  wrapperCol={{ span: 24 }}
+                  rules={[
+                    { required: true, message: "请选择或配置渐变样式" },
+                    {
+                      validator: async (_, value) => {
+                        const css = String(value || "").trim();
+                        if (!css) return;
+                        if (!isSafeGradientCss(css)) {
+                          throw new Error(
+                            "请输入有效且不包含外部资源的 CSS 渐变",
+                          );
+                        }
+                      },
+                    },
+                  ]}
+                >
+                  <GradientEditor />
+                </Form.Item>
               </ProCard>
             ) : null}
           </ProForm>

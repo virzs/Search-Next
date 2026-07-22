@@ -94,7 +94,8 @@ export interface DesktopResource {
 
 export interface DesktopWallpaper {
   _id?: string;
-  type?: "image" | "application";
+  type?: "image" | "gradient" | "application";
+  css?: string;
   image?: string | DesktopResource;
   thumbnail?: string | DesktopResource;
   application?: {
@@ -207,6 +208,34 @@ export const getApplicationWallpaperEntryUrl = (
   return getApiPrefix(
     `/tabs/desktop/wallpaper/runtime/${wallpaper._id}/${wallpaper.application.revision}/entry`,
   ).replace(/\/$/, "");
+};
+
+export const getDesktopWallpaperPreviewUrl = (
+  wallpaper: DesktopWallpaper | null | undefined,
+) => {
+  if (wallpaper?.type === "application") {
+    return getApplicationWallpaperPreviewUrl(wallpaper);
+  }
+  const thumbnail = wallpaper?.thumbnail;
+  const image = wallpaper?.image;
+  if (thumbnail && typeof thumbnail === "object" && thumbnail.url) {
+    return thumbnail.url;
+  }
+  if (image && typeof image === "object" && image.url) return image.url;
+  return null;
+};
+
+export const createGradientWallpaper = (params: DesktopWallpaper) => {
+  return basePostRequest("/tabs/desktop/wallpaper/upload/gradient")(params);
+};
+
+export const updateGradientWallpaper = (
+  id: string,
+  params: DesktopWallpaper,
+) => {
+  return basePutRequestNoId(`/tabs/desktop/wallpaper/upload/${id}/gradient`)(
+    params,
+  );
 };
 
 export const getDesktopWallpapers = (params: any) => {
