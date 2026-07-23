@@ -1,16 +1,22 @@
 [
   {
-    "text": "Guide",
+    "text": "Web 端",
+    "link": "/web/",
+    "activeMatch": "/web/"
+  },
+  {
+    "text": "Admin 端",
+    "link": "/admin/",
+    "activeMatch": "/admin/"
+  },
+  {
+    "text": "常见问题",
+    "link": "/faq",
+    "activeMatch": "/faq"
+  },
+  {
+    "text": "部署与开发",
     "link": "/guide/",
     "activeMatch": "/guide/"
-  },
-  {
-    "text": "Hello world",
-    "link": "/hello/",
-    "activeMatch": "/hello/"
-  },
-  {
-    "text": "API",
-    "link": "https://rspress.dev/api/index.html"
   }
 ]

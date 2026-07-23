@@ -1,5 +1,27 @@
 # 部署与 Nginx 配置
 
+如果不希望在服务器上从源码构建，可以直接从 [GitHub Releases](https://github.com/virzs/Search-Next/releases) 下载已构建的部署文件。
+
+## 从 GitHub Releases 获取部署文件
+
+进入 Releases 页面后，先选择要部署的版本，再在 **Assets** 中下载对应压缩包。完整版本使用 `v<version>` 标签，例如 `v0.14.0`；单项发布使用 `web-v<version>`、`admin-v<version>` 或 `api-v<version>` 等标签，只包含该项目的资产。
+
+| 发布资产 | 用途 | 建议解压目录 |
+| --- | --- | --- |
+| `search-next-api-<version>.zip` | API 单文件构建产物 | `/var/www/search-next/api/` |
+| `search-next-web-<version>.zip` | 用户端静态站点 | `/var/www/search-next/web/` |
+| `search-next-admin-<version>.zip` | 管理端静态站点 | `/var/www/search-next/admin/` |
+| `search-next-docs-<version>.zip` | 文档静态站点（可选） | 文档站点目录 |
+| `release-manifest.json` | 记录发布项目、版本、资产名和文件大小 | 下载后用于核对 |
+
+:::warning 不要下载源码包
+GitHub 自动生成的 **Source code (zip)** 和 **Source code (tar.gz)** 是源码快照，不包含可直接上线的已构建 `dist` 资产。部署时应下载上表中的 `search-next-*.zip`。
+:::
+
+解压后请将 Web、Admin 和 API 部署到各自目录，并确保它们来自同一个版本。上线前可对照 `release-manifest.json` 检查项目名、版本、文件名和文件大小，然后再按下文配置运行环境和 Nginx。
+
+## 部署目录与存储
+
 生产部署建议把 API、用户端主站、管理后台和上传目录分清楚：
 
 ```text

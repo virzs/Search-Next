@@ -826,6 +826,15 @@ importers:
 
   apps/docs:
     dependencies:
+      '@remixicon/react':
+        specifier: ^4.7.0
+        version: 4.8.0(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       rspress:
         specifier: ^1.40.2
         version: 1.47.1(tslib@2.8.1)(webpack@5.107.2(lightningcss@1.30.2))
@@ -850,7 +859,7 @@ importers:
         version: 3.8.3
       typescript-eslint:
         specifier: ^8.22.0
-        version: 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+        version: 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.7.3)
 
   apps/web:
     dependencies:
@@ -16432,6 +16441,10 @@ snapshots:
 
   '@remix-run/router@1.23.3': {}
 
+  '@remixicon/react@4.8.0(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+
   '@remixicon/react@4.8.0(react@19.2.3)':
     dependencies:
       react: 19.2.3
@@ -24682,17 +24695,6 @@ snapshots:
       '@typescript-eslint/utils': 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.7.3)
       eslint: 9.39.2(jiti@2.6.1)
       typescript: 5.7.3
-    transitivePeerDependencies:
-      - supports-color
-
-  typescript-eslint@8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3):
-    dependencies:
-      '@typescript-eslint/eslint-plugin': 8.51.0(@typescript-eslint/parser@8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      '@typescript-eslint/parser': 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      '@typescript-eslint/typescript-estree': 8.51.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.51.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      eslint: 9.39.2(jiti@2.6.1)
-      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
