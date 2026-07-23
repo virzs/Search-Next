@@ -38,5 +38,6 @@ Deploy command: pnpm deploy:docs
 Build output directory: apps/docs/doc_build
 ```
 
-The deploy command uses `apps/docs/wrangler.jsonc` explicitly so Wrangler does
-not try to auto-detect an application from the monorepo root.
+The repository-root `wrangler.jsonc` targets the documentation build, so either
+`pnpm deploy:docs` or the default `npx wrangler deploy` command works from the
+monorepo root without application auto-detection.

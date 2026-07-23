@@ -2,6 +2,6 @@
   "name": "search-next-docs",
   "compatibility_date": "2026-07-23",
   "assets": {
-    "directory": "./doc_build"
+    "directory": "./apps/docs/doc_build"
   }
 }

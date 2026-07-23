@@ -21,7 +21,7 @@
     "preview:prod": "pnpm --filter search-next-web preview:prod",
     "dev:docs": "pnpm --filter search-next-docs dev",
     "build:docs": "pnpm --filter search-next-docs build",
-    "deploy:docs": "npx wrangler deploy --config apps/docs/wrangler.jsonc",
+    "deploy:docs": "npx wrangler deploy --config wrangler.jsonc",
     "build:all": "pnpm build:api && pnpm build:prod && pnpm build:admin && pnpm build:docs && pnpm build:apps",
     "app:create": "node scripts/create-app.mjs",
     "app:pack": "node scripts/pack-app.mjs",
