@@ -2,6 +2,20 @@
 
 `apps/apps` 目录支持通过脚手架创建 React、Vue、Solid 应用。宿主加载协议保持一致：应用入口必须导出 `mount(container, props)`，也可以默认导出该函数；`mount` 返回的函数会在应用卸载时执行。
 
+:::warning 当前需要从源码打包
+GitHub Releases 暂不提供 `.snapp` 应用成品。开发或使用仓库内置应用时，需要先克隆源码并在本地打包。
+:::
+
+## 获取源码与安装依赖
+
+```bash
+git clone https://github.com/virzs/Search-Next.git
+cd Search-Next
+pnpm install --frozen-lockfile
+```
+
+所有应用命令都应在仓库根目录执行。已有应用位于 `apps/apps/<name>`；可通过下面的脚手架命令创建新应用。
+
 ## 创建应用
 
 ```bash
@@ -43,7 +57,25 @@ pnpm --filter <name>-app build
 pnpm app:pack <name>
 ```
 
-打包脚本会读取 `apps/apps/<name>/app.config.json`，通过 pnpm workspace 执行应用自己的 `build`，确保截图清单已生成，再把构建目录完整写入 `dist/apps/<name>-<version>.snapp`。其中 `screenshots/manifest.json` 和 `screenshots/icon/*.png` 会随包一起发布。
+`app:pack` 会自动执行该应用的 `build`，因此只需要成品包时无需先手动构建。打包脚本会读取 `apps/apps/<name>/app.config.json`，确保截图清单已生成，再把构建目录完整写入 `dist/apps/<name>-<version>.snapp`。其中 `screenshots/manifest.json` 和 `screenshots/icon/*.png` 会随包一起发布。
+
+打包全部仓库内应用：
+
+```bash
+pnpm app:pack:all
+```
+
+应用截图默认需要本机安装 Chrome 或 Chromium。可以通过 `APP_SCREENSHOT_CHROME=/path/to/chrome` 指定浏览器路径；临时跳过截图可设置 `APP_SCREENSHOTS=0`，但正式发布的图标模式应用建议保留完整截图。
+
+## 导入后台
+
+打包成功后，在 Admin 端进入 **新标签页 → 应用 → 应用管理**，使用“批量上传”导入：
+
+```text
+dist/apps/<name>-<version>.snapp
+```
+
+导入后核对应用名称、版本、入口文件、图标、可用尺寸和默认尺寸，再启用应用并到 Web 端应用商店与桌面验证。更完整的后台操作说明见 [应用、壁纸与桌面](/admin/apps-desktop)。
 
 ## 框架约定
 

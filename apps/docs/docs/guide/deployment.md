@@ -20,6 +20,10 @@ GitHub 自动生成的 **Source code (zip)** 和 **Source code (tar.gz)** 是源
 
 解压后请将 Web、Admin 和 API 部署到各自目录，并确保它们来自同一个版本。上线前可对照 `release-manifest.json` 检查项目名、版本、文件名和文件大小，然后再按下文配置运行环境和 Nginx。
 
+:::warning Release 暂不包含应用与网页壁纸
+当前 GitHub Releases 只用于 Web、Admin、API 和文档等部署文件，不提供 `.snapp` 应用包或 `.snwall` 网页壁纸包。应用与网页壁纸需要先克隆源码，再分别参考 [应用脚手架](/guide/app-scaffold) 和 [网页壁纸开发](/guide/wallpaper-dev) 自行打包。
+:::
+
 ## 部署目录与存储
 
 生产部署建议把 API、用户端主站、管理后台和上传目录分清楚：
