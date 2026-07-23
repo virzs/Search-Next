@@ -41,7 +41,8 @@ server {
   root /var/www/search-next/web;
   index index.html;
 
-  location /api/ {
+  # ^~ 防止面板或安全模板中的正则 location 拦截 /api/.../runtime/...。
+  location ^~ /api/ {
     proxy_pass http://127.0.0.1:5151/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -86,7 +87,8 @@ server {
   root /var/www/search-next/admin;
   index index.html;
 
-  location /api/ {
+  # ^~ 防止面板或安全模板中的正则 location 拦截 /api/.../runtime/...。
+  location ^~ /api/ {
     proxy_pass http://127.0.0.1:5151/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -149,6 +151,24 @@ location / {
 
 如果缺少这段配置，直接访问或刷新 `/login`、`/dashboard` 等页面时，Nginx 会按真实文件查找，找不到就返回 404。
 
+## 网页壁纸运行接口
+
+网页壁纸的入口、预览和包内资源由 API 动态提供，路径形式为：
+
+```text
+/api/tabs/desktop/wallpaper/runtime/<id>/<revision>/entry
+/api/tabs/desktop/wallpaper/runtime/<id>/<revision>/preview
+/api/tabs/desktop/wallpaper/runtime/<id>/<revision>/assets/...
+```
+
+这些请求不使用 `/static/`，也不应直接映射网页壁纸的存储目录。API 会读取资源，并为入口 HTML 注入运行桥接代码和安全响应头。
+
+部分面板或安全模板会自动添加拦截 `/runtime/` 目录的正则 `location`。普通的 `location /api/` 仍可能被该正则覆盖，因此用户端和管理端都应使用 `location ^~ /api/`。如果普通 API 正常，但网页壁纸运行接口返回 Nginx 的 HTML 404，可以检查完整配置：
+
+```bash
+nginx -T 2>&1 | grep -n -C 4 -i runtime
+```
+
 ## 常见 404 原因
 
 - 只给管理端配置了 `/static/`，用户端域名没有配置。
@@ -156,6 +176,7 @@ location / {
 - API 的 `local_storage_path` 和 Nginx 的 `alias` 指向了不同目录。
 - 上传目录没有持久化，重启或重新部署后文件丢失。
 - `alias` 末尾缺少 `/`。
+- `/api/` 未使用 `^~`，被面板或安全模板中针对 `/runtime/` 的正则规则覆盖，导致网页壁纸入口或预览返回 Nginx HTML 404。
 - 缺少 `location / { try_files $uri $uri/ /index.html; }`，导致刷新 `/login`、`/dashboard` 等前端路由 404。
 
 上线后可以用应用图标验证：

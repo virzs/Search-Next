@@ -215,7 +215,7 @@ pnpm --filter search-next-api start:prod
 
 ### 反向代理示例
 
-主站和 API 同域部署时，可参考下面的 Nginx 配置。重点是 `/api/` 代理到后端时去掉 `/api` 前缀，因为后端路由本身不带该前缀。
+主站和 API 同域部署时，可参考下面的 Nginx 配置。重点是 `/api/` 代理到后端时去掉 `/api` 前缀，因为后端路由本身不带该前缀。`^~` 用于确保 API 请求不会再被面板或安全模板中的正则 `location` 接管，例如针对 `/runtime/` 目录的拦截规则。
 
 ```nginx
 server {
@@ -225,7 +225,7 @@ server {
   root /var/www/search-next/web;
   index index.html;
 
-  location /api/ {
+  location ^~ /api/ {
     proxy_pass http://127.0.0.1:5151/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -260,6 +260,8 @@ server {
 }
 ```
 
+网页壁纸的入口、预览和包内资源使用 `/api/tabs/desktop/wallpaper/runtime/...` 动态提供，不属于 `/static/` 上传文件。如果普通 API 正常，但该路径返回 Nginx 的 HTML 404，请确认 `/api/` 使用了 `location ^~ /api/`，并通过 `nginx -T` 检查是否存在拦截 `/runtime/` 的正则规则。不要为网页壁纸运行目录额外配置 `alias`，否则会绕过后端注入的运行桥接代码和安全响应头。
+
 后台可用另一份静态站点配置，把 `root` 指向 `apps/admin/dist` 的部署目录。若主站域名和后台域名不同，两边都要配置同样的 `/static/` 规则。默认情况下，`web`、`admin`、`api` 在同一个部署目录内，API 从 `/var/www/search-next/api` 启动，上传文件实际位于 `/var/www/search-next/api/assets/uploads/apps/...`，接口返回的资源路径是 `/static/apps/...`。因此 `alias` 必须指向 API 启动目录下的 `assets/uploads/`，不要指向 `assets/uploads/apps/`，否则会拼出 `assets/uploads/apps/apps/...` 并导致 404。
 
 如果你把 `local_storage_path` 改成了绝对路径或共享持久化目录，Nginx 的 `alias` 也必须改成同一个目录。
@@ -278,7 +280,7 @@ location ^~ /static/ {
 
 多域名部署时，建议让所有浏览器可见域名都提供：
 
-- `/api/`：转发到 API 服务，并去掉 `/api` 前缀。
+- `/api/`：使用 `location ^~ /api/` 转发到 API 服务，并去掉 `/api` 前缀。
 - `/static/`：直接 `alias` 到 API 使用的同一个 `assets/uploads/`，或转发到 API 的 `/static/` 静态服务。
 - `/`：回退到对应前端项目的 `index.html`。
 
@@ -293,7 +295,7 @@ location / {
 ### 上线检查
 
 - API 进程已连接生产 MongoDB 与 Redis。
-- `/api` 能正确转发到后端，`/static/apps/<name>/<version>/icon.svg` 能在主站域名和后台域名下同时访问。
+- `/api` 能正确转发到后端，网页壁纸 `/api/tabs/desktop/wallpaper/runtime/...` 不会被 Nginx 正则规则拦截，`/static/apps/<name>/<version>/icon.svg` 能在主站域名和后台域名下同时访问。
 - 主站和后台刷新 `/login`、`/dashboard` 等前端路由都能回退到 `index.html`。
 - 上传目录、MongoDB、Redis 中的重要数据已配置备份。
 - 生产环境不使用仓库中的示例密钥、个人密钥或开发环境配置。
