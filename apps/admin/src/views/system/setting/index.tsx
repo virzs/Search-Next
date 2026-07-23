@@ -14,10 +14,10 @@ import {
   ProFormText,
   ProFormTextArea,
 } from "@ant-design/pro-components";
+import { RiExternalLinkLine, RiSaveLine } from "@remixicon/react";
 import { useRequest } from "ahooks";
 import { Alert, Button, message, Switch } from "antd";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { RiExternalLinkLine } from "@remixicon/react";
 import {
   getRoleList,
   RoleRequest,
@@ -98,17 +98,6 @@ const Setting = () => {
 
   const ref = useRef<ProFormInstance<ProjectData>>(null);
 
-  const resetForm = () => {
-    ref.current?.resetFields();
-    if (data) {
-      requestAnimationFrame(() => {
-        ref.current?.setFieldsValue({
-          ...data,
-        } as any);
-      });
-    }
-  };
-
   const submitForm = () => {
     ref.current?.submit?.();
   };
@@ -134,14 +123,14 @@ const Setting = () => {
         },
         bodyStyle: { background: "#f7f8fa" },
         extra: (
-          <>
-            <Button onClick={resetForm} disabled={submitting}>
-              重置
-            </Button>
-            <Button type="primary" onClick={submitForm} loading={submitting}>
-              保存设置
-            </Button>
-          </>
+          <Button
+            type="primary"
+            icon={<RiSaveLine size={16} />}
+            onClick={submitForm}
+            loading={submitting}
+          >
+            保存设置
+          </Button>
         ),
       }}
     >

@@ -1,4 +1,6 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import ProFormUpload from "@/components/pro-form/fields/upload";
 import { baseFormItemLayout } from "@/utils/utils";
 import {
@@ -188,7 +190,7 @@ const AppCollectionHandle: FC = () => {
   }, [classifyOptionsData]);
 
   return (
-    <FullPageContainer loading={detailLoading}>
+    <FormPageContainer form={ref} loading={detailLoading}>
       <div className="max-w-5xl mx-auto py-6">
         <ProForm<CollectionFormValues>
           {...baseFormItemLayout}
@@ -196,7 +198,7 @@ const AppCollectionHandle: FC = () => {
           initialValues={initialValues}
           submitter={{
             searchConfig: { submitText: "保存" },
-            render: (_: any, dom: any) => <div className="flex items-center justify-center gap-2">{dom}</div>,
+            render: (_: any, dom: any) => <FormPageActions>{dom}</FormPageActions>,
           }}
           onFinish={async (values) => {
             const range = values.effectiveRange;
@@ -415,7 +417,7 @@ const AppCollectionHandle: FC = () => {
           }}
         />
       </div>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

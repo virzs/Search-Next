@@ -1,6 +1,7 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer from "@/components/containter/form";
 import { ProFormEditor } from "@/components/pro-form";
 import { SnippetsOutlined } from "@ant-design/icons";
+import { RiSaveLine } from "@remixicon/react";
 import {
   getLegalDocumentDraft,
   publishLegalDocument,
@@ -54,6 +55,7 @@ const LegalDocumentHandle = () => {
   const [requiresReconfirmation, setRequiresReconfirmation] = useState(true);
   const [preview, setPreview] = useState<LegalFormValues | null>(null);
   const [editorVersion, setEditorVersion] = useState(0);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const {
     data: draft,
@@ -103,6 +105,7 @@ const LegalDocumentHandle = () => {
           },
     );
     setEditorVersion((value) => value + 1);
+    setHasUnsavedChanges(false);
   }, [documentType, draft]);
 
   const getValidatedValues = async () => {
@@ -115,6 +118,7 @@ const LegalDocumentHandle = () => {
     const values = await getValidatedValues();
     if (!values) return;
     await persistDraft(documentType, values);
+    setHasUnsavedChanges(false);
     message.success("草稿已保存");
     loadDraft(documentType);
   };
@@ -131,6 +135,7 @@ const LegalDocumentHandle = () => {
     const apply = () => {
       formRef.current?.setFieldsValue(getLegalDocumentTemplate(documentType));
       setEditorVersion((value) => value + 1);
+      setHasUnsavedChanges(true);
       message.success("推荐模板已填充");
     };
     const values = formRef.current?.getFieldsValue() as
@@ -190,7 +195,9 @@ const LegalDocumentHandle = () => {
   };
 
   return (
-    <FullPageContainer
+    <FormPageContainer
+      form={formRef}
+      hasUnsavedChanges={() => hasUnsavedChanges}
       loading={detailLoading}
       title={
         documentType ? `编辑${documentLabels[documentType]}` : "编辑文档"
@@ -202,7 +209,11 @@ const LegalDocumentHandle = () => {
               填充模板
             </Button>
             <Button onClick={previewDraft}>预览</Button>
-            <Button onClick={() => void submitDraft()} loading={saving}>
+            <Button
+              icon={<RiSaveLine size={16} />}
+              onClick={() => void submitDraft()}
+              loading={saving}
+            >
               保存草稿
             </Button>
             <Button type="primary" onClick={() => setPublishOpen(true)}>
@@ -220,6 +231,7 @@ const LegalDocumentHandle = () => {
         />
         <ProForm<LegalFormValues>
           formRef={formRef}
+          onValuesChange={() => setHasUnsavedChanges(true)}
           submitter={false}
           layout="vertical"
           initialValues={{
@@ -338,7 +350,7 @@ const LegalDocumentHandle = () => {
           </div>
         ) : null}
       </Modal>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

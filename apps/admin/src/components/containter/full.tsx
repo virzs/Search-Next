@@ -38,7 +38,7 @@ const FullPageContainer: FC<FullPageContainerProps> = (props) => {
               : undefined
           }
           extra={
-            <Space>
+            <Space wrap size={[8, 8]}>
               {extra}
               {showBackButton && <BackButton {...backButtonProps} />}
             </Space>

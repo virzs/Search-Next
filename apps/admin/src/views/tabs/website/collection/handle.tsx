@@ -1,4 +1,6 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import { baseFormItemLayout } from "@/utils/utils";
 import { ProForm, ProFormColorPicker, ProFormDateRangePicker, ProFormDigit, ProFormInstance, ProFormSelect, ProFormSwitch, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
 import ProFormUpload from "@/components/pro-form/fields/upload";
@@ -161,7 +163,7 @@ const WebsiteCollectionHandle: FC = () => {
   }, [intervalUnit, intervalValue]);
 
   return (
-    <FullPageContainer loading={detailLoading}>
+    <FormPageContainer form={ref} loading={detailLoading}>
       <div className="max-w-5xl mx-auto py-6">
         <ProForm<CollectionFormValues>
           {...baseFormItemLayout}
@@ -169,7 +171,7 @@ const WebsiteCollectionHandle: FC = () => {
           initialValues={initialValues}
           submitter={{
             searchConfig: { submitText: "保存" },
-            render: (_: any, dom: any) => <div className="flex items-center justify-center gap-2">{dom}</div>,
+            render: (_: any, dom: any) => <FormPageActions>{dom}</FormPageActions>,
           }}
           onFinish={async (values: CollectionFormValues) => {
             const range = values.effectiveRange;
@@ -415,7 +417,7 @@ const WebsiteCollectionHandle: FC = () => {
           }}
         />
       </div>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

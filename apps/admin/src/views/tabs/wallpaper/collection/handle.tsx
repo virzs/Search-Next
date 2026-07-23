@@ -1,4 +1,6 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import ProFormUpload from "@/components/pro-form/fields/upload";
 import {
   getEnabledDesktopWallpaperCategories,
@@ -194,7 +196,7 @@ const WallpaperCollectionHandle: FC = () => {
   }, [categoryData]);
 
   return (
-    <FullPageContainer loading={loading}>
+    <FormPageContainer form={formRef} loading={loading}>
       <div className="mx-auto max-w-5xl py-6">
         <ProForm<CollectionFormValues>
           {...baseFormItemLayout}
@@ -217,7 +219,7 @@ const WallpaperCollectionHandle: FC = () => {
           submitter={{
             searchConfig: { submitText: "保存" },
             render: (_, dom) => (
-              <div className="flex justify-center gap-2">{dom}</div>
+              <FormPageActions>{dom}</FormPageActions>
             ),
           }}
           onFinish={async (values) => {
@@ -497,7 +499,7 @@ const WallpaperCollectionHandle: FC = () => {
           }}
         />
       </div>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

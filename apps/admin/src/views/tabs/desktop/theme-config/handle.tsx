@@ -1,4 +1,4 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer from "@/components/containter/form";
 import { ProForm, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
 import { Desktop, DesktopListItem, desktopThemeDark, desktopThemeLight } from "zs_library";
 import defaultList from "./default-list.json";
@@ -103,7 +103,8 @@ const DesktopThemeConfigHandle = () => {
   };
 
   return (
-    <FullPageContainer
+    <FormPageContainer
+      form={form}
       cardProps={{
         title: <Steps size="small" current={activeStep} items={[{ title: "基础信息" }, { title: "主题配置" }]} />,
         extra: (
@@ -130,9 +131,6 @@ const DesktopThemeConfigHandle = () => {
             </Button>
           </>
         ),
-      }}
-      backButtonProps={{
-        confirm: true,
       }}
       loading={detailLoading}
     >
@@ -240,7 +238,7 @@ const DesktopThemeConfigHandle = () => {
           )}
         </AnimatePresence>
       </ProForm>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

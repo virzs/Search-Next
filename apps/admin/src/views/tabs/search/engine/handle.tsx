@@ -1,9 +1,10 @@
-import BasePageContainer from "@/components/containter/base";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import { baseFormItemLayout } from "@/utils/utils";
-import { RollbackOutlined, SearchOutlined, ExperimentOutlined } from "@ant-design/icons";
+import { SearchOutlined, ExperimentOutlined } from "@ant-design/icons";
 import {
   ProForm,
-  ProCard,
   ProFormInstance,
   ProFormText,
   ProFormTextArea,
@@ -290,16 +291,7 @@ const SearchEngineHandle: FC = () => {
   }, [id]);
 
   return (
-    <BasePageContainer loading={detailLoading}>
-      <ProCard
-        extra={
-          <Space>
-            <Button icon={<RollbackOutlined />} onClick={() => navigate(-1)}>
-              返回
-            </Button>
-          </Space>
-        }
-      >
+    <FormPageContainer form={ref} loading={detailLoading}>
         <div className="max-w-5xl mx-auto py-6">
           <ProForm
             {...baseFormItemLayout}
@@ -310,7 +302,7 @@ const SearchEngineHandle: FC = () => {
             }}
             submitter={{
               searchConfig: { submitText: "保存" },
-              render: (_, dom) => <div className="flex items-center justify-center gap-2">{...dom}</div>,
+              render: (_, dom) => <FormPageActions>{dom}</FormPageActions>,
             }}
             onFinish={async (values) => {
               const payload: any = {
@@ -486,9 +478,8 @@ const SearchEngineHandle: FC = () => {
             </ProFormDependency>
           </ProForm>
         </div>
-      </ProCard>
       {contextHolder}
-    </BasePageContainer>
+    </FormPageContainer>
   );
 };
 

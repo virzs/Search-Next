@@ -1,4 +1,6 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import {
   ProForm,
   ProFormDateRangePicker,
@@ -7,7 +9,7 @@ import {
   ProFormText,
 } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
-import { message, Space } from "antd";
+import { message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -114,16 +116,15 @@ const NoticeHandle = () => {
   };
 
   return (
-    <FullPageContainer loading={detailLoading}>
+    <FormPageContainer form={ref} loading={detailLoading}>
       <ProForm<NoticeFormValues>
         {...baseFormItemLayout}
         formRef={ref}
         onFinish={handleFinish}
         initialValues={{ enable: true }}
         submitter={{
-          render: (_, dom) => (
-            <Space className="w-full justify-center">{dom}</Space>
-          ),
+          searchConfig: { submitText: "保存" },
+          render: (_, dom) => <FormPageActions>{dom}</FormPageActions>,
           submitButtonProps: {
             loading: addLoading || editLoading,
           },
@@ -167,7 +168,7 @@ const NoticeHandle = () => {
           }}
         />
       </ProForm>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

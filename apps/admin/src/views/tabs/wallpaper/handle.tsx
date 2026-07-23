@@ -1,4 +1,6 @@
-import BasePageContainer from "@/components/containter/base";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import ProFormUpload from "@/components/pro-form/fields/upload";
 import {
   ProCard,
@@ -20,7 +22,6 @@ import {
   Typography,
   Upload,
 } from "antd";
-import { RollbackOutlined } from "@ant-design/icons";
 import { RiUploadCloud2Line } from "@remixicon/react";
 import { useNavigate, useParams } from "react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -159,14 +160,7 @@ const WallpaperHandle = () => {
     );
 
   return (
-    <BasePageContainer loading={detailLoading}>
-      <ProCard
-        extra={
-          <Button icon={<RollbackOutlined />} onClick={() => navigate(-1)}>
-            返回
-          </Button>
-        }
-      >
+    <FormPageContainer form={form} loading={detailLoading}>
         <div className="max-w-5xl mx-auto py-6">
           <ProForm
             {...baseFormItemLayout}
@@ -174,11 +168,7 @@ const WallpaperHandle = () => {
             initialValues={{ type: "image", isActive: true, sortOrder: 0 }}
             submitter={{
               searchConfig: { submitText: "保存" },
-              render: (_, dom) => (
-                <div className="flex items-center justify-center gap-2">
-                  {...dom}
-                </div>
-              ),
+              render: (_, dom) => <FormPageActions>{dom}</FormPageActions>,
             }}
             onFinish={async (values) => {
               try {
@@ -501,8 +491,7 @@ const WallpaperHandle = () => {
             </ProCard>
           ) : null}
         </div>
-      </ProCard>
-    </BasePageContainer>
+    </FormPageContainer>
   );
 };
 

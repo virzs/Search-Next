@@ -1,9 +1,11 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import { PermissionListData, getPermissionTree } from "@/services/system/permission";
 import { RoleRequest, detailRolePermissions, postRole, putRole } from "@/services/system/role";
 import { baseFormItemLayout } from "@/utils/utils";
 import { useRequest } from "ahooks";
-import { Alert, Button, Form, Input, message, Space, Tree } from "antd";
+import { Alert, Button, Form, Input, message, Tree } from "antd";
 import type { DataNode } from "antd/es/tree";
 import type { Key } from "react";
 import { FC, useEffect, useMemo } from "react";
@@ -135,7 +137,7 @@ const RoleHandle = () => {
   };
 
   return (
-    <FullPageContainer loading={pLoading || loading}>
+    <FormPageContainer form={form} loading={pLoading || loading}>
       <div className="max-w-5xl mx-auto">
         {isSystemRole ? (
           <Alert className="mb-4" message="系统内置角色不可修改，也不需要配置具体权限。" type="info" showIcon />
@@ -161,18 +163,15 @@ const RoleHandle = () => {
             <PermissionTreeField treeData={permissionTreeData} assignableKeys={assignablePermissionKeys} />
           </Form.Item>
           {!isSystemRole ? (
-            <Form.Item wrapperCol={{ offset: 6, span: 14 }}>
-              <Space>
-                <Button type="primary" htmlType="submit">
-                  保存
-                </Button>
-                <Button onClick={() => navigate(-1)}>取消</Button>
-              </Space>
-            </Form.Item>
+            <FormPageActions>
+              <Button type="primary" onClick={() => form.submit()}>
+                保存
+              </Button>
+            </FormPageActions>
           ) : null}
         </Form>
       </div>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

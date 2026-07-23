@@ -7,7 +7,9 @@ import { useNavigate, useParams } from "react-router";
 import { addApp, getAppDetail, updateApp, uploadAppPackage, AppItem, AppScreenshot, AppSettingsField } from "@/services/tabs/app";
 import { useRequest } from "ahooks";
 import { getAllAppClassify } from "@/services/tabs/app_classify";
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import ProFormUpload from "@/components/pro-form/fields/upload";
 import { RiUploadCloud2Line } from "@remixicon/react";
 import Access from "@/components/Access";
@@ -316,7 +318,7 @@ const AppHandle: FC = () => {
   );
 
   return (
-    <FullPageContainer loading={detailLoading}>
+    <FormPageContainer form={ref} loading={detailLoading}>
       <div className="max-w-5xl mx-auto py-6">
         <ProForm
           {...baseFormItemLayout}
@@ -335,7 +337,7 @@ const AppHandle: FC = () => {
           submitter={{
             searchConfig: { submitText: "保存" },
             render: (_, dom) =>
-              canSave ? <div className="flex items-center justify-center gap-2">{...dom}</div> : null,
+              canSave ? <FormPageActions>{dom}</FormPageActions> : null,
           }}
           onFinish={async (values: AppItem) => {
             const payload = normalizeAppPayload(values);
@@ -645,7 +647,7 @@ const AppHandle: FC = () => {
           </Form.Item>
         </ProForm>
       </div>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

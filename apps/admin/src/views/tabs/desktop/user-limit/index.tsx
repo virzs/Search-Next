@@ -18,7 +18,9 @@ import {
   DesktopUserLimitResponse,
 } from "@/services/tabs/desktop/user-limit";
 import { getRoleList, RoleRequest } from "@/services/system/role";
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 
 const DesktopUserLimitConfig: FC = () => {
   const ref = useRef<ProFormInstance<any>>(null);
@@ -81,7 +83,11 @@ const DesktopUserLimitConfig: FC = () => {
   }, []);
 
   return (
-    <FullPageContainer loading={detailLoading} showBackButton={false}>
+    <FormPageContainer
+      form={ref}
+      loading={detailLoading}
+      showBackButton={false}
+    >
       <div className="max-w-4xl mx-auto py-6">
         <ProForm
           {...baseFormItemLayout}
@@ -95,7 +101,7 @@ const DesktopUserLimitConfig: FC = () => {
           }}
           submitter={{
             searchConfig: { submitText: "保存配置" },
-            render: (_, dom) => <div className="flex items-center justify-center gap-2">{...dom}</div>,
+            render: (_, dom) => <FormPageActions>{dom}</FormPageActions>,
             resetButtonProps: false,
           }}
           onFinish={async (values) => {
@@ -243,7 +249,7 @@ const DesktopUserLimitConfig: FC = () => {
         </ProForm>
       </div>
       {contextHolder}
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

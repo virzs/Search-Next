@@ -1,4 +1,6 @@
-import BasePageContainer from "@/components/containter/base";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import {
   addProvider,
   AddProviderData,
@@ -9,7 +11,6 @@ import {
 } from "@/services/ai/providers";
 import { baseFormItemLayout } from "@/utils/utils";
 import {
-  ProCard,
   ProForm,
   ProFormDigit,
   ProFormSelect,
@@ -17,7 +18,6 @@ import {
   ProFormText,
   ProFormTextArea,
 } from "@ant-design/pro-components";
-import { RollbackOutlined } from "@ant-design/icons";
 import { RiWifiLine } from "@remixicon/react";
 import { useRequest } from "ahooks";
 import { App, Button, Form, Space } from "antd";
@@ -112,21 +112,25 @@ const ProvidersHandle = () => {
   };
 
   return (
-    <BasePageContainer loading={detailLoading}>
+    <FormPageContainer
+      form={form}
+      loading={detailLoading}
+      title={id ? "修改服务商" : "新增服务商"}
+      backButtonProps={{ onBack: () => navigate(PROVIDERS_PATH) }}
+      cardProps={{
+        extra: (
+          <Button
+            icon={<RiWifiLine size={16} />}
+            disabled={!id}
+            loading={testLoading}
+            onClick={handleTest}
+          >
+            测试连接
+          </Button>
+        ),
+      }}
+    >
       <Space direction="vertical" size={16} style={{ width: "100%" }}>
-        <ProCard
-          title={id ? "修改服务商" : "新增服务商"}
-          extra={
-            <Space>
-              <Button icon={<RollbackOutlined />} onClick={() => navigate(PROVIDERS_PATH)}>
-                返回
-              </Button>
-              <Button icon={<RiWifiLine size={16} />} disabled={!id} loading={testLoading} onClick={handleTest}>
-                测试连接
-              </Button>
-            </Space>
-          }
-        >
           <div className="max-w-5xl mx-auto py-6">
             <ProForm<AddProviderData>
               {...baseFormItemLayout}
@@ -139,7 +143,7 @@ const ProvidersHandle = () => {
               }}
               submitter={{
                 searchConfig: { submitText: "保存" },
-                render: (_, dom) => <div className="flex items-center justify-center gap-2">{...dom}</div>,
+                render: (_, dom) => <FormPageActions>{dom}</FormPageActions>,
               }}
               onFinish={async (values) => {
                 try {
@@ -147,11 +151,14 @@ const ProvidersHandle = () => {
                     const nextDetail = await updateProvider(id, values);
                     message.success("修改成功");
                     setDetail(nextDetail || { ...detail, ...values });
+                    form.resetFields();
+                    form.setFieldsValue(nextDetail || { ...detail, ...values });
                     detailRun(id);
                   } else {
                     const created: any = await addProvider(values);
                     const nextId = created?._id || created?.id;
                     message.success("新增成功");
+                    form.resetFields();
                     if (nextId) {
                       navigate(`${PROVIDER_HANDLE_PATH}/${nextId}`, { replace: true });
                     } else {
@@ -206,7 +213,6 @@ const ProvidersHandle = () => {
               <ProFormSwitch name="enabled" label="是否启用" />
             </ProForm>
           </div>
-        </ProCard>
         <ProviderModelsSection
           key={`${id || "new"}-${modelsRefreshKey}`}
           providerId={id}
@@ -215,7 +221,7 @@ const ProvidersHandle = () => {
           onSync={handleSync}
         />
       </Space>
-    </BasePageContainer>
+    </FormPageContainer>
   );
 };
 

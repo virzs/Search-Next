@@ -1,4 +1,6 @@
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer, {
+  FormPageActions,
+} from "@/components/containter/form";
 import {
   detailVersion,
   getLatestVersion,
@@ -327,7 +329,10 @@ const VersionHandle = () => {
   ];
 
   return (
-    <FullPageContainer title={id ? "编辑版本" : "新增版本"}>
+    <FormPageContainer
+      form={ref}
+      title={id ? "编辑版本" : "新增版本"}
+    >
       <div className="mx-auto max-w-4xl py-8">
         {id && legacyPlatforms.length > 1 ? (
           <Alert
@@ -347,11 +352,7 @@ const VersionHandle = () => {
               submitText: id ? "保存" : "发布版本",
             },
             render(_, dom) {
-              return (
-                <div className="flex items-center justify-center gap-2">
-                  {...dom}
-                </div>
-              );
+              return <FormPageActions>{dom}</FormPageActions>;
             },
           }}
           onFinish={async (values: any) => {
@@ -397,7 +398,7 @@ const VersionHandle = () => {
           columns={columns}
         />
       </div>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 

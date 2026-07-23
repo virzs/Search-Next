@@ -8,7 +8,7 @@ import DesktopEditor, {
   DesktopEditorToolbar,
   type DesktopThemeType,
 } from "./components/desktop-editor";
-import FullPageContainer from "@/components/containter/full";
+import FormPageContainer from "@/components/containter/form";
 import { App, Button, Steps } from "antd";
 import { RiSaveLine } from "@remixicon/react";
 import { useEffect, useState } from "react";
@@ -101,8 +101,8 @@ const DesktopHandle = () => {
   }, [globalDesktopThemeType, hasCustomDesktopThemeType]);
 
   return (
-    <FullPageContainer
-      backButtonProps={{ confirm: true }}
+    <FormPageContainer
+      form={form}
       title={
         activeStep === 0 ? (
           <Steps
@@ -215,7 +215,7 @@ const DesktopHandle = () => {
           )}
         </AnimatePresence>
       </ProForm>
-    </FullPageContainer>
+    </FormPageContainer>
   );
 };
 
